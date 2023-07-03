@@ -52,7 +52,6 @@ public class StatefulPersistenceContext implements PersistenceContext {
 
     @Override
     public Proxy getCachedDatabaseSnapshot(EntityKey key) {
-
         return entitySnapshotsByKey.get(key);
     }
 

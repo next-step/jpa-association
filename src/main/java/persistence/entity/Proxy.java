@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import static persistence.entity.PersistenceContext.NO_ROW;
+
 public class Proxy {
     private final Class<?> clazz;
     private final Object object;
