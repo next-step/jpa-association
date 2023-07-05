@@ -47,20 +47,15 @@ public class BasicEntityManger implements EntityManager {
     @Override
     public void persist(Object entity) {
         String insertQuery = insertQueryBuilder.insert(entity);
-        jdbcTemplate.execute(insertQuery);
-
-        Long id = setGeneratedId(entity);
+        Long id = jdbcTemplate.insert(insertQuery);
+        setGeneratedId(entity, id);
         persistenceContext.addEntity(id, entity);
         persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
-    private Long setGeneratedId(Object entity) {
-        String selectLastSavedQuery = selectQueryBuilder.findFirst(entity.getClass());
-        Object savedEntity = jdbcTemplate.queryForObject(selectLastSavedQuery, new RowMapperImpl<>(entity.getClass()));
+    private void setGeneratedId(Object entity, Long id) {
         AccessibleField idField = getAccessibleField(entity);
-        Long idFieldValue = (Long) idField.getValue(savedEntity);
-        idField.setValue(entity, idFieldValue);
-        return idFieldValue;
+        idField.setValue(entity, id);
     }
 
     @Override
