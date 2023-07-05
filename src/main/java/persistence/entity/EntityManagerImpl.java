@@ -9,14 +9,14 @@ import static persistence.entity.PersistenceContext.NO_ROW;
 
 public class EntityManagerImpl implements EntityManager {
     private final transient StatefulPersistenceContext persistenceContext;
-    private final QueryBuilder queryBuilder;
+    private final EntityLoader queryBuilder;
 
-    private EntityManagerImpl(StatefulPersistenceContext persistenceContext, QueryBuilder queryBuilder) {
+    private EntityManagerImpl(StatefulPersistenceContext persistenceContext, EntityLoader queryBuilder) {
         this.persistenceContext = persistenceContext;
         this.queryBuilder = queryBuilder;
     }
 
-    public EntityManagerImpl(QueryBuilder queryBuilder) {
+    public EntityManagerImpl(EntityLoader queryBuilder) {
         this(initStatefulPersistenceContext(), queryBuilder);
     }
 

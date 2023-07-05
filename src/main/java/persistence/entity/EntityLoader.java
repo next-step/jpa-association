@@ -7,14 +7,14 @@ import persistence.sql.ddl.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class QueryBuilder {
+public class EntityLoader {
     private final SelectQueryBuilder selectQueryBuilder;
     private final DeleteQueryBuilder deleteQueryBuilder;
     private final InsertQueryBuilder insertQueryBuilder;
     private final UpdateQueryBuilder updateQueryBuilder;
     private final JdbcTemplate jdbcTemplate;
 
-    protected QueryBuilder(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, InsertQueryBuilder insertQueryBuilder, UpdateQueryBuilder updateQueryBuilder, JdbcTemplate jdbcTemplate) {
+    protected EntityLoader(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, InsertQueryBuilder insertQueryBuilder, UpdateQueryBuilder updateQueryBuilder, JdbcTemplate jdbcTemplate) {
         this.selectQueryBuilder = selectQueryBuilder;
         this.deleteQueryBuilder = deleteQueryBuilder;
         this.insertQueryBuilder = insertQueryBuilder;
