@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import persistence.sql.ddl.CreateDdlBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.ddl.InsertQueryBuilder;
-import persistence.sql.ddl.ReflectiveRowMapper;
+import persistence.entity.EntityLoader;
 import persistence.sql.ddl.h2.H2CreateDdlBuilder;
 import persistence.sql.ddl.h2.H2DropQueryBuilder;
 import persistence.sql.ddl.h2.H2InsertQueryBuilder;
@@ -47,12 +47,12 @@ public class DatabaseTest {
     }
 
     public Object queryForObject(String query) {
-        ReflectiveRowMapper<Person> mapper = new ReflectiveRowMapper<>(Person.class);
+        EntityLoader<Person> mapper = new EntityLoader<>(Person.class);
         return jdbcTemplate.queryForObject(query, mapper);
     }
 
     protected List<Person> query(String sql) {
-        ReflectiveRowMapper<Person> mapper = new ReflectiveRowMapper<>(Person.class);
+        EntityLoader<Person> mapper = new EntityLoader<>(Person.class);
         return jdbcTemplate.query(sql, mapper);
     }
 

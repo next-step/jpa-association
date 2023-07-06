@@ -1,51 +1,61 @@
 package persistence.entity;
 
-import jakarta.persistence.Id;
-import jdbc.JdbcTemplate;
-import persistence.sql.ddl.*;
+import jakarta.persistence.Column;
+import jdbc.RowMapper;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public class EntityLoader {
-    private final SelectQueryBuilder selectQueryBuilder;
-    private final DeleteQueryBuilder deleteQueryBuilder;
-    private final InsertQueryBuilder insertQueryBuilder;
-    private final UpdateQueryBuilder updateQueryBuilder;
-    private final JdbcTemplate jdbcTemplate;
+public class EntityLoader<T> implements RowMapper<T> {
+    private final Class<T> targetType;
+    private final Map<String, String> columnMap;
 
-    protected EntityLoader(SelectQueryBuilder selectQueryBuilder, DeleteQueryBuilder deleteQueryBuilder, InsertQueryBuilder insertQueryBuilder, UpdateQueryBuilder updateQueryBuilder, JdbcTemplate jdbcTemplate) {
-        this.selectQueryBuilder = selectQueryBuilder;
-        this.deleteQueryBuilder = deleteQueryBuilder;
-        this.insertQueryBuilder = insertQueryBuilder;
-        this.updateQueryBuilder = updateQueryBuilder;
-        this.jdbcTemplate = jdbcTemplate;
+    public EntityLoader(Class<T> targetType) {
+        this.targetType = targetType;
+        this.columnMap = Arrays.stream(targetType.getDeclaredFields())
+                .collect(Collectors.toMap(this::columnName, Field::getName));
+
     }
 
-    protected <T> Object findById(Class<T> clazz, Long key) {
-        String sql = selectQueryBuilder.findById(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), String.valueOf(key));
-        ReflectiveRowMapper<T> mapper = new ReflectiveRowMapper<>(clazz);
+    @Override
+    public T mapRow(ResultSet resultSet) throws SQLException {
+        ResultSetMetaData meta = resultSet.getMetaData();
+        int columnCount = meta.getColumnCount();
+        T targetObject = null;
+        try {
+            targetObject = targetType.getDeclaredConstructor().newInstance();
+            
+            for (int i = 0; i < columnCount; i++) {
+                String alias = meta.getColumnLabel(i + 1);
+                String name = meta.getColumnName(i + 1);
+                Field field = targetType.getDeclaredField(columnMap.get(alias.toLowerCase()));
+                field.setAccessible(true);
 
-        return jdbcTemplate.queryForObject(sql, mapper);
+                Object value = resultSet.getObject(name);
+                field.set(targetObject, value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return targetObject;
     }
 
-    protected <T> void delete(Class<T> clazz, Long key) {
-        jdbcTemplate.execute(deleteQueryBuilder.delete(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), key.toString()));
-    }
+    private String columnName(Field field) {
+        Column columnAnnotation = field.getAnnotation(Column.class);
 
-    public void save(Object entity) {
-        insertQueryBuilder.createInsertBuild(entity);
-    }
+        if (columnAnnotation == null) {
+            return field.getName();
+        }
 
-    public void update(Long key, String tableName, Object entity) {
-        jdbcTemplate.execute(updateQueryBuilder.createUpdateBuild(key, tableName, ColumnMap.of(entity)));
-    }
+        if (columnAnnotation.name().equals("")) {
+            return field.getName();
+        }
 
-    private Field unique(Field[] field) {
-        return Arrays.stream(field)
-                .filter(it -> it.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
+        return columnAnnotation.name();
     }
-
 }

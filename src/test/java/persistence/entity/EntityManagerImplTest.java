@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 class EntityManagerImplTest extends DatabaseTest {
-    private EntityLoader queryBuilder;
+    private QueryBuilder queryBuilder;
 
     @BeforeEach
     public void beforeEach() throws SQLException {
         super.beforeEach();
-        queryBuilder = new EntityLoader(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), new H2InsertQueryBuilder(), new H2UpdateQueryBuilder(), jdbcTemplate);
+        queryBuilder = new QueryBuilder(new H2SelectQueryBuilder(), new H2DeleteQueryBuilder(), new H2InsertQueryBuilder(), new H2UpdateQueryBuilder(), jdbcTemplate);
     }
 
     @Test
