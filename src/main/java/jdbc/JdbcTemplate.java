@@ -13,6 +13,19 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
+    public Long insert(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        throw new RuntimeException();
+    }
+
     public void execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
             statement.execute(sql);
@@ -23,7 +36,10 @@ public class JdbcTemplate {
 
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return rowMapper.mapRow(resultSet);
+            if (resultSet.next()) {
+                return rowMapper.mapRow(resultSet);
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
