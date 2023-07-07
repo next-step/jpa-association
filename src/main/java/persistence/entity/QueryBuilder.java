@@ -24,7 +24,7 @@ public class QueryBuilder {
 
     protected <T> Object findById(Class<T> clazz, Long key) {
         String sql = selectQueryBuilder.findById(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), String.valueOf(key));
-        ReflectiveRowMapper<T> mapper = new ReflectiveRowMapper<>(clazz);
+        EntityLoader<T> mapper = new EntityLoader<>(clazz);
 
         return jdbcTemplate.queryForObject(sql, mapper);
     }
