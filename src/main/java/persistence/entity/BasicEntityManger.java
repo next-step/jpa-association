@@ -2,28 +2,27 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
-import jdbc.RowMapperImpl;
 import persistence.common.AccessibleField;
 import persistence.common.Fields;
 import persistence.context.BasicPersistentContext;
 import persistence.context.PersistenceContext;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
-import persistence.sql.dml.builder.SelectQueryBuilder;
 import persistence.sql.dml.builder.UpdateQueryBuilder;
 import persistence.sql.dml.column.DmlColumns;
 
 public class BasicEntityManger implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final JdbcTemplate jdbcTemplate;
-    private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
+    private final EntityLoader entityLoader;
     private final InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.INSTANCE;
     private final DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
     private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
 
-    public BasicEntityManger(JdbcTemplate jdbcTemplate) {
+    public BasicEntityManger(JdbcTemplate jdbcTemplate, EntityLoader entityLoader) {
         this.persistenceContext = new BasicPersistentContext();
         this.jdbcTemplate = jdbcTemplate;
+        this.entityLoader = entityLoader;
     }
 
     @Override
@@ -33,8 +32,7 @@ public class BasicEntityManger implements EntityManager {
             return (T) entity;
         }
 
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
-        T selectedEntity = jdbcTemplate.queryForObject(selectQuery, new RowMapperImpl<>(clazz));
+        T selectedEntity = entityLoader.load(clazz, id);
         if (selectedEntity == null) {
             return null;
         }
