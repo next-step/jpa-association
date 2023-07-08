@@ -14,4 +14,6 @@ public interface EntityManager {
     void detach(Object entity);
 
     boolean isDirty(Object entity);
+
+    boolean isNew(Object entity);
 }

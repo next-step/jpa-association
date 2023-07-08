@@ -30,9 +30,9 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final String query = hasEntity(entity)
-                ? dml.getUpdateQuery(entity)
-                : dml.getInsertQuery(entity);
+        final String query = isNew(entity)
+                ? dml.getInsertQuery(entity)
+                : dml.getUpdateQuery(entity);
         jdbcTemplate.execute(query);
         context.addEntity(entity);
         context.getDatabaseSnapshot(
@@ -69,10 +69,18 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public boolean isDirty(Object entity) {
-        return !hasEntity(entity) || !EntityHelper.equals(
+        return !EntityHelper.equals(
                 entity,
                 context.getCachedDatabaseSnapshot(new EntityKey<>(entity))
         );
+    }
+
+    @Override
+    public boolean isNew(Object entity) {
+        return !find(
+                entity.getClass(),
+                new EntityKey(entity).getEntityId()
+        ).isPresent();
     }
 
     private <T> Optional<T> findFromDB(EntityKey<T> key) {
@@ -89,12 +97,5 @@ public class EntityManagerImpl implements EntityManager {
         return Optional.of(context.getDatabaseSnapshot(
                 new EntityKey<>(entity), entity
         ));
-    }
-
-    private boolean hasEntity(Object entity) {
-        return find(
-                entity.getClass(),
-                new EntityKey(entity).getEntityId()
-        ).isPresent();
     }
 }
