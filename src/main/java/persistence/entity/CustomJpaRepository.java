@@ -8,9 +8,6 @@ public class CustomJpaRepository<T, ID> {
     }
 
     public T save(T t) {
-        if (entityManager.isDirty(t)) {
-            entityManager.merge(t);
-        }
-        return t;
+        return entityManager.persist(t);
     }
 }
