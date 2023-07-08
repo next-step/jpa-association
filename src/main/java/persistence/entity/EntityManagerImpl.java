@@ -29,17 +29,16 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public <T> T persist(T entity) {
-        if (!isDirty(entity)) {
-            return entity;
-        }
+    public void persist(Object entity) {
         final String query = hasEntity(entity)
                 ? dml.getUpdateQuery(entity)
                 : dml.getInsertQuery(entity);
         jdbcTemplate.execute(query);
         context.addEntity(entity);
-        saveSnapshot(new EntityKey(entity));
-        return entity;
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity),
+                EntityHelper.clone(entity)
+        );
     }
 
     @Override
@@ -52,6 +51,19 @@ public class EntityManagerImpl implements EntityManager {
                 entity.getClass(),
                 key.getEntityId()
         ));
+        context.removeEntity(entity);
+    }
+
+    @Override
+    public void merge(Object entity) {
+        persist(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
+        );
+    }
+
+    @Override
+    public void detach(Object entity) {
         context.removeEntity(entity);
     }
 
@@ -84,12 +96,5 @@ public class EntityManagerImpl implements EntityManager {
                 entity.getClass(),
                 new EntityKey(entity).getEntityId()
         ).isPresent();
-    }
-
-    private void saveSnapshot(EntityKey key) {
-        final Object snapshot = EntityHelper.clone(
-                context.getEntity(key)
-        );
-        context.getDatabaseSnapshot(key, snapshot);
     }
 }
