@@ -75,6 +75,7 @@ public class BasicEntityManger implements EntityManager {
             String updateQuery = updateQueryBuilder.update(entity);
             jdbcTemplate.execute(updateQuery);
             persistenceContext.getDatabaseSnapshot(id, entity);
+            persistenceContext.addEntity(id, entity);
         }
 
         return entity;
