@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import jdbc.RowMapperImpl;
 import persistence.sql.dml.DmlBuilder;
 
 import java.util.List;
@@ -80,7 +79,7 @@ public class EntityManagerImpl implements EntityManager {
         Class<T> clazz = key.getEntityClass();
         List<T> entities = jdbcTemplate.query(
                 dml.getFindByIdQuery(clazz, key.getEntityId()),
-                new RowMapperImpl<>(clazz)
+                new EntityLoader<>(clazz)
         );
         if (entities.isEmpty()) {
             return Optional.empty();
