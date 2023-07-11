@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
@@ -23,9 +24,10 @@ class EntityManagerTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        server = new H2();
-        jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityManager = new BasicEntityManger(jdbcTemplate);
+        Connection connection = new H2().getConnection();
+        jdbcTemplate = new JdbcTemplate(connection);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+        entityManager = new BasicEntityManger(jdbcTemplate, entityLoader);
 
         createTable(Person.class, jdbcTemplate);
     }

@@ -8,7 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.BasicEntityManger;
+import persistence.entity.EntityLoader;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import static fixture.PersonFixtures.createPerson;
@@ -23,8 +25,10 @@ class CustomJpaRepositoryTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        jdbcTemplate = new JdbcTemplate(new H2().getConnection());
-        repository = new CustomJpaRepository<>(new BasicEntityManger(jdbcTemplate));
+        Connection connection = new H2().getConnection();
+        jdbcTemplate = new JdbcTemplate(connection);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+        repository = new CustomJpaRepository<>(new BasicEntityManger(jdbcTemplate, entityLoader));
 
         createTable(Person.class, jdbcTemplate);
     }
