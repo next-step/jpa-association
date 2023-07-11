@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import jdbc.RowMapperImpl;
 import persistence.sql.dml.DmlBuilder;
 
 import java.util.List;
@@ -31,9 +30,9 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        final String query = hasEntity(entity)
-                ? dml.getUpdateQuery(entity)
-                : dml.getInsertQuery(entity);
+        final String query = isNew(entity)
+                ? dml.getInsertQuery(entity)
+                : dml.getUpdateQuery(entity);
         jdbcTemplate.execute(query);
         context.addEntity(entity);
         context.getDatabaseSnapshot(
@@ -70,17 +69,25 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public boolean isDirty(Object entity) {
-        return !hasEntity(entity) || !EntityHelper.equals(
+        return !EntityHelper.equals(
                 entity,
                 context.getCachedDatabaseSnapshot(new EntityKey<>(entity))
         );
+    }
+
+    @Override
+    public boolean isNew(Object entity) {
+        return !find(
+                entity.getClass(),
+                new EntityKey(entity).getEntityId()
+        ).isPresent();
     }
 
     private <T> Optional<T> findFromDB(EntityKey<T> key) {
         Class<T> clazz = key.getEntityClass();
         List<T> entities = jdbcTemplate.query(
                 dml.getFindByIdQuery(clazz, key.getEntityId()),
-                new RowMapperImpl<>(clazz)
+                new EntityLoader<>(clazz)
         );
         if (entities.isEmpty()) {
             return Optional.empty();
@@ -90,12 +97,5 @@ public class EntityManagerImpl implements EntityManager {
         return Optional.of(context.getDatabaseSnapshot(
                 new EntityKey<>(entity), entity
         ));
-    }
-
-    private boolean hasEntity(Object entity) {
-        return find(
-                entity.getClass(),
-                new EntityKey(entity).getEntityId()
-        ).isPresent();
     }
 }
