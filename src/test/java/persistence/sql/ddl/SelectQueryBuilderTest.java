@@ -44,6 +44,6 @@ class SelectQueryBuilderTest extends DatabaseTest {
 
         String actual = selectQueryBuilder.findByIdByJoin(entityMeta, 1L);
 
-        assertThat(actual).isEqualTo("select * from orders join order_items on orders.id=order_items.id where orders.id=1");
+        assertThat(actual).isEqualTo("select orders.* from orders join order_items on orders.id=order_items.order_id where orders.id=1");
     }
 }

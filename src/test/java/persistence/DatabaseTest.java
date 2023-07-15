@@ -42,6 +42,8 @@ public class DatabaseTest {
     void afterEach() {
         DropQueryBuilder dropQueryBuilder = new H2DropQueryBuilder();
         jdbcTemplate.execute(dropQueryBuilder.createQueryBuild(Person.class));
+        jdbcTemplate.execute(dropQueryBuilder.createQueryBuild(Order.class));
+        jdbcTemplate.execute(dropQueryBuilder.createQueryBuild(OrderItem.class));
 
         server.stop();
     }
