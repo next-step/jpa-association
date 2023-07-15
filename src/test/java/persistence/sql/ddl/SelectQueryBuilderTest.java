@@ -1,9 +1,9 @@
 package persistence.sql.ddl;
 
-import domain.Person;
+import domain.Order;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
-import persistence.sql.ddl.h2.H2InsertQueryBuilder;
+import persistence.EntityMeta;
 import persistence.sql.ddl.h2.H2SelectQueryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,5 +35,15 @@ class SelectQueryBuilderTest extends DatabaseTest {
                 () -> assertThat(actual).isEqualTo("select * from users where id=1"),
                 () -> assertNotNull(queryForObject(actual))
         );
+    }
+
+    @Test
+    void findById_hasJoin() {
+        SelectQueryBuilder selectQueryBuilder = new H2SelectQueryBuilder();
+        EntityMeta entityMeta = EntityMeta.ofJoin(Order.class);
+
+        String actual = selectQueryBuilder.findByIdByJoin(entityMeta, 1L);
+
+        assertThat(actual).isEqualTo("select * from orders join order_items on orders.id=order_items.id where orders.id=1");
     }
 }

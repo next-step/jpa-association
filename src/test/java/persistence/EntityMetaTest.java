@@ -31,9 +31,9 @@ class EntityMetaTest {
     void unique_id() {
         EntityMeta entityMeta = EntityMeta.of(Person.class);
 
-        String uniqueColumn = entityMeta.uniqueColumn();
+        String uniqueColumn = entityMeta.uniqueColumn(entityMeta.tableName());
 
-        assertThat(uniqueColumn).isEqualTo("id");
+        assertThat(uniqueColumn).isEqualTo("users.id");
     }
 
     @Test
