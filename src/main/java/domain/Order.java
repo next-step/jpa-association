@@ -2,7 +2,6 @@ package domain;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,5 +30,9 @@ public class Order {
     }
 
     public Order() {
+    }
+
+    public int orderItemCount() {
+        return orderItems.size();
     }
 }

@@ -51,6 +51,8 @@ public class EntityLoader<T> implements RowMapper<T> {
                 }
             }
 
+            List<Object> items = null;
+            Field joinField = null;
             for (Field field : targetType.getDeclaredFields()) {
                 if (field.isAnnotationPresent(OneToMany.class)) {
                     Class<?> fieldType = field.getType();
@@ -58,15 +60,26 @@ public class EntityLoader<T> implements RowMapper<T> {
                         ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                         Class<?> listItemType = (Class<?>) genericType.getActualTypeArguments()[0];
 
-                        List<Object> items = makeOneToMany(resultSet, listItemType);
-                        field.setAccessible(true);
-                        field.set(targetObject, items);
+                        if (items == null) {
+                            items = makeOneToMany(resultSet, listItemType);
+                            joinField = field;
+                        } else {
+                            items.addAll(makeOneToMany(resultSet, listItemType));
+                        }
+
                     }
                 }
             }
+
+            if (joinField != null) {
+                joinField.setAccessible(true);
+                joinField.set(targetObject, items);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return targetObject;
     }
 
@@ -86,16 +99,21 @@ public class EntityLoader<T> implements RowMapper<T> {
 
     private List<Object> makeOneToMany(ResultSet resultSet, Class<?> listItemType) throws SQLException {
         List<Object> items = new ArrayList<>();
+        boolean isLoop = true;
+        while (isLoop) {
+            Object item;
+            try {
+                item = listItemType.getDeclaredConstructor().newInstance();
+                mapDataFields(item, resultSet);
+                items.add(item);
 
-        Object item;
-        try {
-            item = listItemType.getDeclaredConstructor().newInstance();
-            mapDataFields(item, resultSet);
-            items.add(item);
-        } catch (Exception e) {
-            e.printStackTrace();
+                if (!resultSet.next()) {
+                    isLoop = false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
         return items;
     }
 

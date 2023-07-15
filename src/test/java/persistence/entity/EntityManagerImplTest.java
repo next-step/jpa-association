@@ -41,7 +41,10 @@ class EntityManagerImplTest extends DatabaseTest {
 
         Order actual = entityManager.find(Order.class, 1L);
 
-        assertNotNull(actual);
+        assertAll(
+                () -> assertNotNull(actual),
+                () -> assertEquals(actual.orderItemCount(), 2)
+        );
     }
 
     @Test
