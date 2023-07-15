@@ -3,6 +3,7 @@ package persistence.sql.ddl;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import persistence.CustomTable;
 import persistence.dialect.DdlType;
 import persistence.dialect.Dialect;
 import persistence.dialect.TypeJavaClassMappings;
@@ -22,7 +23,7 @@ public abstract class CreateDdlBuilder {
         return new StringBuilder()
                 .append(dialect.getCreateTableString())
                 .append(" ")
-                .append(clazz.getSimpleName().toLowerCase())
+                .append(CustomTable.of(clazz).name())
                 .append(" (")
                 .append(idColumn(clazz.getDeclaredFields()))
                 .append(columns(clazz.getDeclaredFields()))

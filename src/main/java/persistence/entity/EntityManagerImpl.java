@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.Id;
+import persistence.CustomTable;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -26,7 +27,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long key) {
-        EntityKey entityKey = EntityKey.of(key, clazz.getSimpleName());
+        EntityKey entityKey = EntityKey.of(key, CustomTable.of(clazz).name());
         if (persistenceContext.containsEntity(entityKey)) {
             return clazz.cast(persistenceContext.getEntity(entityKey));
         }
@@ -94,10 +95,10 @@ public class EntityManagerImpl implements EntityManager {
     public void update(Class<?> clazz, Proxy proxy) throws IllegalAccessException {
         Object entity = proxy.entity();
         Object key = getKey(entity);
-        EntityKey entityKey = EntityKey.of(getKey(entity), entity.getClass().getSimpleName());
+        EntityKey entityKey = EntityKey.of(getKey(entity), CustomTable.of(entity.getClass()).name());
 
         Proxy changedProxy = proxy.toDirty(persistenceContext.getCachedDatabaseSnapshot(entityKey));
-        queryBuilder.update((Long) key, clazz.getSimpleName(), changedProxy.entity());
+        queryBuilder.update((Long) key, CustomTable.of(clazz).name(), changedProxy.entity());
     }
 
     private Field unique(Field[] field) {

@@ -63,7 +63,6 @@ public class ColumnMap {
         return name;
     }
 
-
     private static String getFieldValue(Field field, Object object) {
         try {
             field.setAccessible(true);
@@ -75,5 +74,9 @@ public class ColumnMap {
 
     public Collection<Map.Entry<String, String>> entrySet() {
         return map.entrySet();
+    }
+
+    public String get(String alias) {
+        return map.get(alias);
     }
 }
