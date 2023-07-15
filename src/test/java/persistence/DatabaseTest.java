@@ -67,7 +67,7 @@ public class DatabaseTest {
 
         Person person = new Person("slow", 20, "email@email.com", 1);
         Order order = new Order("orderNumber1");
-        OrderItem orderItem  = new OrderItem("productName", 1, 1);
+        OrderItem orderItem  = new OrderItem("productName", 10, 1);
 
         execute(insertQueryBuilder.createInsertBuild(person));
         execute(insertQueryBuilder.createInsertBuild(order));
