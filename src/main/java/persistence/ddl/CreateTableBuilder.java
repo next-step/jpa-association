@@ -1,14 +1,14 @@
 package persistence.ddl;
 
 import persistence.Columns;
-import persistence.Table;
+import persistence.CustomTable;
 
 public class CreateTableBuilder {
     private static final String KEYWORD = "create table %s (%s);";
-    private final Table table;
+    private final CustomTable table;
     private final Columns columns;
 
-    public CreateTableBuilder(Table table, Columns columns) {
+    public CreateTableBuilder(CustomTable table, Columns columns) {
         this.table = table;
         this.columns = columns;
     }

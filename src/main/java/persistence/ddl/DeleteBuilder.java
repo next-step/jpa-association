@@ -1,12 +1,12 @@
 package persistence.ddl;
 
-import persistence.Table;
+import persistence.CustomTable;
 
 public class DeleteBuilder {
     private static final String KEYWORD = "DELETE FROM %s WHERE %s = %s";
-    private final Table table;
+    private final CustomTable table;
 
-    public DeleteBuilder(Table table) {
+    public DeleteBuilder(CustomTable table) {
         this.table = table;
     }
 
