@@ -14,7 +14,7 @@ public abstract class SelectQueryBuilder {
 
     public String findByIdByJoin(EntityMeta entityMeta, Object id) {
         return new StringBuilder()
-                .append(String.format("select * from %s", entityMeta.tableName()))
+                .append(String.format("select %s.* from %s", entityMeta.tableName(), entityMeta.tableName()))
                 .append(String.format(" join %s", entityMeta.joinTableName()))
                 .append(String.format(" on %s=%s", entityMeta.joinRootColumn(), entityMeta.joinJoinColumn()))
                 .append(String.format(" where %s=%s", entityMeta.uniqueColumn(entityMeta.tableName()), id))

@@ -13,9 +13,9 @@ public class CustomJoinTable {
     private final String rootTable;
     private final String joinTable;
     private final UniqueColumn rootColumn;
-    private final UniqueColumn joinColumn;
+    private final String joinColumn;
 
-    public CustomJoinTable(String rootTable, String joinTable, UniqueColumn rootColumn, UniqueColumn joinColumn) {
+    public CustomJoinTable(String rootTable, String joinTable, UniqueColumn rootColumn, String joinColumn) {
         this.rootTable = rootTable;
         this.joinTable = joinTable;
         this.rootColumn = rootColumn;
@@ -30,15 +30,24 @@ public class CustomJoinTable {
                 CustomTable.of(clazz).name(),
                 getJoinTable(table),
                 UniqueColumn.of(clazz),
-                UniqueColumn.of(clazz)
+                getJoinColumn(clazz)
         );
+    }
+
+    private static <T> String getJoinColumn(Class<T> clazz) {
+        Field field =Arrays.stream(clazz.getDeclaredFields())
+                .filter(it -> it.isAnnotationPresent(JoinColumn.class))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+        
+        return field.getAnnotation(JoinColumn.class).name();
     }
 
     public static String getJoinTable(Table table) {
         return table.name();
     }
 
-    private static <T> Table findTableFiled(Class<T> clazz) {
+    public static <T> Table findTableFiled(Class<T> clazz) {
         Optional<Field> joinField = getJoinField(clazz);
 
         if (joinField.isEmpty()) {
@@ -57,10 +66,6 @@ public class CustomJoinTable {
                 .findFirst();
     }
 
-    public boolean hasJoin() {
-        return joinTable != null;
-    }
-
     public String joinTable() {
         return joinTable;
     }
@@ -70,6 +75,6 @@ public class CustomJoinTable {
     }
 
     public String joinColumn() {
-        return String.format("%s.%s", joinTable, joinColumn.name());
+        return String.format("%s.%s", joinTable, joinColumn);
     }
 }

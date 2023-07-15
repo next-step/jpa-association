@@ -2,6 +2,7 @@ package domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,10 +21,15 @@ public class Order {
     private List<OrderItem> orderItems;
 
     public Order(String orderNumber) {
+        this(null, orderNumber, null);
+    }
+
+    public Order(Long id, String orderNumber, List<OrderItem> orderItems) {
+        this.id = id;
         this.orderNumber = orderNumber;
+        this.orderItems = orderItems;
     }
 
     public Order() {
-        
     }
 }

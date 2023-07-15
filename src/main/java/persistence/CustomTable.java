@@ -19,7 +19,7 @@ public class CustomTable implements Node {
         }
         return table.name();
     }
-    
+
     @Override
     public String expression() {
         return name;

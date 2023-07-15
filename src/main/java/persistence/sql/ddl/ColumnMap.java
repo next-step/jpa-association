@@ -2,6 +2,7 @@ package persistence.sql.ddl;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
@@ -24,6 +25,7 @@ public class ColumnMap {
         Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(field -> field.getAnnotation(Transient.class) == null)
                 .filter(field -> field.getAnnotation(Id.class) == null)
+                .filter(field -> field.getAnnotation(JoinColumn.class) == null)
                 .forEach(field -> map.put(columnName(field), getFieldValue(field, object)));
 
         return new ColumnMap(map);

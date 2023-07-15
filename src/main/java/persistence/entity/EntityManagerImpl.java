@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import persistence.CustomTable;
+import persistence.EntityMeta;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -32,10 +33,19 @@ public class EntityManagerImpl implements EntityManager {
             return clazz.cast(persistenceContext.getEntity(entityKey));
         }
 
-        Object object = queryBuilder.findById(clazz, key);
+        Object object = extracted(clazz, key);
+
         persistenceContext.addEntity(entityKey, object);
 
         return clazz.cast(persistenceContext.getEntity(entityKey));
+    }
+
+    private <T> Object extracted(Class<T> clazz, Long key) {
+        if(EntityMeta.hasJoin(clazz)) {
+            return queryBuilder.findByIdJoin(clazz, key);
+        }
+
+        return queryBuilder.findById(clazz, key);
     }
 
     @Override

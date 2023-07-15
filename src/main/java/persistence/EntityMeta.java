@@ -71,4 +71,8 @@ public class EntityMeta {
     public String joinJoinColumn() {
         return customJoinTable.joinColumn();
     }
+
+    public static boolean hasJoin(Class<?> clazz) {
+        return CustomJoinTable.findTableFiled(clazz) != null;
+    }
 }
