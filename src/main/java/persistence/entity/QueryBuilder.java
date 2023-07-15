@@ -31,7 +31,7 @@ public class QueryBuilder {
     }
 
     protected <T> void delete(Class<T> clazz, Long key) {
-        jdbcTemplate.execute(deleteQueryBuilder.delete(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), key.toString()));
+        jdbcTemplate.execute(deleteQueryBuilder.delete(CustomTable.of(clazz).name(), unique(clazz.getDeclaredFields()).getName(), key.toString()));
     }
 
     public void save(Object entity) {

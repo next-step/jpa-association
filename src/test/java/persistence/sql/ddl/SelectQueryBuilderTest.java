@@ -16,10 +16,10 @@ class SelectQueryBuilderTest extends DatabaseTest {
         SelectQueryBuilder selectQueryBuilder = new H2SelectQueryBuilder();
         insertDb();
 
-        String actual = selectQueryBuilder.findAll("person");
+        String actual = selectQueryBuilder.findAll("users");
 
         assertAll(
-                () -> assertThat(actual).isEqualTo("select * from person"),
+                () -> assertThat(actual).isEqualTo("select * from users"),
                 () -> assertThat(query(actual)).hasSize(1)
         );
     }
@@ -29,10 +29,10 @@ class SelectQueryBuilderTest extends DatabaseTest {
         SelectQueryBuilder selectQueryBuilder = new H2SelectQueryBuilder();
         insertDb();
 
-        String actual = selectQueryBuilder.findById("person", "id", "1");
+        String actual = selectQueryBuilder.findById("users", "id", "1");
 
         assertAll(
-                () -> assertThat(actual).isEqualTo("select * from person where id=1"),
+                () -> assertThat(actual).isEqualTo("select * from users where id=1"),
                 () -> assertNotNull(queryForObject(actual))
         );
     }

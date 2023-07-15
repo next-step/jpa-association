@@ -46,7 +46,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Class<?> clazz, Object entity) throws IllegalAccessException {
         Object key = getKey(entity);
-        EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
+        EntityKey entityKey = EntityKey.of((Long) key, CustomTable.of(clazz).name());
 
         queryBuilder.save(entity);
         persistenceContext.addEntity(entityKey, entity);
@@ -126,6 +126,6 @@ public class EntityManagerImpl implements EntityManager {
     private EntityKey getEntityKey(Object entity) throws IllegalAccessException {
         Class<?> clazz = entity.getClass();
         Object key = getKey(entity);
-        return EntityKey.of((Long) key, clazz.getSimpleName());
+        return EntityKey.of((Long) key, CustomTable.of(clazz).name());
     }
 }

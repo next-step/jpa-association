@@ -14,7 +14,7 @@ class DropQueryBuilderTest {
 
         String actual = dropQueryBuilder.createQueryBuild(Person.class);
 
-        assertThat(actual).isEqualTo("drop table Person");
+        assertThat(actual).isEqualTo("drop table users");
     }
 
 }
