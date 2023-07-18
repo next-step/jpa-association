@@ -2,6 +2,8 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import domain.PersonFixture;
 import jdbc.JdbcTemplate;
@@ -15,6 +17,7 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.DmlBuilder;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,12 +48,14 @@ class EntityManagerImplTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.execute(
-                ddl.getDropQuery(Person.class)
-        );
-        jdbcTemplate.execute(
+        List.of(
+                ddl.getDropQuery(Person.class),
+                ddl.getDropQuery(OrderItem.class),
+                ddl.getDropQuery(Order.class),
+                ddl.getCreateQuery(Order.class),
+                ddl.getCreateQuery(OrderItem.class),
                 ddl.getCreateQuery(Person.class)
-        );
+        ).forEach(jdbcTemplate::execute);
         entityManager = new EntityManagerImpl(
                 new StatefulPersistenceContext(),
                 jdbcTemplate, dml
