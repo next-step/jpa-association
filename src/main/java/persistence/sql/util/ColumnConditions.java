@@ -2,9 +2,9 @@ package persistence.sql.util;
 
 import java.util.stream.Collectors;
 
-public final class ColumnConditions {
-    private static final String DELIMITER = ", ";
+import static persistence.sql.util.StringConstant.DELIMITER;
 
+public final class ColumnConditions {
     private ColumnConditions() {}
 
     public static String forUpsert(Object entity) {

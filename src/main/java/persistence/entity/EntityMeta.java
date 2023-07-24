@@ -16,7 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static persistence.sql.util.StringConstant.DELIMITER;
+
 public class EntityMeta {
+    private final Class parentClass;
     private final String tableName;
     private final List<String> columnNames;
     private final String pkName;
@@ -25,6 +28,7 @@ public class EntityMeta {
     private final EntityMeta childMeta;
 
     public EntityMeta(Class clazz) {
+        this.parentClass = clazz;
         this.tableName = findTableName(clazz);
         this.pkName = findPkName(clazz);
         this.fkName = findFkName(clazz);
@@ -98,6 +102,10 @@ public class EntityMeta {
         }
     }
 
+    public Class getParentClass() {
+        return parentClass;
+    }
+
     public String getTableName() {
         return tableName;
     }
@@ -108,8 +116,8 @@ public class EntityMeta {
 
     public String joinColumnNames(String prefix) {
         return getColumnNames().stream().map(
-                columnName -> String.format("%s.%s", prefix, columnName)
-        ).collect(Collectors.joining(", "));
+                columnName -> formatColumn(prefix, columnName)
+        ).collect(Collectors.joining(DELIMITER));
     }
 
     public String getPkName() {
@@ -122,13 +130,9 @@ public class EntityMeta {
 
     public String getFKCondition(String parentPrefix, String childPrefix) {
         return new StringBuilder()
-                .append(parentPrefix)
-                .append(".")
-                .append(pkName)
+                .append(formatColumn(parentPrefix, pkName))
                 .append(" = ")
-                .append(childPrefix)
-                .append(".")
-                .append(fkName)
+                .append(formatColumn(childPrefix, fkName))
                 .toString();
     }
 
@@ -138,5 +142,15 @@ public class EntityMeta {
 
     public EntityMeta getChildMeta() {
         return childMeta;
+    }
+
+    public boolean isOneToMany() {
+        return fkName != null
+                && childClass != null
+                && childMeta != null;
+    }
+
+    private String formatColumn(String prefix, String columnName) {
+        return String.format("%s.%s", prefix, columnName);
     }
 }

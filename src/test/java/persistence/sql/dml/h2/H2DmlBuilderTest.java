@@ -1,10 +1,12 @@
 package persistence.sql.dml.h2;
 
+import domain.Order;
 import domain.Person;
 import domain.PersonFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityMeta;
 import persistence.sql.dml.DmlBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +27,20 @@ class H2DmlBuilderTest {
                 + " VALUES ('고정완', 30, 'ghojeong@email.com')";
         assertThat(
                 dml.getInsertQuery(PersonFixture.createPerson())
+        ).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("Order Entity 를 위한 join 쿼리를 생성한다.")
+    void eagerJoinQuery() {
+        String expected = "SELECT"
+                + " t1.id, t1.order_number,"
+                + " t2.id, t2.product, t2.quantity, t2.order_id"
+                + " FROM orders AS t1"
+                + " INNER JOIN order_items AS t2"
+                + " ON t1.id = t2.order_id";
+        assertThat(
+                dml.getEagerJoinQuery(new EntityMeta(Order.class))
         ).isEqualTo(expected);
     }
 

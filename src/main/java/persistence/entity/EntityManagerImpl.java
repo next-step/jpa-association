@@ -18,6 +18,21 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
+    public <T> List<T> findAll(Class<T> clazz) {
+        EntityMeta meta = new EntityMeta(clazz);
+        if (meta.isOneToMany()) {
+            return jdbcTemplate.query(
+                    dml.getEagerJoinQuery(meta),
+                    new EntityLoader<>(clazz)
+            );
+        }
+        return jdbcTemplate.query(
+                dml.getFindAllQuery(clazz),
+                new EntityLoader<>(clazz)
+        );
+    }
+
+    @Override
     public <T> Optional<T> find(Class<T> clazz, Object id) {
         EntityKey<T> key = new EntityKey<>(clazz, id);
         if (!context.hasEntity(key)) {

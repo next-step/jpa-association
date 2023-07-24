@@ -82,11 +82,10 @@ class EntityManagerImplTest {
         entityManager.persist(person);
         entityManager.remove(person);
         assertThat(
-                entityManager.find(
-                        person.getClass(),
-                        personId
-                ).isPresent()
-        ).isFalse();
+                entityManager.findAll(
+                        person.getClass()
+                ).isEmpty()
+        ).isTrue();
     }
 
     @Test

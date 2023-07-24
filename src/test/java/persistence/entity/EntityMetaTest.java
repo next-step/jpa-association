@@ -20,6 +20,13 @@ class EntityMetaTest {
     }
 
 
+    @DisplayName("부모 엔티티 클래스 정보를 가져올 수 있다.")
+    @Test
+    void getParentClass() {
+        assertThat(meta.getParentClass())
+                .isEqualTo(Order.class);
+    }
+
     @DisplayName("테이블 이름 정보를 가져올 수 있다.")
     @Test
     void getTableName() {
@@ -72,6 +79,13 @@ class EntityMetaTest {
                 .isEqualTo(OrderItem.class);
     }
 
+    @DisplayName("조인 쿼리를 생성할 수 있는지 여부를 알 수 있다.")
+    @Test
+    void isOneToMany() {
+        assertThat(meta.isOneToMany())
+                .isTrue();
+    }
+
     @DisplayName("조인되는 자식의 클래스 정보를 Meta 객체 형태로 가공할 수 있다.")
     @Test
     void getChildMeta() {
@@ -91,7 +105,9 @@ class EntityMetaTest {
                 () -> assertThat(childMeta.getPkName())
                         .isEqualTo("id"),
                 () -> assertThat(childMeta.getFkName())
-                        .isEqualTo(null)
+                        .isEqualTo(null),
+                () -> assertThat(childMeta.isOneToMany())
+                        .isFalse()
         );
     }
 }
