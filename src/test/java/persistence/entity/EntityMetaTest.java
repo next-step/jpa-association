@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -34,21 +32,11 @@ class EntityMetaTest {
                 .isEqualTo("orders");
     }
 
-    @DisplayName("칼럼 이름 정보들을 가져올 수 있다.")
-    @Test
-    void getColumnNames() {
-        assertThat(meta.getColumnNames())
-                .isEqualTo(List.of(
-                        "id",
-                        "order_number"
-                ));
-    }
-
-    @DisplayName("칼럼 이름들을 조합해서 하나의 String 으로 만들 수 있다.")
+    @DisplayName("칼럼 이름과 별명을 조합해서 하나의 String 으로 만들 수 있다.")
     @Test
     void joinColumnNames() {
         assertThat(meta.joinColumnNames("t1"))
-                .isEqualTo("t1.id, t1.order_number");
+                .isEqualTo("t1.id AS t1_id, t1.order_number AS t1_order_number");
     }
 
     @DisplayName("테이블의 PK 이름을 가져올 수 있다.")
@@ -93,15 +81,8 @@ class EntityMetaTest {
         assertAll(
                 () -> assertThat(childMeta.getTableName())
                         .isEqualTo("order_items"),
-                () -> assertThat(childMeta.getColumnNames())
-                        .isEqualTo(List.of(
-                                "id",
-                                "product",
-                                "quantity",
-                                "order_id"
-                        )),
                 () -> assertThat(childMeta.joinColumnNames("t2"))
-                        .isEqualTo("t2.id, t2.product, t2.quantity, t2.order_id"),
+                        .isEqualTo("t2.id AS t2_id, t2.product AS t2_product, t2.quantity AS t2_quantity, t2.order_id AS t2_order_id"),
                 () -> assertThat(childMeta.getPkName())
                         .isEqualTo("id"),
                 () -> assertThat(childMeta.getFkName())

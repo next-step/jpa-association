@@ -21,10 +21,12 @@ public class EntityManagerImpl implements EntityManager {
     public <T> List<T> findAll(Class<T> clazz) {
         EntityMeta meta = new EntityMeta(clazz);
         if (meta.isOneToMany()) {
-            return jdbcTemplate.query(
+            OneToManyEntityLoader<T> loader = new OneToManyEntityLoader<>(clazz);
+            jdbcTemplate.query(
                     dml.getEagerJoinQuery(meta),
-                    new EntityLoader<>(clazz)
+                    loader
             );
+            return loader.collectDistinct();
         }
         return jdbcTemplate.query(
                 dml.getFindAllQuery(clazz),

@@ -3,6 +3,7 @@ package persistence.entity;
 import database.DatabaseServer;
 import database.H2;
 import domain.Order;
+import domain.OrderFixture;
 import domain.OrderItem;
 import domain.Person;
 import domain.PersonFixture;
@@ -56,6 +57,8 @@ class EntityManagerImplTest {
                 ddl.getCreateQuery(OrderItem.class),
                 ddl.getCreateQuery(Person.class)
         ).forEach(jdbcTemplate::execute);
+        jdbcTemplate.execute(OrderFixture.INSERT_ORDERS);
+        jdbcTemplate.execute(OrderFixture.INSERT_ORDER_ITEMS);
         entityManager = new EntityManagerImpl(
                 new StatefulPersistenceContext(),
                 jdbcTemplate, dml
@@ -97,5 +100,12 @@ class EntityManagerImplTest {
         assertThat(
                 entityManager.isDirty(person)
         ).isTrue();
+    }
+
+    @Test
+    @DisplayName("OneToMany 관계에 있는 엔티티를 객체화 할 수 있다.")
+    void oneToMany() {
+        List<Order> orders = entityManager.findAll(Order.class);
+        assertThat(orders).isNotEmpty();
     }
 }

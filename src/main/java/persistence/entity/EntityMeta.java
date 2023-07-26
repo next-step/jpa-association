@@ -12,8 +12,11 @@ import persistence.sql.exception.EntityIdNotFoundException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static persistence.sql.util.StringConstant.DELIMITER;
@@ -21,18 +24,18 @@ import static persistence.sql.util.StringConstant.DELIMITER;
 public class EntityMeta {
     private final Class parentClass;
     private final String tableName;
-    private final List<String> columnNames;
-    private final String pkName;
-    private final String fkName;
+    private final List<Field> columnFields;
+    private final Field pkField;
+    private final Field fkField;
     private final Class childClass;
     private final EntityMeta childMeta;
 
     public EntityMeta(Class clazz) {
         this.parentClass = clazz;
         this.tableName = findTableName(clazz);
-        this.pkName = findPkName(clazz);
-        this.fkName = findFkName(clazz);
-        this.columnNames = findColumnNames(clazz);
+        this.pkField = findPkField(clazz);
+        this.fkField = findFkField(clazz);
+        this.columnFields = findColumnFields(clazz);
         this.childClass = findChildClass(clazz);
         this.childMeta = childClass == null
                 ? null : new EntityMeta(childClass);
@@ -45,13 +48,12 @@ public class EntityMeta {
                 : table.name();
     }
 
-    private static List<String> findColumnNames(Class clazz) {
+    private static List<Field> findColumnFields(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(
                         field -> !field.isAnnotationPresent(Transient.class)
                                 && !field.isAnnotationPresent(OneToMany.class)
-                ).map(EntityMeta::findColumnName)
-                .collect(Collectors.toList());
+                ).collect(Collectors.toList());
     }
 
     private static String findColumnName(Field field) {
@@ -61,20 +63,17 @@ public class EntityMeta {
                 : column.name();
     }
 
-    private static String findPkName(Class clazz) {
+    private static Field findPkField(Class clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findAny()
-                .map(EntityMeta::findColumnName)
                 .orElseThrow(() -> new EntityIdNotFoundException());
     }
 
-    private static String findFkName(Class clazz) {
+    private static Field findFkField(Class clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(JoinColumn.class))
-                .findAny()
-                .map(field -> field.getDeclaredAnnotation(JoinColumn.class).name())
-                .orElse(null);
+                .findAny().orElse(null);
     }
 
     private static Class findChildClass(Class clazz) {
@@ -110,29 +109,49 @@ public class EntityMeta {
         return tableName;
     }
 
-    public List<String> getColumnNames() {
-        return columnNames;
+    public Map<String, Field> collectColumnFields(String prefix) {
+        return columnFields.stream().collect(Collectors.toMap(
+                column -> formatAlias(prefix, findColumnName(column)),
+                Function.identity()
+        ));
     }
 
     public String joinColumnNames(String prefix) {
-        return getColumnNames().stream().map(
-                columnName -> formatColumn(prefix, columnName)
-        ).collect(Collectors.joining(DELIMITER));
+        return columnFields.stream()
+                .map(field -> format(prefix, field))
+                .collect(Collectors.joining(DELIMITER));
     }
 
     public String getPkName() {
-        return pkName;
+        return findColumnName(pkField);
     }
 
     public String getFkName() {
-        return fkName;
+        return fkField == null
+                ? null
+                : fkField.getDeclaredAnnotation(JoinColumn.class).name();
+    }
+
+    public void initOneToMany(Object obj) throws IllegalAccessException {
+        if (!isOneToMany()) {
+            return;
+        }
+        fkField.setAccessible(true);
+        fkField.set(obj, new ArrayList<>());
+    }
+
+    public void addChild(Object parent, Object child) throws IllegalAccessException {
+        if (!isOneToMany()) {
+            return;
+        }
+        ((List) fkField.get(parent)).add(child);
     }
 
     public String getFKCondition(String parentPrefix, String childPrefix) {
         return new StringBuilder()
-                .append(formatColumn(parentPrefix, pkName))
+                .append(formatColumn(parentPrefix, getPkName()))
                 .append(" = ")
-                .append(formatColumn(childPrefix, fkName))
+                .append(formatColumn(childPrefix, getFkName()))
                 .toString();
     }
 
@@ -145,12 +164,25 @@ public class EntityMeta {
     }
 
     public boolean isOneToMany() {
-        return fkName != null
+        return getFkName() != null
                 && childClass != null
                 && childMeta != null;
     }
 
+    private String format(String prefix, Field field) {
+        final String columnName = findColumnName(field);
+        return String.format(
+                "%s AS %s",
+                formatColumn(prefix, columnName),
+                formatAlias(prefix, columnName)
+        );
+    }
+
     private String formatColumn(String prefix, String columnName) {
         return String.format("%s.%s", prefix, columnName);
+    }
+
+    private String formatAlias(String prefix, String columnName) {
+        return String.format("%s_%s", prefix, columnName);
     }
 }
