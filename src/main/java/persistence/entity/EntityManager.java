@@ -8,11 +8,11 @@ public interface EntityManager {
 
     <T> Optional<T> find(Class<T> clazz, Object id);
 
-    void persist(Object entity);
+    <T> T persist(T entity);
+
+    <T> T merge(T entity);
 
     void remove(Object entity);
-
-    void merge(Object entity);
 
     void detach(Object entity);
 

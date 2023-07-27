@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EntityLoader<T> implements RowMapper<T> {
@@ -20,10 +21,7 @@ public class EntityLoader<T> implements RowMapper<T> {
         this.fieldsByName = ColumnFields.forQuery(clazz)
                 .stream().collect(Collectors.toMap(
                         ColumnName::build,
-                        field -> {
-                            field.setAccessible(true);
-                            return field;
-                        }
+                        Function.identity()
                 ));
     }
 
@@ -34,12 +32,10 @@ public class EntityLoader<T> implements RowMapper<T> {
             final ResultSetMetaData metaData = resultSet.getMetaData();
             final int columnCount = metaData.getColumnCount();
             for (int i = 1; i <= columnCount; i++) {
-                fieldsByName.get(
-                        metaData.getColumnLabel(i)
-                ).set(
-                        object,
-                        resultSet.getObject(metaData.getColumnName(i))
-                );
+                Field field = fieldsByName.get(metaData.getColumnLabel(i));
+                Object value = resultSet.getObject(metaData.getColumnName(i));
+                field.setAccessible(true);
+                field.set(object, value);
             }
             return object;
         } catch (Exception e) {
