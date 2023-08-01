@@ -19,19 +19,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> List<T> findAll(Class<T> clazz) {
-        EntityMeta meta = new EntityMeta(clazz);
-        if (meta.isEagerOneToMany()) {
-            EagerOneToManyEntityLoader<T> loader = new EagerOneToManyEntityLoader<>(clazz);
-            jdbcTemplate.query(
-                    dml.getEagerJoinQuery(meta),
-                    loader
-            );
-            return loader.collectDistinct();
-        }
-        return jdbcTemplate.query(
-                dml.getFindAllQuery(clazz),
-                new EntityLoader<>(clazz)
-        );
+        return new EntitiesLoader(clazz, jdbcTemplate, dml).findAll();
     }
 
     @Override

@@ -110,6 +110,13 @@ public class EntityMeta {
         return tableName;
     }
 
+    public Map<String, Field> collectColumnFields() {
+        return columnFields.stream().collect(Collectors.toMap(
+                EntityMeta::findColumnName,
+                Function.identity()
+        ));
+    }
+
     public Map<String, Field> collectColumnFields(String prefix) {
         return columnFields.stream().collect(Collectors.toMap(
                 column -> formatAlias(prefix, findColumnName(column)),
@@ -127,6 +134,14 @@ public class EntityMeta {
         return findColumnName(pkField);
     }
 
+    public Field getPkField() {
+        return pkField;
+    }
+
+    public Field getFkField() {
+        return fkField;
+    }
+
     public String getFkName() {
         return fkField == null
                 ? null
@@ -134,7 +149,7 @@ public class EntityMeta {
     }
 
     public void initOneToMany(Object obj) throws IllegalAccessException {
-        if (!isEagerOneToMany()) {
+        if (!isOneToMany()) {
             return;
         }
         fkField.setAccessible(true);
@@ -142,7 +157,7 @@ public class EntityMeta {
     }
 
     public void addChild(Object parent, Object child) throws IllegalAccessException {
-        if (!isEagerOneToMany()) {
+        if (!isOneToMany()) {
             return;
         }
         ((List) fkField.get(parent)).add(child);
@@ -165,12 +180,21 @@ public class EntityMeta {
     }
 
     public boolean isEagerOneToMany() {
-        if (fkField == null || childClass == null || childMeta == null) {
-            return false;
-        }
-        OneToMany annotation = fkField.getDeclaredAnnotation(OneToMany.class);
-        return annotation != null
-                && annotation.fetch() == FetchType.EAGER;
+        return isOneToMany() && fkField.getDeclaredAnnotation(OneToMany.class)
+                .fetch() == FetchType.EAGER;
+    }
+
+    public boolean isLazyOneToMany() {
+        return isOneToMany() && fkField.getDeclaredAnnotation(OneToMany.class)
+                .fetch() == FetchType.LAZY;
+    }
+
+    private boolean isOneToMany() {
+        return fkField != null
+                && childClass != null
+                && childMeta != null
+                && fkField.getDeclaredAnnotation(OneToMany.class) != null
+                && fkField.getDeclaredAnnotation(JoinColumn.class) != null;
     }
 
     private String format(String prefix, Field field) {

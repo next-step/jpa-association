@@ -3,6 +3,8 @@ package persistence.sql.dml.h2;
 import persistence.entity.EntityMeta;
 import persistence.sql.dml.DmlBuilder;
 
+import java.util.Map;
+
 public final class H2DmlBuilder implements DmlBuilder {
     private H2DmlBuilder() {}
 
@@ -23,6 +25,11 @@ public final class H2DmlBuilder implements DmlBuilder {
     @Override
     public String getFindAllQuery(Class clazz) {
         return H2FindAllQuery.build(clazz);
+    }
+
+    @Override
+    public String getWhereQuery(Map<String, Object> condition) {
+        return H2WhereQuery.build(condition);
     }
 
     @Override

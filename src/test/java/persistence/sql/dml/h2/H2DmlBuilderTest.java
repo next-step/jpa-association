@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.EntityMeta;
 import persistence.sql.dml.DmlBuilder;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class H2DmlBuilderTest {
@@ -53,6 +56,17 @@ class H2DmlBuilderTest {
         assertThat(
                 dml.getFindAllQuery(Person.class)
         ).isEqualTo(expected);
+    }
+
+    @DisplayName("Where 조건문을 생성할 수 있다.")
+    @Test
+    void where() {
+        String expected = " WHERE id = 1, name = 'ghojeong'";
+        Map<String, Object> condition = new LinkedHashMap<>();
+        condition.put("id", 1);
+        condition.put("name", "ghojeong");
+        assertThat(dml.getWhereQuery(condition))
+                .isEqualTo(expected);
     }
 
     @Test

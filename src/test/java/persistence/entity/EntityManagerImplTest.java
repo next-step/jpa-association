@@ -2,6 +2,7 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.LazyOrder;
 import domain.Order;
 import domain.OrderFixture;
 import domain.OrderItem;
@@ -105,11 +106,22 @@ class EntityManagerImplTest {
     }
 
     @Test
-    @DisplayName("OneToMany 관계에 있는 엔티티를 객체화 할 수 있다.")
-    void oneToMany() {
+    @DisplayName("Eager OneToMany 관계에 있는 엔티티를 객체화 할 수 있다.")
+    void eagerOneToMany() {
         List<Order> orders = entityManager.findAll(Order.class);
         List<OrderItem> orderItems = orders.stream()
                 .map(Order::getOrderItems)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        assertThat(orderItems).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Lazy OneToMany 관계에 있는 엔티티를 객체화 할 수 있다.")
+    void lazyOneToMany() {
+        List<LazyOrder> orders = entityManager.findAll(LazyOrder.class);
+        List<OrderItem> orderItems = orders.stream()
+                .map(LazyOrder::getOrderItems)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
         assertThat(orderItems).isNotEmpty();

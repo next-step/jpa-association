@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import domain.LazyOrder;
 import domain.Order;
 import domain.OrderItem;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,8 +70,15 @@ class EntityMetaTest {
 
     @DisplayName("조인 쿼리를 생성할 수 있는지 여부를 알 수 있다.")
     @Test
-    void isOneToMany() {
+    void isEagerOneToMany() {
         assertThat(meta.isEagerOneToMany())
+                .isTrue();
+    }
+
+    @DisplayName("OneToMany 가 Lazy 한지 여부를 알 수 있다.")
+    @Test
+    void isLazyOneToMany() {
+        assertThat(new EntityMeta(LazyOrder.class).isLazyOneToMany())
                 .isTrue();
     }
 
