@@ -2,6 +2,8 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -32,12 +34,16 @@ public class DatabaseTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         jdbcTemplate.execute(createDdlBuilder.createTableBuild(Person.class));
+        jdbcTemplate.execute(createDdlBuilder.createTableBuild(Order.class));
+        jdbcTemplate.execute(createDdlBuilder.createTableBuild(OrderItem.class));
     }
 
     @AfterEach
     void afterEach() {
         DropQueryBuilder dropQueryBuilder = new H2DropQueryBuilder();
         jdbcTemplate.execute(dropQueryBuilder.createQueryBuild(Person.class));
+        jdbcTemplate.execute(dropQueryBuilder.createQueryBuild(Order.class));
+        jdbcTemplate.execute(dropQueryBuilder.createQueryBuild(OrderItem.class));
 
         server.stop();
     }
@@ -60,8 +66,13 @@ public class DatabaseTest {
         InsertQueryBuilder insertQueryBuilder = new H2InsertQueryBuilder();
 
         Person person = new Person("slow", 20, "email@email.com", 1);
+        Order order = new Order("orderNumber1");
+        OrderItem orderItem  = new OrderItem("productName", 10, 1);
+        OrderItem orderItem1  = new OrderItem("productName2", 20, 1);
 
-        String query = insertQueryBuilder.createInsertBuild(person);
-        execute(query);
+        execute(insertQueryBuilder.createInsertBuild(person));
+        execute(insertQueryBuilder.createInsertBuild(order));
+        execute(insertQueryBuilder.createInsertBuild(orderItem));
+        execute(insertQueryBuilder.createInsertBuild(orderItem1));
     }
 }

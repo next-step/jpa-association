@@ -12,9 +12,9 @@ class DeleteQueryBuilderTest extends DatabaseTest {
     void delete_query() {
         DeleteQueryBuilder deleteQueryBuilder = new H2DeleteQueryBuilder();
 
-        String actual = deleteQueryBuilder.delete("person", "id", "1");
+        String actual = deleteQueryBuilder.delete("users", "id", "1");
 
         execute(actual);
-        assertThat(actual).isEqualTo("delete from person where id = 1");
+        assertThat(actual).isEqualTo("delete from users where id = 1");
     }
 }

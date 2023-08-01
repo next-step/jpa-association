@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
+import persistence.CustomTable;
+import persistence.EntityMeta;
 import persistence.sql.ddl.*;
 
 import java.lang.reflect.Field;
@@ -23,14 +25,22 @@ public class QueryBuilder {
     }
 
     protected <T> Object findById(Class<T> clazz, Long key) {
-        String sql = selectQueryBuilder.findById(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), String.valueOf(key));
+        String sql = selectQueryBuilder.findById(CustomTable.of(clazz).name(), unique(clazz.getDeclaredFields()).getName(), String.valueOf(key));
+        EntityLoader<T> mapper = new EntityLoader<>(clazz);
+
+        return jdbcTemplate.queryForObject(sql, mapper);
+    }
+
+    public <T> Object findByIdJoin(Class<T> clazz, Long key) {
+        EntityMeta entityMeta = EntityMeta.ofJoin(clazz);
+        String sql = selectQueryBuilder.findByIdByJoin(entityMeta, String.valueOf(key));
         EntityLoader<T> mapper = new EntityLoader<>(clazz);
 
         return jdbcTemplate.queryForObject(sql, mapper);
     }
 
     protected <T> void delete(Class<T> clazz, Long key) {
-        jdbcTemplate.execute(deleteQueryBuilder.delete(clazz.getSimpleName(), unique(clazz.getDeclaredFields()).getName(), key.toString()));
+        jdbcTemplate.execute(deleteQueryBuilder.delete(CustomTable.of(clazz).name(), unique(clazz.getDeclaredFields()).getName(), key.toString()));
     }
 
     public void save(Object entity) {

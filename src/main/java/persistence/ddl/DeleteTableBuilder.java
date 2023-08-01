@@ -1,12 +1,12 @@
 package persistence.ddl;
 
-import persistence.Table;
+import persistence.CustomTable;
 
 public class DeleteTableBuilder {
     private static final String KEYWORD = "drop table if exists %s cascade";
-    private final Table table;
+    private final CustomTable table;
 
-    public DeleteTableBuilder(Table table) {
+    public DeleteTableBuilder(CustomTable table) {
         this.table = table;
     }
 

@@ -1,8 +1,11 @@
 package persistence.sql.ddl;
 
+import persistence.CustomTable;
+
 public abstract class DropQueryBuilder {
 
     public String createQueryBuild(Class<?> clazz) {
-        return String.format("drop table %s", clazz.getSimpleName());
+        CustomTable customTable = CustomTable.of(clazz);
+        return String.format("drop table %s", customTable.name());
     }
 }

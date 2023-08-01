@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,19 @@ class EntityManagerImplTest extends DatabaseTest {
         Person actual = entityManager.find(Person.class, 1L);
 
         assertNotNull(actual);
+    }
+
+    @Test
+    void find_hasJoin() throws SQLException {
+        insertDb();
+        EntityManager entityManager = new EntityManagerImpl(queryBuilder);
+
+        Order actual = entityManager.find(Order.class, 1L);
+
+        assertAll(
+                () -> assertNotNull(actual),
+                () -> assertEquals(actual.orderItemCount(), 2)
+        );
     }
 
     @Test

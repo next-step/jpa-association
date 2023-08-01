@@ -13,8 +13,8 @@ public class EntityReflectionManager {
         this.entity = entity;
     }
 
-    public Table table() {
-        return new Table(entity.getSimpleName());
+    public CustomTable table() {
+        return new CustomTable(entity.getSimpleName());
     }
 
     public Columns columns() {

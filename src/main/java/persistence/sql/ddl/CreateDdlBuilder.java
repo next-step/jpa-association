@@ -2,7 +2,9 @@ package persistence.sql.ddl;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Transient;
+import persistence.CustomTable;
 import persistence.dialect.DdlType;
 import persistence.dialect.Dialect;
 import persistence.dialect.TypeJavaClassMappings;
@@ -22,7 +24,7 @@ public abstract class CreateDdlBuilder {
         return new StringBuilder()
                 .append(dialect.getCreateTableString())
                 .append(" ")
-                .append(clazz.getSimpleName().toLowerCase())
+                .append(CustomTable.of(clazz).name())
                 .append(" (")
                 .append(idColumn(clazz.getDeclaredFields()))
                 .append(columns(clazz.getDeclaredFields()))
@@ -50,7 +52,7 @@ public abstract class CreateDdlBuilder {
 
     private String columns(Field[] fields) {
         return Arrays.stream(fields)
-                .filter(field -> this.notTransient(field) && this.notUnique(field))
+                .filter(field -> this.notTransient(field) && this.notUnique(field) && this.notJoin(field))
                 .map(field -> this.columnBuild(field) + this.columnNotNullBuild(field))
                 .collect(Collectors.joining(", "));
     }
@@ -106,6 +108,12 @@ public abstract class CreateDdlBuilder {
 
     private boolean notTransient(Field field) {
         Transient annotation = field.getAnnotation(Transient.class);
+
+        return annotation == null;
+    }
+
+    private boolean notJoin(Field field) {
+        JoinColumn annotation = field.getAnnotation(JoinColumn.class);
 
         return annotation == null;
     }

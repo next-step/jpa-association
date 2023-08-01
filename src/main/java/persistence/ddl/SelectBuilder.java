@@ -2,13 +2,13 @@ package persistence.ddl;
 
 
 import persistence.Columns;
-import persistence.Table;
+import persistence.CustomTable;
 
 public class SelectBuilder {
-    private final Table table;
+    private final CustomTable table;
     private final Columns columns;
 
-    public SelectBuilder(Table table, Columns columns) {
+    public SelectBuilder(CustomTable table, Columns columns) {
         this.table = table;
         this.columns = columns;
     }

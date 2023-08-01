@@ -1,14 +1,14 @@
 package persistence.ddl;
 
 import persistence.ColumnMap;
-import persistence.Table;
+import persistence.CustomTable;
 
 public class InsertBuilder {
     private static final String KEYWORD = "insert into %s (%s) values (%s)";
     private final ColumnMap columnMap;
-    private final Table table;
+    private final CustomTable table;
 
-    public InsertBuilder(Table table, ColumnMap columnMap) {
+    public InsertBuilder(CustomTable table, ColumnMap columnMap) {
         this.columnMap = columnMap;
         this.table = table;
     }

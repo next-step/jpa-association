@@ -1,6 +1,8 @@
 package persistence.entity;
 
 import jakarta.persistence.Id;
+import persistence.CustomTable;
+import persistence.EntityMeta;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -26,15 +28,24 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long key) {
-        EntityKey entityKey = EntityKey.of(key, clazz.getSimpleName());
+        EntityKey entityKey = EntityKey.of(key, CustomTable.of(clazz).name());
         if (persistenceContext.containsEntity(entityKey)) {
             return clazz.cast(persistenceContext.getEntity(entityKey));
         }
 
-        Object object = queryBuilder.findById(clazz, key);
+        Object object = extracted(clazz, key);
+
         persistenceContext.addEntity(entityKey, object);
 
         return clazz.cast(persistenceContext.getEntity(entityKey));
+    }
+
+    private <T> Object extracted(Class<T> clazz, Long key) {
+        if(EntityMeta.hasJoin(clazz)) {
+            return queryBuilder.findByIdJoin(clazz, key);
+        }
+
+        return queryBuilder.findById(clazz, key);
     }
 
     @Override
@@ -45,7 +56,7 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public void persist(Class<?> clazz, Object entity) throws IllegalAccessException {
         Object key = getKey(entity);
-        EntityKey entityKey = EntityKey.of((Long) key, clazz.getSimpleName());
+        EntityKey entityKey = EntityKey.of((Long) key, CustomTable.of(clazz).name());
 
         queryBuilder.save(entity);
         persistenceContext.addEntity(entityKey, entity);
@@ -94,10 +105,10 @@ public class EntityManagerImpl implements EntityManager {
     public void update(Class<?> clazz, Proxy proxy) throws IllegalAccessException {
         Object entity = proxy.entity();
         Object key = getKey(entity);
-        EntityKey entityKey = EntityKey.of(getKey(entity), entity.getClass().getSimpleName());
+        EntityKey entityKey = EntityKey.of(getKey(entity), CustomTable.of(entity.getClass()).name());
 
         Proxy changedProxy = proxy.toDirty(persistenceContext.getCachedDatabaseSnapshot(entityKey));
-        queryBuilder.update((Long) key, clazz.getSimpleName(), changedProxy.entity());
+        queryBuilder.update((Long) key, CustomTable.of(clazz).name(), changedProxy.entity());
     }
 
     private Field unique(Field[] field) {
@@ -125,6 +136,6 @@ public class EntityManagerImpl implements EntityManager {
     private EntityKey getEntityKey(Object entity) throws IllegalAccessException {
         Class<?> clazz = entity.getClass();
         Object key = getKey(entity);
-        return EntityKey.of((Long) key, clazz.getSimpleName());
+        return EntityKey.of((Long) key, CustomTable.of(clazz).name());
     }
 }
