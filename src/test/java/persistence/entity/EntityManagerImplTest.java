@@ -18,7 +18,9 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.DmlBuilder;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -106,6 +108,10 @@ class EntityManagerImplTest {
     @DisplayName("OneToMany 관계에 있는 엔티티를 객체화 할 수 있다.")
     void oneToMany() {
         List<Order> orders = entityManager.findAll(Order.class);
-        assertThat(orders).isNotEmpty();
+        List<OrderItem> orderItems = orders.stream()
+                .map(Order::getOrderItems)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        assertThat(orderItems).isNotEmpty();
     }
 }

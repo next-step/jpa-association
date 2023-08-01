@@ -70,7 +70,7 @@ class EntityMetaTest {
     @DisplayName("조인 쿼리를 생성할 수 있는지 여부를 알 수 있다.")
     @Test
     void isOneToMany() {
-        assertThat(meta.isOneToMany())
+        assertThat(meta.isEagerOneToMany())
                 .isTrue();
     }
 
@@ -87,7 +87,7 @@ class EntityMetaTest {
                         .isEqualTo("id"),
                 () -> assertThat(childMeta.getFkName())
                         .isEqualTo(null),
-                () -> assertThat(childMeta.isOneToMany())
+                () -> assertThat(childMeta.isEagerOneToMany())
                         .isFalse()
         );
     }

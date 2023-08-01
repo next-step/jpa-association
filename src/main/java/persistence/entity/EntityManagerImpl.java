@@ -20,8 +20,8 @@ public class EntityManagerImpl implements EntityManager {
     @Override
     public <T> List<T> findAll(Class<T> clazz) {
         EntityMeta meta = new EntityMeta(clazz);
-        if (meta.isOneToMany()) {
-            OneToManyEntityLoader<T> loader = new OneToManyEntityLoader<>(clazz);
+        if (meta.isEagerOneToMany()) {
+            EagerOneToManyEntityLoader<T> loader = new EagerOneToManyEntityLoader<>(clazz);
             jdbcTemplate.query(
                     dml.getEagerJoinQuery(meta),
                     loader

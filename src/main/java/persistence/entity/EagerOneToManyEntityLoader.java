@@ -13,14 +13,14 @@ import java.util.Map;
 import static persistence.sql.util.StringConstant.CHILD_PREFIX;
 import static persistence.sql.util.StringConstant.PARENT_PREFIX;
 
-public class OneToManyEntityLoader<T> implements RowMapper<T> {
+public class EagerOneToManyEntityLoader<T> implements RowMapper<T> {
     private final EntityMeta parentMeta;
     private final Map<String, Field> parentFieldsByName;
     private final Map<String, Field> childFieldsByName;
     private final Map<EntityKey, T> parentObjectByKey = new HashMap<>();
 
 
-    public OneToManyEntityLoader(Class<T> clazz) {
+    public EagerOneToManyEntityLoader(Class<T> clazz) {
         this.parentMeta = new EntityMeta(clazz);
         this.parentFieldsByName = parentMeta.collectColumnFields(PARENT_PREFIX);
         this.childFieldsByName = parentMeta.getChildMeta().collectColumnFields(CHILD_PREFIX);

@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -133,7 +134,7 @@ public class EntityMeta {
     }
 
     public void initOneToMany(Object obj) throws IllegalAccessException {
-        if (!isOneToMany()) {
+        if (!isEagerOneToMany()) {
             return;
         }
         fkField.setAccessible(true);
@@ -141,7 +142,7 @@ public class EntityMeta {
     }
 
     public void addChild(Object parent, Object child) throws IllegalAccessException {
-        if (!isOneToMany()) {
+        if (!isEagerOneToMany()) {
             return;
         }
         ((List) fkField.get(parent)).add(child);
@@ -163,10 +164,13 @@ public class EntityMeta {
         return childMeta;
     }
 
-    public boolean isOneToMany() {
-        return getFkName() != null
-                && childClass != null
-                && childMeta != null;
+    public boolean isEagerOneToMany() {
+        if (fkField == null || childClass == null || childMeta == null) {
+            return false;
+        }
+        OneToMany annotation = fkField.getDeclaredAnnotation(OneToMany.class);
+        return annotation != null
+                && annotation.fetch() == FetchType.EAGER;
     }
 
     private String format(String prefix, Field field) {
