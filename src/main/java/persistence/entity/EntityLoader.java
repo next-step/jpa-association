@@ -1,18 +1,15 @@
 package persistence.entity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
 import jdbc.RowMapper;
 import persistence.CustomTable;
+import persistence.JoinEntityLoader;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -41,7 +38,6 @@ public class EntityLoader<T> implements RowMapper<T> {
                 String alias = meta.getColumnLabel(i + 1);
                 String name = meta.getColumnName(i + 1);
 
-
                 if (tableName.equals(CustomTable.of(targetType).name().toUpperCase())) {
                     Field field = targetType.getDeclaredField(columnMap.get(alias.toLowerCase()));
                     field.setAccessible(true);
@@ -51,29 +47,12 @@ public class EntityLoader<T> implements RowMapper<T> {
                 }
             }
 
-            List<Object> items = null;
-            Field joinField = null;
-            for (Field field : targetType.getDeclaredFields()) {
-                if (field.isAnnotationPresent(OneToMany.class)) {
-                    Class<?> fieldType = field.getType();
-                    if (List.class.isAssignableFrom(fieldType)) {
-                        ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-                        Class<?> listItemType = (Class<?>) genericType.getActualTypeArguments()[0];
-
-                        if (items == null) {
-                            items = makeOneToMany(resultSet, listItemType);
-                            joinField = field;
-                        } else {
-                            items.addAll(makeOneToMany(resultSet, listItemType));
-                        }
-
-                    }
-                }
-            }
+            JoinEntityLoader joinEntityLoader = new JoinEntityLoader(targetType.getDeclaredFields());
+            Field joinField = joinEntityLoader.mapJoinFields(resultSet);
 
             if (joinField != null) {
                 joinField.setAccessible(true);
-                joinField.set(targetObject, items);
+                joinField.set(targetObject, joinEntityLoader.joinItems());
             }
 
         } catch (Exception e) {
@@ -95,40 +74,5 @@ public class EntityLoader<T> implements RowMapper<T> {
         }
 
         return columnAnnotation.name();
-    }
-
-    private List<Object> makeOneToMany(ResultSet resultSet, Class<?> listItemType) throws SQLException {
-        List<Object> items = new ArrayList<>();
-        boolean isLoop = true;
-        while (isLoop) {
-            Object item;
-            try {
-                item = listItemType.getDeclaredConstructor().newInstance();
-                mapDataFields(item, resultSet);
-                items.add(item);
-
-                if (!resultSet.next()) {
-                    isLoop = false;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return items;
-    }
-
-    private void mapDataFields(Object object, ResultSet resultSet) throws SQLException {
-        Field[] fields = object.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            String columnName = field.getName();
-            try {
-                Object value = resultSet.getObject(columnName);
-                field.setAccessible(true);
-                field.set(object, value);
-            } catch (Exception e) {
-                continue;
-            }
-        }
     }
 }
