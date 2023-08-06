@@ -3,6 +3,7 @@ package persistence.entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import persistence.CustomTable;
+import persistence.JoinTable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -10,16 +11,12 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class CustomJoinTable {
-    private final String rootTable;
-    private final String joinTable;
-    private final UniqueColumn rootColumn;
-    private final String joinColumn;
+    private final RootTable rootTable;
+    private final JoinTable joinTable;
 
-    private CustomJoinTable(String rootTable, String joinTable, UniqueColumn rootColumn, String joinColumn) {
+    private CustomJoinTable(RootTable rootTable, JoinTable joinTable) {
         this.rootTable = rootTable;
         this.joinTable = joinTable;
-        this.rootColumn = rootColumn;
-        this.joinColumn = joinColumn;
     }
 
     public static <T> CustomJoinTable of(Class<T> clazz) {
@@ -27,19 +24,17 @@ public class CustomJoinTable {
 
         assert table != null;
         return new CustomJoinTable(
-                CustomTable.of(clazz).name(),
-                getJoinTable(table),
-                UniqueColumn.of(clazz),
-                getJoinColumn(clazz)
+                new RootTable(CustomTable.of(clazz).name(), UniqueColumn.of(clazz)),
+                new JoinTable(getJoinTable(table), getJoinColumn(clazz))
         );
     }
 
     private static <T> String getJoinColumn(Class<T> clazz) {
-        Field field =Arrays.stream(clazz.getDeclaredFields())
+        Field field = Arrays.stream(clazz.getDeclaredFields())
                 .filter(it -> it.isAnnotationPresent(JoinColumn.class))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
-        
+
         return field.getAnnotation(JoinColumn.class).name();
     }
 
@@ -67,14 +62,14 @@ public class CustomJoinTable {
     }
 
     public String joinTable() {
-        return joinTable;
+        return joinTable.name();
     }
 
     public String rootColumn() {
-        return String.format("%s.%s", rootTable, rootColumn.name());
+        return String.format("%s.%s", rootTable.name(), rootTable.uniqueColumn());
     }
 
     public String joinColumn() {
-        return String.format("%s.%s", joinTable, joinColumn);
+        return String.format("%s.%s", joinTable.name(), joinTable.column());
     }
 }

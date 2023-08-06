@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class UniqueColumn {
     private final String columnName;
 
-    public UniqueColumn(String name) {
+    private UniqueColumn(String name) {
         this.columnName = name;
     }
 
