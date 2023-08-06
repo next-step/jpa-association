@@ -15,7 +15,7 @@ public class CustomJoinTable {
     private final UniqueColumn rootColumn;
     private final String joinColumn;
 
-    public CustomJoinTable(String rootTable, String joinTable, UniqueColumn rootColumn, String joinColumn) {
+    private CustomJoinTable(String rootTable, String joinTable, UniqueColumn rootColumn, String joinColumn) {
         this.rootTable = rootTable;
         this.joinTable = joinTable;
         this.rootColumn = rootColumn;
