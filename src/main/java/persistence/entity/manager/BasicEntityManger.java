@@ -1,15 +1,15 @@
-package persistence.entity;
+package persistence.entity.manager;
 
-import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
-import persistence.common.AccessibleField;
-import persistence.common.Fields;
 import persistence.context.BasicPersistentContext;
 import persistence.context.PersistenceContext;
+import persistence.entity.model.EntityMeta;
+import persistence.entity.model.EntityMetaFactory;
 import persistence.sql.dml.builder.DeleteQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.UpdateQueryBuilder;
-import persistence.sql.dml.column.DmlColumns;
+
+import java.util.List;
 
 public class BasicEntityManger implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -18,6 +18,7 @@ public class BasicEntityManger implements EntityManager {
     private final InsertQueryBuilder insertQueryBuilder = InsertQueryBuilder.INSTANCE;
     private final DeleteQueryBuilder deleteQueryBuilder = DeleteQueryBuilder.INSTANCE;
     private final UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.INSTANCE;
+    private final EntityMetaFactory entityMetaFactory = EntityMetaFactory.INSTANCE;
 
     public BasicEntityManger(JdbcTemplate jdbcTemplate, EntityLoader entityLoader) {
         this.persistenceContext = new BasicPersistentContext();
@@ -44,33 +45,30 @@ public class BasicEntityManger implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        String insertQuery = insertQueryBuilder.insert(entity);
+        EntityMeta entityMeta = entityMetaFactory.create(entity.getClass());
+        String insertQuery = insertQueryBuilder.insert(entityMeta, entity);
         Long id = jdbcTemplate.insert(insertQuery);
-        setGeneratedId(entity, id);
+        entityMeta.getIdColumn().setValue(entity, id);
         persistenceContext.addEntity(id, entity);
         persistenceContext.getDatabaseSnapshot(id, entity);
     }
 
-    private void setGeneratedId(Object entity, Long id) {
-        AccessibleField idField = getAccessibleField(entity);
-        idField.setValue(entity, id);
-    }
-
     @Override
     public void remove(Object entity) {
-        String deleteQuery = deleteQueryBuilder.delete(entity);
+        EntityMeta entityMeta = entityMetaFactory.create(entity.getClass());
+        String deleteQuery = deleteQueryBuilder.delete(entityMeta, entity);
         jdbcTemplate.execute(deleteQuery);
-        removePersistentContextEntity(entity);
+        removePersistentContextEntity(entityMeta, entity);
     }
 
     @Override
     public <T> T merge(T entity) {
-        AccessibleField accessibleIdField = getAccessibleField(entity);
-        Long id = (Long) accessibleIdField.getValue(entity);
+        EntityMeta entityMeta = entityMetaFactory.create(entity.getClass());
+        Long id = (Long) entityMeta.getIdColumn().getValue(entity);
         T originEntity = originEntity(entity.getClass(), id);
 
-        if (hasUpdatedField(originEntity, entity)) {
-            String updateQuery = updateQueryBuilder.update(entity);
+        if (hasUpdatedField(entityMeta, originEntity, entity)) {
+            String updateQuery = updateQueryBuilder.update(entityMeta, entity);
             jdbcTemplate.execute(updateQuery);
             persistenceContext.getDatabaseSnapshot(id, entity);
             persistenceContext.addEntity(id, entity);
@@ -89,20 +87,14 @@ public class BasicEntityManger implements EntityManager {
         return (T) find(clazz, id);
     }
 
-    private <T> boolean hasUpdatedField(T snapShot, T entity) {
-        DmlColumns snapShotEntityColumns = DmlColumns.of(snapShot);
-        DmlColumns entityColumns = DmlColumns.of(entity);
+    private <T> boolean hasUpdatedField(EntityMeta entityMeta, T snapShot, T entity) {
+        List<Object> snapShotValues = entityMeta.getNormalColumns().getValues(snapShot);
+        List<Object> entityValues = entityMeta.getNormalColumns().getValues(entity);
 
-        return !snapShotEntityColumns.equals(entityColumns);
+        return !snapShotValues.equals(entityValues);
     }
 
-    private void removePersistentContextEntity(Object entity) {
-        AccessibleField idField = getAccessibleField(entity);
-        persistenceContext.removeEntity((Long) idField.getValue(entity));
-    }
-
-    private static AccessibleField getAccessibleField(Object entity) {
-        Fields fields = Fields.of(entity.getClass());
-        return fields.getAccessibleField(Id.class);
+    private void removePersistentContextEntity(EntityMeta entityMeta, Object entity) {
+        persistenceContext.removeEntity((Long) entityMeta.getIdColumn().getValue(entity));
     }
 }

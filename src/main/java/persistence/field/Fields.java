@@ -1,9 +1,10 @@
-package persistence.common;
+package persistence.field;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Fields {
@@ -20,16 +21,15 @@ public class Fields {
     }
 
     public Field getField(Class<? extends Annotation> isAnnotationClass) {
-        return fields.stream()
-                .filter(field -> field.isAnnotationPresent(isAnnotationClass))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        isAnnotationClass.getName() + " 어노테이션이 선언된 필드가 존재하지 않습니다.")
-                );
+        return findField(isAnnotationClass).orElseThrow(() -> new IllegalArgumentException(
+                isAnnotationClass.getName() + " 어노테이션이 선언된 필드가 존재하지 않습니다.")
+        );
     }
 
-    public AccessibleField getAccessibleField(Class<? extends Annotation> isAnnotationClass) {
-        return new AccessibleField(getField(isAnnotationClass));
+    public Optional<Field> findField(Class<? extends Annotation> isAnnotationClass) {
+        return fields.stream()
+                .filter(field -> field.isAnnotationPresent(isAnnotationClass))
+                .findFirst();
     }
 
     @SafeVarargs

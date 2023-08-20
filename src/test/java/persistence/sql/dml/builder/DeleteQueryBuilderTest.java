@@ -3,6 +3,8 @@ package persistence.sql.dml.builder;
 import fixture.PersonV3;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.model.EntityMeta;
+import persistence.entity.model.EntityMetaFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,8 +21,9 @@ class DeleteQueryBuilderTest {
                 "yohan@google.com",
                 1
         );
+        EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(person.getClass());
 
-        assertThat(deleteQueryBuilder.delete(person)).isEqualTo(
+        assertThat(deleteQueryBuilder.delete(entityMeta, person)).isEqualTo(
                 "delete from users where id=1"
         );
     }

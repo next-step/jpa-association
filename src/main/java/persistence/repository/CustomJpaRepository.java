@@ -1,8 +1,8 @@
 package persistence.repository;
 
-import jakarta.persistence.Id;
-import persistence.common.Fields;
-import persistence.entity.EntityManager;
+import persistence.entity.manager.EntityManager;
+import persistence.entity.model.EntityMeta;
+import persistence.entity.model.EntityMetaFactory;
 
 public class CustomJpaRepository<T, ID> {
     private final EntityManager entityManager;
@@ -21,10 +21,7 @@ public class CustomJpaRepository<T, ID> {
     }
 
     private boolean isNewEntity(T entity) {
-        Object id = Fields.of(entity.getClass())
-                .getAccessibleField(Id.class)
-                .getValue(entity);
-
-        return id == null;
+        EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(entity.getClass());
+        return entityMeta.isNew(entity);
     }
 }

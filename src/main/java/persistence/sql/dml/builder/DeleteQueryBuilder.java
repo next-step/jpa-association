@@ -1,6 +1,7 @@
 package persistence.sql.dml.builder;
 
-import persistence.sql.dml.column.DmlColumn;
+import persistence.entity.model.EntityColumn;
+import persistence.entity.model.EntityMeta;
 import persistence.sql.dml.statement.QueryStatement;
 
 public class DeleteQueryBuilder {
@@ -9,11 +10,10 @@ public class DeleteQueryBuilder {
     private DeleteQueryBuilder() {
     }
 
-    public String delete(Object entity) {
-        Class<?> clazz = entity.getClass();
-
-        return QueryStatement.delete(clazz)
-                .where(DmlColumn.id(clazz, entity))
+    public String delete(EntityMeta entityMeta, Object entity) {
+        EntityColumn idColumn = entityMeta.getIdColumn();
+        return QueryStatement.delete(entityMeta.getTableName())
+                .where(idColumn.getName(), idColumn.getValue(entity).toString())
                 .query();
     }
 }

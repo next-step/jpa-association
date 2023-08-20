@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.field;
 
 import database.DatabaseServer;
 import database.H2;
@@ -8,6 +8,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.manager.BasicEntityManger;
+import persistence.entity.manager.EntityLoader;
+import persistence.entity.manager.EntityManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;

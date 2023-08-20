@@ -1,12 +1,18 @@
 package jdbc;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
-import persistence.sql.base.ColumnName;
+import persistence.entity.model.EntityMeta;
+import persistence.entity.model.EntityMetaFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class RowMapperImpl<T> implements RowMapper<T> {
     private final Class<T> clazz;
@@ -42,10 +48,49 @@ public class RowMapperImpl<T> implements RowMapper<T> {
 
         field.setAccessible(true);
         try {
-            String columnName = ColumnName.of(field).name();
-            field.set(entity, resultSet.getObject(columnName));
+            if (field.isAnnotationPresent(OneToMany.class)) {
+                ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+                Class<?> collectionGenericType = (Class<?>) genericType.getActualTypeArguments()[0];
+                List<Object> items = getOneToMany(resultSet, collectionGenericType);
+                field.set(entity, items);
+            } else {
+                String columnName = getName(field);
+                Object object = resultSet.getObject(columnName);
+                field.set(entity, object);
+            }
         } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<Object> getOneToMany(ResultSet resultSet, Class<?> collectionGenericType) {
+        EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(collectionGenericType);
+        Field[] declaredFields = collectionGenericType.getDeclaredFields();
+        String tableName = entityMeta.getTableName();
+        List<Object> elements = new ArrayList<>();
+
+        try {
+            do {
+                Object element = collectionGenericType.getDeclaredConstructor().newInstance();
+                for (Field declaredField : declaredFields) {
+                    declaredField.setAccessible(true);
+                    declaredField.set(element, resultSet.getObject(tableName + "." + getName(declaredField)));
+                }
+                elements.add(element);
+            } while (resultSet.next());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return elements;
+    }
+
+    public String getName(Field field) {
+        Column column = field.getAnnotation(Column.class);
+        if (column == null || column.name().isBlank()) {
+            return field.getName();
+        }
+
+        return column.name();
     }
 }

@@ -1,12 +1,12 @@
-package persistence.sql.dml.column;
+package persistence.sql.support;
 
 import java.util.Objects;
 
-public class ColumnValue {
+public class EntityColumnValue {
     private static final String STRING_VALUE_FORMAT = "'%s'";
     private final Object value;
 
-    public ColumnValue(Object value) {
+    public EntityColumnValue(Object value) {
         this.value = value;
     }
 
@@ -22,7 +22,7 @@ public class ColumnValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ColumnValue that = (ColumnValue) o;
+        EntityColumnValue that = (EntityColumnValue) o;
         return Objects.equals(value, that.value);
     }
 

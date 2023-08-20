@@ -2,6 +2,8 @@ package fixture;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
+import persistence.entity.model.EntityMeta;
+import persistence.entity.model.EntityMetaFactory;
 import persistence.sql.ddl.builder.DdlQueryBuilder;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
@@ -20,13 +22,15 @@ public class TableFixtures {
     }
 
     public static void insert(Object object, JdbcTemplate jdbcTemplate) {
-        String insertQuery = InsertQueryBuilder.INSTANCE.insert(object);
+        EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(object.getClass());
+        String insertQuery = InsertQueryBuilder.INSTANCE.insert(entityMeta, object);
         jdbcTemplate.execute(insertQuery);
     }
 
     public static <T> T select(Class<T> clazz, Long id, JdbcTemplate jdbcTemplate) {
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
-        String findByIdQuery = selectQueryBuilder.findById(clazz, id);
+        EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(clazz);
+        String findByIdQuery = selectQueryBuilder.findById(entityMeta, id);
         return jdbcTemplate.queryForObject(findByIdQuery, new RowMapperImpl<>(clazz));
     }
 }

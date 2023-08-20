@@ -1,7 +1,9 @@
-package persistence.entity;
+package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapperImpl;
+import persistence.entity.model.EntityMeta;
+import persistence.entity.model.EntityMetaFactory;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
 public class EntityLoader {
@@ -13,7 +15,8 @@ public class EntityLoader {
 
     public <T> T load(Class<T> clazz, Long id) {
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
-        String selectQuery = selectQueryBuilder.findById(clazz, id);
+        EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(clazz);
+        String selectQuery = selectQueryBuilder.findById(entityMeta, id);
         return jdbcTemplate.queryForObject(selectQuery, new RowMapperImpl<>(clazz));
     }
 }

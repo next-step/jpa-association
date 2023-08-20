@@ -7,8 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.BasicEntityManger;
-import persistence.entity.EntityLoader;
+import persistence.entity.manager.BasicEntityManger;
+import persistence.entity.manager.EntityLoader;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,9 +1,10 @@
-package persistence.common;
+package persistence.entity.field;
 
 import jakarta.persistence.Id;
 import model.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.field.Fields;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -23,19 +24,6 @@ class FieldsTest {
 
         // then
         assertThat(result).isEqualTo(Person.class.getDeclaredField("id"));
-    }
-
-    @Test
-    @DisplayName("접근 가능한 필드를 조회한다")
-    void getAccessField() throws NoSuchFieldException {
-        // given
-        Fields fields = Fields.of(Person.class);
-
-        // when
-        AccessibleField result = fields.getAccessibleField(Id.class);
-
-        // then
-        assertThat(result).isEqualTo(new AccessibleField(Person.class.getDeclaredField("id")));
     }
 
     @Test
