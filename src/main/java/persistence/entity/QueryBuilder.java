@@ -58,4 +58,10 @@ public class QueryBuilder {
                 .orElseThrow(RuntimeException::new);
     }
 
+    public <T> Object findAllBy(String tableName, String columnName, Object columnValue, Class<T> childClazz) {
+        String sql = selectQueryBuilder.findAllBy(tableName, columnName, columnValue);
+        EntityLoader<T> mapper = new EntityLoader<>(childClazz);
+
+        return jdbcTemplate.query(sql, mapper);
+    }
 }

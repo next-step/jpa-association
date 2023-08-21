@@ -15,18 +15,22 @@ public class Order {
     @Column(name = "order_number")
     private String orderNumber;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
-
-    public Order(String orderNumber) {
-        this(null, orderNumber, null);
-    }
 
     public Order(Long id, String orderNumber, List<OrderItem> orderItems) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.orderItems = orderItems;
+    }
+
+    public Order(String orderNumber) {
+        this(null, orderNumber, null);
+    }
+
+    public Order(Long id, String orderNumber) {
+        this(id, orderNumber, null);
     }
 
     public Order() {

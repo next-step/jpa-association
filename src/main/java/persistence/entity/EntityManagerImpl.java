@@ -33,19 +33,19 @@ public class EntityManagerImpl implements EntityManager {
             return clazz.cast(persistenceContext.getEntity(entityKey));
         }
 
-        Object object = extracted(clazz, key);
+        Object object = findExtracted(clazz, key);
 
         persistenceContext.addEntity(entityKey, object);
 
         return clazz.cast(persistenceContext.getEntity(entityKey));
     }
 
-    private <T> Object extracted(Class<T> clazz, Long key) {
-        if(EntityMeta.hasJoin(clazz)) {
+    private <T> Object findExtracted(Class<T> clazz, Long key) {
+        if(EntityMeta.hasJoin(clazz) && EntityMeta.hasJoinEager(clazz)) {
             return queryBuilder.findByIdJoin(clazz, key);
         }
 
-        return queryBuilder.findById(clazz, key);
+        return EntityProxy.createProxy(queryBuilder.findById(clazz, key), queryBuilder);
     }
 
     @Override
