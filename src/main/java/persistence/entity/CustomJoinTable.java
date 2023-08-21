@@ -1,6 +1,8 @@
 package persistence.entity;
 
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import persistence.CustomTable;
 import persistence.JoinTable;
@@ -53,6 +55,20 @@ public class CustomJoinTable {
 
         Class<?> fieldClass = (Class<?>) genericType.getActualTypeArguments()[0];
         return fieldClass.getAnnotation(Table.class);
+    }
+
+    public static <T> boolean findJoinEager(Class<T> clazz) {
+        Optional<Field> joinField = getJoinField(clazz);
+
+        if (joinField.isEmpty()) {
+            return false;
+        }
+
+        OneToMany annotation = joinField.get().getAnnotation(OneToMany.class);
+
+        FetchType fetchType = annotation.fetch();
+
+        return fetchType == FetchType.EAGER;
     }
 
     private static <T> Optional<Field> getJoinField(Class<T> clazz) {

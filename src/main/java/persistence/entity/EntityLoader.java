@@ -1,6 +1,8 @@
 package persistence.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jdbc.RowMapper;
 import persistence.CustomTable;
 import persistence.JoinEntityLoader;
@@ -50,7 +52,7 @@ public class EntityLoader<T> implements RowMapper<T> {
             JoinEntityLoader joinEntityLoader = new JoinEntityLoader(targetType.getDeclaredFields());
             Field joinField = joinEntityLoader.mapJoinFields(resultSet);
 
-            if (joinField != null) {
+            if (joinField != null && joinField.getAnnotation(OneToMany.class).fetch() == FetchType.EAGER) {
                 joinField.setAccessible(true);
                 joinField.set(targetObject, joinEntityLoader.joinItems());
             }

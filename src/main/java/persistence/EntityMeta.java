@@ -75,4 +75,8 @@ public class EntityMeta {
     public static boolean hasJoin(Class<?> clazz) {
         return CustomJoinTable.findTableFiled(clazz) != null;
     }
+
+    public static <T> boolean hasJoinEager(Class<T> clazz) {
+        return CustomJoinTable.findJoinEager(clazz);
+    }
 }

@@ -11,7 +11,8 @@ import persistence.sql.ddl.h2.H2UpdateQueryBuilder;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class EntityProxyTest extends DatabaseTest {
     private QueryBuilder queryBuilder;
 

@@ -15,7 +15,7 @@ public class Order {
     @Column(name = "order_number")
     private String orderNumber;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
 
