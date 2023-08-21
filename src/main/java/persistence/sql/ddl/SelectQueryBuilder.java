@@ -20,4 +20,8 @@ public abstract class SelectQueryBuilder {
                 .append(String.format(" where %s=%s", entityMeta.uniqueColumn(entityMeta.tableName()), id))
                 .toString();
     }
+
+    public String findAllBy(String tableName, String columnName, Object columnValue) {
+        return String.format("select * from %s where %s=%s", tableName, columnName, columnValue);
+    }
 }
