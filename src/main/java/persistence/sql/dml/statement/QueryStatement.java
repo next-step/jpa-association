@@ -2,7 +2,7 @@ package persistence.sql.dml.statement;
 
 import persistence.entity.model.EntityColumn;
 import persistence.entity.model.EntityMeta;
-import persistence.entity.model.OneToManyColumn;
+import persistence.entity.model.EntityMetaFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,19 +24,19 @@ public class QueryStatement {
         return new QueryStatement(stringBuilder);
     }
 
-    public static QueryStatement selectJoin(EntityMeta entityMeta, OneToManyColumn oneToManyColumn) {
+    public static QueryStatement selectJoin(EntityMeta entityMeta) {
         String tableName = entityMeta.getTableName();
         String tableColumns = String.join(DELIMITER, entityMeta.getColumnNames());
 
-        EntityMeta joinTable = oneToManyColumn.getEntityMeta();
-        String joinTableName = joinTable.getTableName();
-        String joinTableColumns = String.join(DELIMITER, joinTable.getColumnNames());
+        EntityMeta joinEntityMeta = EntityMetaFactory.INSTANCE.create(entityMeta.getOneToManyColumnClass());
+        String joinTableName = joinEntityMeta.getTableName();
+        String joinTableColumns = String.join(DELIMITER, joinEntityMeta.getColumnNames());
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(String.format("select %s, %s", tableColumns, joinTableColumns));
         stringBuilder.append(String.format(" from %s join %s", tableName, joinTableName));
         stringBuilder.append(String.format(" on %s.%s = ", tableName, entityMeta.getIdColumn().getName()));
-        stringBuilder.append(String.format("%s.%s", joinTableName, oneToManyColumn.getForeignKeyName()));
+        stringBuilder.append(String.format("%s.%s", joinTableName, entityMeta.getForeignKeyName()));
 
         return new QueryStatement(stringBuilder);
     }
@@ -75,7 +75,7 @@ public class QueryStatement {
         return queryBuilder.toString();
     }
 
-    private String  convertColumn(Object value) {
+    private String convertColumn(Object value) {
         if (value instanceof String) {
             return String.format(STRING_VALUE_FORMAT, value);
         }

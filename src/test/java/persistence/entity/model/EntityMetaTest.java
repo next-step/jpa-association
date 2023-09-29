@@ -17,6 +17,7 @@ class EntityMetaTest {
     void setUp() throws NoSuchFieldException {
         Class<Order> orderClass = Order.class;
         entityMeta = new EntityMeta(
+                orderClass,
                 "orders",
                 new EntityColumn(orderClass.getDeclaredField("id")),
                 new EntityColumns(Arrays.asList(new EntityColumn(orderClass.getDeclaredField("orderNumber")))),
@@ -54,11 +55,8 @@ class EntityMetaTest {
     @Test
     @DisplayName("엔티티 일대다 컬럼을 반환한다")
     void getOneToManyColumn() {
-        // when
-        OneToManyColumn oneToManyColumn = entityMeta.getOneToManyColumn().get();
-
-        // then
-        assertThat(oneToManyColumn.getForeignKeyName()).isEqualTo("order_id");
+        // when then
+        assertThat(entityMeta.getForeignKeyName()).isEqualTo("order_id");
     }
 
     @Test

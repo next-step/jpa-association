@@ -2,17 +2,23 @@ package persistence.entity.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EntityMeta {
+    private final Class<?> entityClass;
     private final String tableName;
     private final EntityColumn idColumn;
     private final EntityColumns normalColumns;
     private final OneToManyColumn oneToManyColumn;
 
-    public EntityMeta(String tableName, EntityColumn idColumn, EntityColumns normalColumns, OneToManyColumn oneToManyColumn) {
+    public EntityMeta(
+            Class<?> entityClass,
+            String tableName,
+            EntityColumn idColumn,
+            EntityColumns normalColumns,
+            OneToManyColumn oneToManyColumn
+    ) {
+        this.entityClass = entityClass;
         this.tableName = tableName;
         this.idColumn = idColumn;
         this.normalColumns = normalColumns;
@@ -33,12 +39,12 @@ public class EntityMeta {
                 .collect(Collectors.toList());
     }
 
-    public Optional<OneToManyColumn> getOneToManyColumn() {
-        return Optional.ofNullable(oneToManyColumn);
-    }
-
     public EntityColumn getIdColumn() {
         return idColumn;
+    }
+
+    public Class<?> getOneToManyColumnClass() {
+        return oneToManyColumn.getEntityClass();
     }
 
     public EntityColumns getNormalColumns() {
@@ -50,20 +56,20 @@ public class EntityMeta {
         return value == null || (Long) value == 0;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        EntityMeta that = (EntityMeta) o;
-        return Objects.equals(tableName, that.tableName) &&
-                Objects.equals(idColumn, that.idColumn) &&
-                Objects.equals(normalColumns, that.normalColumns) &&
-                Objects.equals(oneToManyColumn, that.oneToManyColumn);
+    public Class<?> getEntityClass() {
+        return entityClass;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(tableName, idColumn, normalColumns, oneToManyColumn);
+    public boolean isLazyLoading() {
+        return oneToManyColumn != null && oneToManyColumn.isLazy();
+    }
+
+    public boolean isEagerLoading() {
+        return oneToManyColumn != null && oneToManyColumn.isEager();
+    }
+
+    public String getForeignKeyName() {
+        return oneToManyColumn.getForeignKeyName();
     }
 }
 

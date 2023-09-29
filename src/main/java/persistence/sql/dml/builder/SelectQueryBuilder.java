@@ -2,9 +2,6 @@ package persistence.sql.dml.builder;
 
 import persistence.entity.model.EntityColumn;
 import persistence.entity.model.EntityMeta;
-import persistence.entity.model.OneToManyColumn;
-
-import java.util.Optional;
 
 import static persistence.sql.dml.statement.QueryStatement.selectFrom;
 import static persistence.sql.dml.statement.QueryStatement.selectJoin;
@@ -20,17 +17,22 @@ public class SelectQueryBuilder {
     }
 
     public String findById(EntityMeta entityMeta, Object id) {
-        Optional<OneToManyColumn> oneToManyColumn = entityMeta.getOneToManyColumn();
         EntityColumn idColumn = entityMeta.getIdColumn();
-
-        if (oneToManyColumn.isPresent()) {
-            return selectJoin(entityMeta, oneToManyColumn.get())
-                    .where(entityMeta.getTableName() + "." + idColumn.getName(), id.toString())
-                    .query();
-        }
-
         return selectFrom(entityMeta.getTableName(), entityMeta.getColumnNames())
                 .where(idColumn.getName(), id.toString())
+                .query();
+    }
+
+    public String findByIdWithJoin(EntityMeta entityMeta, Object id) {
+        EntityColumn idColumn = entityMeta.getIdColumn();
+        return selectJoin(entityMeta)
+                .where(entityMeta.getTableName() + "." + idColumn.getName(), id.toString())
+                .query();
+    }
+
+    public String findAllByForeignKey(EntityMeta entityMeta, String foreignKeyName, Object foreignKey) {
+        return selectFrom(entityMeta.getTableName(), entityMeta.getColumnNames())
+                .where(foreignKeyName, foreignKey.toString())
                 .query();
     }
 }

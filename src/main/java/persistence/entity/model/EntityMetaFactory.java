@@ -22,7 +22,7 @@ public class EntityMetaFactory {
         OneToManyColumn oneToManyColumn = getOneToManyColumn(tableFields);
         EntityColumns normalColumns = getNormalColumns(tableFields);
 
-        return new EntityMeta(tableName, idColumn, normalColumns, oneToManyColumn);
+        return new EntityMeta(clazz, tableName, idColumn, normalColumns, oneToManyColumn);
     }
 
     private static EntityColumns getNormalColumns(Fields tableFields) {

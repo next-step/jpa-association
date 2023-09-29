@@ -31,10 +31,10 @@ class SelectQueryBuilderTest {
     }
 
     @Test
-    @DisplayName("OneToMany 연관관계가 즉시 로딩일 경우 조인 쿼리를 반환한다")
+    @DisplayName("조인 쿼리를 반환한다")
     void associationFindByIdSql() {
         EntityMeta entityMeta = EntityMetaFactory.INSTANCE.create(Order.class);
-        String query = selectQueryBuilder.findById(entityMeta, 1L);
+        String query = selectQueryBuilder.findByIdWithJoin(entityMeta, 1L);
 
         assertThat(query).isEqualTo(
                 "select orders.id, orders.order_number, order_items.id, order_items.product, order_items.quantity " +
@@ -42,5 +42,4 @@ class SelectQueryBuilderTest {
                         "where orders.id=1"
         );
     }
-
 }

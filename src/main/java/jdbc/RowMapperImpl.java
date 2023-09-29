@@ -1,6 +1,7 @@
 package jdbc;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import persistence.entity.model.EntityMeta;
@@ -42,13 +43,13 @@ public class RowMapperImpl<T> implements RowMapper<T> {
     }
 
     private void setField(Field field, T entity, ResultSet resultSet) {
-        if (field.isAnnotationPresent(Transient.class)) {
+        if (field.isAnnotationPresent(Transient.class) || isLazyLoadingField(field)) {
             return;
         }
 
         field.setAccessible(true);
         try {
-            if (field.isAnnotationPresent(OneToMany.class)) {
+            if (isEagerLoadingField(field)) {
                 ParameterizedType genericType = (ParameterizedType) field.getGenericType();
                 Class<?> collectionGenericType = (Class<?>) genericType.getActualTypeArguments()[0];
                 List<Object> items = getOneToMany(resultSet, collectionGenericType);
@@ -61,6 +62,16 @@ public class RowMapperImpl<T> implements RowMapper<T> {
         } catch (IllegalAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static boolean isLazyLoadingField(Field field) {
+        OneToMany oneToMany = field.getAnnotation(OneToMany.class);
+        return oneToMany != null && oneToMany.fetch() == FetchType.LAZY;
+    }
+
+    private static boolean isEagerLoadingField(Field field) {
+        OneToMany oneToMany = field.getAnnotation(OneToMany.class);
+        return oneToMany != null && oneToMany.fetch() == FetchType.EAGER;
     }
 
     private List<Object> getOneToMany(ResultSet resultSet, Class<?> collectionGenericType) {

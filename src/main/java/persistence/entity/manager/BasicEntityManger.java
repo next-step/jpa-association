@@ -33,7 +33,8 @@ public class BasicEntityManger implements EntityManager {
             return (T) entity;
         }
 
-        T selectedEntity = entityLoader.load(clazz, id);
+        EntityMeta entityMeta = entityMetaFactory.create(clazz);
+        T selectedEntity = entityLoader.load(entityMeta, id);
         if (selectedEntity == null) {
             return null;
         }
