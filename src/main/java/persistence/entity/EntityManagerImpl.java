@@ -18,6 +18,11 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
+    public <T> List<T> findAll(Class<T> clazz) {
+        return new EntitiesLoader(clazz, jdbcTemplate, dml).findAll();
+    }
+
+    @Override
     public <T> Optional<T> find(Class<T> clazz, Object id) {
         EntityKey<T> key = new EntityKey<>(clazz, id);
         if (!context.hasEntity(key)) {
@@ -29,16 +34,24 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void persist(Object entity) {
-        final String query = isNew(entity)
-                ? dml.getInsertQuery(entity)
-                : dml.getUpdateQuery(entity);
+    public <T> T persist(T entity) {
+        final String query = getPersistQuery(entity);
         jdbcTemplate.execute(query);
         context.addEntity(entity);
         context.getDatabaseSnapshot(
                 new EntityKey<>(entity),
                 EntityHelper.clone(entity)
         );
+        return entity;
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        persist(entity);
+        context.getDatabaseSnapshot(
+                new EntityKey<>(entity), entity
+        );
+        return entity;
     }
 
     @Override
@@ -52,14 +65,6 @@ public class EntityManagerImpl implements EntityManager {
                 key.getEntityId()
         ));
         context.removeEntity(entity);
-    }
-
-    @Override
-    public void merge(Object entity) {
-        persist(entity);
-        context.getDatabaseSnapshot(
-                new EntityKey<>(entity), entity
-        );
     }
 
     @Override
@@ -81,6 +86,12 @@ public class EntityManagerImpl implements EntityManager {
                 entity.getClass(),
                 new EntityKey(entity).getEntityId()
         ).isPresent();
+    }
+
+    private String getPersistQuery(Object entity) {
+        return isNew(entity)
+                ? dml.getInsertQuery(entity)
+                : dml.getUpdateQuery(entity);
     }
 
     private <T> Optional<T> findFromDB(EntityKey<T> key) {

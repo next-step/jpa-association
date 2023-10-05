@@ -17,12 +17,9 @@ class SimpleProxyTest {
     void executeProxy() {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(Person.class);
-        enhancer.setCallback(new LazyLoader() {
-            @Override
-            public Object loadObject() throws Exception {
-                System.out.println("프록시가 실행됨");
-                return PersonFixture.createPerson();
-            }
+        enhancer.setCallback((LazyLoader) () -> {
+            System.out.println("프록시가 실행됨");
+            return PersonFixture.createPerson();
         });
 
         Person person = (Person) enhancer.create();

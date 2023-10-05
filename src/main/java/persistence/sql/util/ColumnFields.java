@@ -1,6 +1,7 @@
 package persistence.sql.util;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
@@ -15,6 +16,7 @@ public final class ColumnFields {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(
                         field -> !field.isAnnotationPresent(Transient.class)
+                                && !field.isAnnotationPresent(OneToMany.class)
                 ).collect(Collectors.toList());
     }
 
