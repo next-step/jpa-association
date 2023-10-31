@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EntityPersisterProviderTest {
+class EntityPersistersTest {
     private Class<?> fixtureClass;
-    private EntityPersisterProvider entityPersisterProvider;
+    private EntityPersisters entityPersisters;
 
     @BeforeEach
     void setUp() throws SQLException {
-        entityPersisterProvider = new EntityPersisterProvider(initEntityPersisters(new MockDmlGenerator(), new MockJdbcTemplate()));
+        entityPersisters = new EntityPersisters(initEntityPersisters(new MockDmlGenerator(), new MockJdbcTemplate()));
     }
 
     private Map<Class<?>, EntityPersister> initEntityPersisters(final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
@@ -36,19 +36,19 @@ class EntityPersisterProviderTest {
     }
 
     @Test
-    @DisplayName("EntityPersisterProvider 를 통해 해당 클래스의 EntityPersister 를 사용할 수 있다..")
-    void entityPersisterProviderTest() {
+    @DisplayName("entityPersisters 를 통해 해당 클래스의 EntityPersister 를 사용할 수 있다..")
+    void entityPersistersTest() {
         fixtureClass = FixtureEntity.WithId.class;
-        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(fixtureClass);
+        final EntityPersister entityPersister = entityPersisters.getEntityPersister(fixtureClass);
         assertThat(entityPersister).isNotNull();
     }
 
     @Test
-    @DisplayName("EntityPersisterProvider 를 통해 조회된 같은 타입의 EntityPersister 는 같은 객체이다.")
+    @DisplayName("entityPersisters 를 통해 조회된 같은 타입의 EntityPersister 는 같은 객체이다.")
     void entityPersisterCacheTest() {
         fixtureClass = FixtureEntity.WithId.class;
-        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(fixtureClass);
-        final EntityPersister entityPersisterV2 = entityPersisterProvider.getEntityPersister(fixtureClass);
+        final EntityPersister entityPersister = entityPersisters.getEntityPersister(fixtureClass);
+        final EntityPersister entityPersisterV2 = entityPersisters.getEntityPersister(fixtureClass);
         assertThat(entityPersister == entityPersisterV2).isTrue();
     }
 

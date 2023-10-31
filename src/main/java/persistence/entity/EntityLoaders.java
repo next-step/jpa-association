@@ -2,11 +2,11 @@ package persistence.entity;
 
 import java.util.Map;
 
-public class EntityLoaderProvider {
+public class EntityLoaders {
 
     private final Map<Class<?>, EntityLoader<?>> cache;
 
-    public EntityLoaderProvider(final Map<Class<?>, EntityLoader<?>> loaders) {
+    public EntityLoaders(final Map<Class<?>, EntityLoader<?>> loaders) {
         this.cache = loaders;
     }
 

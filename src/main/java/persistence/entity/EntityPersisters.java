@@ -2,10 +2,10 @@ package persistence.entity;
 
 import java.util.Map;
 
-public class EntityPersisterProvider {
+public class EntityPersisters {
     private final Map<Class<?>, EntityPersister> cache;
 
-    public EntityPersisterProvider(final Map<Class<?>, EntityPersister> persisters) {
+    public EntityPersisters(final Map<Class<?>, EntityPersister> persisters) {
         this.cache = persisters;
     }
 

@@ -7,21 +7,21 @@ import java.util.Objects;
 
 public class SimpleEntityManager implements EntityManager {
 
-    private final EntityPersisterProvider entityPersisterProvider;
-    private final EntityLoaderProvider entityLoaderProvider;
+    private final EntityPersisters entityPersisters;
+    private final EntityLoaders entityLoaders;
     private final PersistenceContext persistenceContext;
     private final EntityKeyGenerator entityKeyGenerator;
 
-    public SimpleEntityManager(final EntityPersisterProvider entityPersisterProvider, final EntityLoaderProvider entityLoaderProvider) {
-        this.entityPersisterProvider = entityPersisterProvider;
-        this.entityLoaderProvider = entityLoaderProvider;
+    public SimpleEntityManager(final EntityPersisters entityPersisters, final EntityLoaders entityLoaders) {
+        this.entityPersisters = entityPersisters;
+        this.entityLoaders = entityLoaders;
         this.entityKeyGenerator = new EntityKeyGenerator();
         this.persistenceContext = new SimplePersistenceContext();
     }
 
     @Override
     public <T> T find(final Class<T> clazz, final Object id) {
-        final EntityLoader<T> entityLoader = entityLoaderProvider.getEntityLoader(clazz);
+        final EntityLoader<T> entityLoader = entityLoaders.getEntityLoader(clazz);
         final EntityKey entityKey = entityKeyGenerator.generate(clazz, id);
         final Object entity = persistenceContext.getEntity(entityKey)
                 .orElseGet(() -> initEntity(entityKey, entityLoader));
@@ -30,7 +30,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void persist(final Object entity) {
-        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+        final EntityPersister entityPersister = entityPersisters.getEntityPersister(entity.getClass());
 
         final Object idValue = extractId(entity, entityPersister);
         final boolean hasIdValue = !Objects.isNull(idValue);
@@ -45,7 +45,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T merge(final T entity) {
-        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+        final EntityPersister entityPersister = entityPersisters.getEntityPersister(entity.getClass());
 
         final Object idValue = extractId(entity, entityPersister);
         final boolean isIdValueNull = Objects.isNull(idValue);
@@ -59,7 +59,7 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public void remove(final Object entity) {
-        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+        final EntityPersister entityPersister = entityPersisters.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
 
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
@@ -125,7 +125,7 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private boolean isDirty(final Object entity) {
-        final EntityPersister entityPersister = entityPersisterProvider.getEntityPersister(entity.getClass());
+        final EntityPersister entityPersister = entityPersisters.getEntityPersister(entity.getClass());
         final Object idValue = extractId(entity, entityPersister);
         final EntityKey entityKey = entityKeyGenerator.generate(entity.getClass(), idValue);
         final Object databaseSnapshot = persistenceContext.getDatabaseSnapshot(entityKey, entity);
