@@ -80,7 +80,7 @@ class EntityMetadataTest {
     void getIdColumnTest() throws NoSuchFieldException {
         mockClass = FixtureEntity.WithId.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityColumn idColumn = new EntityColumn(mockClass.getDeclaredField("id"));
+        final EntityColumn idColumn = new EntityIdColumn(mockClass.getDeclaredField("id"));
 
         assertThat(entityMetadata.getIdColumn()).isEqualTo(idColumn);
     }
@@ -90,7 +90,7 @@ class EntityMetadataTest {
     void getInsertableColumnTest() throws NoSuchFieldException {
         mockClass = FixtureEntity.WithColumnNonInsertable.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityColumn insertableColumn = new EntityColumn(mockClass.getDeclaredField("insertableColumn"));
+        final EntityColumn insertableColumn = new EntityFieldColumn(mockClass.getDeclaredField("insertableColumn"));
 
         assertThatIterable(entityMetadata.toInsertableColumn()).containsExactly(insertableColumn);
     }

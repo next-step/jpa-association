@@ -1,10 +1,7 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.core.EntityColumn;
-import persistence.core.EntityColumns;
-import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
+import persistence.core.*;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
 
@@ -13,7 +10,7 @@ import java.util.Optional;
 
 public class EntityLoader<T> {
     private final String tableName;
-    private final EntityColumn idColumn;
+    private final EntityIdColumn idColumn;
     private final EntityColumns columns;
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;

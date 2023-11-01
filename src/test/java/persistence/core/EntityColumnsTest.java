@@ -32,7 +32,7 @@ class EntityColumnsTest {
     void entityColumnsGetIdTest() throws Exception {
         mockClass = FixtureEntity.WithId.class;
         final EntityColumns columns = new EntityColumns(mockClass);
-        final EntityColumn idColumn = new EntityColumn(mockClass.getDeclaredField("id"));
+        final EntityColumn idColumn = new EntityIdColumn(mockClass.getDeclaredField("id"));
         assertThat(columns.getId()).isEqualTo(idColumn);
     }
 
@@ -41,7 +41,7 @@ class EntityColumnsTest {
     void entityColumnsWithTransientNotExistTest() throws Exception {
         mockClass = FixtureEntity.WithTransient.class;
         final EntityColumns columns = new EntityColumns(mockClass);
-        final EntityColumn idColumn = new EntityColumn(mockClass.getDeclaredField("column"));
+        final EntityColumn idColumn = new EntityFieldColumn(mockClass.getDeclaredField("column"));
         assertThatIterable(columns).doesNotContain(idColumn);
     }
 

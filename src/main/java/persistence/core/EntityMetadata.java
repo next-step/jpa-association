@@ -12,7 +12,7 @@ public class EntityMetadata<T> {
 
     private final String tableName;
     private final EntityColumns columns;
-    private final EntityColumn idColumn;
+    private final EntityIdColumn idColumn;
 
     public EntityMetadata(final Class<T> clazz) {
         this.validate(clazz);
@@ -81,7 +81,7 @@ public class EntityMetadata<T> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public EntityColumn getIdColumn() {
+    public EntityIdColumn getIdColumn() {
         return this.idColumn;
     }
 
