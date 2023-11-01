@@ -1,6 +1,7 @@
 package persistence.core;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 import java.lang.reflect.Field;
 
@@ -28,6 +29,10 @@ public interface EntityColumn {
     static EntityColumn from(final Field field) {
         if (field.isAnnotationPresent(Id.class)) {
             return new EntityIdColumn(field);
+        }
+
+        if (field.isAnnotationPresent(OneToMany.class)) {
+            return new EntityOneToManyColumn(field);
         }
 
         return new EntityFieldColumn(field);
