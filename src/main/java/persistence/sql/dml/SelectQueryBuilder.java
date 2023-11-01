@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import persistence.dialect.Dialect;
+import persistence.dialect.PageQuery;
 import persistence.exception.PersistenceException;
 
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class SelectQueryBuilder {
 
         final String query = builder.toString();
         return Optional.ofNullable(this.limit)
-                .map(limit -> dialect.getPagingStrategy().renderPagingQuery(query, this.offset, this.limit))
+                .map(limit -> dialect.getPagingStrategy().renderPagingQuery(PageQuery.of(query, this.offset, this.limit)))
                 .orElse(query);
     }
 }

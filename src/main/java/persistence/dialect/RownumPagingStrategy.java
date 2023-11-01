@@ -1,6 +1,6 @@
 package persistence.dialect;
 
-public class RownumPagingStrategy extends PagingStrategy {
+public class RownumPagingStrategy implements PagingStrategy {
 
     private RownumPagingStrategy() {
     }
@@ -10,15 +10,15 @@ public class RownumPagingStrategy extends PagingStrategy {
     }
 
     @Override
-    public String doPaging(final String query, final int offset, final int limit) {
+    public String renderPagingQuery(final PageQuery pageQuery) {
         final StringBuilder pagingBuilder = new StringBuilder();
         pagingBuilder
                 .append("select * from (select row.*, rownum as rnum from (")
-                .append(query)
+                .append(pageQuery.getQuery())
                 .append(") row) where rnum > ")
-                .append(offset)
+                .append(pageQuery.getOffset())
                 .append(" and rnum <= ")
-                .append(offset + limit);
+                .append(pageQuery.getMaxResult());
         return pagingBuilder.toString();
     }
 
