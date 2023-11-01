@@ -28,12 +28,10 @@ class EntityEntriesTest {
     void entityEntriesTest() {
         entityEntries.addEntityEntry(person, Status.LOADING);
 
-        final Optional<EntityEntry> result = entityEntries.getEntityEntry(person);
+        final EntityEntry actual = entityEntries.getEntityEntry(person).get();
+        final EntityEntry expected = new EntityEntry(Status.LOADING);
 
-        assertSoftly(softly -> {
-            softly.assertThat(result).isNotEmpty();
-            softly.assertThat(result.get().getStatus()).isEqualTo(Status.LOADING);
-        });
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -49,29 +47,25 @@ class EntityEntriesTest {
     @DisplayName("updateEntityEntryStatus 를 통해 person instance 의 EntityEntry 의 상태를 변경할 수 있다.")
     void updateEntityEntryStatusTest() {
         entityEntries.addEntityEntry(person, Status.LOADING);
-
         entityEntries.updateEntityEntryStatus(person, Status.MANAGED);
-        final Optional<EntityEntry> result = entityEntries.getEntityEntry(person);
 
-        assertSoftly(softly -> {
-            softly.assertThat(result).isNotEmpty();
-            softly.assertThat(result.get().getStatus()).isEqualTo(Status.MANAGED);
-        });
+        final EntityEntry actual = entityEntries.getEntityEntry(person).get();
+        final EntityEntry expected = new EntityEntry(Status.MANAGED);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     @DisplayName("updateEntityEntryStatus 를 통해 property 가 변한 person instance 의 EntityEntry 의 상태를 변경할 수 있다.")
     void updateEntityEntryStatusWithChangedPropertyTest() {
         entityEntries.addEntityEntry(person, Status.LOADING);
-
         person.changeEmail("chagned@email.com");
         entityEntries.updateEntityEntryStatus(person, Status.MANAGED);
-        final Optional<EntityEntry> result = entityEntries.getEntityEntry(person);
 
-        assertSoftly(softly -> {
-            softly.assertThat(result).isNotEmpty();
-            softly.assertThat(result.get().getStatus()).isEqualTo(Status.MANAGED);
-        });
+        final EntityEntry actual = entityEntries.getEntityEntry(person).get();
+        final EntityEntry expected = new EntityEntry(Status.MANAGED);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
