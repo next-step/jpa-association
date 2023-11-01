@@ -1,5 +1,6 @@
 package persistence.core;
 
+import domain.FixtureAssociatedEntity;
 import domain.FixtureEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class EntityColumnsTest {
 
     @Test
     @DisplayName("EntityColumns.getNames 를 통해 컬럼들의 이름들을 조회할 수 있다.")
-    void entityColumnsGetNamesTest() throws Exception {
+    void entityColumnsGetNamesTest() {
         mockClass = FixtureEntity.WithColumn.class;
         final EntityColumns columns = new EntityColumns(mockClass);
 
@@ -56,10 +57,21 @@ class EntityColumnsTest {
 
     @Test
     @DisplayName("EntityColumns.getFieldNames 를 통해 컬럼들의 필드 이름들을 조회할 수 있다.")
-    void entityColumnsGetFieldNamesTest() throws Exception {
+    void entityColumnsGetFieldNamesTest() {
         mockClass = FixtureEntity.WithColumn.class;
         final EntityColumns columns = new EntityColumns(mockClass);
 
         assertThatIterable(columns.getFieldNames()).containsExactly("id", "column", "notNullColumn");
+    }
+
+    @Test
+    @DisplayName("EntityColumns.getOneToManyColumns 를 통해 OneToMany 컬럼들을 조회할 수 있다.")
+    void entityColumnsGetOneToManyColumnsTest() throws Exception {
+        mockClass = FixtureAssociatedEntity.WithOneToManyJoinColumn.class;
+
+        final EntityColumns columns = new EntityColumns(mockClass);
+        final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+
+        assertThatIterable(columns.getOneToManyColumns()).containsExactly(oneToManyColumn);
     }
 }

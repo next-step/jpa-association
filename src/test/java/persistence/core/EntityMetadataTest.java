@@ -1,6 +1,7 @@
 package persistence.core;
 
 
+import domain.FixtureAssociatedEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import domain.FixtureEntity;
@@ -17,7 +18,11 @@ class EntityMetadataTest {
     void entityMetadataCreateTest() {
         mockClass = FixtureEntity.WithId.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        assertResult(entityMetadata, "WithId", "id");
+        assertSoftly(softly -> {
+            softly.assertThat(entityMetadata).isNotNull();
+            softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithId");
+            softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
+        });
     }
 
     @Test
@@ -33,7 +38,11 @@ class EntityMetadataTest {
     void tableAnnotatedEntityMetadataCreateTest() {
         mockClass = FixtureEntity.WithTable.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        assertResult(entityMetadata, "test_table", "id");
+        assertSoftly(softly -> {
+            softly.assertThat(entityMetadata).isNotNull();
+            softly.assertThat(entityMetadata.getTableName()).isEqualTo("test_table");
+            softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
+        });
     }
 
     @Test
@@ -95,12 +104,15 @@ class EntityMetadataTest {
         assertThatIterable(entityMetadata.toInsertableColumn()).containsExactly(insertableColumn);
     }
 
+    @Test
+    @DisplayName("getOneToManyColumns 를 통해 OneToMany columns 를 반환 받을 수 있다.")
+    void getOneToManyColumnsTest() throws Exception {
+        mockClass = FixtureAssociatedEntity.WithOneToManyJoinColumn.class;
 
-    private void assertResult(final EntityMetadata<?> entityMetadata, final String withId, final String id) {
-        assertSoftly(softly -> {
-            softly.assertThat(entityMetadata).isNotNull();
-            softly.assertThat(entityMetadata.getTableName()).isEqualTo(withId);
-            softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo(id);
-        });
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+        final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+
+        assertThatIterable(entityMetadata.getOneToManyColumns()).containsExactly(oneToManyColumn);
     }
+
 }

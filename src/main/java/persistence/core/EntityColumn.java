@@ -26,6 +26,10 @@ public interface EntityColumn {
         return this instanceof EntityIdColumn;
     }
 
+    default boolean isOneToMany() {
+        return this instanceof EntityOneToManyColumn;
+    }
+
     static EntityColumn from(final Field field) {
         if (field.isAnnotationPresent(Id.class)) {
             return new EntityIdColumn(field);
@@ -37,4 +41,5 @@ public interface EntityColumn {
 
         return new EntityFieldColumn(field);
     }
+
 }

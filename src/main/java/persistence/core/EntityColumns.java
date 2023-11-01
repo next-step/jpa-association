@@ -73,4 +73,11 @@ public class EntityColumns implements Iterable<EntityColumn> {
                 .map(EntityColumn::getFieldName)
                 .collect(Collectors.toUnmodifiableList());
     }
+
+    public List<EntityOneToManyColumn> getOneToManyColumns() {
+        return this.columns.stream()
+                .filter(EntityColumn::isOneToMany)
+                .map(EntityOneToManyColumn.class::cast)
+                .collect(Collectors.toUnmodifiableList());
+    }
 }

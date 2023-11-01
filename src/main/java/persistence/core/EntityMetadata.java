@@ -13,12 +13,14 @@ public class EntityMetadata<T> {
     private final String tableName;
     private final EntityColumns columns;
     private final EntityIdColumn idColumn;
+    private final List<EntityOneToManyColumn> oneToManyColumns;
 
     public EntityMetadata(final Class<T> clazz) {
         this.validate(clazz);
         this.tableName = initTableName(clazz);
         this.columns = new EntityColumns(clazz);
         this.idColumn = this.columns.getId();
+        this.oneToManyColumns = this.columns.getOneToManyColumns();
     }
 
     private void validate(final Class<T> clazz) {
@@ -90,5 +92,9 @@ public class EntityMetadata<T> {
                 this.columns.stream()
                         .filter(EntityColumn::isInsertable)
                         .collect(Collectors.toUnmodifiableList()));
+    }
+
+    public List<EntityOneToManyColumn> getOneToManyColumns() {
+        return this.oneToManyColumns;
     }
 }
