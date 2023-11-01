@@ -32,8 +32,8 @@ class DmlGeneratorTest {
     @Test
     @DisplayName("주어진 person 인스턴스를 이용해 insert ddl 을 생성할 수 있다.")
     void dmlGeneratorTest() {
-        final List<String> columnNames = entityMetadata.getInsertableColumnNames();
-        final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.getInsertableColumnFieldNames());
+        final List<String> columnNames = entityMetadata.toInsertableColumnNames();
+        final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.toInsertableColumnFieldNames());
         final String query = generator.insert(entityMetadata.getTableName(), columnNames, values);
 
         assertThat(query).isEqualToIgnoringCase(String.format("insert into users (nick_name, old, email) values ('%s', %d, '%s')", "min", 30, "jongmin4943@gmail.com"));
@@ -42,7 +42,7 @@ class DmlGeneratorTest {
     @Test
     @DisplayName("Person 클래스 정보로 select ddl 을 생성할 수 있다.")
     void findAllTest() {
-        final String query = generator.findAll(entityMetadata.getTableName(), entityMetadata.getColumnNames());
+        final String query = generator.findAll(entityMetadata.getTableName(), entityMetadata.toColumnNames());
 
         assertThat(query).isEqualToIgnoringCase("select id, nick_name, old, email from users");
     }
@@ -50,7 +50,7 @@ class DmlGeneratorTest {
     @Test
     @DisplayName("Person 클래스 정보로 select ddl 을 생성할 수 있다.")
     void findByIdTest() {
-        final String query = generator.findById(entityMetadata.getTableName(), entityMetadata.getColumnNames(), entityMetadata.getIdColumnName(), person.getId());
+        final String query = generator.findById(entityMetadata.getTableName(), entityMetadata.toColumnNames(), entityMetadata.getIdColumnName(), person.getId());
 
         assertThat(query).isEqualToIgnoringCase("select id, nick_name, old, email from users where id=1");
     }
@@ -66,8 +66,8 @@ class DmlGeneratorTest {
     @Test
     @DisplayName("Person 클래스 정보로 delete ddl 을 생성할 수 있다.")
     void generateUpdateDmlTest() {
-        final List<String> columnNames = entityMetadata.getInsertableColumnNames();
-        final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.getInsertableColumnFieldNames());
+        final List<String> columnNames = entityMetadata.toInsertableColumnNames();
+        final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.toInsertableColumnFieldNames());
         final String query = generator.update(entityMetadata.getTableName(), columnNames, values, entityMetadata.getIdColumnName(), person.getId());
 
         assertThat(query).isEqualToIgnoringCase("update users set nick_name='min', old=30, email='jongmin4943@gmail.com' where id=1");

@@ -43,14 +43,14 @@ public class EntityMetadata<T> {
         return this.columns;
     }
 
-    public List<String> getInsertableColumnNames() {
+    public List<String> toInsertableColumnNames() {
         return this.columns.stream()
                 .filter(EntityColumn::isInsertable)
                 .map(EntityColumn::getName)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<String> getInsertableColumnFieldNames() {
+    public List<String> toInsertableColumnFieldNames() {
         return this.columns.stream()
                 .filter(EntityColumn::isInsertable)
                 .map(EntityColumn::getFieldName)
@@ -69,13 +69,13 @@ public class EntityMetadata<T> {
         return this.columns.size();
     }
 
-    public List<String> getColumnNames() {
+    public List<String> toColumnNames() {
         return this.columns.stream()
                 .map(EntityColumn::getName)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<String> getColumnFieldNames() {
+    public List<String> toColumnFieldNames() {
         return this.columns.stream()
                 .map(EntityColumn::getFieldName)
                 .collect(Collectors.toUnmodifiableList());
@@ -85,7 +85,7 @@ public class EntityMetadata<T> {
         return this.idColumn;
     }
 
-    public EntityColumns getInsertableColumn() {
+    public EntityColumns toInsertableColumn() {
         return new EntityColumns(
                 this.columns.stream()
                         .filter(EntityColumn::isInsertable)

@@ -24,7 +24,7 @@ public class EntityPersister {
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.columns = entityMetadata.getColumns();
-        this.insertableColumns = entityMetadata.getInsertableColumn();
+        this.insertableColumns = entityMetadata.toInsertableColumn();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
         this.entityRowMapper = new EntityIdMapper(clazz);

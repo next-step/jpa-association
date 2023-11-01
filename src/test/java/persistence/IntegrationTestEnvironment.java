@@ -41,8 +41,8 @@ public abstract class IntegrationTestEnvironment {
         people = createDummyUsers();
 
         people.forEach(person -> {
-            final List<String> columnNames = entityMetadata.getInsertableColumnNames();
-            final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.getInsertableColumnFieldNames());
+            final List<String> columnNames = entityMetadata.toInsertableColumnNames();
+            final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.toInsertableColumnFieldNames());
             jdbcTemplate.execute(dmlGenerator.insert(entityMetadata.getTableName(), columnNames, values));
         });
     }

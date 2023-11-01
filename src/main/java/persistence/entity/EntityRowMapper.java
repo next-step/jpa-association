@@ -18,8 +18,8 @@ public class EntityRowMapper<T> {
     public EntityRowMapper(final Class<T> clazz) {
         final EntityMetadata<T> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
         this.clazz = clazz;
-        this.columnNames = entityMetadata.getColumnNames();
-        this.fieldNames = entityMetadata.getColumnFieldNames();
+        this.columnNames = entityMetadata.toColumnNames();
+        this.fieldNames = entityMetadata.toColumnFieldNames();
         this.columnSize = entityMetadata.getColumnSize();
     }
 

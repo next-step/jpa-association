@@ -45,7 +45,7 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata).isNotNull();
             softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithColumnNonInsertable");
             softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
-            softly.assertThat(entityMetadata.getInsertableColumnNames()).containsExactly("insertableColumn");
+            softly.assertThat(entityMetadata.toInsertableColumnNames()).containsExactly("insertableColumn");
         });
     }
 
@@ -58,7 +58,7 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata).isNotNull();
             softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithColumn");
             softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
-            softly.assertThat(entityMetadata.getColumnNames()).containsExactly("id", "test_column", "notNullColumn");
+            softly.assertThat(entityMetadata.toColumnNames()).containsExactly("id", "test_column", "notNullColumn");
         });
     }
 
@@ -71,7 +71,7 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata).isNotNull();
             softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithColumn");
             softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
-            softly.assertThat(entityMetadata.getColumnFieldNames()).containsExactly("id", "column", "notNullColumn");
+            softly.assertThat(entityMetadata.toColumnFieldNames()).containsExactly("id", "column", "notNullColumn");
         });
     }
 
@@ -92,7 +92,7 @@ class EntityMetadataTest {
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
         final EntityColumn insertableColumn = new EntityColumn(mockClass.getDeclaredField("insertableColumn"));
 
-        assertThatIterable(entityMetadata.getInsertableColumn()).containsExactly(insertableColumn);
+        assertThatIterable(entityMetadata.toInsertableColumn()).containsExactly(insertableColumn);
     }
 
 
