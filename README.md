@@ -54,3 +54,6 @@ public class CustomSelect {
 <br> 목표 쿼리문 : `select orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity from orders left join order_items on orders.id = order_items.order_id where orders.id=1`
 
 - 요구사항 2 - Join Query 를 만들어 Entity 화 해보기
+<br>`FetchType.EAGER 인 경우`
+- [x] RowMapper 를 left join 시에도 적용 가능하게 변경
+- [x] Order 조회해서 Entity 화 및 검증
