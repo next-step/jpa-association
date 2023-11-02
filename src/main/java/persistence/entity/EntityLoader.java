@@ -12,7 +12,6 @@ public class EntityLoader<T> {
     private final EntityMetadata<T> entityMetadata;
     private final String tableName;
     private final EntityIdColumn idColumn;
-    private final EntityColumns columns;
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
     private final EntityRowMapper<T> entityRowMapper;
@@ -21,7 +20,6 @@ public class EntityLoader<T> {
         this.entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
-        this.columns = entityMetadata.getColumns();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
         this.entityRowMapper = new EntityRowMapper<>(clazz);
@@ -30,6 +28,7 @@ public class EntityLoader<T> {
     public Optional<T> loadById(final Object id) {
         final String query = renderSelect(id);
         final List<T> result = jdbcTemplate.query(query, entityRowMapper::mapRow);
+
         if (result.size() > 1) {
             throw new PersistenceException("id 로 조회된 row 가 2개 이상입니다.");
         }

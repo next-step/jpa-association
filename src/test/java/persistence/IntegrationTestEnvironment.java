@@ -2,6 +2,8 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.FixtureAssociatedEntity.Order;
+import domain.FixtureAssociatedEntity.OrderItem;
 import domain.FixtureEntity.Person;
 import extension.EntityMetadataExtension;
 import jdbc.JdbcTemplate;
@@ -24,7 +26,9 @@ public abstract class IntegrationTestEnvironment {
     private DatabaseServer server;
     protected DdlGenerator ddlGenerator;
     protected DmlGenerator dmlGenerator;
-    protected EntityMetadata<?> entityMetadata;
+    protected EntityMetadata<Person> personEntityMetadata;
+    protected EntityMetadata<Order> orderEntityMetadata;
+    protected EntityMetadata<OrderItem> orderItemEntityMetadata;
     protected JdbcTemplate jdbcTemplate;
     protected PersistenceEnvironment persistenceEnvironment;
     protected List<Person> people;
@@ -38,21 +42,18 @@ public abstract class IntegrationTestEnvironment {
         ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
 
-        entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
-        final String createDdl = ddlGenerator.generateCreateDdl(entityMetadata);
-        jdbcTemplate.execute(createDdl);
+        personEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
+        orderEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Order.class);
+        orderItemEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderItem.class);
+        final String createPersonDdl = ddlGenerator.generateCreateDdl(personEntityMetadata);
+        jdbcTemplate.execute(createPersonDdl);
         people = createDummyUsers();
-
-        people.forEach(person -> {
-            final List<String> columnNames = entityMetadata.toInsertableColumnNames();
-            final List<Object> values = ReflectionUtils.getFieldValues(person, entityMetadata.toInsertableColumnFieldNames());
-            jdbcTemplate.execute(dmlGenerator.insert(entityMetadata.getTableName(), columnNames, values));
-        });
+        saveDummyUsers();
     }
 
     @AfterEach
     void integrationTearDown() {
-        final String dropDdl = ddlGenerator.generateDropDdl(entityMetadata);
+        final String dropDdl = ddlGenerator.generateDropDdl(personEntityMetadata);
         jdbcTemplate.execute(dropDdl);
         server.stop();
     }
@@ -64,5 +65,14 @@ public abstract class IntegrationTestEnvironment {
         final Person test03 = new Person("test03", 30, "test03@gmail.com");
         return List.of(test00, test01, test02, test03);
     }
+
+    private void saveDummyUsers() {
+        people.forEach(person -> {
+            final List<String> columnNames = personEntityMetadata.toInsertableColumnNames();
+            final List<Object> values = ReflectionUtils.getFieldValues(person, personEntityMetadata.toInsertableColumnFieldNames());
+            jdbcTemplate.execute(dmlGenerator.insert(personEntityMetadata.getTableName(), columnNames, values));
+        });
+    }
+
 
 }

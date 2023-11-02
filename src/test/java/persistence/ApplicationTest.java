@@ -14,7 +14,7 @@ class ApplicationTest extends IntegrationTestEnvironment {
     @Test
     @DisplayName("쿼리 실행을 통해 데이터를 여러 row 를 넣어 정상적으로 나오는지 확인할 수 있다.")
     void findAllTest() {
-        final String query = dmlGenerator.findAll(entityMetadata.getTableName(), entityMetadata.toColumnNames());
+        final String query = dmlGenerator.findAll(personEntityMetadata.getTableName(), personEntityMetadata.toColumnNames());
 
         final List<Person> result = jdbcTemplate.query(query, personRowMapper());
 
@@ -24,7 +24,7 @@ class ApplicationTest extends IntegrationTestEnvironment {
     @Test
     @DisplayName("findById 를 통해 원하는 row 를 찾을 수 있다.")
     void findByIdTest() {
-        final String query = dmlGenerator.findById(entityMetadata.getTableName(), entityMetadata.toColumnNames(), entityMetadata.getIdColumnName(), 1L);
+        final String query = dmlGenerator.findById(personEntityMetadata.getTableName(), personEntityMetadata.toColumnNames(), personEntityMetadata.getIdColumnName(), 1L);
 
         final Person result = jdbcTemplate.queryForObject(query, personRowMapper());
 
