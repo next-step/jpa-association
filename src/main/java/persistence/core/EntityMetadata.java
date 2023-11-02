@@ -5,11 +5,13 @@ import jakarta.persistence.Table;
 import persistence.exception.PersistenceException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EntityMetadata<T> {
 
+    private final Class<T> clazz;
     private final String tableName;
     private final EntityColumns columns;
     private final EntityIdColumn idColumn;
@@ -17,6 +19,7 @@ public class EntityMetadata<T> {
 
     public EntityMetadata(final Class<T> clazz) {
         this.validate(clazz);
+        this.clazz = clazz;
         this.tableName = initTableName(clazz);
         this.columns = new EntityColumns(clazz);
         this.idColumn = this.columns.getId();
@@ -96,5 +99,22 @@ public class EntityMetadata<T> {
 
     public List<EntityOneToManyColumn> getOneToManyColumns() {
         return this.oneToManyColumns;
+    }
+
+    public boolean isType(final Class<?> clazz) {
+        return this.clazz.equals(clazz);
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final EntityMetadata<?> that = (EntityMetadata<?>) object;
+        return Objects.equals(clazz, that.clazz) && Objects.equals(tableName, that.tableName) && Objects.equals(columns, that.columns) && Objects.equals(idColumn, that.idColumn) && Objects.equals(oneToManyColumns, that.oneToManyColumns);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz, tableName, columns, idColumn, oneToManyColumns);
     }
 }

@@ -7,6 +7,7 @@ import persistence.exception.ColumnNotExistException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -79,5 +80,18 @@ public class EntityColumns implements Iterable<EntityColumn> {
                 .filter(EntityColumn::isOneToMany)
                 .map(EntityOneToManyColumn.class::cast)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final EntityColumns that = (EntityColumns) object;
+        return Objects.equals(columns, that.columns);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(columns);
     }
 }

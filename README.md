@@ -48,6 +48,8 @@ public class CustomSelect {
 - [x] @OneToMany(fetch) 정보를 Metadata 에 저장한다.
 - [x] @JoinColumn 정보를 Metadata 에 저장한다.
 - [x] @OneToMany Generic 클래스 정보를 Metadata 에 저장한다.
+- [x] Entity `Order` 와 `OrderItem` 의 Metadata 를 이용해 create 쿼리를 만든다.
+<br> 목표 쿼리문 : `create table order_items (id bigint not null auto_increment,product varchar(255),quantity int,order_id bigint,foreign key(order_id) references order (id),CONSTRAINT PK_order_items PRIMARY KEY (id))`
 - [ ] Entity `Order` 와 `OrderItem` 의 Metadata 를 이용해 select 쿼리를 만든다.
 <br> 목표 쿼리문 : `select order.*, order_item.* from order left join order_item on order.id = order_item.order_id`
 

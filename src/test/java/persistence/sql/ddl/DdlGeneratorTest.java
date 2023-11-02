@@ -1,9 +1,12 @@
 package persistence.sql.ddl;
 
 
+import domain.FixtureAssociatedEntity;
+import extension.EntityMetadataExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -15,6 +18,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(EntityMetadataExtension.class)
 class DdlGeneratorTest {
     DdlGenerator generator;
     EntityMetadata<?> entityMetadata;
@@ -51,6 +55,24 @@ class DdlGeneratorTest {
         final String query = generator.generateCreateDdl(entityMetadata);
 
         assertThat(query).isEqualToIgnoringCase(expected);
+    }
+
+    @Test
+    @DisplayName("Order class create 쿼리 생성 테스트")
+    void generateOrderCreateDdlTest() {
+        entityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.Order.class);
+        final String query = generator.generateCreateDdl(entityMetadata);
+        assertThat(query)
+                .isEqualToIgnoringCase("create table orders (id bigint not null auto_increment,orderNumber varchar(255),CONSTRAINT PK_orders PRIMARY KEY (id))");
+    }
+
+    @Test
+    @DisplayName("OrderItem class create 쿼리 생성 테스트")
+    void generateOrderItemCreateDdlTest() {
+        entityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.OrderItem.class);
+        final String query = generator.generateCreateDdl(entityMetadata);
+        assertThat(query)
+                .isEqualToIgnoringCase("create table order_items (id bigint not null auto_increment,product varchar(255),quantity int,order_id bigint,foreign key(order_id) references order (id),CONSTRAINT PK_order_items PRIMARY KEY (id))");
     }
 
     private static Stream<Arguments> fixtureArgumentProvider() {
