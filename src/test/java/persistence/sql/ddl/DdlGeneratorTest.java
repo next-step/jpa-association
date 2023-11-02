@@ -72,7 +72,7 @@ class DdlGeneratorTest {
         entityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.OrderItem.class);
         final String query = generator.generateCreateDdl(entityMetadata);
         assertThat(query)
-                .isEqualToIgnoringCase("create table order_items (id bigint not null auto_increment,product varchar(255),quantity int,order_id bigint,foreign key(order_id) references order (id),CONSTRAINT PK_order_items PRIMARY KEY (id))");
+                .isEqualToIgnoringCase("create table order_items (id bigint not null auto_increment,product varchar(255),quantity int,order_id bigint,foreign key(order_id) references orders (id),CONSTRAINT PK_order_items PRIMARY KEY (id))");
     }
 
     private static Stream<Arguments> fixtureArgumentProvider() {
