@@ -11,6 +11,7 @@ import persistence.mapper.TestEntityRowMapper;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.infra.H2SqlConverter;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -31,7 +32,7 @@ public class DatabaseServerTest extends DatabaseTest {
 
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
 
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
+                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
 
                 EntityFixtures.SampleOneWithValidAnnotation entityOne =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);

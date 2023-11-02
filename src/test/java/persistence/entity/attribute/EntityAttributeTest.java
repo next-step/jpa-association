@@ -10,6 +10,8 @@ import persistence.sql.ddl.wrapper.CreateDDLWrapper;
 import persistence.sql.ddl.wrapper.DropDDLWrapper;
 import persistence.sql.infra.H2SqlConverter;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
@@ -27,7 +29,7 @@ public class EntityAttributeTest {
             @DisplayName("EntityAttribute를 반환한다.")
             void returnEntityAttribute() {
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>());
 
                 Assertions.assertAll(
                         () -> assertThat(entityAttribute.getTableName())
@@ -50,7 +52,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                EntityFixtures.EntityWithMultiIdAnnotation.class));
+                                EntityFixtures.EntityWithMultiIdAnnotation.class, new HashSet<>()));
             }
         }
 
@@ -62,7 +64,7 @@ public class EntityAttributeTest {
             void throwException() {
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                EntityFixtures.EntityWithOutEntityAnnotation.class));
+                                EntityFixtures.EntityWithOutEntityAnnotation.class, new HashSet<>()));
             }
         }
     }

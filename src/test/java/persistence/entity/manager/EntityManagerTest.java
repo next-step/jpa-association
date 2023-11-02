@@ -18,6 +18,7 @@ import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.infra.H2SqlConverter;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -38,7 +39,7 @@ public class EntityManagerTest extends DatabaseTest {
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
                 EntityFixtures.SampleOneWithValidAnnotation sample =
                         new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
@@ -69,7 +70,7 @@ public class EntityManagerTest extends DatabaseTest {
                 setUpFixtureTable(EntityFixtures.SampleTwoWithValidAnnotation.class, new H2SqlConverter());
 
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>());
 
                 EntityFixtures.SampleTwoWithValidAnnotation sample =
                         new EntityFixtures.SampleTwoWithValidAnnotation(1L, "민준", 29L);

@@ -3,6 +3,7 @@ package persistence.sql.dml.builder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.sql.dml.WhereClause;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

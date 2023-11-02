@@ -1,4 +1,4 @@
-package persistence.sql.dml.builder;
+package persistence.sql.dml;
 
 public class WhereClause {
     private final StringBuilder conditions = new StringBuilder();
@@ -10,8 +10,12 @@ public class WhereClause {
         conditions.append(condition);
     }
 
-    public void and(String fieldName, String value) {
-        and(String.format("%s = '%s'", fieldName, value));
+    public void and(String columnName, String value) {
+        and(String.format("%s = '%s'", columnName, value));
+    }
+
+    public void and(String alias, String columnName, String value) {
+        and(String.format("%s.%s = '%s'", alias, columnName, value));
     }
 
     @Override
@@ -19,6 +23,6 @@ public class WhereClause {
         if (conditions.length() == 0) {
             return "";
         }
-        return " WHERE " + conditions;
+        return "WHERE " + conditions;
     }
 }

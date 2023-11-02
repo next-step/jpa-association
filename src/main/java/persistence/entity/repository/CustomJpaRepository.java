@@ -4,6 +4,7 @@ import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.manager.EntityManager;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 
 public class CustomJpaRepository<T, ID> {
     private final EntityManager entityManager;
@@ -13,7 +14,7 @@ public class CustomJpaRepository<T, ID> {
     }
 
     public T save(T instance) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass());
+        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(),new HashSet<>());
         Field idField = entityAttribute.getIdAttribute().getField();
         idField.setAccessible(true);
         return entityManager.persist(instance);

@@ -8,6 +8,8 @@ import persistence.DatabaseTest;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.sql.infra.H2SqlConverter;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static persistence.sql.common.DDLType.CREATE;
 
@@ -24,7 +26,7 @@ public class CreateDDLQueryBuilderTest extends DatabaseTest {
             @Test
             @DisplayName("CREATE DDL을 리턴한다.")
             void returnDDL() {
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
+                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
 
                 String ddl = DDLQueryBuilderFactory.createQueryBuilder(CREATE)
                         .prepareStatement(entityAttribute, new H2SqlConverter());

@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class EntityLoaderImpl implements EntityLoader {
 
     @Override
     public <T> T load(Class<T> clazz, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz);
+        EntityAttribute entityAttribute = EntityAttribute.of(clazz,new HashSet<>());
         IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
         String sql = SelectQueryBuilder.of(entityAttribute).where(idAttribute.getColumnName(), id).prepareStatement();

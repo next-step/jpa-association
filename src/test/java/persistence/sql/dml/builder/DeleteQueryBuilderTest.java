@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
@@ -22,7 +24,7 @@ public class DeleteQueryBuilderTest {
             void returnDML() {
                 DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
                 String dml
-                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class), String.valueOf(1));
+                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>()), String.valueOf(1));
                 assertThat(dml).isEqualTo("DELETE FROM two where id = 1");
             }
         }

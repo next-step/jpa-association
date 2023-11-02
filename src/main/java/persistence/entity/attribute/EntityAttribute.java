@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static persistence.entity.attribute.resolver.AttributeHolder.GENERAL_ATTRIBUTE_RESOLVERS;
@@ -21,21 +22,28 @@ public class EntityAttribute {
     private final String tableName;
     private final List<GeneralAttribute> generalAttributes;
     private final IdAttribute idAttribute;
+    private final List<OneToManyField> oneToManyFields;
 
     private EntityAttribute(
             String tableName,
             IdAttribute idAttribute,
-            List<GeneralAttribute> generalAttributes
+            List<GeneralAttribute> generalAttributes,
+            List<OneToManyField> oneToManies
     ) {
         this.tableName = tableName;
         this.generalAttributes = generalAttributes;
         this.idAttribute = idAttribute;
+        this.oneToManyFields = oneToManies;
     }
 
-    public static EntityAttribute of(Class<?> clazz) {
-        String tableName = Optional.ofNullable(clazz.getAnnotation(Table.class)).map(Table::name).orElse(clazz.getSimpleName());
+    public static EntityAttribute of(Class<?> clazz, Set<Class<?>> visitedEntities) {
+        String tableName = Optional.ofNullable(clazz.getAnnotation(Table.class))
+                .map(Table::name)
+                .orElse(clazz.getSimpleName());
 
-        List<GeneralAttribute> generalAttributes = Arrays.stream(clazz.getDeclaredFields())
+        Field[] fields = clazz.getDeclaredFields();
+
+        List<GeneralAttribute> generalAttributes = Arrays.stream(fields)
                 .filter(field -> field.isAnnotationPresent(Column.class)
                         && !field.isAnnotationPresent(Id.class))
                 .map(it -> {
@@ -47,7 +55,7 @@ public class EntityAttribute {
                     throw new RuntimeException("일반 어트리뷰트 파싱 실패 예외");
                 }).collect(Collectors.toList());
 
-        Field idField = Arrays.stream(clazz.getDeclaredFields())
+        Field idField = Arrays.stream(fields)
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(String.format("[%s] 엔티티에 @Id가 없습니다", clazz.getSimpleName())));
@@ -58,12 +66,21 @@ public class EntityAttribute {
                 .map(resolver -> resolver.resolve(idField))
                 .findFirst().orElseThrow(() -> new IllegalStateException("IdAttribute 파싱에 실패했습니다."));
 
-        validate(clazz, idAttribute);
+        validate(clazz, idAttribute, visitedEntities);
 
-        return new EntityAttribute(tableName, idAttribute, generalAttributes);
+        List<OneToManyField> oneToManies = Arrays.stream(fields)
+                .filter(field -> field.isAnnotationPresent(jakarta.persistence.OneToMany.class))
+                .map(field -> new OneToManyField(field, tableName, idAttribute.getColumnName(), visitedEntities)).toList();
+
+
+        return new EntityAttribute(tableName, idAttribute, generalAttributes, oneToManies);
     }
 
-    private static void validate(Class<?> clazz, IdAttribute idAttribute) {
+    private static void validate(Class<?> clazz, IdAttribute idAttribute, Set<Class<?>> visitedEntities) {
+        if (visitedEntities.contains(clazz)) {
+            throw new IllegalStateException(String.format("[%s] 엔티티에서 순환 참조가 발견되었습니다.", clazz.getSimpleName()));
+        }
+
         long idAnnotatedFieldCount = Arrays.stream((clazz.getDeclaredFields()))
                 .filter(it -> it.isAnnotationPresent(Id.class))
                 .count();
@@ -93,5 +110,9 @@ public class EntityAttribute {
 
     public IdAttribute getIdAttribute() {
         return idAttribute;
+    }
+
+    public List<OneToManyField> getOneToManyFields() {
+        return this.oneToManyFields;
     }
 }

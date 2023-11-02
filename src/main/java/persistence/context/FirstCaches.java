@@ -1,5 +1,8 @@
 package persistence.context;
 
+import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.OneToManyField;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,8 +14,22 @@ public class FirstCaches {
         if (instance == null) {
             return;
         }
-        firstCaches.computeIfAbsent(instance.getClass(), k -> new HashMap<>())
-                .put(instanceId, instance);
+        firstCaches.computeIfAbsent(instance.getClass(), k -> new HashMap<>()).put(instanceId, instance);
+    }
+
+    public void putFirstCache(Object instance, String instanceId, EntityAttribute entityAttribute) {
+        if (instance == null) {
+            return;
+        }
+
+        firstCaches.computeIfAbsent(instance.getClass(), k -> new HashMap<>()).put(instanceId, instance);
+
+//        for (OneToManyField oneToManyField : entityAttribute.getOneToManyFields()) {
+//            instance.
+//            this.putFirstCache(oneToManyField, oneToManyField.getEntityAttribute());
+//        }
+
+        firstCaches.computeIfAbsent(instance.getClass(), k -> new HashMap<>()).put(instanceId, instance);
     }
 
     public Object getFirstCacheOrNull(Class<?> clazz, String id) {

@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
@@ -24,7 +26,7 @@ public class InsertQueryBuilderTest {
             void returnStatement() {
                 Person person = new Person(1L, "민준", 29, "민준.com");
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
                 String statement = insertQueryBuilder.prepareStatement(entityAttribute, person);
                 assertThat(statement)

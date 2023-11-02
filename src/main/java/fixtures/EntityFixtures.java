@@ -2,6 +2,8 @@ package fixtures;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 public class EntityFixtures {
     @Entity
     @Table(name = "entity_name")
@@ -158,4 +160,33 @@ public class EntityFixtures {
                     '}';
         }
     }
+
+    @Entity
+    @Table(name = "orders")
+    public class Order {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String orderNumber;
+
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn(name = "order_id")
+        private List<OrderItem> orderItems;
+    }
+
+    @Entity
+    @Table(name = "order_items")
+    public class OrderItem {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String product;
+
+        private Integer quantity;
+    }
+
 }

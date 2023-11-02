@@ -15,6 +15,7 @@ import persistence.sql.ddl.builder.DDLQueryBuilderFactory;
 import persistence.sql.ddl.converter.SqlConverter;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 
 public class DatabaseTest {
@@ -43,7 +44,7 @@ public class DatabaseTest {
 
     protected void setUpFixtureTable(Class<?> clazz, SqlConverter sqlConverter) {
         DDLQueryBuilder queryBuilder = DDLQueryBuilderFactory.createQueryBuilder(DDLType.CREATE);
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz);
+        EntityAttribute entityAttribute = EntityAttribute.of(clazz,new HashSet<>());
         jdbcTemplate.execute(queryBuilder.prepareStatement(entityAttribute, sqlConverter));
     }
 }
