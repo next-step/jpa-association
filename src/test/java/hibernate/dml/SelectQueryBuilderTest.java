@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,6 +25,29 @@ class SelectQueryBuilderTest {
                 new EntityField(TestEntity.class.getDeclaredField("id")),
                 1
         );
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void join_select쿼리를_생성한다() throws NoSuchFieldException {
+        // given
+        String expected = "select orders.id, orders.orderNumber, orderItem.id, orderItem.produce, orderItem.quantity " +
+                "from orders " +
+                "join orderItem on orders.id = orderItem.id " +
+                "where orders.id = 1;";
+
+        // when
+        String actual = selectQueryBuilder.generateQuery(
+                "orders",
+                List.of("id", "orderNumber"),
+                new EntityField(Order.class.getDeclaredField("id")),
+                1,
+                Map.of("orderItem", List.of("id", "produce", "quantity")),
+                Map.of("orderItem", new EntityField(orderItem.class.getDeclaredField("id")))
+        );
+        System.out.println(actual);
 
         // then
         assertThat(actual).isEqualTo(expected);
@@ -50,5 +74,24 @@ class SelectQueryBuilderTest {
             this.name = name;
             this.email = email;
         }
+    }
+
+    @Entity
+    @Table(name = "orders")
+    static class Order {
+        @Id
+        private Long id;
+
+        private String orderNumber;
+    }
+
+    @Entity
+    static class orderItem {
+        @Id
+        private Long id;
+
+        private String produce;
+
+        private Integer quantity;
     }
 }
