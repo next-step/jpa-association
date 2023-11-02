@@ -2,7 +2,9 @@ package domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class FixtureAssociatedEntity {
@@ -75,6 +77,37 @@ public class FixtureAssociatedEntity {
         @OneToMany(fetch = FetchType.EAGER)
         @JoinColumn(name = "order_id")
         private List<OrderItem> orderItems;
+
+        protected Order() {
+        }
+
+        public Order(final Long id, final String orderNumber) {
+            this.id = id;
+            this.orderNumber = orderNumber;
+        }
+
+        public Order(final String orderNumber) {
+            this(null, orderNumber);
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getOrderNumber() {
+            return orderNumber;
+        }
+
+        public List<OrderItem> getOrderItems() {
+            return orderItems;
+        }
+
+        public void addOrderItem(final OrderItem orderItem) {
+            if(Objects.isNull(this.orderItems)) {
+                this.orderItems = new ArrayList<>();
+            }
+            this.orderItems.add(orderItem);
+        }
     }
 
     @Entity
@@ -88,5 +121,31 @@ public class FixtureAssociatedEntity {
         private String product;
 
         private Integer quantity;
+
+        public OrderItem() {
+        }
+
+        public OrderItem(final Long id, final String product, final Integer quantity) {
+            this.id = id;
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        public OrderItem(final String product, final Integer quantity) {
+            this(null, product, quantity);
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getProduct() {
+            return product;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
     }
 }
