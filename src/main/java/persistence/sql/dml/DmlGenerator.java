@@ -35,6 +35,10 @@ public class DmlGenerator {
                 .build();
     }
 
+    public SelectQueryBuilder select() {
+        return new SelectQueryBuilder(dialect);
+    }
+
     public String delete(final String tableName, final String idColumnName, final Object id) {
         return DeleteQueryBuilder.builder()
                 .table(tableName)

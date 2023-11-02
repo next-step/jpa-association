@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class EntityLoader<T> {
+    private final EntityMetadata<T> entityMetadata;
     private final String tableName;
     private final EntityIdColumn idColumn;
     private final EntityColumns columns;
@@ -17,7 +18,7 @@ public class EntityLoader<T> {
     private final EntityRowMapper<T> entityRowMapper;
 
     public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
-        final EntityMetadata<T> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+        this.entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.columns = entityMetadata.getColumns();
@@ -40,6 +41,12 @@ public class EntityLoader<T> {
     }
 
     public String renderSelect(final Object id) {
-        return dmlGenerator.findById(tableName, columns.getNames(), idColumn.getName(), id);
+        return dmlGenerator.select()
+                .table(tableName)
+                .column(entityMetadata)
+                .leftJoin(entityMetadata)
+                .where(tableName + "." + idColumn.getName(), String.valueOf(id))
+                .build();
     }
+
 }
