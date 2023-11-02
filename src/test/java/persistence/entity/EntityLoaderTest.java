@@ -1,6 +1,7 @@
 package persistence.entity;
 
-import domain.Person;
+import domain.FixtureEntity.Person;
+import extension.EntityMetadataExtension;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import mock.MockDatabaseServer;
@@ -8,6 +9,7 @@ import mock.MockDmlGenerator;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.exception.PersistenceException;
 
 import java.sql.SQLException;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+@ExtendWith(EntityMetadataExtension.class)
 class EntityLoaderTest {
 
     static class MockJdbcTemplate extends JdbcTemplate {

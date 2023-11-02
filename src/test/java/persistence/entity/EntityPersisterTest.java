@@ -1,12 +1,14 @@
 package persistence.entity;
 
+import domain.FixtureEntity.Person;
 import domain.FixturePerson;
-import domain.Person;
+import extension.EntityMetadataExtension;
 import mock.MockDmlGenerator;
 import mock.MockJdbcTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIterable;
 
+@ExtendWith(EntityMetadataExtension.class)
 class EntityPersisterTest {
 
     private EntityPersister entityPersister;
@@ -74,7 +77,7 @@ class EntityPersisterTest {
     @Test
     @DisplayName("getIdColumnFieldName 을 이용해 entity 의 id field 이름을 반환 받을 수 있다.")
     void getIdColumnFieldNameTest() {
-        String idColumnFieldName = entityPersister.getIdColumnFieldName();
+        final String idColumnFieldName = entityPersister.getIdColumnFieldName();
 
         assertThat(idColumnFieldName).isEqualTo("id");
     }

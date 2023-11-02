@@ -2,10 +2,12 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
-import domain.Person;
+import domain.FixtureEntity.Person;
+import extension.EntityMetadataExtension;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.core.EntityMetadata;
 import persistence.core.EntityMetadataProvider;
 import persistence.core.PersistenceEnvironment;
@@ -17,6 +19,7 @@ import persistence.util.ReflectionUtils;
 import java.sql.SQLException;
 import java.util.List;
 
+@ExtendWith(EntityMetadataExtension.class)
 public abstract class IntegrationTestEnvironment {
     private DatabaseServer server;
     protected DdlGenerator ddlGenerator;

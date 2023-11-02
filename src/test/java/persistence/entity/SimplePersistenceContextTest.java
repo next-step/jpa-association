@@ -1,14 +1,17 @@
 package persistence.entity;
 
+import domain.FixtureEntity.Person;
 import domain.FixturePerson;
-import domain.Person;
+import extension.EntityMetadataExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+@ExtendWith(EntityMetadataExtension.class)
 class SimplePersistenceContextTest {
 
     private PersistenceContext persistenceContext;

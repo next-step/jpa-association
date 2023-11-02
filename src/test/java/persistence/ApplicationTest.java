@@ -1,6 +1,6 @@
 package persistence;
 
-import domain.Person;
+import domain.FixtureEntity.Person;
 import jdbc.RowMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

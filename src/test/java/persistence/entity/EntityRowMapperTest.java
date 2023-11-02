@@ -1,17 +1,20 @@
 package persistence.entity;
 
 
-import domain.Person;
+import domain.FixtureEntity.Person;
+import extension.EntityMetadataExtension;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.sql.SQLException;
 import java.sql.Types;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+@ExtendWith(EntityMetadataExtension.class)
 class EntityRowMapperTest {
 
     private EntityRowMapper<Person> entityRowMapper;
