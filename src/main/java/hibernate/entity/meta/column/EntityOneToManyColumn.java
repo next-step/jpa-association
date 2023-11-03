@@ -7,6 +7,8 @@ import jakarta.persistence.OneToMany;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntityOneToManyColumn implements EntityJoinColumn {
 
@@ -54,5 +56,22 @@ public class EntityOneToManyColumn implements EntityJoinColumn {
 
     @Override
     public void assignFieldValue(final Object entity, final Object value) {
+        try {
+            field.setAccessible(true);
+            List<Object> objects = (List<Object>) field.get(entity);
+            if (objects == null) {
+                objects = new ArrayList<>();
+                objects.add(value);
+                field.set(entity, objects);
+            } else {
+                objects.add(value);
+            }
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("필드값에 접근할 수 없습니다.");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Entity 객체에 일치하는 필드값이 없습니다.");
+        } finally {
+            field.setAccessible(false);
+        }
     }
 }

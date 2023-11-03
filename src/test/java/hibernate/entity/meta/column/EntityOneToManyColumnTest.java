@@ -4,6 +4,7 @@ import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +31,34 @@ class EntityOneToManyColumnTest {
         );
     }
 
+    @Test
+    void entity의_list가_null인_경우_arraylist를_추가하여_assign한다() throws NoSuchFieldException {
+        // given
+        TestEntity givenEntity = new TestEntity();
+
+        // when
+        new EntityOneToManyColumn(TestEntity.class.getDeclaredField("childEntities"))
+                .assignFieldValue(givenEntity, new ChildEntity());
+
+        // then
+        assertThat(givenEntity.childEntities).hasSize(1);
+    }
+
+    @Test
+    void entity의_list가_이미_있는_경우_값을_추가한다() throws NoSuchFieldException {
+        // given
+        TestEntity givenEntity = new TestEntity(new ArrayList<>());
+        givenEntity.childEntities
+                .add(new ChildEntity());
+
+        // when
+        new EntityOneToManyColumn(TestEntity.class.getDeclaredField("childEntities"))
+                .assignFieldValue(givenEntity, new ChildEntity());
+
+        // then
+        assertThat(givenEntity.childEntities).hasSize(2);
+    }
+
     static class NoOneToManyEntity {
         @Id
         private Long id;
@@ -45,6 +74,13 @@ class EntityOneToManyColumnTest {
         @OneToMany(fetch = FetchType.EAGER)
         @JoinColumn(name = "child_id")
         private List<ChildEntity> childEntities;
+
+        public TestEntity() {
+        }
+
+        public TestEntity(List<ChildEntity> childEntities) {
+            this.childEntities = childEntities;
+        }
     }
 
     @Entity
@@ -53,5 +89,8 @@ class EntityOneToManyColumnTest {
         private Long id;
 
         private String name;
+
+        public ChildEntity() {
+        }
     }
 }
