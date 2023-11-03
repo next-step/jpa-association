@@ -64,9 +64,9 @@ public class EntityMetadata<T> {
                 return Collections.emptyList();
             }
             return oneToManyColumn.getAssociatedEntityColumnNamesWithAlias();
-        } else {
-            return List.of(entityColumn.getNameWithAlias());
         }
+
+        return List.of(entityColumn.getNameWithAlias());
     }
 
     public List<String> toInsertableColumnNames() {
