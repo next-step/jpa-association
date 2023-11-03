@@ -70,10 +70,6 @@ public class EntityMetadata<T> {
         return this.idColumn.getFieldName();
     }
 
-    public int getColumnSize() {
-        return this.columns.size();
-    }
-
     public List<String> toColumnNames() {
         return this.columns.stream()
                 .map(EntityColumn::getName)
