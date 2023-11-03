@@ -14,7 +14,7 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
 
     public EntityOneToManyMapper(final List<EntityOneToManyColumn> oneToManyColumns) {
         this.oneToManyColumns = oneToManyColumns;
-        this.collectionStrategies = new MapperCollectionStrategies();
+        this.collectionStrategies = MapperCollectionStrategies.getInstance();
     }
 
     public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
