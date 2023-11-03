@@ -19,7 +19,7 @@ class EntityIdMapperTest {
     void entityIdMapperTest() throws SQLException {
         final Class<Order> clazz = Order.class;
         final Order order = ReflectionUtils.createInstance(clazz);
-        final EntityColumns entityColumns = new EntityColumns(clazz);
+        final EntityColumns entityColumns = new EntityColumns(clazz, "orders");
         final EntityIdMapper entityIdMapper = new EntityIdMapper(entityColumns.getId());
         final SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("id", Types.BIGINT, 10, 0);

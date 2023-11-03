@@ -15,7 +15,7 @@ class EntityAssociatedColumnTest {
     @DisplayName("EntityAssociatedColumn 을 통해 @OneToMany 필드의 정보를 가진 객체를 생성할 수 있다.")
     void defaultAssociatedEntityTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.WithOneToMany.class;
-        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToMany");
 
         assertSoftly(softly->{
             softly.assertThat(associatedColumn.getFetchType()).isEqualTo(FetchType.LAZY);
@@ -31,7 +31,7 @@ class EntityAssociatedColumnTest {
     @DisplayName("@OneToMany(fetch) 를 통해 FetchType.EAGER 로 설정 할 수 있다.")
     void fetchTypeEagerTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.WithOneToManyFetchTypeEAGER.class;
-        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyFetchTypeEAGER");
 
         assertThat(associatedColumn.getFetchType()).isEqualTo(FetchType.EAGER);
     }
@@ -40,7 +40,7 @@ class EntityAssociatedColumnTest {
     @DisplayName("@JoinColumn(name) 를 통해 조인 column 이름을 정할 수 있다.")
     void joinColumnNameTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.WithOneToManyJoinColumn.class;
-        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyJoinColumn");
 
         assertSoftly(softly->{
             softly.assertThat(associatedColumn.getName()).isEqualTo("join_pk");
@@ -53,7 +53,7 @@ class EntityAssociatedColumnTest {
     @DisplayName("@JoinColumn(insertable) 를 통해 column 의 insertable 여부를 결정할 수 있다.")
     void joinColumnInsertableTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.WithOneToManyInsertableFalse.class;
-        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyInsertableFalse");
 
         assertThat(associatedColumn.isInsertable()).isFalse();
     }
@@ -62,7 +62,7 @@ class EntityAssociatedColumnTest {
     @DisplayName("@JoinColumn(nullable) 를 통해 column 의 nullable 를 결정할 수 있다.")
     void joinColumnNullableTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.WithOneToManyNullableFalse.class;
-        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+        final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyNullableFalse");
 
         assertThat(associatedColumn.isNotNull()).isTrue();
     }

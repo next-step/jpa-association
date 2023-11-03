@@ -18,7 +18,7 @@ class EntityIdColumnTest {
     void testEntityColumnWithId() throws Exception {
         mockClass = FixtureEntity.WithId.class;
         final Field field = mockClass.getDeclaredField("id");
-        final EntityColumn column = new EntityIdColumn(field);
+        final EntityColumn column = new EntityIdColumn(field, "WithId");
         assertResult(column, "id", "id", false, Long.class);
     }
 
@@ -27,7 +27,7 @@ class EntityIdColumnTest {
     void testEntityColumnWithIdAndColumn() throws Exception {
         mockClass = FixtureEntity.WithIdAndColumn.class;
         final Field field = mockClass.getDeclaredField("id");
-        final EntityColumn column = new EntityIdColumn(field);
+        final EntityColumn column = new EntityIdColumn(field, "WithIdAndColumn");
         assertResult(column, "test_id", "id", false, Long.class);
     }
 
@@ -36,7 +36,7 @@ class EntityIdColumnTest {
     void testEntityColumnWithIdGeneratedValue() throws Exception {
         mockClass = FixtureEntity.IdWithGeneratedValue.class;
         final Field field = mockClass.getDeclaredField("id");
-        final EntityColumn column = new EntityIdColumn(field);
+        final EntityColumn column = new EntityIdColumn(field, "IdWithGeneratedValue");
         assertResult(column, "id", "id", true, Long.class);
     }
 
@@ -45,7 +45,7 @@ class EntityIdColumnTest {
     void testEntityColumnWithIdNonInsertableNotWorking() throws Exception {
         mockClass = FixtureEntity.WithIdInsertable.class;
         final Field field = mockClass.getDeclaredField("id");
-        final EntityColumn column = new EntityIdColumn(field);
+        final EntityColumn column = new EntityIdColumn(field, "WithIdInsertable");
         assertResult(column, "id", "id", false, Long.class);
     }
 

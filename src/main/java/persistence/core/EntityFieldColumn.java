@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class EntityFieldColumn implements EntityColumn {
+    private final String tableName;
     private final String name;
     private final String fieldName;
     private final Class<?> type;
@@ -16,7 +17,8 @@ public class EntityFieldColumn implements EntityColumn {
     private final boolean isInsertable;
 
 
-    public EntityFieldColumn(final Field field) {
+    public EntityFieldColumn(final Field field, final String tableName) {
+        this.tableName = tableName;
         field.setAccessible(true);
         this.name = initName(field);
         this.fieldName = field.getName();
@@ -54,6 +56,11 @@ public class EntityFieldColumn implements EntityColumn {
         return Optional.ofNullable(columnMetadata)
                 .map(Column::insertable)
                 .orElse(true);
+    }
+
+    @Override
+    public String getTableName() {
+        return this.tableName;
     }
 
     @Override
@@ -101,11 +108,11 @@ public class EntityFieldColumn implements EntityColumn {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         final EntityFieldColumn that = (EntityFieldColumn) object;
-        return isNotNull == that.isNotNull && isStringValued == that.isStringValued && stringLength == that.stringLength && isInsertable == that.isInsertable && Objects.equals(name, that.name) && Objects.equals(fieldName, that.fieldName) && Objects.equals(type, that.type);
+        return isNotNull == that.isNotNull && isStringValued == that.isStringValued && stringLength == that.stringLength && isInsertable == that.isInsertable && Objects.equals(tableName, that.tableName) && Objects.equals(name, that.name) && Objects.equals(fieldName, that.fieldName) && Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, fieldName, type, isNotNull, isStringValued, stringLength, isInsertable);
+        return Objects.hash(tableName, name, fieldName, type, isNotNull, isStringValued, stringLength, isInsertable);
     }
 }

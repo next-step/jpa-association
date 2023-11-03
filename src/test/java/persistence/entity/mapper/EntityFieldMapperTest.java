@@ -19,7 +19,7 @@ class EntityFieldMapperTest {
     void entityFieldMapperTest() throws SQLException {
         final Class<Order> clazz = Order.class;
         final Order order = ReflectionUtils.createInstance(clazz);
-        final EntityColumns entityColumns = new EntityColumns(clazz);
+        final EntityColumns entityColumns = new EntityColumns(clazz, "orders");
         final EntityFieldMapper entityFieldMapper = new EntityFieldMapper(entityColumns.getFieldColumns());
         final SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("orderNumber", Types.VARCHAR, 255, 0);

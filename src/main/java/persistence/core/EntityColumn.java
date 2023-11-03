@@ -9,6 +9,8 @@ public interface EntityColumn {
 
     String ALIAS_DELIMITER = ".";
 
+    String getTableName();
+
     String getName();
 
     boolean isNotNull();
@@ -37,16 +39,20 @@ public interface EntityColumn {
         return this instanceof EntityFieldColumn;
     }
 
-    static EntityColumn from(final Field field) {
+    static EntityColumn from(final Field field, final String tableName) {
         if (field.isAnnotationPresent(Id.class)) {
-            return new EntityIdColumn(field);
+            return new EntityIdColumn(field, tableName);
         }
 
         if (field.isAnnotationPresent(OneToMany.class)) {
-            return new EntityOneToManyColumn(field);
+            return new EntityOneToManyColumn(field, tableName);
         }
 
-        return new EntityFieldColumn(field);
+        return new EntityFieldColumn(field, tableName);
+    }
+
+    default String getNameWithAlias() {
+        return this.getTableName() + ALIAS_DELIMITER + this.getName();
     }
 
     default String getNameWithAlias(final String tableName) {

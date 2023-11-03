@@ -50,9 +50,9 @@ public class SelectClauseBuilder {
                 return Collections.emptyList();
             }
             final EntityMetadata<?> oneToManyEntityMetadata = getLeftJoiningEntityMetadata(oneToManyColumn);
-            return oneToManyEntityMetadata.getColumnNamesWithAlias(oneToManyEntityMetadata.getTableName());
+            return oneToManyEntityMetadata.getColumnNamesWithAlias();
         } else {
-            return List.of(entityColumn.getNameWithAlias(entityMetadata.getTableName()));
+            return List.of(entityColumn.getNameWithAlias());
         }
     }
 

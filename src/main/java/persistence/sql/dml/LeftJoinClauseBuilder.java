@@ -36,7 +36,7 @@ public class LeftJoinClauseBuilder {
 
 
     private String getJoinOnCondition(final EntityMetadata<?> entityMetadata, final EntityOneToManyColumn entityOneToManyColumn) {
-        return entityMetadata.getIdColumnNameWithAlias(entityMetadata.getTableName())
+        return entityMetadata.getIdColumnNameWithAlias()
                 + " = "
                 + entityOneToManyColumn.getNameWithAlias(getJoiningTableName(entityOneToManyColumn));
     }

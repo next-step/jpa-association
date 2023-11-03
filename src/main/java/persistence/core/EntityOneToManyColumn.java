@@ -18,9 +18,9 @@ public class EntityOneToManyColumn implements EntityAssociatedColumn {
     private final Class<?> joinColumnType;
     private final String joinColumnName;
 
-    public EntityOneToManyColumn(final Field field) {
+    public EntityOneToManyColumn(final Field field, final String tableName) {
         field.setAccessible(true);
-        this.column = new EntityFieldColumn(field);
+        this.column = new EntityFieldColumn(field, tableName);
         this.isNotNull = initIsNotNull(field);
         this.isInsertable = initIsInsertable(field);
         this.fetchType = initFetchType(field);
@@ -73,6 +73,11 @@ public class EntityOneToManyColumn implements EntityAssociatedColumn {
     @Override
     public Class<?> getJoinColumnType() {
         return this.joinColumnType;
+    }
+
+    @Override
+    public String getTableName() {
+        return this.column.getTableName();
     }
 
     @Override

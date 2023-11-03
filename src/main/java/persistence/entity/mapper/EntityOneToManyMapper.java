@@ -28,7 +28,7 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
 
                 for (final EntityColumn innerEntityColumn : innerEntityMetadata.getColumns()) {
                     final String fieldName = innerEntityColumn.getFieldName();
-                    final String columnName = innerEntityColumn.getNameWithAlias(innerEntityMetadata.getTableName());
+                    final String columnName = innerEntityColumn.getNameWithAlias();
                     final Object object = resultSet.getObject(columnName);
                     ReflectionUtils.injectField(innerInstance, fieldName, object);
                 }

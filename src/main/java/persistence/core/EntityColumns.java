@@ -15,19 +15,19 @@ import java.util.stream.StreamSupport;
 public class EntityColumns implements Iterable<EntityColumn> {
     private final List<EntityColumn> columns;
 
-    public EntityColumns(final Class<?> clazz) {
-        this.columns = generateColumns(clazz);
+    public EntityColumns(final Class<?> clazz, final String tableName) {
+        this.columns = generateColumns(clazz,tableName);
     }
 
     public EntityColumns(final List<EntityColumn> entityColumns) {
         this.columns = entityColumns;
     }
 
-    private List<EntityColumn> generateColumns(final Class<?> clazz) {
+    private List<EntityColumn> generateColumns(final Class<?> clazz, final String tableName) {
         this.validate(clazz);
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
-                .map(EntityColumn::from)
+                .map(field -> EntityColumn.from(field, tableName))
                 .collect(Collectors.toUnmodifiableList());
     }
 

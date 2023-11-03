@@ -21,7 +21,7 @@ public class EntityMetadata<T> {
         this.validate(clazz);
         this.clazz = clazz;
         this.tableName = initTableName(clazz);
-        this.columns = new EntityColumns(clazz);
+        this.columns = new EntityColumns(clazz, tableName);
         this.idColumn = this.columns.getId();
         this.oneToManyColumns = this.columns.getOneToManyColumns();
     }
@@ -48,9 +48,9 @@ public class EntityMetadata<T> {
         return this.columns;
     }
 
-    public List<String> getColumnNamesWithAlias(final String tableName) {
+    public List<String> getColumnNamesWithAlias() {
         return this.columns.stream()
-                .map(entityColumn -> entityColumn.getNameWithAlias(tableName))
+                .map(EntityColumn::getNameWithAlias)
                 .collect(Collectors.toList());
     }
 
@@ -72,8 +72,8 @@ public class EntityMetadata<T> {
         return this.idColumn.getName();
     }
 
-    public String getIdColumnNameWithAlias(final String tableName) {
-        return this.idColumn.getNameWithAlias(tableName);
+    public String getIdColumnNameWithAlias() {
+        return this.idColumn.getNameWithAlias();
     }
 
     public String getIdColumnFieldName() {

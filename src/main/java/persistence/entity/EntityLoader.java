@@ -47,7 +47,7 @@ public class EntityLoader<T> {
                 .table(tableName)
                 .column(entityMetadata)
                 .leftJoin(entityMetadata)
-                .where(idColumn.getNameWithAlias(tableName), String.valueOf(id))
+                .where(idColumn.getNameWithAlias(), String.valueOf(id))
                 .build();
     }
 

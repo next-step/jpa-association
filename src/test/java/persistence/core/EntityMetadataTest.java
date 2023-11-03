@@ -89,7 +89,7 @@ class EntityMetadataTest {
     void getIdColumnTest() throws NoSuchFieldException {
         mockClass = FixtureEntity.WithId.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityColumn idColumn = new EntityIdColumn(mockClass.getDeclaredField("id"));
+        final EntityColumn idColumn = new EntityIdColumn(mockClass.getDeclaredField("id"), "WithId");
 
         assertThat(entityMetadata.getIdColumn()).isEqualTo(idColumn);
     }
@@ -99,7 +99,7 @@ class EntityMetadataTest {
     void getInsertableColumnTest() throws NoSuchFieldException {
         mockClass = FixtureEntity.WithColumnNonInsertable.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityColumn insertableColumn = new EntityFieldColumn(mockClass.getDeclaredField("insertableColumn"));
+        final EntityColumn insertableColumn = new EntityFieldColumn(mockClass.getDeclaredField("insertableColumn"), "WithColumnNonInsertable");
 
         assertThatIterable(entityMetadata.toInsertableColumn()).containsExactly(insertableColumn);
     }
@@ -110,7 +110,7 @@ class EntityMetadataTest {
         mockClass = FixtureAssociatedEntity.WithOneToManyJoinColumn.class;
 
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
+        final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyJoinColumn");
 
         assertThatIterable(entityMetadata.getOneToManyColumns()).containsExactly(oneToManyColumn);
     }

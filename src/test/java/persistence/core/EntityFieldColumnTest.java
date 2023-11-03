@@ -18,8 +18,8 @@ class EntityFieldColumnTest {
     void testEntityColumnWithoutColumn() throws Exception {
         mockClass = FixtureEntity.WithoutColumn.class;
         final Field field = mockClass.getDeclaredField("column");
-        final EntityColumn column = new EntityFieldColumn(field);
-        assertResult(column, "column", "column", false, true, String.class);
+        final EntityColumn column = new EntityFieldColumn(field, "WithoutColumn");
+        assertResult(column, "WithoutColumn", "column", "column", false, true, String.class);
     }
 
     @Test
@@ -27,8 +27,8 @@ class EntityFieldColumnTest {
     void testEntityColumnWithColumn() throws Exception {
         mockClass = FixtureEntity.WithColumn.class;
         final Field field = mockClass.getDeclaredField("column");
-        final EntityColumn column = new EntityFieldColumn(field);
-        assertResult(column, "test_column", "column", false, true, String.class);
+        final EntityColumn column = new EntityFieldColumn(field, "WithColumn");
+        assertResult(column, "WithColumn", "test_column", "column", false, true, String.class);
     }
 
     @Test
@@ -36,8 +36,8 @@ class EntityFieldColumnTest {
     void testEntityColumnWithColumnNonNull() throws Exception {
         mockClass = FixtureEntity.WithColumn.class;
         final Field field = mockClass.getDeclaredField("notNullColumn");
-        final EntityColumn column = new EntityFieldColumn(field);
-        assertResult(column, "notNullColumn", "notNullColumn", true, true, String.class);
+        final EntityColumn column = new EntityFieldColumn(field, "WithColumn");
+        assertResult(column, "WithColumn", "notNullColumn", "notNullColumn", true, true, String.class);
     }
 
     @Test
@@ -45,17 +45,19 @@ class EntityFieldColumnTest {
     void testEntityColumnWithColumnNonInsertable() throws Exception {
         mockClass = FixtureEntity.WithColumnNonInsertable.class;
         final Field field = mockClass.getDeclaredField("notInsertableColumn");
-        final EntityColumn column = new EntityFieldColumn(field);
-        assertResult(column, "notInsertableColumn", "notInsertableColumn", false, false, String.class);
+        final EntityColumn column = new EntityFieldColumn(field, "WithColumnNonInsertable");
+        assertResult(column, "WithColumnNonInsertable", "notInsertableColumn", "notInsertableColumn", false, false, String.class);
     }
 
     private void assertResult(final EntityColumn result,
+                              final String tableName,
                               final String columnName,
                               final String fieldName,
                               final boolean isNotNull,
                               final boolean isInsertable,
                               final Class<?> type) {
         assertSoftly(softly -> {
+            softly.assertThat(result.getTableName()).isEqualTo(tableName);
             softly.assertThat(result.getName()).isEqualTo(columnName);
             softly.assertThat(result.getFieldName()).isEqualTo(fieldName);
             softly.assertThat(result.isId()).isEqualTo(false);

@@ -11,9 +11,9 @@ public class EntityIdColumn implements EntityColumn {
     private final EntityColumn column;
     private final boolean isAutoIncrement;
 
-    public EntityIdColumn(final Field field) {
+    public EntityIdColumn(final Field field, final String tableName) {
         field.setAccessible(true);
-        this.column = new EntityFieldColumn(field);
+        this.column = new EntityFieldColumn(field, tableName);
         this.isAutoIncrement = initIsAutoIncrement(field);
     }
 
@@ -22,6 +22,11 @@ public class EntityIdColumn implements EntityColumn {
         return Optional.ofNullable(generatedValue)
                 .filter(value -> value.strategy() == GenerationType.IDENTITY)
                 .isPresent();
+    }
+
+    @Override
+    public String getTableName() {
+        return this.column.getTableName();
     }
 
     @Override
