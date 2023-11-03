@@ -74,4 +74,16 @@ class EntityColumnsTest {
 
         assertThatIterable(columns.getOneToManyColumns()).containsExactly(oneToManyColumn);
     }
+
+    @Test
+    @DisplayName("EntityColumns.getFieldColumns 를 통해 일반 컬럼들을 조회할 수 있다.")
+    void entityColumnsGetFieldColumnsTest() throws Exception {
+        mockClass = FixtureAssociatedEntity.OrderItem.class;
+
+        final EntityColumns columns = new EntityColumns(mockClass);
+        final EntityFieldColumn productColumn = new EntityFieldColumn(mockClass.getDeclaredField("product"));
+        final EntityFieldColumn quantityColumn = new EntityFieldColumn(mockClass.getDeclaredField("quantity"));
+
+        assertThatIterable(columns.getFieldColumns()).containsExactly(productColumn, quantityColumn);
+    }
 }
