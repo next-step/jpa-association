@@ -55,6 +55,17 @@ class EntityClassTest {
         );
     }
 
+    @Test
+    void eager_join테이블의_fk필드를_가져온다() {
+        Map<String, Object> actual = EntityClass.getInstance(Order.class)
+                .getEagerJoinTableIds();
+
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual.get("order_items")).isEqualTo("order_id")
+        );
+    }
+
     @Entity
     @Table(name = "new_table")
     static class TableEntity {

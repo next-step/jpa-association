@@ -91,4 +91,13 @@ public class EntityClass<T> {
                 ));
     }
 
+
+    public Map<String, Object> getEagerJoinTableIds() {
+        return manyToOneColumns.getEagerValues()
+                .stream()
+                .collect(Collectors.toMap(
+                        entityJoinColumn -> entityJoinColumn.getEntityClass().tableName.getValue(),
+                        EntityJoinColumn::getJoinColumnName
+                ));
+    }
 }
