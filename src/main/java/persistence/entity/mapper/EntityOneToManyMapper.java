@@ -16,7 +16,7 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
         this.oneToManyColumns = oneToManyColumns;
     }
 
-    public void mapColumns(final ResultSet resultSet, final Object instance) throws SQLException {
+    public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
         for (final EntityOneToManyColumn column : oneToManyColumns) {
             final Collection<Object> oneToManyFieldCollection = getOneToManyFieldCollection(instance, column);
             final Class<?> joinColumnType = column.getJoinColumnType();

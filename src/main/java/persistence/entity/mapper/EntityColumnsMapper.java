@@ -6,6 +6,6 @@ import java.sql.SQLException;
 
 public interface EntityColumnsMapper {
 
-    void mapColumns(ResultSet resultSet, Object instance) throws SQLException;
+    <T> void mapColumns(ResultSet resultSet, T instance) throws SQLException;
 
 }
