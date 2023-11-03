@@ -8,12 +8,11 @@ import persistence.core.EntityOneToManyColumn;
 import persistence.exception.PersistenceException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SelectClauseBuilder {
-    private static final String DOT = ".";
 
     private final List<String> selectColumns;
 
@@ -27,7 +26,8 @@ public class SelectClauseBuilder {
 
     public SelectClauseBuilder add(final EntityMetadata<?> entityMetadata) {
         final List<String> columnClause = entityMetadata.getColumns().stream()
-                .flatMap(entityColumn -> getColumnNames(entityMetadata, entityColumn))
+                .map(entityColumn -> getColumnNames(entityMetadata, entityColumn))
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
         selectColumns.addAll(columnClause);
         return this;
@@ -43,26 +43,22 @@ public class SelectClauseBuilder {
         return this;
     }
 
-    private Stream<String> getColumnNames(final EntityMetadata<?> entityMetadata, final EntityColumn entityColumn) {
+    private List<String> getColumnNames(final EntityMetadata<?> entityMetadata, final EntityColumn entityColumn) {
         if (entityColumn.isOneToMany()) {
             final EntityOneToManyColumn oneToManyColumn = (EntityOneToManyColumn) entityColumn;
-            if(oneToManyColumn.getFetchType().equals(FetchType.LAZY)) {
-                return Stream.empty();
+            if (oneToManyColumn.getFetchType().equals(FetchType.LAZY)) {
+                return Collections.emptyList();
             }
             final EntityMetadata<?> oneToManyEntityMetadata = getLeftJoiningEntityMetadata(oneToManyColumn);
-            return oneToManyEntityMetadata.getColumns().stream().map(e -> combineTableNameWithColumn(oneToManyEntityMetadata.getTableName(), e.getName()));
+            return oneToManyEntityMetadata.getColumnNamesWithAlias(oneToManyEntityMetadata.getTableName());
         } else {
-            return Stream.of(combineTableNameWithColumn(entityMetadata.getTableName(), entityColumn.getName()));
+            return List.of(entityColumn.getNameWithAlias(entityMetadata.getTableName()));
         }
     }
 
 
     private static EntityMetadata<?> getLeftJoiningEntityMetadata(final EntityOneToManyColumn entityOneToManyColumn) {
         return EntityMetadataProvider.getInstance().getEntityMetadata(entityOneToManyColumn.getJoinColumnType());
-    }
-
-    private String combineTableNameWithColumn(final String tableName, final String columnName) {
-        return tableName + DOT + columnName;
     }
 
     public String build() {

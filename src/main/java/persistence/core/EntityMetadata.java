@@ -48,6 +48,12 @@ public class EntityMetadata<T> {
         return this.columns;
     }
 
+    public List<String> getColumnNamesWithAlias(final String tableName) {
+        return this.columns.stream()
+                .map(entityColumn -> entityColumn.getNameWithAlias(tableName))
+                .collect(Collectors.toList());
+    }
+
     public List<String> toInsertableColumnNames() {
         return this.columns.stream()
                 .filter(EntityColumn::isInsertable)
@@ -64,6 +70,10 @@ public class EntityMetadata<T> {
 
     public String getIdColumnName() {
         return this.idColumn.getName();
+    }
+
+    public String getIdColumnNameWithAlias(final String tableName) {
+        return this.idColumn.getNameWithAlias(tableName);
     }
 
     public String getIdColumnFieldName() {
