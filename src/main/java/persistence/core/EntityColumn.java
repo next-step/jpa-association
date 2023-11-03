@@ -55,7 +55,4 @@ public interface EntityColumn {
         return this.getTableName() + ALIAS_DELIMITER + this.getName();
     }
 
-    default String getNameWithAlias(final String tableName) {
-        return tableName + ALIAS_DELIMITER + this.getName();
-    }
 }
