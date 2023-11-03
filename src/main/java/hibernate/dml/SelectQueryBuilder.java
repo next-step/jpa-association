@@ -32,7 +32,7 @@ public class SelectQueryBuilder {
             final EntityColumn entityId,
             final Object id,
             final Map<String, List<String>> joinTableFields,
-            final Map<String, EntityColumn> joinTableIds
+            final Map<String, Object> joinTableIds
     ) {
         final List<String> parsedFieldNames = fieldNames.stream()
                 .map(fieldName -> parseColumnQuery(tableName, fieldName))
@@ -45,6 +45,8 @@ public class SelectQueryBuilder {
             queryBuilder.append(", ")
                     .append(parseJoinColumnQueries(joinTableFields))
                     .append(" ");
+        } else {
+            queryBuilder.append(" ");
         }
         queryBuilder.append("from ")
                 .append(tableName)
@@ -82,10 +84,10 @@ public class SelectQueryBuilder {
                 .collect(Collectors.joining(SELECT_QUERY_COLUMN_DELIMITER));
     }
 
-    private String parseJoinTableQuery(final String tableName, final EntityColumn entityId, final Map<String, EntityColumn> joinTableIds) {
+    private String parseJoinTableQuery(final String tableName, final EntityColumn entityId, final Map<String, Object> joinTableIds) {
         return joinTableIds.entrySet()
                 .stream()
-                .map(entry -> "join " + entry.getKey() + " on " + parseColumnQuery(tableName, entityId.getFieldName()) + " = " + parseColumnQuery(entry.getKey(), entry.getValue().getFieldName()))
+                .map(entry -> "join " + entry.getKey() + " on " + parseColumnQuery(tableName, entityId.getFieldName()) + " = " + parseColumnQuery(entry.getKey(), entry.getValue().toString()))
                 .collect(Collectors.joining(" "));
     }
 }

@@ -35,7 +35,7 @@ class SelectQueryBuilderTest {
         // given
         String expected = "select orders.id, orders.orderNumber, orderItem.id, orderItem.produce, orderItem.quantity " +
                 "from orders " +
-                "join orderItem on orders.id = orderItem.id " +
+                "join orderItem on orders.id = orderItem.order_id " +
                 "where orders.id = 1;";
 
         // when
@@ -45,7 +45,7 @@ class SelectQueryBuilderTest {
                 new EntityField(Order.class.getDeclaredField("id")),
                 1,
                 Map.of("orderItem", List.of("id", "produce", "quantity")),
-                Map.of("orderItem", new EntityField(orderItem.class.getDeclaredField("id")))
+                Map.of("orderItem", "order_id")
         );
         System.out.println(actual);
 
@@ -83,10 +83,14 @@ class SelectQueryBuilderTest {
         private Long id;
 
         private String orderNumber;
+
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn(name = "order_id")
+        private List<OrderItem> orderItems;
     }
 
     @Entity
-    static class orderItem {
+    static class OrderItem {
         @Id
         private Long id;
 
