@@ -2,7 +2,6 @@ package persistence.sql.dml;
 
 import jakarta.persistence.FetchType;
 import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.core.EntityOneToManyColumn;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class LeftJoinClauseBuilder {
         final Map<String, String> joinOnClause = entityMetadata.getOneToManyColumns().stream()
                 .filter(entityOneToManyColumn -> entityOneToManyColumn.getFetchType().equals(FetchType.EAGER))
                 .collect(Collectors.toMap(
-                        this::getJoiningTableName,
+                        EntityOneToManyColumn::getAssociatedEntityTableName,
                         entityOneToManyColumn -> getJoinOnCondition(entityMetadata, entityOneToManyColumn)
                 ));
         joinData.putAll(joinOnClause);
@@ -38,13 +37,7 @@ public class LeftJoinClauseBuilder {
     private String getJoinOnCondition(final EntityMetadata<?> entityMetadata, final EntityOneToManyColumn entityOneToManyColumn) {
         return entityMetadata.getIdColumnNameWithAlias()
                 + " = "
-                + entityOneToManyColumn.getNameWithAlias(getJoiningTableName(entityOneToManyColumn));
-    }
-
-    private String getJoiningTableName(final EntityOneToManyColumn entityOneToManyColumn) {
-        final EntityMetadata<?> leftJoiningEntityMetadata = EntityMetadataProvider.getInstance()
-                .getEntityMetadata(entityOneToManyColumn.getJoinColumnType());
-        return leftJoiningEntityMetadata.getTableName();
+                + entityOneToManyColumn.getNameWithAliasAssociatedEntity();
     }
 
     public String build() {

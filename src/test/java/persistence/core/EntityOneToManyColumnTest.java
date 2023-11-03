@@ -1,14 +1,17 @@
 package persistence.core;
 
 import domain.FixtureAssociatedEntity;
+import extension.EntityMetadataExtension;
 import jakarta.persistence.FetchType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-class EntityAssociatedColumnTest {
+@ExtendWith(EntityMetadataExtension.class)
+class EntityOneToManyColumnTest {
 
     private Class<?> mockClass;
     @Test
@@ -65,5 +68,33 @@ class EntityAssociatedColumnTest {
         final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyNullableFalse");
 
         assertThat(associatedColumn.isNotNull()).isTrue();
+    }
+
+    @Test
+    @DisplayName("getAssociatedEntityColumnNamesWithAlias 를 통해 연관관계 Entity column 들을 Alias 와 함께 반환 받을 수 있다.")
+    void getAssociatedEntityColumnNamesWithAliasTest() throws NoSuchFieldException {
+        mockClass = FixtureAssociatedEntity.Order.class;
+        final EntityOneToManyColumn entityOneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("orderItems"), "WithOneToManyNullableFalse");
+
+        assertThat(entityOneToManyColumn.getAssociatedEntityColumnNamesWithAlias())
+                .containsExactly("order_items.id", "order_items.product", "order_items.quantity");
+    }
+    @Test
+    @DisplayName("getNameWithAliasAssociatedEntity 를 통해 연관관계 Entity 의 id Column 이름을 Alias 와 함께 반환 받을 수 있다.")
+    void getNameWithAliasAssociatedEntityTest() throws NoSuchFieldException {
+        mockClass = FixtureAssociatedEntity.Order.class;
+        final EntityOneToManyColumn entityOneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("orderItems"), "WithOneToManyNullableFalse");
+
+        assertThat(entityOneToManyColumn.getNameWithAliasAssociatedEntity())
+                .isEqualTo("order_items.order_id");
+    }
+    @Test
+    @DisplayName("getAssociatedEntityTableName 를 통해 연관관계 Entity 의 tableName 을 반환 받을 수 있다.")
+    void getAssociatedEntityTableNameTest() throws NoSuchFieldException {
+        mockClass = FixtureAssociatedEntity.Order.class;
+        final EntityOneToManyColumn entityOneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("orderItems"), "WithOneToManyNullableFalse");
+
+        assertThat(entityOneToManyColumn.getAssociatedEntityTableName())
+                .isEqualTo("order_items");
     }
 }
