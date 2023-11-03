@@ -1,9 +1,11 @@
 package persistence.core;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import persistence.exception.PersistenceException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,8 +52,21 @@ public class EntityMetadata<T> {
 
     public List<String> getColumnNamesWithAlias() {
         return this.columns.stream()
-                .map(EntityColumn::getNameWithAlias)
+                .map(this::getColumnNames)
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
+    }
+
+    private List<String> getColumnNames(final EntityColumn entityColumn) {
+        if (entityColumn.isOneToMany()) {
+            final EntityOneToManyColumn oneToManyColumn = (EntityOneToManyColumn) entityColumn;
+            if (oneToManyColumn.getFetchType().equals(FetchType.LAZY)) {
+                return Collections.emptyList();
+            }
+            return oneToManyColumn.getAssociatedEntityColumnNamesWithAlias();
+        } else {
+            return List.of(entityColumn.getNameWithAlias());
+        }
     }
 
     public List<String> toInsertableColumnNames() {

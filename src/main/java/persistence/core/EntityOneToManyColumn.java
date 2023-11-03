@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import persistence.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,6 +64,11 @@ public class EntityOneToManyColumn implements EntityAssociatedColumn {
     private String guessJoinColumnName(final Field field) {
         final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(joinColumnType);
         return field.getName() + DELIMITER + entityMetadata.getIdColumnName();
+    }
+
+    public List<String> getAssociatedEntityColumnNamesWithAlias() {
+        final EntityMetadata<?> associatedEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(this.joinColumnType);
+        return associatedEntityMetadata.getColumnNamesWithAlias();
     }
 
     @Override

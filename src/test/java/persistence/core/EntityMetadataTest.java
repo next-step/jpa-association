@@ -3,13 +3,16 @@ package persistence.core;
 
 import domain.FixtureAssociatedEntity;
 import domain.FixtureEntity;
+import extension.EntityMetadataExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.exception.PersistenceException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+@ExtendWith(EntityMetadataExtension.class)
 class EntityMetadataTest {
     private Class<?> mockClass;
 
@@ -146,6 +149,22 @@ class EntityMetadataTest {
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
 
         assertThat(entityMetadata.getIdName()).isEqualTo("id");
+    }
+
+    @Test
+    @DisplayName("getColumnNamesWithAlias 를 통해 EntityMetadata 의 Column Name 들을 Alias 와 함께 반환 받을 수 있다.")
+    void getColumnNamesWithAliasTest() {
+        mockClass = FixtureAssociatedEntity.Order.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+
+        assertThat(entityMetadata.getColumnNamesWithAlias()).containsExactly(
+                "orders.id",
+                "orders.orderNumber",
+                "order_items.id",
+                "order_items.product",
+                "order_items.quantity"
+        );
     }
 
 }
