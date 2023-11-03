@@ -41,14 +41,12 @@ public class ReflectionRowMapper<T> implements RowMapper<T> {
             for (EntityJoinColumn eagerJoinColumn : eagerJoinColumns) {
                 EntityClass<?> eagerJoinClass = eagerJoinColumn.getEntityClass();
 
-                List<Object> subInstances = new ArrayList<>();
                 Object subInstance = eagerJoinClass.newInstance();
                 List<EntityColumn> subEntityColumns = eagerJoinClass.getEntityColumns();
                 for (EntityColumn subEntityColumn : subEntityColumns) {
                     subEntityColumn.assignFieldValue(subInstance, resultSet.getObject(eagerJoinClass.tableName() + "." + subEntityColumn.getFieldName()));
                 }
-                subInstances.add(subInstance);
-                eagerJoinColumn.assignFieldValue(instance, subInstances);
+                eagerJoinColumn.assignFieldValue(instance, subInstance);
             }
         } while (resultSet.next());
         return instance;
