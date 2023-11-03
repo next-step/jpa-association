@@ -14,6 +14,7 @@ public class EntityIdMapper implements EntityColumnsMapper {
         this.idColumn = idColumn;
     }
 
+    @Override
     public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
         final String fieldName = idColumn.getFieldName();
         final String columnName = idColumn.getName();

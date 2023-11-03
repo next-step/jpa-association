@@ -16,6 +16,7 @@ public class EntityFieldMapper implements EntityColumnsMapper {
         this.columns = columns;
     }
 
+    @Override
     public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
         for (final EntityColumn column : columns) {
             final String fieldName = column.getFieldName();

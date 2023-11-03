@@ -17,6 +17,7 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
         this.collectionStrategies = MapperCollectionStrategies.getInstance();
     }
 
+    @Override
     public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
         for (final EntityOneToManyColumn column : oneToManyColumns) {
             final Collection<Object> oneToManyFieldCollection = getOneToManyFieldCollection(instance, column);
@@ -34,8 +35,9 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
                 }
 
                 oneToManyFieldCollection.add(innerInstance);
-                ReflectionUtils.injectField(instance, column.getFieldName(), oneToManyFieldCollection);
             } while (resultSet.next());
+
+            ReflectionUtils.injectField(instance, column.getFieldName(), oneToManyFieldCollection);
         }
 
     }
