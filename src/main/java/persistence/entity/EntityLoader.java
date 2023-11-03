@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import persistence.core.*;
+import persistence.entity.mapper.EntityRowMapper;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
 

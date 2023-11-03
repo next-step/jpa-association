@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.mapper;
 
 
 import domain.FixtureAssociatedEntity;
@@ -6,7 +6,6 @@ import domain.FixtureAssociatedEntity.Order;
 import domain.FixtureEntity.Person;
 import extension.EntityMetadataExtension;
 import org.h2.tools.SimpleResultSet;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +47,20 @@ class EntityRowMapperTest {
     void rowMappingTest() throws SQLException {
         final Class<Order> clazz = Order.class;
         final EntityRowMapper<Order> entityRowMapper = new EntityRowMapper<>(clazz);
+        final SimpleResultSet rs = mockOrderSimpleResultSet();
+
+        final Order order = entityRowMapper.mapRow(rs);
+        final List<FixtureAssociatedEntity.OrderItem> orderItems = order.getOrderItems();
+        assertSoftly(softly -> {
+            softly.assertThat(order.getId()).isEqualTo(1L);
+            softly.assertThat(order.getOrderNumber()).isEqualTo("1");
+            softly.assertThat(orderItems).hasSize(4);
+            softly.assertThat(orderItems).extracting(FixtureAssociatedEntity.OrderItem::getId)
+                    .containsExactly(1L, 2L, 3L, 4L);
+        });
+    }
+
+    private static SimpleResultSet mockOrderSimpleResultSet() throws SQLException {
         final SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("id", Types.BIGINT, 10, 0);
         rs.addColumn("orderNumber", Types.VARCHAR, 255, 0);
@@ -60,15 +73,6 @@ class EntityRowMapperTest {
         rs.addRow(1L, "1", 3L, "testProduct03", 10, 1L);
         rs.addRow(1L, "1", 4L, "testProduct04", 10, 1L);
         rs.next();
-
-        final Order order = entityRowMapper.mapRow(rs);
-        final List<FixtureAssociatedEntity.OrderItem> orderItems = order.getOrderItems();
-        assertSoftly(softly -> {
-            softly.assertThat(order.getId()).isEqualTo(1L);
-            softly.assertThat(order.getOrderNumber()).isEqualTo("1");
-            softly.assertThat(orderItems).hasSize(4);
-            softly.assertThat(orderItems).extracting(FixtureAssociatedEntity.OrderItem::getId)
-                    .containsExactly(1L, 2L, 3L, 4L);
-        });
+        return rs;
     }
 }

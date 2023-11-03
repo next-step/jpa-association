@@ -29,6 +29,9 @@ public interface EntityColumn {
     default boolean isOneToMany() {
         return this instanceof EntityOneToManyColumn;
     }
+    default boolean isField() {
+        return this instanceof EntityFieldColumn;
+    }
 
     static EntityColumn from(final Field field) {
         if (field.isAnnotationPresent(Id.class)) {
