@@ -23,7 +23,9 @@ public class EntityLoader {
                 entityClass.tableName(),
                 entityClass.getFieldNames(),
                 entityClass.getEntityId(),
-                id
+                id,
+                entityClass.getEagerJoinTableFields(),
+                entityClass.getEagerJoinTableIds()
         );
         return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
     }
