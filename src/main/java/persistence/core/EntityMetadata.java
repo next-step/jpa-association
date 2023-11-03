@@ -110,6 +110,14 @@ public class EntityMetadata<T> {
                 .anyMatch(entityOneToManyColumn -> entityMetadata.isType(entityOneToManyColumn.getJoinColumnType()));
     }
 
+    public Class<?> getIdType() {
+        return this.idColumn.getType();
+    }
+
+    public String getIdName() {
+        return this.idColumn.getName();
+    }
+
     @Override
     public boolean equals(final Object object) {
         if (this == object) return true;

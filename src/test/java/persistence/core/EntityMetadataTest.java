@@ -128,4 +128,24 @@ class EntityMetadataTest {
         });
     }
 
+    @Test
+    @DisplayName("getIdType 를 통해 EntityMetadata 의 Id Column Class Type 을 반환 받을 수 있다.")
+    void getIdTypeTest() {
+        mockClass = FixtureAssociatedEntity.WithId.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+
+        assertThat(entityMetadata.getIdType()).isEqualTo(Long.class);
+    }
+
+    @Test
+    @DisplayName("getIdName 를 통해 EntityMetadata 의 Id Column Name 을 반환 받을 수 있다.")
+    void getIdNameTest() {
+        mockClass = FixtureAssociatedEntity.WithId.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+
+        assertThat(entityMetadata.getIdName()).isEqualTo("id");
+    }
+
 }

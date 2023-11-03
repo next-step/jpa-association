@@ -1,7 +1,6 @@
 package persistence.sql.ddl;
 
 import persistence.core.EntityColumn;
-import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
 import persistence.core.EntityMetadataProvider;
 import persistence.dialect.Dialect;
@@ -51,24 +50,22 @@ public class DdlGenerator {
     private String generateAssociatedColumnsClause(final EntityMetadata<?> entityMetadata) {
         final StringBuilder builder = new StringBuilder();
         final Set<EntityMetadata<?>> allAssociatedEntitiesMetadata = EntityMetadataProvider.getInstance().getAllAssociatedEntitiesMetadata(entityMetadata);
-        allAssociatedEntitiesMetadata.forEach(associatedEntityMetadata -> {
-            final EntityIdColumn associatedEntityIdColumn = associatedEntityMetadata.getIdColumn();
-            associatedEntityMetadata.getOneToManyColumns().forEach(entityOneToManyColumn ->
-                    builder.append(entityOneToManyColumn.getName())
-                            .append(" ")
-                            .append(dialect.getColumnTypeMapper().getColumnName(associatedEntityIdColumn.getType()))
-                            .append(generateNotNullClause(entityOneToManyColumn))
-                            .append(",")
-                            .append("foreign key(")
-                            .append(entityOneToManyColumn.getName())
-                            .append(") references ")
-                            .append(associatedEntityMetadata.getTableName())
-                            .append(" (")
-                            .append(associatedEntityIdColumn.getName())
-                            .append(")")
-                            .append(",")
-            );
-        });
+        allAssociatedEntitiesMetadata.forEach(associatedEntityMetadata ->
+                associatedEntityMetadata.getOneToManyColumns().forEach(entityOneToManyColumn ->
+                        builder.append(entityOneToManyColumn.getName())
+                                .append(" ")
+                                .append(dialect.getColumnTypeMapper().getColumnName(associatedEntityMetadata.getIdType()))
+                                .append(generateNotNullClause(entityOneToManyColumn))
+                                .append(",")
+                                .append("foreign key(")
+                                .append(entityOneToManyColumn.getName())
+                                .append(") references ")
+                                .append(associatedEntityMetadata.getTableName())
+                                .append(" (")
+                                .append(associatedEntityMetadata.getIdName())
+                                .append(")")
+                                .append(",")
+                ));
         return builder.toString();
     }
 
