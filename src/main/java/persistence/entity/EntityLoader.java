@@ -1,7 +1,9 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.core.*;
+import persistence.core.EntityIdColumn;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.entity.mapper.EntityRowMapper;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
@@ -45,7 +47,7 @@ public class EntityLoader<T> {
                 .table(tableName)
                 .column(entityMetadata)
                 .leftJoin(entityMetadata)
-                .where(tableName + "." + idColumn.getName(), String.valueOf(id))
+                .where(idColumn.getNameWithAlias(tableName), String.valueOf(id))
                 .build();
     }
 

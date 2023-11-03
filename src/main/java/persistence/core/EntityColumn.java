@@ -6,6 +6,9 @@ import jakarta.persistence.OneToMany;
 import java.lang.reflect.Field;
 
 public interface EntityColumn {
+
+    String ALIAS_DELIMITER = ".";
+
     String getName();
 
     boolean isNotNull();
@@ -29,6 +32,7 @@ public interface EntityColumn {
     default boolean isOneToMany() {
         return this instanceof EntityOneToManyColumn;
     }
+
     default boolean isField() {
         return this instanceof EntityFieldColumn;
     }
@@ -45,4 +49,7 @@ public interface EntityColumn {
         return new EntityFieldColumn(field);
     }
 
+    default String getNameWithAlias(final String tableName) {
+        return tableName + ALIAS_DELIMITER + this.getName();
+    }
 }
