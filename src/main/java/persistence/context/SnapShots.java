@@ -1,9 +1,7 @@
 package persistence.context;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class SnapShots {
     private final Map<Class<?>, Map<String, Object>> snapShots = new HashMap<>();
@@ -40,6 +38,19 @@ public class SnapShots {
 
     private <T> T createDeepCopy(T original) {
         try {
+            if (original instanceof List) {
+                List<?> originalList = (List<?>) original;
+                List<Object> copyList = new ArrayList<>();
+                for (Object item : originalList) {
+                    if (item != null && !isPrimitiveOrWrapper(item.getClass())) {
+                        copyList.add(createDeepCopy(item));
+                    } else {
+                        copyList.add(item);
+                    }
+                }
+                return (T) copyList;
+            }
+
             Class<?> clazz = original.getClass();
             T copy = (T) clazz.getDeclaredConstructor().newInstance();
             for (Field field : clazz.getDeclaredFields()) {

@@ -23,17 +23,20 @@ public class EntityAttribute {
     private final List<GeneralAttribute> generalAttributes;
     private final IdAttribute idAttribute;
     private final List<OneToManyField> oneToManyFields;
+    private final Class<?> clazz;
 
     private EntityAttribute(
             String tableName,
             IdAttribute idAttribute,
             List<GeneralAttribute> generalAttributes,
-            List<OneToManyField> oneToManies
+            List<OneToManyField> oneToManies,
+            Class<?> clazz
     ) {
         this.tableName = tableName;
         this.generalAttributes = generalAttributes;
         this.idAttribute = idAttribute;
         this.oneToManyFields = oneToManies;
+        this.clazz = clazz;
     }
 
     public static EntityAttribute of(Class<?> clazz, Set<Class<?>> visitedEntities) {
@@ -73,7 +76,7 @@ public class EntityAttribute {
                 .map(field -> new OneToManyField(field, tableName, idAttribute.getColumnName(), visitedEntities)).toList();
 
 
-        return new EntityAttribute(tableName, idAttribute, generalAttributes, oneToManies);
+        return new EntityAttribute(tableName, idAttribute, generalAttributes, oneToManies, clazz);
     }
 
     private static void validate(Class<?> clazz, IdAttribute idAttribute, Set<Class<?>> visitedEntities) {
@@ -109,10 +112,15 @@ public class EntityAttribute {
     }
 
     public IdAttribute getIdAttribute() {
+
         return idAttribute;
     }
 
     public List<OneToManyField> getOneToManyFields() {
         return this.oneToManyFields;
+    }
+
+    public Class<?> getClazz() {
+        return this.clazz;
     }
 }

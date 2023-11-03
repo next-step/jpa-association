@@ -18,6 +18,6 @@ public class JoinClause {
         if (conditions.length() == 0) {
             return "";
         }
-        return conditions.toString();
+        return " " + conditions;
     }
 }

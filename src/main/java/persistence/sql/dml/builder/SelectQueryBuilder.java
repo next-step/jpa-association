@@ -34,6 +34,6 @@ public class SelectQueryBuilder {
     }
 
     public String prepareStatement() {
-        return String.format("SELECT * FROM %s as %s %s %s", tableName, tableName, joinClause, whereClause);
+        return String.format("SELECT * FROM %s as %s%s%s", tableName, tableName, joinClause, whereClause);
     }
 }

@@ -15,6 +15,7 @@ import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.infra.H2SqlConverter;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -50,6 +51,43 @@ class PersistenceContextImplTest extends DatabaseTest {
                         = persistenceContext.getEntity(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
 
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
+            }
+        }
+
+        @Nested
+        @DisplayName("일대다 관계에 FetchType.EAGER의 엔티티가 주어지면")
+        class withOneToManyEagerFetchEntity {
+
+            @Test
+            @DisplayName("일차 캐시에 객체가 존재하면 객체를 반환하고, 없으면 null을 반환한다.")
+            void returnFromFirstCache() throws SQLException {
+                setUpFixtureTable(EntityFixtures.OrderItem.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.Order.class, new H2SqlConverter());
+
+                EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1);
+
+
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
+
+                EntityFixtures.OrderItem insertedOrderItem = persistenceContext.addEntity(orderItem);
+                EntityFixtures.Order order =
+                        new EntityFixtures.Order("민준", List.of(insertedOrderItem));
+
+                EntityFixtures.Order notInsertedOrder
+                        = persistenceContext.getEntity(EntityFixtures.Order.class, "1");
+
+                assertThat(notInsertedOrder).isEqualTo(null);
+
+                persistenceContext.addEntity(order);
+
+                EntityFixtures.Order insertedOrder
+                        = persistenceContext.getEntity(EntityFixtures.Order.class, "1");
+
+                assertThat(insertedOrder.toString())
+                        .isEqualTo("Order{id=1, orderNumber='민준', orderItems=[OrderItem{id=1, product='티비', quantity=1}]}");
             }
         }
     }
@@ -138,6 +176,39 @@ class PersistenceContextImplTest extends DatabaseTest {
 
                 assertThat(persistenceContext.getDatabaseSnapshot(sample, "1").toString())
                         .isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
+            }
+        }
+
+        @Nested
+        @DisplayName("일대다 관계에 FetchType.EAGER인 인스턴스와 아이디가 주어지면")
+        class withOneToManyEagerFetchEntity {
+            @Test
+            @DisplayName("일차 캐시에 객체가 존재하면 객체를 반환하고, 없으면 null을 반환한다.")
+            void returnFromFirstCache() throws SQLException {
+                setUpFixtureTable(EntityFixtures.OrderItem.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.Order.class, new H2SqlConverter());
+
+                EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1);
+
+
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityAttributes entityAttributes = new EntityAttributes();
+                PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
+
+                EntityFixtures.OrderItem insertedOrderItem = persistenceContext.addEntity(orderItem);
+                EntityFixtures.Order order =
+                        new EntityFixtures.Order("민준", List.of(insertedOrderItem));
+
+                EntityFixtures.Order notInsertedOrder
+                        = persistenceContext.getDatabaseSnapshot(order, "1");
+
+                assertThat(notInsertedOrder).isEqualTo(null);
+
+                EntityFixtures.Order insertedOrder = persistenceContext.addEntity(order);
+
+                assertThat(persistenceContext.getDatabaseSnapshot(insertedOrder, "1").toString())
+                        .isEqualTo("Order{id=1, orderNumber='민준', orderItems=[OrderItem{id=1, product='티비', quantity=1}]}");
             }
         }
     }

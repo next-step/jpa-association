@@ -26,7 +26,7 @@ public class SelectInsertQueryBuilderTest {
             void returnDmlWithWhereClause() {
                 String dml = SelectQueryBuilder.of(EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>()))
                         .where("id", "1").prepareStatement();
-                assertThat(dml).isEqualTo("SELECT * FROM entity_name WHERE id = '1'");
+                assertThat(dml).isEqualTo("SELECT * FROM entity_name as entity_name WHERE id = '1'");
             }
         }
 

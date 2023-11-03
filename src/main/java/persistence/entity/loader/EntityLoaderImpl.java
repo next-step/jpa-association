@@ -40,10 +40,10 @@ public class EntityLoaderImpl implements EntityLoader {
 
     @Override
     public <T> T load(Class<T> clazz, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz,new HashSet<>());
+        EntityAttribute entityAttribute = EntityAttribute.of(clazz, new HashSet<>());
         IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
-        String sql = SelectQueryBuilder.of(entityAttribute).where(idAttribute.getColumnName(), id).prepareStatement();
+        String sql = SelectQueryBuilder.of(entityAttribute).where(entityAttribute.getTableName(), idAttribute.getColumnName(), id).prepareStatement();
 
         return jdbcTemplate.queryForObject(sql,
                 rs -> mapResultSetToEntity(clazz, idAttribute, rs));

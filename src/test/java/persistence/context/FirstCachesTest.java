@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.entity.attribute.EntityAttribute;
+
+import java.util.HashSet;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -21,14 +25,17 @@ class FirstCachesTest {
             @DisplayName("일차캐시를 반환한다.")
             void returnFirstCache() {
                 FirstCaches firstCaches = new FirstCaches();
-                EntityFixtures.SampleOneWithValidAnnotation sample
-                        = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
-                firstCaches.putFirstCache(sample, "1");
+                EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem(1L, "티비", 1);
+                EntityFixtures.Order order
+                        = new EntityFixtures.Order(1L, "민준", List.of(orderItem));
 
-                Object firstCache = firstCaches.getFirstCacheOrNull(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
+                firstCaches.putFirstCache(order, "1");
 
-                assertThat(firstCache.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
+                Object firstCache = firstCaches.getFirstCacheOrNull(EntityFixtures.Order.class, "1");
+
+                assertThat(firstCache.toString())
+                        .isEqualTo("Order{id=1, orderNumber='민준', orderItems=[OrderItem{id=1, product='티비', quantity=1}]}");
             }
         }
 
@@ -54,13 +61,29 @@ class FirstCachesTest {
         @DisplayName("인스턴스와 이이디를 받으면")
         class withValidArgs {
             @Test
-            @DisplayName("일차캐시에 인스턴스를 저장하고 엔트리 상태를 PERSISTENT로 변경한다.")
+            @DisplayName("일차캐시에 인스턴스를 저장한다.")
             void putFirstCache() {
                 FirstCaches firstCaches = new FirstCaches();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
                 Assertions.assertDoesNotThrow(() -> firstCaches.putFirstCache(sample, "1"));
+            }
+        }
+
+        @Nested
+        @DisplayName("OneToMany 연관관계가 있는 인스턴스와 이이디를 받으면")
+        class withValidInstanceAndIdAndEntityAttribute {
+            @Test
+            @DisplayName("일차캐시에 인스턴스를 저장하고, 연관된 인스턴스까지 같이 저장한다.")
+            void putFirstCache() {
+                FirstCaches firstCaches = new FirstCaches();
+                EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem(1L, "티비", 1);
+                EntityFixtures.Order order
+                        = new EntityFixtures.Order(1L, "민준", List.of(orderItem));
+                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>());
+
+                Assertions.assertDoesNotThrow(() -> firstCaches.putFirstCache(order, "1", entityAttribute));
             }
         }
     }

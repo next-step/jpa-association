@@ -22,7 +22,6 @@ public class OneToManyField {
         this.field = field;
         this.tableName = tableName;
         this.idColumnName = idColumnName;
-
         this.fieldName = field.getName();
         this.fetchType = getFetchTypeFromField(field);
         this.resolvedJoinColumnName = getJoinColumnNameFromField(field);
@@ -67,5 +66,9 @@ public class OneToManyField {
 
     public EntityAttribute getEntityAttribute() {
         return entityAttribute;
+    }
+
+    public Field getField() {
+        return field;
     }
 }

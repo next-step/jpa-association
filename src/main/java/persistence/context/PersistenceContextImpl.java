@@ -26,6 +26,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     @Override
     public <T> T getEntity(Class<T> clazz, String id) {
         Object firstCache = firstCaches.getFirstCacheOrNull(clazz, id);
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
 
         if (firstCache == null) {
             T loaded = simpleEntityPersister.load(clazz, id);
@@ -35,8 +36,7 @@ public class PersistenceContextImpl implements PersistenceContext {
             }
 
             entityEntries.changeOrSetStatus(LOADING, loaded);
-
-            firstCaches.putFirstCache(loaded, id);
+            firstCaches.putFirstCache(loaded, id, entityAttribute);
             snapShots.putSnapShot(loaded, id);
 
             return loaded;
@@ -62,7 +62,7 @@ public class PersistenceContextImpl implements PersistenceContext {
         T updated = simpleEntityPersister.update(snapshot, instance); // 나중에 쓰기지연 구현
 
         snapShots.putSnapShot(instance, instanceId);
-        firstCaches.putFirstCache(instance, instanceId);
+        firstCaches.putFirstCache(instance, instanceId, entityAttribute);
         entityEntries.changeOrSetStatus(MANAGED, instance);
 
         return updated;

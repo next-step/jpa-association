@@ -23,6 +23,6 @@ public class WhereClause {
         if (conditions.length() == 0) {
             return "";
         }
-        return "WHERE " + conditions;
+        return " WHERE " + conditions;
     }
 }

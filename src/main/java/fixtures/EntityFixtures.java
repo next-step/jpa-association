@@ -163,8 +163,7 @@ public class EntityFixtures {
 
     @Entity
     @Table(name = "orders")
-    public class Order {
-
+    public static class Order {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
@@ -174,11 +173,59 @@ public class EntityFixtures {
         @OneToMany(fetch = FetchType.EAGER)
         @JoinColumn(name = "order_id")
         private List<OrderItem> orderItems;
+
+        public Order(String orderNumber, List<OrderItem> orderItems) {
+            this.orderNumber = orderNumber;
+            this.orderItems = orderItems;
+        }
+
+        public Order(long id, String orderNumber, List<OrderItem> orderItems) {
+            this.id = id;
+            this.orderNumber = orderNumber;
+            this.orderItems = orderItems;
+        }
+
+        @Override
+        public String toString() {
+            return "Order{" +
+                    "id=" + id +
+                    ", orderNumber='" + orderNumber + '\'' +
+                    ", orderItems=" + orderItems +
+                    '}';
+        }
+
+        public Order() {
+
+        }
     }
 
     @Entity
     @Table(name = "order_items")
-    public class OrderItem {
+    public static class OrderItem {
+
+        public OrderItem(String product, Integer quantity) {
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        public OrderItem() {
+
+        }
+
+        public OrderItem(Long id, String product, Integer quantity) {
+            this.id = id;
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        @Override
+        public String toString() {
+            return "OrderItem{" +
+                    "id=" + id +
+                    ", product='" + product + '\'' +
+                    ", quantity=" + quantity +
+                    '}';
+        }
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

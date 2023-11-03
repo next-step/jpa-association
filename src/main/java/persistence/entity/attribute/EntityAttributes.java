@@ -11,6 +11,8 @@ public class EntityAttributes {
     private static final Map<Class<?>, EntityAttribute> entityAttributeCenter = new HashMap<>();
 
     static {
+        entityAttributeCenter.put(EntityFixtures.Order.class, EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>()));
+        entityAttributeCenter.put(EntityFixtures.OrderItem.class, EntityAttribute.of(EntityFixtures.OrderItem.class, new HashSet<>()));
         entityAttributeCenter.put(EntityFixtures.EntityWithIntegerId.class, EntityAttribute.of(EntityFixtures.EntityWithIntegerId.class, new HashSet<>()));
         entityAttributeCenter.put(EntityFixtures.EntityWithStringId.class, EntityAttribute.of(EntityFixtures.EntityWithStringId.class, new HashSet<>()));
         entityAttributeCenter.put(EntityFixtures.SampleOneWithValidAnnotation.class, EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>()));
