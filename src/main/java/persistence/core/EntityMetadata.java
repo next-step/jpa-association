@@ -105,6 +105,11 @@ public class EntityMetadata<T> {
         return this.clazz.equals(clazz);
     }
 
+    public boolean hasAssociatedOf(final EntityMetadata<?> entityMetadata) {
+        return oneToManyColumns.stream()
+                .anyMatch(entityOneToManyColumn -> entityMetadata.isType(entityOneToManyColumn.getJoinColumnType()));
+    }
+
     @Override
     public boolean equals(final Object object) {
         if (this == object) return true;

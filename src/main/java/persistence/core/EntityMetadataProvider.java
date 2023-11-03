@@ -38,13 +38,8 @@ public class EntityMetadataProvider {
 
     public Set<EntityMetadata<?>> getAllAssociatedEntitiesMetadata(final EntityMetadata<?> entityMetadata) {
         return cache.values().stream()
-                .filter(metadata -> hasAssociatedEntityMetadata(entityMetadata, metadata))
+                .filter(metadata -> metadata.hasAssociatedOf(entityMetadata))
                 .collect(Collectors.toUnmodifiableSet());
-    }
-
-    private boolean hasAssociatedEntityMetadata(final EntityMetadata<?> entityMetadata, final EntityMetadata<?> metadata) {
-        return metadata.getOneToManyColumns().stream()
-                .anyMatch(entityOneToManyColumn -> entityMetadata.isType(entityOneToManyColumn.getJoinColumnType()));
     }
 
     private static class InstanceHolder {

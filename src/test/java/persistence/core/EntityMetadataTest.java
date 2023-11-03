@@ -2,9 +2,9 @@ package persistence.core;
 
 
 import domain.FixtureAssociatedEntity;
+import domain.FixtureEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.FixtureEntity;
 import persistence.exception.PersistenceException;
 
 import static org.assertj.core.api.Assertions.*;
@@ -113,6 +113,19 @@ class EntityMetadataTest {
         final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"));
 
         assertThatIterable(entityMetadata.getOneToManyColumns()).containsExactly(oneToManyColumn);
+    }
+
+    @Test
+    @DisplayName("hasAssociatedOf 를 통해 EntityMetadata 가 특정 EntityMetadata 를 associated 하고 있는지 여부를 반환 받을 수 있다.")
+    void hasAssociatedOfTest() {
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.WithOneToManyJoinColumn.class);
+        final EntityMetadata<?> associatedEntityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.WithId.class);
+        final EntityMetadata<?> notAssociatedEntityMetadata = new EntityMetadata<>(FixtureEntity.WithIdAndColumn.class);
+
+        assertSoftly(softly -> {
+            softly.assertThat(entityMetadata.hasAssociatedOf(associatedEntityMetadata)).isTrue();
+            softly.assertThat(entityMetadata.hasAssociatedOf(notAssociatedEntityMetadata)).isFalse();
+        });
     }
 
 }
