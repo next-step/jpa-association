@@ -48,6 +48,11 @@ public class ColumnMetas implements Iterable<ColumnMeta> {
                 .anyMatch(ColumnMeta::isGenerationTypeIdentity);
     }
 
+    public boolean hasJoinEntity() {
+        return values.stream()
+                .anyMatch(ColumnMeta::isJoinColumn);
+    }
+
     @Override
     public Iterator<ColumnMeta> iterator() {
         return values.iterator();
