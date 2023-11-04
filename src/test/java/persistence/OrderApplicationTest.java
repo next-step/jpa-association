@@ -5,6 +5,8 @@ import domain.FixtureAssociatedEntity.OrderItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerFactory;
 import persistence.entity.EntityScanner;
@@ -20,6 +22,8 @@ public class OrderApplicationTest extends IntegrationTestEnvironment {
 
     @BeforeEach
     void setUp() {
+        final EntityMetadata<Order> orderEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Order.class);
+        final EntityMetadata<OrderItem> orderItemEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderItem.class);
         final String createOrderDdl = ddlGenerator.generateCreateDdl(orderEntityMetadata);
         final String createOrderItemDdl = ddlGenerator.generateCreateDdl(orderItemEntityMetadata);
         jdbcTemplate.execute(createOrderDdl);

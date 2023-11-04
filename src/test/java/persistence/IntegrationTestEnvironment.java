@@ -2,8 +2,6 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
-import domain.FixtureAssociatedEntity.Order;
-import domain.FixtureAssociatedEntity.OrderItem;
 import domain.FixtureEntity.Person;
 import extension.EntityMetadataExtension;
 import jdbc.JdbcTemplate;
@@ -27,8 +25,6 @@ public abstract class IntegrationTestEnvironment {
     protected DdlGenerator ddlGenerator;
     protected DmlGenerator dmlGenerator;
     protected EntityMetadata<Person> personEntityMetadata;
-    protected EntityMetadata<Order> orderEntityMetadata;
-    protected EntityMetadata<OrderItem> orderItemEntityMetadata;
     protected JdbcTemplate jdbcTemplate;
     protected PersistenceEnvironment persistenceEnvironment;
     protected List<Person> people;
@@ -43,8 +39,6 @@ public abstract class IntegrationTestEnvironment {
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
 
         personEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
-        orderEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Order.class);
-        orderItemEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderItem.class);
         final String createPersonDdl = ddlGenerator.generateCreateDdl(personEntityMetadata);
         jdbcTemplate.execute(createPersonDdl);
         people = createDummyUsers();
