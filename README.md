@@ -82,6 +82,5 @@ class HelloTarget {
 - [x] CGLib Proxy 도움 사이트를 보며 다양하게 써본다.
 
 - 요구사항 2 - 조회 시 프록시 객체를 사용해 적용해보자
-- [ ] Entity 를 Load 할시, 먼저 Proxy 객체를 생성한다.
-- [ ] Eagar 일 경우 바로 load 한다.
-- [ ] Lazy 일 경우 Entity 의 메서드 호출 시 load 한다.
+- [x] Entity 를 Load 할시 OneToManyColumn 이 Lazy 인 경우 Proxy 객체를 생성해서 넣어둔다.
+- [x] OneToManyColumn 의 메서드 호출 시 load 한다.

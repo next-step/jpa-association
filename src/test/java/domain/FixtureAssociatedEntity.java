@@ -148,4 +148,90 @@ public class FixtureAssociatedEntity {
         }
 
     }
+
+    @Entity
+    @Table(name = "lazy_orders")
+    public static class OrderLazy {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String orderNumber;
+
+        @OneToMany(fetch = FetchType.LAZY)
+        @JoinColumn(name = "lazy_order_id")
+        private List<OrderLazyItem> orderItems;
+
+        protected OrderLazy() {
+        }
+
+        public OrderLazy(final Long id, final String orderNumber) {
+            this.id = id;
+            this.orderNumber = orderNumber;
+        }
+
+        public OrderLazy(final String orderNumber) {
+            this(null, orderNumber);
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getOrderNumber() {
+            return orderNumber;
+        }
+
+        public List<OrderLazyItem> getOrderItems() {
+            return orderItems;
+        }
+
+        public void addOrderItem(final OrderLazyItem orderItem) {
+            if(Objects.isNull(this.orderItems)) {
+                this.orderItems = new ArrayList<>();
+            }
+            this.orderItems.add(orderItem);
+        }
+    }
+
+    @Entity
+    @Table(name = "lazy_order_items")
+    public static class OrderLazyItem {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String product;
+
+        private Integer quantity;
+
+        public OrderLazyItem() {
+        }
+
+        public OrderLazyItem(final Long id, final String product, final Integer quantity) {
+            this.id = id;
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        public OrderLazyItem(final String product, final Integer quantity) {
+            this(null, product, quantity);
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getProduct() {
+            return product;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
+    }
+
 }

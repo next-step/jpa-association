@@ -8,6 +8,7 @@ import persistence.entity.mapper.EntityRowMapper;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class EntityLoader<T> {
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
     private final EntityRowMapper<T> entityRowMapper;
+    private final EntityCollectionLoader entityCollectionLoader;
 
     public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         this.entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
@@ -26,6 +28,7 @@ public class EntityLoader<T> {
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
         this.entityRowMapper = new EntityRowMapper<>(clazz);
+        this.entityCollectionLoader = new EntityCollectionLoader(dmlGenerator, jdbcTemplate);
     }
 
     public Optional<T> loadById(final Object id) {
@@ -39,7 +42,24 @@ public class EntityLoader<T> {
         if (result.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(result.get(0));
+
+        final T entity = result.get(0);
+
+        if (entityMetadata.hasLazyOneToManyColumn()) {
+            entityMetadata.getOneToManyColumns()
+                    .forEach(oneToManyColumn -> entityCollectionLoader.initLazyOneToMany(oneToManyColumn, entity, id));
+        }
+
+        return Optional.of(entity);
+    }
+
+    public Collection<?> loadAll(final String column, final Object columnValue) {
+        final String query = dmlGenerator.select()
+                .table(entityMetadata.getTableName())
+                .column(entityMetadata)
+                .where(column, String.valueOf(columnValue))
+                .build();
+        return jdbcTemplate.query(query, entityRowMapper::mapRow);
     }
 
     public String renderSelect(final Object id) {
@@ -50,5 +70,4 @@ public class EntityLoader<T> {
                 .where(idColumn.getNameWithAlias(), String.valueOf(id))
                 .build();
     }
-
 }
