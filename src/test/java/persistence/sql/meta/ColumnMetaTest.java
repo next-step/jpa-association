@@ -1,5 +1,6 @@
 package persistence.sql.meta;
 
+import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,6 +90,14 @@ class ColumnMetaTest {
         ColumnMeta columnMeta = ColumnMeta.of(field);
         String columnName = columnMeta.getColumnName();
         assertThat(columnName).isEqualTo("email");
+    }
+
+    @Test
+    @DisplayName("join 대상 컬럼여부를 확인한다")
+    void isJoinColumn() throws Exception {
+        Field field = Order.class.getDeclaredField("orderItems");
+        ColumnMeta columnMeta = ColumnMeta.of(field);
+        assertThat(columnMeta.isJoinColumn()).isTrue();
     }
 
 }
