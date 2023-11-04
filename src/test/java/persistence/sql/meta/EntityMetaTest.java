@@ -1,5 +1,6 @@
 package persistence.sql.meta;
 
+import domain.Order;
 import domain.Person;
 import jakarta.persistence.Table;
 import org.junit.jupiter.api.DisplayName;
@@ -30,5 +31,12 @@ class EntityMetaTest {
         EntityMeta entityMeta = EntityMeta.of(Person.class);
         Table tableAnnotation = Person.class.getDeclaredAnnotation(Table.class);
         assertThat(entityMeta.getTableName()).isEqualTo(tableAnnotation.name());
+    }
+
+    @Test
+    @DisplayName("PK 컬럼 Name 조회테스트")
+    void getPkColumnName() {
+        EntityMeta entityMeta = EntityMeta.of(Order.class);
+        assertThat(entityMeta.getPkColumnName()).isEqualTo("id");
     }
 }
