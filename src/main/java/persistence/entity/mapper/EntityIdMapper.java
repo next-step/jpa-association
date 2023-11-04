@@ -10,8 +10,12 @@ public class EntityIdMapper implements EntityColumnsMapper {
 
     private final EntityIdColumn idColumn;
 
-    public EntityIdMapper(final EntityIdColumn idColumn) {
+    private EntityIdMapper(final EntityIdColumn idColumn) {
         this.idColumn = idColumn;
+    }
+
+    public static EntityColumnsMapper of(final EntityIdColumn idColumn) {
+        return new EntityIdMapper(idColumn);
     }
 
     @Override

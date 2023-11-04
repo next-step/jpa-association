@@ -25,7 +25,7 @@ class EntityOneToManyMapperTest {
         final Class<Order> clazz = Order.class;
         final Order order = ReflectionUtils.createInstance(clazz);
         final EntityColumns entityColumns = new EntityColumns(clazz, "orders");
-        final EntityOneToManyMapper entityOneToManyMapper = new EntityOneToManyMapper(entityColumns.getOneToManyColumns());
+        final EntityColumnsMapper entityOneToManyMapper = EntityOneToManyMapper.of(entityColumns.getOneToManyColumns());
         final SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("order_items.id", Types.BIGINT, 10, 0);
         rs.addColumn("order_items.product", Types.VARCHAR, 255, 0);

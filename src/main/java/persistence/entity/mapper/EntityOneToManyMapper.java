@@ -12,9 +12,13 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
     private final List<EntityOneToManyColumn> oneToManyColumns;
     private final MapperCollectionStrategies collectionStrategies;
 
-    public EntityOneToManyMapper(final List<EntityOneToManyColumn> oneToManyColumns) {
+    private EntityOneToManyMapper(final List<EntityOneToManyColumn> oneToManyColumns) {
         this.oneToManyColumns = oneToManyColumns;
         this.collectionStrategies = MapperCollectionStrategies.getInstance();
+    }
+
+    public static EntityColumnsMapper of(final List<EntityOneToManyColumn> oneToManyColumns) {
+        return new EntityOneToManyMapper(oneToManyColumns);
     }
 
     @Override
