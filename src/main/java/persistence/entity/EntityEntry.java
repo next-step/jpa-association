@@ -6,9 +6,13 @@ public class EntityEntry {
     private EntityKey entityKey;
     private EntityStatus entityStatus;
 
-    public EntityEntry(EntityKey entityKey) {
+    private EntityEntry(EntityKey entityKey, EntityStatus entityStatus) {
         this.entityKey = entityKey;
-        this.entityStatus = EntityStatus.LOADING;
+        this.entityStatus = entityStatus;
+    }
+
+    public static EntityEntry loadingOf(EntityKey entityKey) {
+        return new EntityEntry(entityKey, EntityStatus.LOADING);
     }
 
     public void readOnly() {

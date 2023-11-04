@@ -9,7 +9,7 @@ public class EntityEntryContext {
     private final Map<EntityKey, EntityEntry> context = new ConcurrentHashMap<>();
 
     public EntityEntry getEntityEntry(EntityKey entityKey) {
-        return context.getOrDefault(entityKey, new EntityEntry(entityKey));
+        return context.getOrDefault(entityKey, EntityEntry.loadingOf(entityKey));
     }
 
     public List<EntityKey> getDeletedEntityKey() {

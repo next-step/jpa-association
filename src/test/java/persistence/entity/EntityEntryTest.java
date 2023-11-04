@@ -48,7 +48,7 @@ class EntityEntryTest {
         final EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
 
         //when
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
         final Object saved = entityEntry.saving(entityPersister, person);
 
         //then
@@ -62,7 +62,7 @@ class EntityEntryTest {
     void manged() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
 
         //when
         entityEntry.managed();
@@ -76,7 +76,7 @@ class EntityEntryTest {
     void readOnly() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
         final EntityMeta entityMeta = EntityMeta.from(person.getClass());
         final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
         final EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
@@ -95,7 +95,7 @@ class EntityEntryTest {
     void deleted() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
 
         //when
         entityEntry.deleted();
@@ -109,7 +109,7 @@ class EntityEntryTest {
     void readOnlyDelete() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
 
         //when
         entityEntry.readOnly();
@@ -124,7 +124,7 @@ class EntityEntryTest {
     void goneIsNotLoad() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
         final EntityMeta entityMeta = EntityMeta.from(person.getClass());
         final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, new EntityMapper(entityMeta));
@@ -138,11 +138,11 @@ class EntityEntryTest {
     }
 
     @Test
-    @DisplayName("EntityEntry의 초기 상태는 Loading 상태이다")
+    @DisplayName("EntityEntry의 Loading 상태로 생성이 된다.")
     void initLoading() {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
-        EntityEntry entityEntry = new EntityEntry(EntityKey.of(person));
+        EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
 
         //when & then
         assertThat(entityEntry.isLoading()).isTrue();
