@@ -19,6 +19,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Nested
 @DisplayName("CustomJpaRepository 클래스의")
 class CustomJpaRepositoryTest extends DatabaseTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
+
     @Nested
     @DisplayName("save 메소드는")
     class save {
@@ -32,7 +34,7 @@ class CustomJpaRepositoryTest extends DatabaseTest {
 
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);

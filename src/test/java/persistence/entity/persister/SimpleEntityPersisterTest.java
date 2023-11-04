@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaderImpl;
 import persistence.sql.infra.H2SqlConverter;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Nested
 @DisplayName("SimpleEntityPersister 클래스의")
 public class SimpleEntityPersisterTest extends DatabaseTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
     EntityFixtures.SampleOneWithValidAnnotation sample
             = new EntityFixtures.SampleOneWithValidAnnotation(1, "test_nick_name", 29);
 
@@ -32,7 +34,7 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
             void returnInstanceWithIdMapping() throws SQLException {
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
                 assertThat(inserted.toString())
@@ -52,7 +54,7 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
             void returnInstanceWithIdMapping() throws SQLException {
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
@@ -78,7 +80,7 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
             void returnInstanceWithIdMapping() throws SQLException {
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
@@ -98,7 +100,7 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
             void returnObject() throws SQLException {
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 

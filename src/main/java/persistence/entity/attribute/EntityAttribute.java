@@ -73,8 +73,8 @@ public class EntityAttribute {
 
         List<OneToManyField> oneToManies = Arrays.stream(fields)
                 .filter(field -> field.isAnnotationPresent(jakarta.persistence.OneToMany.class))
-                .map(field -> new OneToManyField(field, tableName, idAttribute.getColumnName(), visitedEntities)).toList();
-
+                .map(field -> new OneToManyField(field, tableName, idAttribute.getColumnName(), visitedEntities))
+                .collect(Collectors.toList());
 
         return new EntityAttribute(tableName, idAttribute, generalAttributes, oneToManies, clazz);
     }

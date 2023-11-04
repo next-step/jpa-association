@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.infra.H2SqlConverter;
 
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Nested
 @DisplayName("EntityLoader 클래스의")
 public class EntityLoaderImplTest extends DatabaseTest {
-
+    private final EntityAttributes entityAttributes = new EntityAttributes();
     private final EntityFixtures.SampleOneWithValidAnnotation sample =
             new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
@@ -31,12 +32,12 @@ public class EntityLoaderImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
 
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
-                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate);
+                EntityLoaderImpl entityLoaderImpl = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
 
                 EntityFixtures.SampleOneWithValidAnnotation retrieved =
                         entityLoaderImpl.load(EntityFixtures.SampleOneWithValidAnnotation.class, inserted.getId().toString());

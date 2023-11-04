@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.GeneralAttribute;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.attribute.resolver.GeneralAttributeResolver;
@@ -14,7 +15,6 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,9 +22,12 @@ import static persistence.entity.attribute.resolver.AttributeHolder.GENERAL_ATTR
 
 public class EntityLoaderImpl implements EntityLoader {
     private final JdbcTemplate jdbcTemplate;
+    private final EntityAttributes entityAttributes;
 
-    public EntityLoaderImpl(JdbcTemplate jdbcTemplate) {
+    public EntityLoaderImpl(JdbcTemplate jdbcTemplate,
+                            EntityAttributes entityAttributes) {
         this.jdbcTemplate = jdbcTemplate;
+        this.entityAttributes = entityAttributes;
     }
 
     private static <T> void setGeneralFieldFromResultSet(T instance, ResultSet rs, Field field) throws SQLException, IllegalAccessException {
@@ -40,10 +43,12 @@ public class EntityLoaderImpl implements EntityLoader {
 
     @Override
     public <T> T load(Class<T> clazz, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz, new HashSet<>());
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
         IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
-        String sql = SelectQueryBuilder.of(entityAttribute).where(entityAttribute.getTableName(), idAttribute.getColumnName(), id).prepareStatement();
+        String sql = SelectQueryBuilder.of(entityAttribute)
+                .where(entityAttribute.getTableName(), idAttribute.getColumnName(), id)
+                .prepareStatement();
 
         return jdbcTemplate.queryForObject(sql,
                 rs -> mapResultSetToEntity(clazz, idAttribute, rs));

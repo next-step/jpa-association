@@ -11,8 +11,8 @@ import java.util.HashSet;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
-@DisplayName("SelectInsertQueryBuilder 클래스의")
-public class SelectInsertQueryBuilderTest {
+@DisplayName("SelectQueryBuilder 클래스의")
+public class SelectQueryBuilderTest {
 
     @Nested
     @DisplayName("prepareStatement 메소드는")

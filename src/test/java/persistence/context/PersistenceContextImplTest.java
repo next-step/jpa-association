@@ -22,6 +22,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Nested
 @DisplayName("PersistenceContextImpl 클래스의")
 class PersistenceContextImplTest extends DatabaseTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
+
     @Nested
     @DisplayName("getEntity 메소드는")
     class getEntity {
@@ -36,7 +38,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -67,7 +69,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1);
 
 
-                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -107,7 +109,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -137,7 +139,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -167,7 +169,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -191,7 +193,7 @@ class PersistenceContextImplTest extends DatabaseTest {
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1);
 
 
-                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()));
+                EntityLoader entityLoader = new EntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
