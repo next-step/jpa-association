@@ -39,6 +39,10 @@ public class ColumnMeta {
         return columnAnnotation == null || columnAnnotation.nullable();
     }
 
+    public boolean isJoinColumn() {
+        return field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToOne.class);
+    }
+
     public String getColumnName() {
         Column columnAnnotation = field.getDeclaredAnnotation(Column.class);
         if (columnAnnotation == null || StringUtils.isNullOrEmpty(columnAnnotation.name())) {
