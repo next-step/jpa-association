@@ -44,21 +44,32 @@ public class SelectQueryBuilder {
                 .toString();
     }
 
-    public String buildSelectWithJoinByPkQuery(Object pkObject) {
-        return new StringBuilder()
-                .append(getSelectHeaderQuery())
-                .append(joinClauseBuilder.build())
-                .append(whereClauseBuilder.buildPkClause(pkObject))
-                .append(";")
-                .toString();
-    }
-
     private String getSelectHeaderQuery() {
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         ColumnMetas exceptTransient = columnMetas.exceptTransient();
         return new StringBuilder()
                 .append(SELECT)
                 .append(exceptTransient.getColumnsClause())
+                .append(FROM)
+                .append(entityMeta.getTableName())
+                .toString();
+    }
+
+    public String buildSelectWithJoinByPkQuery(Object pkObject) {
+        return new StringBuilder()
+                .append(getSelectHeaderQueryWithJoin())
+                .append(joinClauseBuilder.build())
+                .append(whereClauseBuilder.buildPkClause(pkObject))
+                .append(";")
+                .toString();
+    }
+
+    private String getSelectHeaderQueryWithJoin() {
+        ColumnMetas columnMetas = entityMeta.getColumnMetas();
+        ColumnMetas exceptTransient = columnMetas.exceptTransient();
+        return new StringBuilder()
+                .append(SELECT)
+                .append(exceptTransient.getJoinColumnsClause(entityMeta.getTableName()))
                 .append(FROM)
                 .append(entityMeta.getTableName())
                 .toString();
