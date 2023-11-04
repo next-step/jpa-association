@@ -36,6 +36,6 @@ class SelectQueryBuilderTest {
     @DisplayName("Join Column을 보유한 Entity 의 Join 쿼리 정상빌드")
     void buildSelectWithJoinByPkQuery() {
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(MetaFactory.get(Order.class));
-        assertThat(selectQueryBuilder.buildSelectWithJoinByPkQuery(1L)).isEqualTo("SELECT orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1;");
+        assertThat(selectQueryBuilder.buildSelectWithJoinByPkQuery(1L)).isEqualTo("SELECT orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE id=1;");
     }
 }
