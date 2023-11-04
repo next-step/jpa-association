@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import persistence.mapper.RowMapper;
 
 public class JdbcTemplate {
     private final Connection connection;
@@ -21,9 +22,25 @@ public class JdbcTemplate {
         }
     }
 
+    public Long insertForGenerateKey(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.execute(sql, Statement.RETURN_GENERATED_KEYS);
+            final ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return rowMapper.mapRow(resultSet);
+            if (resultSet.next()) {
+                return rowMapper.mapRow(resultSet);
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
