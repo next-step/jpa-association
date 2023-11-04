@@ -1,5 +1,6 @@
 package persistence.sql.dml.builder;
 
+import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,5 +30,12 @@ class SelectQueryBuilderTest {
     void getSelectByPkQuery() {
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(MetaFactory.get(Person.class));
         assertThat(selectQueryBuilder.buildSelectByPkQuery(1L)).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id=1;");
+    }
+
+    @Test
+    @DisplayName("Join Column을 보유한 Entity 의 Join 쿼리 정상빌드")
+    void buildSelectWithJoinByPkQuery() {
+        SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(MetaFactory.get(Order.class));
+        assertThat(selectQueryBuilder.buildSelectWithJoinByPkQuery(1L)).isEqualTo("SELECT orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1;");
     }
 }
