@@ -29,6 +29,13 @@ public class ColumnMetas implements Iterable<ColumnMeta> {
         return new ColumnMetas(exceptTransient);
     }
 
+    public ColumnMetas exceptJoin() {
+        List<ColumnMeta> exceptTransient = values.stream()
+                .filter(columnMeta -> !columnMeta.isJoinColumn())
+                .collect(Collectors.toList());
+        return new ColumnMetas(exceptTransient);
+    }
+
     public ColumnMetas idColumns() {
         List<ColumnMeta> exceptTransient = values.stream()
                 .filter(ColumnMeta::isId)
