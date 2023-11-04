@@ -138,6 +138,11 @@ public class EntityMetadata<T> {
         return this.idColumn.getName();
     }
 
+    public boolean hasLazyOneToManyColumn() {
+        return this.oneToManyColumns.stream()
+                .anyMatch(EntityAssociatedColumn::isFetchTypeLazy);
+    }
+
     @Override
     public boolean equals(final Object object) {
         if (this == object) return true;
