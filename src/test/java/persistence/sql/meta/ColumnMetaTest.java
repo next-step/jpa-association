@@ -100,4 +100,12 @@ class ColumnMetaTest {
         assertThat(columnMeta.isJoinColumn()).isTrue();
     }
 
+    @Test
+    @DisplayName("Join 대상 테이블명을 조회한다")
+    void getJoinTableName() throws Exception {
+        Field field = Order.class.getDeclaredField("orderItems");
+        ColumnMeta columnMeta = ColumnMeta.of(field);
+        assertThat(columnMeta.getJoinTableName()).isEqualTo("order_items");
+    }
+
 }
