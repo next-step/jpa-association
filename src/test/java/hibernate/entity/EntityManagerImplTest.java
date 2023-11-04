@@ -16,6 +16,7 @@ import org.junit.jupiter.api.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,6 +95,39 @@ class EntityManagerImplTest {
 
         // then
         assertThat(actual).isEqualTo(givenEntity);
+    }
+
+    @Test
+    void eager로_잡힌_oneTomany를_검색한다() {
+        // given
+        jdbcTemplate.execute("CREATE TABLE orders (\n" +
+                "    id BIGINT PRIMARY KEY,\n" +
+                "    orderNumber VARCHAR\n" +
+                ");\n");
+        jdbcTemplate.execute("CREATE TABLE order_items (\n" +
+                "    id BIGINT PRIMARY KEY,\n" +
+                "    order_id BIGINT,\n" +
+                "    product VARCHAR,\n" +
+                "    quantity INTEGER\n" +
+                ");\n");
+        jdbcTemplate.execute("insert into orders (id, orderNumber) values (1, 'ABC123');");
+        jdbcTemplate.execute("insert into order_items (id, order_id, product, quantity) values (1, 1, '라면', 3);");
+        jdbcTemplate.execute("insert into order_items (id, order_id, product, quantity) values (2, 1, '김치', 2);");
+
+        // when
+        Order order = entityManager.find(Order.class, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(order.id).isEqualTo(1L),
+                () -> assertThat(order.orderItems).hasSize(2),
+                () -> assertThat(order.orderItems.get(0).id).isEqualTo(1L),
+                () -> assertThat(order.orderItems.get(0).product).isEqualTo("라면"),
+                () -> assertThat(order.orderItems.get(0).quantity).isEqualTo(3),
+                () -> assertThat(order.orderItems.get(1).id).isEqualTo(2L),
+                () -> assertThat(order.orderItems.get(1).product).isEqualTo("김치"),
+                () -> assertThat(order.orderItems.get(1).quantity).isEqualTo(2)
+        );
     }
 
     @Test
@@ -250,5 +284,34 @@ class EntityManagerImplTest {
             this.age = age;
             this.email = email;
         }
+    }
+
+    @Entity
+    @Table(name = "orders")
+    static class Order {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String orderNumber;
+
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn(name = "order_id")
+        private List<OrderItem> orderItems;
+    }
+
+
+    @Entity
+    @Table(name = "order_items")
+    static class OrderItem {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        private String product;
+
+        private Integer quantity;
     }
 }

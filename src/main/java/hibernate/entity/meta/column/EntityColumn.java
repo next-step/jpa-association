@@ -1,8 +1,6 @@
 package hibernate.entity.meta.column;
 
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 
 import java.lang.reflect.Field;
 
@@ -23,7 +21,8 @@ public interface EntityColumn {
     GenerationType getGenerationType();
 
     static boolean isAvailableCreateEntityColumn(final Field field) {
-        return !field.isAnnotationPresent(Transient.class);
+        return !field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(OneToMany.class)
+                && !field.isAnnotationPresent(ManyToOne.class);
     }
 
     static EntityColumn create(final Field field) {
