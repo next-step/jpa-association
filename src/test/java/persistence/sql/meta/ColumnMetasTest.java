@@ -1,5 +1,6 @@
 package persistence.sql.meta;
 
+import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,5 +30,12 @@ class ColumnMetasTest {
     void hasAutoGenId() {
         ColumnMetas columnMetas = ColumnMetas.of(Person.class.getDeclaredFields());
         assertThat(columnMetas.hasAutoGenId()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Join 대상을 보유한 Entity 여부를 판단한다")
+    void hasJoinEntity() {
+        ColumnMetas columnMetas = ColumnMetas.of(Order.class.getDeclaredFields());
+        assertThat(columnMetas.hasJoinEntity()).isTrue();
     }
 }
