@@ -77,6 +77,6 @@ class HelloTarget {
 }
 ```
 - [x] CGLib 의존성을 추가한다.
-- [ ] 위의 HelloTarget class 를 CGLib Proxy 객체로 생성한다.
-- [ ] HelloTarget 메서드의 결과를 CGLib Proxy 메서드를 이용해 대문자로 반환하도록 한다.
-- [ ] CGLib Proxy 도움 사이트를 보며 다양하게 써본다.
+- [x] 위의 HelloTarget class 를 CGLib Proxy 객체로 생성한다.
+- [x] HelloTarget 메서드의 결과를 CGLib Proxy 메서드를 이용해 대문자로 반환하도록 한다.
+- [x] CGLib Proxy 도움 사이트를 보며 다양하게 써본다.
