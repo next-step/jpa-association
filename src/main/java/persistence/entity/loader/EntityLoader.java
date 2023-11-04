@@ -8,7 +8,6 @@ import persistence.entity.mapper.EntityRowMapper;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,15 +50,6 @@ public class EntityLoader<T> {
         }
 
         return Optional.of(entity);
-    }
-
-    public Collection<?> loadAll(final String column, final Object columnValue) {
-        final String query = dmlGenerator.select()
-                .table(entityMetadata.getTableName())
-                .column(entityMetadata)
-                .where(column, String.valueOf(columnValue))
-                .build();
-        return jdbcTemplate.query(query, entityRowMapper::mapRow);
     }
 
     public String renderSelect(final Object id) {

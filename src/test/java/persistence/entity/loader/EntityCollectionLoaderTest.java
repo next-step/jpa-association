@@ -9,9 +9,12 @@ import mock.MockDatabaseServer;
 import mock.MockDmlGenerator;
 import net.sf.cglib.proxy.Enhancer;
 import org.h2.tools.SimpleResultSet;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.core.EntityOneToManyColumn;
 import persistence.util.ReflectionUtils;
 
@@ -19,11 +22,35 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 
 @ExtendWith(EntityMetadataExtension.class)
 class EntityCollectionLoaderTest {
+
+    private EntityCollectionLoader entityCollectionLoader;
+    private Class<OrderLazy> ownerClass;
+    private EntityOneToManyColumn oneToManyColumn;
+
+    @BeforeEach
+    void setUp() throws NoSuchFieldException {
+        final SimpleResultSet rs = createBaseResultSet();
+        entityCollectionLoader = new EntityCollectionLoader(new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        ownerClass = OrderLazy.class;
+        oneToManyColumn = new EntityOneToManyColumn(ownerClass.getDeclaredField("orderItems"), "WithOneToMany");
+
+    }
+
+    @Test
+    @DisplayName("entityCollectionLoader.selectByOwnerId 를 이용해 lazy 객체의 select query 를 만들 수 있다.")
+    void selectByOwnerIdTest() {
+        final EntityMetadata<OrderLazyItem> lazyEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderLazyItem.class);
+
+        final String query = entityCollectionLoader.selectByOwnerId(lazyEntityMetadata, oneToManyColumn.getNameWithAliasAssociatedEntity(), 1L);
+
+        assertThat(query).isEqualTo("select lazy_order_items.id, lazy_order_items.product, lazy_order_items.quantity from lazy_order_items where lazy_order_items.lazy_order_id=1");
+    }
 
     static class MockJdbcTemplate extends JdbcTemplate {
         private final SimpleResultSet rs;
@@ -49,12 +76,8 @@ class EntityCollectionLoaderTest {
 
     @Test
     @DisplayName("EntityOneToManyColumn(Lazy) 는 proxy 처리 되어 있으며 객체 메서드 호출시 값을 load 한다.")
-    void name() throws NoSuchFieldException {
-        final SimpleResultSet rs = createBaseResultSet();
-        final EntityCollectionLoader entityCollectionLoader = new EntityCollectionLoader(new MockDmlGenerator(), new MockJdbcTemplate(rs));
-        final Class<OrderLazy> targetClass = OrderLazy.class;
-        final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(targetClass.getDeclaredField("orderItems"), "WithOneToMany");
-        final OrderLazy instance = ReflectionUtils.createInstance(targetClass);
+    void shouldLoadLazyOneToManyCollection() {
+        final OrderLazy instance = ReflectionUtils.createInstance(ownerClass);
 
         entityCollectionLoader.initLazyOneToMany(oneToManyColumn, instance, 777L);
 
