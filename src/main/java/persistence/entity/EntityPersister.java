@@ -1,7 +1,12 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
-import persistence.core.*;
+import persistence.core.EntityColumns;
+import persistence.core.EntityIdColumn;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
+import persistence.entity.mapper.EntityColumnsMapper;
+import persistence.entity.mapper.EntityIdMapper;
 import persistence.sql.dml.DmlGenerator;
 import persistence.util.ReflectionUtils;
 
@@ -14,7 +19,7 @@ public class EntityPersister {
     private final EntityColumns insertableColumns;
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
-    private final EntityIdMapper entityRowMapper;
+    private final EntityColumnsMapper entityIdMapper;
 
     public EntityPersister(final Class<?> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
@@ -24,12 +29,12 @@ public class EntityPersister {
         this.insertableColumns = entityMetadata.toInsertableColumn();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
-        this.entityRowMapper = new EntityIdMapper(clazz);
+        this.entityIdMapper = EntityIdMapper.of(entityMetadata.getIdColumn());
     }
 
     public void insert(final Object entity) {
         final String insertQuery = renderInsert(entity);
-        jdbcTemplate.executeInsert(insertQuery, resultSet -> entityRowMapper.mapId(entity, resultSet));
+        jdbcTemplate.executeInsert(insertQuery, resultSet -> entityIdMapper.mapColumns(resultSet, entity));
     }
 
     public void update(final Object entity) {
