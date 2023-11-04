@@ -4,6 +4,8 @@ import persistence.exception.PersistenceException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +64,17 @@ public class ReflectionUtils {
             return copy;
         } catch (final Exception e) {
             throw new PersistenceException(targetClazz.getName() + " 객체 복사를 실패했습니다.", e);
+        }
+    }
+
+    public static Class<?> extractGenericClass(final Field field) {
+        try {
+            final Type type = field.getGenericType();
+            final ParameterizedType parameterizedType = (ParameterizedType) type;
+            final Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            return Class.forName(typeArguments[0].getTypeName());
+        } catch (final Exception e) {
+            throw new PersistenceException(field.getName() + " 제네릭 정보 추출에 실패했습니다.", e);
         }
     }
 

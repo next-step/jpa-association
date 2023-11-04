@@ -26,7 +26,7 @@ class RownumPagingStrategyTest {
     @MethodSource("provideParameters")
     @DisplayName("RownumPagingStrategy 는 rownum 을 이용한 페이징 쿼리를 생성한다.")
     void rownumPagingStrategyStrategyOffsetZeroTest(final int offset, final int limit, final String expected) {
-        final String query = pagingStrategy.renderPagingQuery("select id, age, email from user", offset, limit);
+        final String query = pagingStrategy.renderPagingQuery(PageQuery.of("select id, age, email from user", offset, limit));
 
         assertThat(query).isEqualToIgnoringCase(expected);
     }
@@ -34,14 +34,14 @@ class RownumPagingStrategyTest {
     @Test
     @DisplayName("offset 은 0보다 작을 수 없다.")
     void offsetValidationTest() {
-        assertThatThrownBy(()->pagingStrategy.renderPagingQuery("select id, age, email from user", -1, 0))
+        assertThatThrownBy(()->pagingStrategy.renderPagingQuery(PageQuery.of("select id, age, email from user", -1, 0)))
                 .isInstanceOf(PersistenceException.class);
     }
 
     @Test
     @DisplayName("offset 은 0보다 작을 수 없다.")
     void limitValidationTest() {
-        assertThatThrownBy(()->pagingStrategy.renderPagingQuery("select id, age, email from user", 0, -1))
+        assertThatThrownBy(()->pagingStrategy.renderPagingQuery(PageQuery.of("select id, age, email from user", 0, -1)))
                 .isInstanceOf(PersistenceException.class);
     }
 

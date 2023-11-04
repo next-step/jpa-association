@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import persistence.core.EntityColumn;
+import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
 import persistence.core.EntityMetadataProvider;
 import persistence.exception.PersistenceException;
@@ -10,7 +10,7 @@ import java.util.Objects;
 public class EntityKey {
     private final Object key;
     private final String tableName;
-    private final EntityColumn idColumn;
+    private final EntityIdColumn idColumn;
 
     public EntityKey(final Class<?> clazz, final Object key) {
         validate(key);

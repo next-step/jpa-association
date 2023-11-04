@@ -1,14 +1,18 @@
 package persistence.core;
 
 
+import domain.FixtureAssociatedEntity;
+import domain.FixtureEntity;
+import extension.EntityMetadataExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.FixtureEntity;
+import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.exception.PersistenceException;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+@ExtendWith(EntityMetadataExtension.class)
 class EntityMetadataTest {
     private Class<?> mockClass;
 
@@ -17,7 +21,11 @@ class EntityMetadataTest {
     void entityMetadataCreateTest() {
         mockClass = FixtureEntity.WithId.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        assertResult(entityMetadata, "WithId", "id");
+        assertSoftly(softly -> {
+            softly.assertThat(entityMetadata).isNotNull();
+            softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithId");
+            softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
+        });
     }
 
     @Test
@@ -33,7 +41,11 @@ class EntityMetadataTest {
     void tableAnnotatedEntityMetadataCreateTest() {
         mockClass = FixtureEntity.WithTable.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        assertResult(entityMetadata, "test_table", "id");
+        assertSoftly(softly -> {
+            softly.assertThat(entityMetadata).isNotNull();
+            softly.assertThat(entityMetadata.getTableName()).isEqualTo("test_table");
+            softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
+        });
     }
 
     @Test
@@ -45,7 +57,7 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata).isNotNull();
             softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithColumnNonInsertable");
             softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
-            softly.assertThat(entityMetadata.getInsertableColumnNames()).containsExactly("insertableColumn");
+            softly.assertThat(entityMetadata.toInsertableColumnNames()).containsExactly("insertableColumn");
         });
     }
 
@@ -58,7 +70,7 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata).isNotNull();
             softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithColumn");
             softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
-            softly.assertThat(entityMetadata.getColumnNames()).containsExactly("id", "test_column", "notNullColumn");
+            softly.assertThat(entityMetadata.toColumnNames()).containsExactly("id", "test_column", "notNullColumn");
         });
     }
 
@@ -71,7 +83,7 @@ class EntityMetadataTest {
             softly.assertThat(entityMetadata).isNotNull();
             softly.assertThat(entityMetadata.getTableName()).isEqualTo("WithColumn");
             softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo("id");
-            softly.assertThat(entityMetadata.getColumnFieldNames()).containsExactly("id", "column", "notNullColumn");
+            softly.assertThat(entityMetadata.toColumnFieldNames()).containsExactly("id", "column", "notNullColumn");
         });
     }
 
@@ -80,7 +92,7 @@ class EntityMetadataTest {
     void getIdColumnTest() throws NoSuchFieldException {
         mockClass = FixtureEntity.WithId.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityColumn idColumn = new EntityColumn(mockClass.getDeclaredField("id"));
+        final EntityColumn idColumn = new EntityIdColumn(mockClass.getDeclaredField("id"), "WithId");
 
         assertThat(entityMetadata.getIdColumn()).isEqualTo(idColumn);
     }
@@ -90,17 +102,69 @@ class EntityMetadataTest {
     void getInsertableColumnTest() throws NoSuchFieldException {
         mockClass = FixtureEntity.WithColumnNonInsertable.class;
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
-        final EntityColumn insertableColumn = new EntityColumn(mockClass.getDeclaredField("insertableColumn"));
+        final EntityColumn insertableColumn = new EntityFieldColumn(mockClass.getDeclaredField("insertableColumn"), "WithColumnNonInsertable");
 
-        assertThatIterable(entityMetadata.getInsertableColumn()).containsExactly(insertableColumn);
+        assertThatIterable(entityMetadata.toInsertableColumn()).containsExactly(insertableColumn);
     }
 
+    @Test
+    @DisplayName("getOneToManyColumns 를 통해 OneToMany columns 를 반환 받을 수 있다.")
+    void getOneToManyColumnsTest() throws Exception {
+        mockClass = FixtureAssociatedEntity.WithOneToManyJoinColumn.class;
 
-    private void assertResult(final EntityMetadata<?> entityMetadata, final String withId, final String id) {
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+        final EntityOneToManyColumn oneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyJoinColumn");
+
+        assertThatIterable(entityMetadata.getOneToManyColumns()).containsExactly(oneToManyColumn);
+    }
+
+    @Test
+    @DisplayName("hasAssociatedOf 를 통해 EntityMetadata 가 특정 EntityMetadata 를 associated 하고 있는지 여부를 반환 받을 수 있다.")
+    void hasAssociatedOfTest() {
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.WithOneToManyJoinColumn.class);
+        final EntityMetadata<?> associatedEntityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.WithId.class);
+        final EntityMetadata<?> notAssociatedEntityMetadata = new EntityMetadata<>(FixtureEntity.WithIdAndColumn.class);
+
         assertSoftly(softly -> {
-            softly.assertThat(entityMetadata).isNotNull();
-            softly.assertThat(entityMetadata.getTableName()).isEqualTo(withId);
-            softly.assertThat(entityMetadata.getIdColumnName()).isEqualTo(id);
+            softly.assertThat(entityMetadata.hasAssociatedOf(associatedEntityMetadata)).isTrue();
+            softly.assertThat(entityMetadata.hasAssociatedOf(notAssociatedEntityMetadata)).isFalse();
         });
     }
+
+    @Test
+    @DisplayName("getIdType 를 통해 EntityMetadata 의 Id Column Class Type 을 반환 받을 수 있다.")
+    void getIdTypeTest() {
+        mockClass = FixtureAssociatedEntity.WithId.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+
+        assertThat(entityMetadata.getIdType()).isEqualTo(Long.class);
+    }
+
+    @Test
+    @DisplayName("getIdName 를 통해 EntityMetadata 의 Id Column Name 을 반환 받을 수 있다.")
+    void getIdNameTest() {
+        mockClass = FixtureAssociatedEntity.WithId.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+
+        assertThat(entityMetadata.getIdName()).isEqualTo("id");
+    }
+
+    @Test
+    @DisplayName("getColumnNamesWithAlias 를 통해 EntityMetadata 의 Column Name 들을 Alias 와 함께 반환 받을 수 있다.")
+    void getColumnNamesWithAliasTest() {
+        mockClass = FixtureAssociatedEntity.Order.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+
+        assertThat(entityMetadata.getColumnNamesWithAlias()).containsExactly(
+                "orders.id",
+                "orders.orderNumber",
+                "order_items.id",
+                "order_items.product",
+                "order_items.quantity"
+        );
+    }
+
 }

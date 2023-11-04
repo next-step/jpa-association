@@ -7,6 +7,7 @@ import persistence.exception.ColumnNotExistException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -14,18 +15,19 @@ import java.util.stream.StreamSupport;
 public class EntityColumns implements Iterable<EntityColumn> {
     private final List<EntityColumn> columns;
 
-    public EntityColumns(final Class<?> clazz) {
-        this.columns = generateColumns(clazz);
+    public EntityColumns(final Class<?> clazz, final String tableName) {
+        this.columns = generateColumns(clazz,tableName);
     }
+
     public EntityColumns(final List<EntityColumn> entityColumns) {
         this.columns = entityColumns;
     }
 
-    private List<EntityColumn> generateColumns(final Class<?> clazz) {
+    private List<EntityColumn> generateColumns(final Class<?> clazz, final String tableName) {
         this.validate(clazz);
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
-                .map(EntityColumn::new)
+                .map(field -> EntityColumn.from(field, tableName))
                 .collect(Collectors.toUnmodifiableList());
     }
 
@@ -53,10 +55,11 @@ public class EntityColumns implements Iterable<EntityColumn> {
         return this.columns.size();
     }
 
-    public EntityColumn getId() {
+    public EntityIdColumn getId() {
         return this.columns.stream()
                 .filter(EntityColumn::isId)
                 .findFirst()
+                .map(EntityIdColumn.class::cast)
                 .orElseThrow(() -> new ColumnNotExistException("Id 컬럼이 존재하지 않습니다."));
     }
 
@@ -70,5 +73,32 @@ public class EntityColumns implements Iterable<EntityColumn> {
         return this.columns.stream()
                 .map(EntityColumn::getFieldName)
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<EntityOneToManyColumn> getOneToManyColumns() {
+        return this.columns.stream()
+                .filter(EntityColumn::isOneToMany)
+                .map(EntityOneToManyColumn.class::cast)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<EntityFieldColumn> getFieldColumns() {
+        return this.columns.stream()
+                .filter(EntityColumn::isField)
+                .map(EntityFieldColumn.class::cast)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final EntityColumns that = (EntityColumns) object;
+        return Objects.equals(columns, that.columns);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(columns);
     }
 }

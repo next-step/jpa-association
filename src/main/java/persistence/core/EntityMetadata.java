@@ -1,24 +1,31 @@
 package persistence.core;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import persistence.exception.PersistenceException;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EntityMetadata<T> {
 
+    private final Class<T> clazz;
     private final String tableName;
     private final EntityColumns columns;
-    private final EntityColumn idColumn;
+    private final EntityIdColumn idColumn;
+    private final List<EntityOneToManyColumn> oneToManyColumns;
 
     public EntityMetadata(final Class<T> clazz) {
         this.validate(clazz);
+        this.clazz = clazz;
         this.tableName = initTableName(clazz);
-        this.columns = new EntityColumns(clazz);
+        this.columns = new EntityColumns(clazz, tableName);
         this.idColumn = this.columns.getId();
+        this.oneToManyColumns = this.columns.getOneToManyColumns();
     }
 
     private void validate(final Class<T> clazz) {
@@ -43,14 +50,33 @@ public class EntityMetadata<T> {
         return this.columns;
     }
 
-    public List<String> getInsertableColumnNames() {
+    public List<String> getColumnNamesWithAlias() {
+        return this.columns.stream()
+                .map(this::getColumnNames)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getColumnNames(final EntityColumn entityColumn) {
+        if (entityColumn.isOneToMany()) {
+            final EntityOneToManyColumn oneToManyColumn = (EntityOneToManyColumn) entityColumn;
+            if (oneToManyColumn.getFetchType().equals(FetchType.LAZY)) {
+                return Collections.emptyList();
+            }
+            return oneToManyColumn.getAssociatedEntityColumnNamesWithAlias();
+        }
+
+        return List.of(entityColumn.getNameWithAlias());
+    }
+
+    public List<String> toInsertableColumnNames() {
         return this.columns.stream()
                 .filter(EntityColumn::isInsertable)
                 .map(EntityColumn::getName)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<String> getInsertableColumnFieldNames() {
+    public List<String> toInsertableColumnFieldNames() {
         return this.columns.stream()
                 .filter(EntityColumn::isInsertable)
                 .map(EntityColumn::getFieldName)
@@ -61,34 +87,68 @@ public class EntityMetadata<T> {
         return this.idColumn.getName();
     }
 
+    public String getIdColumnNameWithAlias() {
+        return this.idColumn.getNameWithAlias();
+    }
+
     public String getIdColumnFieldName() {
         return this.idColumn.getFieldName();
     }
 
-    public int getColumnSize() {
-        return this.columns.size();
-    }
-
-    public List<String> getColumnNames() {
+    public List<String> toColumnNames() {
         return this.columns.stream()
                 .map(EntityColumn::getName)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<String> getColumnFieldNames() {
+    public List<String> toColumnFieldNames() {
         return this.columns.stream()
                 .map(EntityColumn::getFieldName)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public EntityColumn getIdColumn() {
+    public EntityIdColumn getIdColumn() {
         return this.idColumn;
     }
 
-    public EntityColumns getInsertableColumn() {
+    public EntityColumns toInsertableColumn() {
         return new EntityColumns(
                 this.columns.stream()
                         .filter(EntityColumn::isInsertable)
                         .collect(Collectors.toUnmodifiableList()));
+    }
+
+    public List<EntityOneToManyColumn> getOneToManyColumns() {
+        return this.oneToManyColumns;
+    }
+
+    public boolean isType(final Class<?> clazz) {
+        return this.clazz.equals(clazz);
+    }
+
+    public boolean hasAssociatedOf(final EntityMetadata<?> entityMetadata) {
+        return oneToManyColumns.stream()
+                .anyMatch(entityOneToManyColumn -> entityMetadata.isType(entityOneToManyColumn.getJoinColumnType()));
+    }
+
+    public Class<?> getIdType() {
+        return this.idColumn.getType();
+    }
+
+    public String getIdName() {
+        return this.idColumn.getName();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        final EntityMetadata<?> that = (EntityMetadata<?>) object;
+        return Objects.equals(clazz, that.clazz) && Objects.equals(tableName, that.tableName) && Objects.equals(columns, that.columns) && Objects.equals(idColumn, that.idColumn) && Objects.equals(oneToManyColumns, that.oneToManyColumns);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz, tableName, columns, idColumn, oneToManyColumns);
     }
 }

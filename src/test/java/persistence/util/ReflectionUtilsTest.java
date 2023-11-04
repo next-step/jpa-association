@@ -8,6 +8,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import persistence.exception.PersistenceException;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -23,10 +25,16 @@ class ReflectionUtilsTest {
         private Long testLong = 2L;
     }
 
+    static class FixtureWithList {
+        private List<String> stringList = new ArrayList<>();
+    }
+
     private Fixture fixture;
+    private FixtureWithList fixtureWithList;
     @BeforeEach
     void setUp() {
         fixture = new Fixture();
+        fixtureWithList = new FixtureWithList();
     }
 
     @Test
@@ -91,6 +99,14 @@ class ReflectionUtilsTest {
                 .isInstanceOf(PersistenceException.class);
     }
 
+    private static Stream<Arguments> wrongArgumentProvider() {
+        return Stream.of(
+                Arguments.of("testString", 1)
+                ,Arguments.of("testInteger", "test")
+                ,Arguments.of("testLong", "test")
+        );
+    }
+
     @Test
     @DisplayName("shallowCopy 를 통해 객체를 얕은복사 할 수 있다.")
     void shallowCopyTest() {
@@ -99,11 +115,13 @@ class ReflectionUtilsTest {
         assertThat(fixture != newFixture).isTrue();
     }
 
-    private static Stream<Arguments> wrongArgumentProvider() {
-        return Stream.of(
-                Arguments.of("testString", 1)
-                ,Arguments.of("testInteger", "test")
-                ,Arguments.of("testLong", "test")
-        );
+    @Test
+    @DisplayName("extractGenericClass 를 통해 Field 의 Generic 클래스 정보를 추출 할 수 있다.")
+    void extractGenericClassTest() throws NoSuchFieldException {
+        final Field genericField = fixtureWithList.getClass().getDeclaredField("stringList");
+
+        final Class<?> actual = ReflectionUtils.extractGenericClass(genericField);
+
+        assertThat(actual).isEqualTo(String.class);
     }
 }
