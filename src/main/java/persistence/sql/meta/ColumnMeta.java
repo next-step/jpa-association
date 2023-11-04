@@ -73,6 +73,14 @@ public class ColumnMeta {
         return entityMeta.getTableName();
     }
 
+    public String getJoinColumnName() {
+        JoinColumn joinColumn = field.getDeclaredAnnotation(JoinColumn.class);
+        if (joinColumn == null || StringUtils.isNullOrEmpty(joinColumn.name())) {
+            return getColumnName();
+        }
+        return joinColumn.name();
+    }
+
     public Class<?> getJavaType() {
         return field.getType();
     }
