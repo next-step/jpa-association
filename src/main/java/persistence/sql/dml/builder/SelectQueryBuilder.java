@@ -47,8 +47,8 @@ public class SelectQueryBuilder {
     public String buildSelectWithJoinByPkQuery(Object pkObject) {
         return new StringBuilder()
                 .append(getSelectHeaderQuery())
-                .append(whereClauseBuilder.buildPkClause(pkObject))
                 .append(joinClauseBuilder.build())
+                .append(whereClauseBuilder.buildPkClause(pkObject))
                 .append(";")
                 .toString();
     }
