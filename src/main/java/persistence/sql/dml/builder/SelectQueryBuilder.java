@@ -10,11 +10,13 @@ public class SelectQueryBuilder {
 
     private final EntityMeta entityMeta;
     private final WhereClauseBuilder whereClauseBuilder;
+    private final JoinClauseBuilder joinClauseBuilder;
 
     private SelectQueryBuilder(EntityMeta entityMeta) {
         validateEntityAnnotation(entityMeta);
         this.entityMeta = entityMeta;
         this.whereClauseBuilder = WhereClauseBuilder.builder(entityMeta);
+        this.joinClauseBuilder = JoinClauseBuilder.of(entityMeta);
     }
 
     private void validateEntityAnnotation(EntityMeta entityMeta) {
@@ -38,6 +40,15 @@ public class SelectQueryBuilder {
         return new StringBuilder()
                 .append(getSelectHeaderQuery())
                 .append(whereClauseBuilder.buildPkClause(pkObject))
+                .append(";")
+                .toString();
+    }
+
+    public String buildSelectWithJoinByPkQuery(Object pkObject) {
+        return new StringBuilder()
+                .append(getSelectHeaderQuery())
+                .append(whereClauseBuilder.buildPkClause(pkObject))
+                .append(joinClauseBuilder.build())
                 .append(";")
                 .toString();
     }
