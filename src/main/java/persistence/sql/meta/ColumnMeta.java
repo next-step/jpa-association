@@ -5,6 +5,7 @@ import persistence.sql.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,16 +59,17 @@ public class ColumnMeta {
     public String getJoinTableName() {
         Class<?> type = field.getType();
         if (List.class.isAssignableFrom(type)) {
-            return getJoinTableNameFromGenericType(type);
+            return getJoinTableNameFromGenericType();
         }
         EntityMeta entityMeta = EntityMeta.of(type);
         return entityMeta.getTableName();
     }
 
-    private String getJoinTableNameFromGenericType(Class<?> type) {
-        ParameterizedType parameterizedType = (ParameterizedType) type.getGenericSuperclass();
-        Class<?> genericType = (Class<?>) parameterizedType.getActualTypeArguments()[FIRST_INDEX];
-        EntityMeta entityMeta = EntityMeta.of(genericType);
+    private String getJoinTableNameFromGenericType() {
+        Type genericType = field.getGenericType();
+        ParameterizedType parameterizedType = (ParameterizedType) genericType;
+        Class<?> genericClass = (Class<?>) parameterizedType.getActualTypeArguments()[FIRST_INDEX];
+        EntityMeta entityMeta = EntityMeta.of(genericClass);
         return entityMeta.getTableName();
     }
 
