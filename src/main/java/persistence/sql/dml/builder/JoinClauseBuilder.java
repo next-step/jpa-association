@@ -37,6 +37,9 @@ public class JoinClauseBuilder {
     }
 
     private StringBuilder build(ColumnMeta columnMeta) {
+        if (!columnMeta.isJoinColumn()) {
+            return new StringBuilder(EMPTY_STRING);
+        }
         return new StringBuilder()
                 .append(JOIN)
                 .append(columnMeta.getJoinTableName())
