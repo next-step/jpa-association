@@ -54,7 +54,7 @@ public class ColumnMetas implements Iterable<ColumnMeta> {
     }
 
     public String getJoinColumnsClause(String masterEntityName) {
-        List<String> columnNames = getColumnNamesWithAlias(masterEntityName);
+        List<String> columnNames = exceptJoin().getColumnNamesWithAlias(masterEntityName);
         List<String> joinColumnNames = values.stream()
                 .filter(ColumnMeta::isJoinColumn)
                 .map(joinColumn -> {
