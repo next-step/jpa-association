@@ -61,16 +61,20 @@ public class ColumnMeta {
         if (List.class.isAssignableFrom(type)) {
             return getJoinTableNameFromGenericType();
         }
-        EntityMeta entityMeta = EntityMeta.of(type);
+        EntityMeta entityMeta = MetaFactory.get(type);
         return entityMeta.getTableName();
     }
 
     private String getJoinTableNameFromGenericType() {
+        EntityMeta entityMeta = getJoinTableEntityMeta();
+        return entityMeta.getTableName();
+    }
+
+    public EntityMeta getJoinTableEntityMeta() {
         Type genericType = field.getGenericType();
         ParameterizedType parameterizedType = (ParameterizedType) genericType;
         Class<?> genericClass = (Class<?>) parameterizedType.getActualTypeArguments()[FIRST_INDEX];
-        EntityMeta entityMeta = EntityMeta.of(genericClass);
-        return entityMeta.getTableName();
+        return MetaFactory.get(genericClass);
     }
 
     public String getJoinColumnName() {
