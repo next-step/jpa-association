@@ -1,7 +1,6 @@
 package persistence.core;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import persistence.exception.PersistenceException;
 
@@ -60,7 +59,7 @@ public class EntityMetadata<T> {
     private List<String> getColumnNames(final EntityColumn entityColumn) {
         if (entityColumn.isOneToMany()) {
             final EntityOneToManyColumn oneToManyColumn = (EntityOneToManyColumn) entityColumn;
-            if (oneToManyColumn.getFetchType().equals(FetchType.LAZY)) {
+            if (oneToManyColumn.isFetchTypeLazy()) {
                 return Collections.emptyList();
             }
             return oneToManyColumn.getAssociatedEntityColumnNamesWithAlias();
