@@ -13,4 +13,7 @@ public class OrderItem {
     private String product;
 
     private Integer quantity;
+
+    @JoinColumn(name = "order_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Long orderId;
 }
