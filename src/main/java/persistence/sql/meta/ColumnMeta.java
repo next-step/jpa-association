@@ -4,9 +4,13 @@ import jakarta.persistence.*;
 import persistence.sql.util.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
 import java.util.Objects;
 
 public class ColumnMeta {
+
+    private static final int FIRST_INDEX = 0;
 
     private final Field field;
 
@@ -49,6 +53,22 @@ public class ColumnMeta {
             return field.getName().toLowerCase();
         }
         return columnAnnotation.name();
+    }
+
+    public String getJoinTableName() {
+        Class<?> type = field.getType();
+        if (List.class.isAssignableFrom(type)) {
+            return getJoinTableNameFromGenericType(type);
+        }
+        EntityMeta entityMeta = EntityMeta.of(type);
+        return entityMeta.getTableName();
+    }
+
+    private String getJoinTableNameFromGenericType(Class<?> type) {
+        ParameterizedType parameterizedType = (ParameterizedType) type.getGenericSuperclass();
+        Class<?> genericType = (Class<?>) parameterizedType.getActualTypeArguments()[FIRST_INDEX];
+        EntityMeta entityMeta = EntityMeta.of(genericType);
+        return entityMeta.getTableName();
     }
 
     public Class<?> getJavaType() {
