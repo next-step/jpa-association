@@ -4,7 +4,7 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import persistence.Application;
 import persistence.core.EntityMetadataProvider;
-import persistence.entity.EntityScanner;
+import persistence.core.EntityScanner;
 
 public class EntityMetadataExtension implements BeforeAllCallback {
     @Override

@@ -1,6 +1,6 @@
 package mock;
 
-import persistence.entity.EntityPersister;
+import persistence.entity.persister.EntityPersister;
 
 import java.sql.SQLException;
 
