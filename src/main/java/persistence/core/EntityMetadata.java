@@ -121,6 +121,13 @@ public class EntityMetadata<T> {
         return this.oneToManyColumns;
     }
 
+    public List<EntityOneToManyColumn> getLazyOneToManyColumns() {
+        return this.oneToManyColumns.stream()
+                .filter(EntityAssociatedColumn::isFetchTypeLazy)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+
     public boolean isType(final Class<?> clazz) {
         return this.clazz.equals(clazz);
     }
@@ -136,11 +143,6 @@ public class EntityMetadata<T> {
 
     public String getIdName() {
         return this.idColumn.getName();
-    }
-
-    public boolean hasLazyOneToManyColumn() {
-        return this.oneToManyColumns.stream()
-                .anyMatch(EntityAssociatedColumn::isFetchTypeLazy);
     }
 
     @Override

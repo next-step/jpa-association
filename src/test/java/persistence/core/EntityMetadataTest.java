@@ -168,16 +168,16 @@ class EntityMetadataTest {
     }
 
     @Test
-    @DisplayName("hasLazyOneToManyColumn 를 통해 해당 Entity 에 Lazy 한 OneToMany 컬럼이 있는지 여부를 반환 받을 수 있다.")
-    void hasLazyOneToManyColumnTest() {
+    @DisplayName("getLazyOneToManyColumns 를 통해 해당 Entity 의 OneToMany(Lazy) 컬럼들을 반환 받을 수 있다.")
+    void getLazyOneToManyColumnsTest() {
         mockClass = FixtureAssociatedEntity.Order.class;
 
         final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
         final EntityMetadata<?> withOneToManyEntityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.WithOneToMany.class);
 
         assertSoftly(softly->{
-            softly.assertThat(entityMetadata.hasLazyOneToManyColumn()).isFalse();
-            softly.assertThat(withOneToManyEntityMetadata.hasLazyOneToManyColumn()).isTrue();
+            softly.assertThat(entityMetadata.getLazyOneToManyColumns()).hasSize(0);
+            softly.assertThat(withOneToManyEntityMetadata.getLazyOneToManyColumns()).hasSize(1);
         });
     }
 
