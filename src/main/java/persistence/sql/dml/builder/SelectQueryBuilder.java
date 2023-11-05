@@ -57,9 +57,10 @@ public class SelectQueryBuilder {
     private String getSelectHeaderQuery() {
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         ColumnMetas exceptTransient = columnMetas.exceptTransient();
+        ColumnMetas exceptJoin = exceptTransient.exceptJoin();
         return new StringBuilder()
                 .append(SELECT)
-                .append(exceptTransient.getColumnsClause())
+                .append(exceptJoin.getColumnsClause())
                 .append(FROM)
                 .append(entityMeta.getTableName())
                 .toString();
