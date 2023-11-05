@@ -10,9 +10,8 @@ public class Order {
 
     protected Order() {}
 
-    public Order(String orderNumber, List<OrderItem> orderItems) {
+    public Order(String orderNumber) {
         this.orderNumber = orderNumber;
-        this.orderItems = orderItems;
     }
 
     @Id
