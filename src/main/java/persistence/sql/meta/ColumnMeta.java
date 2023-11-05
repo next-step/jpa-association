@@ -50,10 +50,14 @@ public class ColumnMeta {
 
     public String getColumnName() {
         Column columnAnnotation = field.getDeclaredAnnotation(Column.class);
-        if (columnAnnotation == null || StringUtils.isNullOrEmpty(columnAnnotation.name())) {
-            return field.getName().toLowerCase();
+        if (columnAnnotation != null && !StringUtils.isNullOrEmpty(columnAnnotation.name())) {
+            return columnAnnotation.name();
         }
-        return columnAnnotation.name();
+        JoinColumn joinColumnAnnotation = field.getDeclaredAnnotation(JoinColumn.class);
+        if (joinColumnAnnotation != null && !StringUtils.isNullOrEmpty(joinColumnAnnotation.name())) {
+            return joinColumnAnnotation.name();
+        }
+        return field.getName().toLowerCase();
     }
 
     public String getJoinTableName() {
