@@ -89,6 +89,10 @@ public class ColumnMeta {
         return field.getType();
     }
 
+    public String getFieldName() {
+        return field.getName();
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
