@@ -27,6 +27,14 @@ public class DMLQueryBuilder extends QueryBuilder {
         return dialect.whereId(column.getName(), id.toString());
     }
 
+    protected String whereId(String tableName ,EntityColumn column, Object id) {
+        String columnName = columnSignature(tableName, column.getName());
+        if (column.isVarchar()) {
+            return dialect.whereId(columnName, "'" + id + "'");
+        }
+        return dialect.whereId(columnName, id.toString());
+    }
+
     protected EntityColumn getPkColumn() {
         return entityMeta.getEntityColumns()
                 .stream()

@@ -4,7 +4,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import persistence.association.OneToManyAssociate;
 import persistence.dialect.Dialect;
-import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
 
@@ -29,21 +28,17 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         if (id == null) {
             throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
         }
+        if (entityMeta.hasOneToManyAssociate()) {
+            return findAllQuery()
+                    + whereId(tableNameSignature(entityMeta.getTableName()) ,getPkColumn(), id);
+        }
 
-        return selectQuery(getColumnsBeforeString(entityMeta))
-                + getFromTableQuery(entityMeta.getTableName())
-                + whereId(getPkColumn(), id);
+        return findAllQuery()
+                + whereId(tableNameSignature(entityMeta.getTableName()) ,getPkColumn(), id);
     }
 
     private String selectQuery(String fileNames) {
         return dialect.select(fileNames);
-    }
-
-    private String getColumnsBeforeString(EntityMeta entityMeta) {
-        return entityMeta.getEntityColumns()
-                .stream()
-                .map(EntityColumn::getName)
-                .collect(Collectors.joining(", "));
     }
 
     private String getColumnsString(EntityMeta entityMeta) {
