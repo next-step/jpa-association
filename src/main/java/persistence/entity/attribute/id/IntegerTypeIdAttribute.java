@@ -30,14 +30,6 @@ public class IntegerTypeIdAttribute implements IdAttribute {
     }
 
     @Override
-    public String prepareDDL(SqlConverter sqlConverter) {
-        String component = (columnName.isBlank() ? fieldName : columnName) + " " +
-                sqlConverter.convert(Integer.class) + " " +
-                sqlConverter.convert(generationType.getClass());
-        return component.trim();
-    }
-
-    @Override
     public Field getField() {
         return this.field;
     }

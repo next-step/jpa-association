@@ -27,15 +27,6 @@ public class StringTypeIdAttribute implements IdAttribute {
     }
 
     @Override
-    public String prepareDDL(SqlConverter sqlConverter) {
-        String component = (columnName.isBlank() ? fieldName : columnName) +
-                " " + sqlConverter.convert(String.class) +
-                String.format("(%s)", length) +
-                " ";
-        return component.trim();
-    }
-
-    @Override
     public Field getField() {
         return field;
     }
@@ -53,6 +44,14 @@ public class StringTypeIdAttribute implements IdAttribute {
     @Override
     public GenerationType getGenerationType() {
         return this.generateValueStrategy;
+    }
+
+    public Integer getLength() {
+        return length;
+    }
+
+    public GenerationType generationType() {
+        return generateValueStrategy;
     }
 
     private void validate(Class<?> type) {

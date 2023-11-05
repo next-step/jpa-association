@@ -25,21 +25,6 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     }
 
     @Override
-    public String prepareDDL(SqlConverter sqlConverter) {
-        StringBuilder component = new StringBuilder();
-
-        component.append(columnName.isBlank() ? fieldName : columnName);
-        component.append(" ").append(sqlConverter.convert(Integer.class));
-        if (scale != 0) {
-            component.append(String.format(" (%s)", scale));
-        }
-        if (!nullable) {
-            component.append(" NOT NULL");
-        }
-        return component.toString().trim();
-    }
-
-    @Override
     public String getColumnName() {
         return this.columnName;
     }
@@ -52,6 +37,14 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     @Override
     public Field getField() {
         return this.field;
+    }
+
+    public boolean isNullable() {
+        return nullable;
+    }
+
+    public int getScale() {
+        return scale;
     }
 
     private void validate(Class<?> type, Column column) {

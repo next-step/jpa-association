@@ -1,7 +1,6 @@
 package persistence.entity.attribute;
 
 import jakarta.persistence.Column;
-import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 
@@ -26,14 +25,6 @@ public class StringTypeGeneralAttribute implements GeneralAttribute {
     }
 
     @Override
-    public String prepareDDL(SqlConverter sqlConverter) {
-        String component = (columnName.isBlank() ? fieldName : columnName) + " " +
-                sqlConverter.convert(String.class) +
-                String.format("(%s)", length) + (!nullable ? " NOT NULL" : "");
-        return component.trim();
-    }
-
-    @Override
     public String getColumnName() {
         return this.columnName;
     }
@@ -46,6 +37,14 @@ public class StringTypeGeneralAttribute implements GeneralAttribute {
     @Override
     public Field getField() {
         return this.field;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public boolean isNullable() {
+        return nullable;
     }
 
     private void validate(Class<?> type, Column column) {

@@ -12,7 +12,6 @@ public class LongTypeGeneralAttribute implements GeneralAttribute {
     private final boolean nullable;
     private final Field field;
 
-
     public LongTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
 
@@ -35,21 +34,6 @@ public class LongTypeGeneralAttribute implements GeneralAttribute {
     }
 
     @Override
-    public String prepareDDL(SqlConverter sqlConverter) {
-        StringBuilder component = new StringBuilder();
-
-        component.append(columnName.isBlank() ? fieldName : columnName).append(" ");
-        component.append(sqlConverter.convert(Long.class));
-        if (scale != 0) {
-            component.append(String.format(" (%s)", scale));
-        }
-        if (!nullable) {
-            component.append(" NOT NULL");
-        }
-        return component.toString().trim();
-    }
-
-    @Override
     public String getColumnName() {
         return this.columnName;
     }
@@ -57,6 +41,14 @@ public class LongTypeGeneralAttribute implements GeneralAttribute {
     @Override
     public String getFieldName() {
         return this.fieldName;
+    }
+
+    public Integer getScale() {
+        return scale;
+    }
+
+    public boolean isNullable() {
+        return nullable;
     }
 
     public Field getField() {

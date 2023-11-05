@@ -6,7 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.attribute.resolver.GeneralAttributeResolver;
-import persistence.sql.ddl.wrapper.DDLWrapper;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -63,7 +62,6 @@ public class EntityAttribute {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(String.format("[%s] 엔티티에 @Id가 없습니다", clazz.getSimpleName())));
 
-
         IdAttribute idAttribute = ID_ATTRIBUTE_RESOLVERS.stream()
                 .filter(resolver -> resolver.supports(idField.getType()))
                 .map(resolver -> resolver.resolve(idField))
@@ -71,12 +69,14 @@ public class EntityAttribute {
 
         validate(clazz, idAttribute, visitedEntities);
 
-        List<OneToManyField> oneToManies = Arrays.stream(fields)
+        visitedEntities.add(clazz);
+
+        List<OneToManyField> oneToManyFields = Arrays.stream(fields)
                 .filter(field -> field.isAnnotationPresent(jakarta.persistence.OneToMany.class))
                 .map(field -> new OneToManyField(field, tableName, idAttribute.getColumnName(), visitedEntities))
                 .collect(Collectors.toList());
 
-        return new EntityAttribute(tableName, idAttribute, generalAttributes, oneToManies, clazz);
+        return new EntityAttribute(tableName, idAttribute, generalAttributes, oneToManyFields, clazz);
     }
 
     private static void validate(Class<?> clazz, IdAttribute idAttribute, Set<Class<?>> visitedEntities) {
@@ -99,10 +99,6 @@ public class EntityAttribute {
         }
     }
 
-    public String prepareDDL(DDLWrapper ddlWrapper) {
-        return ddlWrapper.wrap(tableName, idAttribute, generalAttributes);
-    }
-
     public String getTableName() {
         return tableName;
     }
@@ -112,7 +108,6 @@ public class EntityAttribute {
     }
 
     public IdAttribute getIdAttribute() {
-
         return idAttribute;
     }
 
