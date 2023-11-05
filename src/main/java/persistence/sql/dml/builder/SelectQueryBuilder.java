@@ -2,6 +2,10 @@ package persistence.sql.dml.builder;
 
 import persistence.sql.meta.ColumnMetas;
 import persistence.sql.meta.EntityMeta;
+import persistence.sql.util.StringConstant;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class SelectQueryBuilder {
 
@@ -27,6 +31,12 @@ public class SelectQueryBuilder {
 
     public static SelectQueryBuilder of(EntityMeta entityMeta) {
         return new SelectQueryBuilder(entityMeta);
+    }
+
+    public static List<String> extractSelectColumns(String query) {
+        String headerQuery = query.split(FROM)[0];
+        headerQuery = headerQuery.replace(SELECT, StringConstant.EMPTY_STRING);
+        return Arrays.asList(headerQuery.split(StringConstant.COLUMN_JOIN));
     }
 
     public String buildSelectAllQuery() {
