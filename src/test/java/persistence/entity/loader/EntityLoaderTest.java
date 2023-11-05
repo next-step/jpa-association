@@ -4,10 +4,8 @@ import domain.FixtureAssociatedEntity.Order;
 import domain.FixtureAssociatedEntity.OrderLazyItem;
 import domain.FixtureEntity.Person;
 import extension.EntityMetadataExtension;
-import jdbc.JdbcTemplate;
-import jdbc.RowMapper;
-import mock.MockDatabaseServer;
 import mock.MockDmlGenerator;
+import mock.MockJdbcTemplate;
 import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.exception.PersistenceException;
 
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,28 +22,6 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ExtendWith(EntityMetadataExtension.class)
 class EntityLoaderTest {
-
-    static class MockJdbcTemplate extends JdbcTemplate {
-        private final SimpleResultSet rs;
-
-        public MockJdbcTemplate(final SimpleResultSet rs) {
-            super(new MockDatabaseServer().getConnection());
-            this.rs = rs;
-        }
-
-        @Override
-        public <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
-            try (rs) {
-                final List<T> result = new ArrayList<>();
-                while (rs.next()) {
-                    result.add(rowMapper.mapRow(rs));
-                }
-                return result;
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     @Test
     @DisplayName("loadById 를 통해 객체를 조회할 수 있다.")
