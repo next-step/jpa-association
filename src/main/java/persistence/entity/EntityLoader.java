@@ -2,12 +2,17 @@ package persistence.entity;
 
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
+import jdbc.JoinEntityRowMapper;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectFactory;
 import persistence.sql.dml.DmlQueryGenerator;
+import persistence.sql.meta.ColumnMeta;
 import persistence.sql.meta.ColumnMetas;
 import persistence.sql.meta.EntityMeta;
 import persistence.sql.meta.MetaFactory;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 public class EntityLoader {
 
@@ -43,9 +48,21 @@ public class EntityLoader {
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         columnMetas.forEach(columnMeta -> {
             if (columnMeta.isJoinColumn()) {
-                // Join table 이름으로 자식 엔티티 목록을 매핑조회한다
-                // 조회한 인스턴스를 부모 인스턴스에 세팅한다
+                EntityMeta joinTableEntityMeta = columnMeta.getJoinTableEntityMeta();
+                List<Object> childEntities = jdbcTemplate.query(selectQuery, JoinEntityRowMapper.of(joinTableEntityMeta, selectQuery));
+                setChildEntities(entity, columnMeta, childEntities);
             }
         });
+    }
+
+    private <T> void setChildEntities(T entity, ColumnMeta columnMeta, List<Object> childEntities) {
+        try {
+            Class<?> entityClass = entity.getClass();
+            Field field = entityClass.getDeclaredField(columnMeta.getFieldName());
+            field.setAccessible(true);
+            field.set(entity, childEntities);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
