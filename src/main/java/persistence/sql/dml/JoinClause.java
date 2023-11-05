@@ -16,7 +16,7 @@ public class JoinClause {
         ).collect(Collectors.joining(" ")).trim());
     }
 
-    public String toString() {
+    public String prepareDML() {
         if (conditions.length() == 0) {
             return "";
         }

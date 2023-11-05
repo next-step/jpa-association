@@ -18,8 +18,7 @@ public class WhereClause {
         and(String.format("%s.%s = '%s'", alias, columnName, value));
     }
 
-    @Override
-    public String toString() {
+    public String prepareDML() {
         if (conditions.length() == 0) {
             return "";
         }

@@ -29,7 +29,7 @@ class JoinClauseTest {
                 JoinClause joinClause = new JoinClause(owner.getTableName(), owner.getIdAttribute(), owner.getOneToManyFields());
 
                 //then
-                assertThat(joinClause.toString()).isEqualTo(" join order_items as order_items on orders.id = order_items.id");
+                assertThat(joinClause.prepareDML()).isEqualTo(" join order_items as order_items on orders.id = order_items.id");
             }
         }
     }

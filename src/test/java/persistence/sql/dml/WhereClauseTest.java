@@ -3,7 +3,6 @@ package persistence.sql.dml;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.sql.dml.WhereClause;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -26,7 +25,7 @@ public class WhereClauseTest {
                 whereClause.and("test", "test value");
 
                 //then
-                assertThat(whereClause.toString()).isEqualTo(" WHERE test = 'test value'");
+                assertThat(whereClause.prepareDML()).isEqualTo(" WHERE test = 'test value'");
             }
         }
 
@@ -44,7 +43,7 @@ public class WhereClauseTest {
                 whereClause.and("민준", "1");
 
                 //then
-                assertThat(whereClause.toString()).isEqualTo(" WHERE test = 'test value' AND 민준 = '1'");
+                assertThat(whereClause.prepareDML()).isEqualTo(" WHERE test = 'test value' AND 민준 = '1'");
             }
         }
     }
