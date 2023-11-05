@@ -4,11 +4,14 @@ import persistence.context.EntityKey;
 import persistence.context.EntityKeyGenerator;
 import persistence.context.PersistenceContext;
 import persistence.context.SimplePersistenceContext;
+import persistence.core.EntityMetadata;
+import persistence.core.EntityMetadataProvider;
 import persistence.entity.entry.Status;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaders;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.persister.EntityPersisters;
+import persistence.entity.proxy.EntityProxyFactory;
 import persistence.exception.PersistenceException;
 import persistence.util.ReflectionUtils;
 
@@ -18,12 +21,14 @@ public class SimpleEntityManager implements EntityManager {
 
     private final EntityPersisters entityPersisters;
     private final EntityLoaders entityLoaders;
+    private final EntityProxyFactory entityProxyFactory;
     private final PersistenceContext persistenceContext;
     private final EntityKeyGenerator entityKeyGenerator;
 
-    public SimpleEntityManager(final EntityPersisters entityPersisters, final EntityLoaders entityLoaders) {
+    public SimpleEntityManager(final EntityPersisters entityPersisters, final EntityLoaders entityLoaders, final EntityProxyFactory entityProxyFactory) {
         this.entityPersisters = entityPersisters;
         this.entityLoaders = entityLoaders;
+        this.entityProxyFactory = entityProxyFactory;
         this.entityKeyGenerator = new EntityKeyGenerator();
         this.persistenceContext = new SimplePersistenceContext();
     }
@@ -33,7 +38,7 @@ public class SimpleEntityManager implements EntityManager {
         final EntityLoader<T> entityLoader = entityLoaders.getEntityLoader(clazz);
         final EntityKey entityKey = entityKeyGenerator.generate(clazz, id);
         final Object entity = persistenceContext.getEntity(entityKey)
-                .orElseGet(() -> initEntity(entityKey, entityLoader));
+                .orElseGet(() -> initEntity(clazz, entityKey, entityLoader));
         return clazz.cast(entity);
     }
 
@@ -83,9 +88,15 @@ public class SimpleEntityManager implements EntityManager {
         return ReflectionUtils.getFieldValue(entity, entityPersister.getIdColumnFieldName());
     }
 
-    private <T> Object initEntity(final EntityKey entityKey, final EntityLoader<T> entityLoader) {
-        final Object entityFromDatabase = entityLoader.loadById(entityKey.getKey())
+    private <T> Object initEntity(final Class<T> clazz, final EntityKey entityKey, final EntityLoader<T> entityLoader) {
+        final Object key = entityKey.getKey();
+        final Object entityFromDatabase = entityLoader.loadById(key)
                 .orElseThrow(() -> new PersistenceException("존재하지 않는 entity 입니다."));
+
+        final EntityMetadata<T> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+        entityMetadata.getLazyOneToManyColumns()
+                .forEach(oneToManyColumn -> entityProxyFactory.initProxy(key, entityFromDatabase, oneToManyColumn));
+
         persistenceContext.addEntityEntry(entityFromDatabase, Status.LOADING);
         persistenceContext.addEntity(entityKey, entityFromDatabase);
         persistenceContext.getDatabaseSnapshot(entityKey, entityFromDatabase);
@@ -127,7 +138,7 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     private void updateEntityEntry(final Object foundEntity, final Object entity) {
-        if(Objects.nonNull(foundEntity)) {
+        if (Objects.nonNull(foundEntity)) {
             persistenceContext.updateEntityEntryStatus(foundEntity, Status.GONE);
             persistenceContext.addEntityEntry(entity, Status.SAVING);
         }

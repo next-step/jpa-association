@@ -7,6 +7,7 @@ import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaders;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.persister.EntityPersisters;
+import persistence.entity.proxy.EntityProxyFactory;
 import persistence.sql.dml.DmlGenerator;
 
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 public class SimpleEntityManagerFactory implements EntityManagerFactory {
     private final EntityPersisters entityPersisters;
     private final EntityLoaders entityLoaders;
+    private final EntityProxyFactory entityProxyFactory;
+
 
     public SimpleEntityManagerFactory(final EntityScanner entityScanner, final PersistenceEnvironment persistenceEnvironment) {
         final List<Class<?>> entityClasses = entityScanner.getEntityClasses();
@@ -28,6 +31,7 @@ public class SimpleEntityManagerFactory implements EntityManagerFactory {
 
         this.entityPersisters = new EntityPersisters(persisters);
         this.entityLoaders = new EntityLoaders(loaders);
+        this.entityProxyFactory = new EntityProxyFactory(entityLoaders);
     }
 
     private Map<Class<?>, EntityPersister> createEntityPersisters(final List<Class<?>> entityClasses, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
@@ -48,7 +52,7 @@ public class SimpleEntityManagerFactory implements EntityManagerFactory {
 
     @Override
     public EntityManager createEntityManager() {
-        return new SimpleEntityManager(this.entityPersisters, this.entityLoaders);
+        return new SimpleEntityManager(entityPersisters, entityLoaders, entityProxyFactory);
     }
 }
 
