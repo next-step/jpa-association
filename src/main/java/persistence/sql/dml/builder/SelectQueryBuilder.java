@@ -70,7 +70,7 @@ public class SelectQueryBuilder {
         return new StringBuilder()
                 .append(getSelectHeaderQueryWithJoin())
                 .append(joinClauseBuilder.build())
-                .append(whereClauseBuilder.buildPkClause(pkObject))
+                .append(whereClauseBuilder.buildPkClauseWithAlias(pkObject))
                 .append(";")
                 .toString();
     }

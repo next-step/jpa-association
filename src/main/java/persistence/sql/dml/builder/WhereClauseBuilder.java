@@ -47,8 +47,27 @@ public class WhereClauseBuilder {
         return build();
     }
 
+    public String buildPkClauseWithAlias(Object pkObject) {
+        this.columnValues = ColumnValues.ofId(entityMeta, pkObject);
+        return buildWithAlias();
+    }
+
+    private String buildWithAlias() {
+        if (columnValues.isEmpty()) {
+            return StringConstant.EMPTY_STRING;
+        }
+        return new StringBuilder()
+                .append(WHERE)
+                .append(String.join(AND, buildValueConditions(entityMeta.getTableName())))
+                .toString();
+    }
+
     private List<String> buildValueConditions() {
         return columnValues.buildValueConditions();
+    }
+
+    private List<String> buildValueConditions(String alias) {
+        return columnValues.buildValueConditions(alias);
     }
 
 }

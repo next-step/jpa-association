@@ -122,6 +122,12 @@ public class ColumnValues {
                 .collect(Collectors.toList());
     }
 
+    public List<String> buildValueConditions(String alias) {
+        return elements.keySet().stream()
+                .map(columnMeta -> buildValueCondition(alias + StringConstant.DOT + columnMeta.getColumnName(), elements.get(columnMeta)))
+                .collect(Collectors.toList());
+    }
+
     private String buildValueCondition(String column, String value) {
         return column + StringConstant.EQUAL + value;
     }
