@@ -20,7 +20,9 @@ import persistence.sql.dml.DmlQueryGenerator;
 import persistence.sql.meta.EntityMeta;
 import persistence.sql.meta.MetaFactory;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -74,6 +76,21 @@ class EntityLoaderTest {
 
         Person person = entityLoader.selectOne(Person.class, 1L);
         assertThat(person).isNotNull();
+    }
+
+    @Test
+    @DisplayName("엔티티 조회 - 연관관계에서 자식엔티티를 함께 조회한다")
+    void findWithChildEntities() throws Exception {
+        EntityLoader entityLoader = EntityLoader.of(jdbcTemplate);
+
+        Order order = entityLoader.selectOne(Order.class, 1L);
+        Field orderItemsField = order.getClass().getDeclaredField("orderItems");
+        orderItemsField.setAccessible(true);
+        List<OrderItem> orderItems = (List<OrderItem>) orderItemsField.get(order);
+
+        assertThat(order).isNotNull();
+        assertThat(orderItems).isNotNull();
+        assertThat(orderItems.size()).isEqualTo(3);
     }
 
 }
