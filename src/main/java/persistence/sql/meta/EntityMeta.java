@@ -42,6 +42,10 @@ public class EntityMeta {
                 .orElseThrow();
     }
 
+    public Class<?> getInnerClass() {
+        return clazz;
+    }
+
     public ColumnMetas getColumnMetas() {
         return columnMetas;
     }
