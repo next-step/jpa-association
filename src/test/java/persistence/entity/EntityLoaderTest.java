@@ -5,13 +5,18 @@ import database.H2;
 import domain.Order;
 import domain.OrderItem;
 import domain.Person;
+import fixture.OrderFixtureFactory;
+import fixture.OrderItemFixtureFactory;
+import fixture.PersonFixtureFactory;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.DdlQueryGenerator;
+import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectFactory;
+import persistence.sql.dml.DmlQueryGenerator;
 import persistence.sql.meta.EntityMeta;
 import persistence.sql.meta.MetaFactory;
 
@@ -24,6 +29,7 @@ class EntityLoaderTest {
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
     private DdlQueryGenerator ddlQueryGenerator;
+    private DmlQueryGenerator dmlQueryGenerator;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -32,7 +38,8 @@ class EntityLoaderTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         DialectFactory dialectFactory = DialectFactory.getInstance();
-        ddlQueryGenerator = DdlQueryGenerator.of(dialectFactory.getDialect(jdbcTemplate.getDbmsName()));
+        Dialect dialect = dialectFactory.getDialect(jdbcTemplate.getDbmsName());
+        ddlQueryGenerator = DdlQueryGenerator.of(dialect);
 
         EntityMeta personMeta = MetaFactory.get(Person.class);
         EntityMeta orderMeta = MetaFactory.get(Order.class);
@@ -40,6 +47,13 @@ class EntityLoaderTest {
         jdbcTemplate.execute(ddlQueryGenerator.generateCreateQuery(personMeta));
         jdbcTemplate.execute(ddlQueryGenerator.generateCreateQuery(orderMeta));
         jdbcTemplate.execute(ddlQueryGenerator.generateCreateQuery(orderItemMeta));
+
+        dmlQueryGenerator = DmlQueryGenerator.of(dialect);
+        jdbcTemplate.execute(dmlQueryGenerator.generateInsertQuery(PersonFixtureFactory.getFixture()));
+        jdbcTemplate.execute(dmlQueryGenerator.generateInsertQuery(OrderFixtureFactory.getFixture()));
+        OrderItemFixtureFactory.getFixtures().forEach(
+                fixture -> jdbcTemplate.execute(dmlQueryGenerator.generateInsertQuery(fixture))
+        );
     }
 
     @AfterEach
@@ -59,7 +73,7 @@ class EntityLoaderTest {
         EntityLoader entityLoader = EntityLoader.of(jdbcTemplate);
 
         Person person = entityLoader.selectOne(Person.class, 1L);
-        assertThat(person).isNull();
+        assertThat(person).isNotNull();
     }
 
 }
