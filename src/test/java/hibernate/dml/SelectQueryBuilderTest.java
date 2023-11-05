@@ -47,7 +47,6 @@ class SelectQueryBuilderTest {
                 Map.of("orderItem", List.of("id", "produce", "quantity")),
                 Map.of("orderItem", "order_id")
         );
-        System.out.println(actual);
 
         // then
         assertThat(actual).isEqualTo(expected);
