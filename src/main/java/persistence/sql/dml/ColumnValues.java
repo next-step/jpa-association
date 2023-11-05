@@ -73,6 +73,9 @@ public class ColumnValues {
         if (columnMeta.isTransient()) {
             return;
         }
+        if (columnMeta.isJoinColumn()) {
+            return;
+        }
         columnValueMap.put(columnMeta, getColumnValue(object, field));
     }
 
