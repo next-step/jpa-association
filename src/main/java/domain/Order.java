@@ -23,8 +23,4 @@ public class Order {
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
-
-//    @OneToMany
-//    @JoinColumn(name = "order_item_id2")
-//    private List<OrderItem2> orderItem2;
 }
