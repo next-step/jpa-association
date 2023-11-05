@@ -27,9 +27,9 @@ public class ProxyTest {
         final HelloTarget helloTarget = (HelloTarget) obj;
 
         assertSoftly(softly -> {
-            softly.assertThat(helloTarget.sayHi("종민")).isEqualTo("Hi 종민");
-            softly.assertThat(helloTarget.sayHello("종민")).isEqualTo("Hello 종민");
-            softly.assertThat(helloTarget.sayThankYou("종민")).isEqualTo("Thank You 종민");
+            softly.assertThat(helloTarget.sayHi("JongMin")).isEqualTo("Hi JongMin");
+            softly.assertThat(helloTarget.sayHello("JongMin")).isEqualTo("Hello JongMin");
+            softly.assertThat(helloTarget.sayThankYou("JongMin")).isEqualTo("Thank You JongMin");
         });
     }
 
@@ -41,9 +41,9 @@ public class ProxyTest {
         final HelloTarget helloTarget = (HelloTarget) obj;
 
         assertSoftly(softly -> {
-            softly.assertThat(helloTarget.sayHi("종민")).isEqualTo("HI 종민");
-            softly.assertThat(helloTarget.sayHello("종민")).isEqualTo("HELLO 종민");
-            softly.assertThat(helloTarget.sayThankYou("종민")).isEqualTo("THANK YOU 종민");
+            softly.assertThat(helloTarget.sayHi("JongMin")).isEqualTo("HI JONGMIN");
+            softly.assertThat(helloTarget.sayHello("JongMin")).isEqualTo("HELLO JONGMIN");
+            softly.assertThat(helloTarget.sayThankYou("JongMin")).isEqualTo("THANK YOU JONGMIN");
         });
     }
 
@@ -66,9 +66,9 @@ public class ProxyTest {
         final HelloTarget helloTarget = (HelloTarget) obj;
 
         assertSoftly(softly -> {
-            softly.assertThat(helloTarget.sayHi("종민")).isEqualTo("HI 종민");
-            softly.assertThat(helloTarget.sayHello("종민")).isEqualTo("HELLO 종민");
-            softly.assertThat(helloTarget.sayThankYou("  ")).isEqualTo("Thank You");
+            softly.assertThat(helloTarget.sayHi("JongMin")).isEqualTo("HI JONGMIN");
+            softly.assertThat(helloTarget.sayHello("JongMin")).isEqualTo("HELLO JONGMIN");
+            softly.assertThat(helloTarget.sayThankYou("J  ")).isEqualTo("Thank You J");
         });
     }
 
