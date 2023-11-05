@@ -17,7 +17,7 @@ public class DMLQueryBuilder extends QueryBuilder {
     }
 
     protected String getFromTableQuery(String tableName, String tableAlias) {
-        return getFromTableQuery(tableName) + " " + tableAlias + " ";
+        return getFromTableQuery(tableName) + " " + tableAlias;
     }
 
     protected String whereId(EntityColumn column, Object id) {

@@ -21,9 +21,8 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
                     + new OneToManyJoinQueryBuilder(entityMeta).build();
         }
 
-        return selectQuery(getColumnsBeforeString(entityMeta))
-                + getFromTableQuery(entityMeta.getTableName());
-
+        return selectQuery(getColumnsString(entityMeta))
+                + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()));
     }
 
     public String findByIdQuery(Object id) {

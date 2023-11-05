@@ -31,7 +31,11 @@ class SelectQueryBuilderTest {
         String sql = select.findAllQuery();
 
         //then
-        assertThat(sql).isEqualTo("SELECT id, nick_name, old, email FROM users");
+        assertThat(sql).isEqualTo("SELECT users_0.id as users_0_id"
+                + ", users_0.nick_name as users_0_nick_name"
+                + ", users_0.old as users_0_old"
+                + ", users_0.email as users_0_email"
+                + " FROM users users_0");
     }
 
     @Test

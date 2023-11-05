@@ -32,7 +32,7 @@ class OneToManyJoinQueryBuilderTest {
         String query = oneToMany.build();
 
         //then
-        assertThat(query).isEqualTo("LEFT JOIN order_items order_items_1 ON orders_0.order_id = order_items_1.id");
+        assertThat(query).isEqualTo(" LEFT JOIN order_items order_items_1 ON orders_0.order_id = order_items_1.id");
     }
 
     @Test
@@ -44,7 +44,7 @@ class OneToManyJoinQueryBuilderTest {
         String query = oneToMany.build();
 
         //then
-        assertThat(query).isEqualTo("LEFT JOIN order_items2_dept order_items2_dept_1 ON orders_0.order_id = order_items2_dept_1.id  LEFT JOIN order_items order_items_2 ON order_items2_dept_1.order_item_id = order_items_2.id");
+        assertThat(query).isEqualTo(" LEFT JOIN order_items2_dept order_items2_dept_1 ON orders_0.order_id = order_items2_dept_1.id LEFT JOIN order_items order_items_2 ON order_items2_dept_1.order_item_id = order_items_2.id");
     }
 
     @Test
@@ -56,7 +56,7 @@ class OneToManyJoinQueryBuilderTest {
         String query = oneToMany.build();
 
         //then
-        assertThat(query).isEqualTo("LEFT JOIN order_items order_items_1 ON orders_0.order_items_id = order_items_1.id");
+        assertThat(query).isEqualTo(" LEFT JOIN order_items order_items_1 ON orders_0.order_items_id = order_items_1.id");
     }
 
 

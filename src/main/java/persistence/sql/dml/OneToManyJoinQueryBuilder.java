@@ -17,8 +17,7 @@ public class OneToManyJoinQueryBuilder extends QueryBuilder {
 
     public String build() {
         return generateJoinQueryStream(entityMeta, 0)
-                .collect(Collectors.joining(" "))
-                .trim();
+                .collect(Collectors.joining(""));
     }
 
     private String generateJoinQuery(EntityMeta entityMeta, int depth) {
