@@ -28,9 +28,12 @@ public class EntityAttributeTest {
             @Test
             @DisplayName("EntityAttribute를 반환한다.")
             void returnEntityAttribute() {
+                //given
+                //when
                 EntityAttribute entityAttribute =
                         EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>());
 
+                //then
                 Assertions.assertAll(
                         () -> assertThat(entityAttribute.getTableName())
                                 .isEqualTo("entity_name"),
@@ -50,6 +53,9 @@ public class EntityAttributeTest {
             @Test
             @DisplayName("예외를 반환한다.")
             void throwException() {
+                //given
+                //when
+                //then
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
                                 EntityFixtures.EntityWithMultiIdAnnotation.class, new HashSet<>()));
@@ -62,6 +68,9 @@ public class EntityAttributeTest {
             @Test
             @DisplayName("예외를 반환한다.")
             void throwException() {
+                //given
+                //when
+                //then
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
                                 EntityFixtures.EntityWithOutEntityAnnotation.class, new HashSet<>()));

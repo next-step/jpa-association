@@ -15,8 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static persistence.entity.attribute.resolver.AttributeHolder.GENERAL_ATTRIBUTE_RESOLVERS;
-import static persistence.entity.attribute.resolver.AttributeHolder.ID_ATTRIBUTE_RESOLVERS;
+import static persistence.entity.attribute.resolver.AttributeResolverHolder.GENERAL_ATTRIBUTE_RESOLVERS;
+import static persistence.entity.attribute.resolver.AttributeResolverHolder.ID_ATTRIBUTE_RESOLVERS;
 
 public class EntityAttribute {
     private final String tableName;

@@ -11,12 +11,13 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     private final int scale;
     private final String fieldName;
     private final String columnName;
+    private final Field field;
 
     public IntegerTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
 
         validate(field.getType(), column);
-
+        this.field = field;
         this.scale = column.scale();
         this.fieldName = field.getName();
         this.columnName = column.name().isBlank() ? field.getName() : column.name();
@@ -46,6 +47,10 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
     @Override
     public String getFieldName() {
         return this.fieldName;
+    }
+
+    public Field getField() {
+        return this.field;
     }
 
     private void validate(Class<?> type, Column column) {

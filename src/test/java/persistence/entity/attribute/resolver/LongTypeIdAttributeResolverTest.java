@@ -22,7 +22,11 @@ class LongTypeIdAttributeResolverTest {
             @Test
             @DisplayName("true를 반환한다")
             void supports() {
+                //given
                 IdAttributeResolver resolver = new LongTypeIdAttributeResolver();
+
+                //when
+                //then
                 assertThat(resolver.supports(Integer.class)).isFalse();
                 assertThat(resolver.supports(Long.class)).isTrue();
             }
@@ -38,11 +42,14 @@ class LongTypeIdAttributeResolverTest {
             @Test
             @DisplayName("LongTypeIdAttribute를 반환한다")
             void returnAttribute() throws NoSuchFieldException {
+                //given
                 IdAttributeResolver resolver = new LongTypeIdAttributeResolver();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1, "민준", 29);
                 Field field = sample.getClass().getDeclaredField("id");
 
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() -> resolver.resolve(field));
             }
         }
@@ -57,14 +64,17 @@ class LongTypeIdAttributeResolverTest {
             @Test
             @DisplayName("인스턴스 아이디 필드에 아이디 벨류를 세팅한다.")
             void setIdToEntity() throws NoSuchFieldException, IllegalAccessException {
+                //given
                 IdAttributeResolver resolver = new LongTypeIdAttributeResolver();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
                 Field field = sample.getClass().getDeclaredField("id");
 
+                //when
                 resolver.setIdToEntity(sample, field, 10L);
 
+                //then
                 assertThat(field.get(sample)).isEqualTo(10L);
             }
         }

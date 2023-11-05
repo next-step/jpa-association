@@ -168,6 +168,7 @@ public class EntityFixtures {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
+        @Column(name = "order_number")
         private String orderNumber;
 
         @OneToMany(fetch = FetchType.EAGER)
@@ -202,6 +203,15 @@ public class EntityFixtures {
     @Entity
     @Table(name = "order_items")
     public static class OrderItem {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @Column(name = "product")
+        private String product;
+
+        @Column(name = "quantity")
+        private Integer quantity;
 
         public OrderItem(String product, Integer quantity) {
             this.product = product;
@@ -226,14 +236,5 @@ public class EntityFixtures {
                     ", quantity=" + quantity +
                     '}';
         }
-
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-
-        private String product;
-
-        private Integer quantity;
     }
-
 }

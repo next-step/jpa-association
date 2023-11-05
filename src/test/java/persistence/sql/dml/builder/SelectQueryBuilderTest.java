@@ -24,8 +24,12 @@ public class SelectQueryBuilderTest {
             @Test
             @DisplayName("적절한 DML을 리턴한다.")
             void returnDmlWithWhereClause() {
+                //given
+                //when
                 String dml = SelectQueryBuilder.of(EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>()))
                         .where("id", "1").prepareStatement();
+
+                //then
                 assertThat(dml).isEqualTo("SELECT * FROM entity_name as entity_name WHERE id = '1'");
             }
         }
@@ -37,9 +41,13 @@ public class SelectQueryBuilderTest {
             @Test
             @DisplayName("적절한 DML을 리턴한다.")
             void returnDmlWithWhereClause() {
+                //given
+                //when
                 String dml = SelectQueryBuilder.of(EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>()))
                         .where("orders", "id", "1")
                         .prepareStatement();
+
+                //then
                 assertThat(dml).isEqualTo("SELECT * FROM orders as orders " +
                         "join order_items as order_items " +
                         "on orders.id = order_items.id " +

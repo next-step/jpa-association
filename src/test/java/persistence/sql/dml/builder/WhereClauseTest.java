@@ -20,8 +20,12 @@ public class WhereClauseTest {
             @Test
             @DisplayName("조건을 새로 생성한다.")
             void addCondition() {
+                //given
+                //when
                 WhereClause whereClause = new WhereClause();
                 whereClause.and("test", "test value");
+
+                //then
                 assertThat(whereClause.toString()).isEqualTo(" WHERE test = 'test value'");
             }
         }
@@ -33,10 +37,13 @@ public class WhereClauseTest {
             @Test
             @DisplayName("조건을 이어붙인다.")
             void addCondition() {
+                //given
+                //when
                 WhereClause whereClause = new WhereClause();
                 whereClause.and("test", "test value");
                 whereClause.and("민준", "1");
 
+                //then
                 assertThat(whereClause.toString()).isEqualTo(" WHERE test = 'test value' AND 민준 = '1'");
             }
         }

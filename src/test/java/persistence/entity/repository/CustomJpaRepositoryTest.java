@@ -9,7 +9,7 @@ import persistence.context.PersistenceContext;
 import persistence.context.PersistenceContextImpl;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.loader.EntityLoader;
-import persistence.entity.loader.EntityLoaderImpl;
+import persistence.entity.loader.SimpleEntityLoaderImpl;
 import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.infra.H2SqlConverter;
@@ -29,12 +29,13 @@ class CustomJpaRepositoryTest extends DatabaseTest {
         public class withInstance {
             @Test
             void save() {
+                //given
                 EntityFixtures.SampleOneWithValidAnnotation sample =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -42,6 +43,8 @@ class CustomJpaRepositoryTest extends DatabaseTest {
 
                 CustomJpaRepository customJpaRepository = new CustomJpaRepository(entityManager);
 
+                //when
+                //then
                 assertThat(customJpaRepository.save(sample).toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
             }
         }

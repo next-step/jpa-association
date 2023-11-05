@@ -27,11 +27,14 @@ public class DropDDLQueryBuilderTest {
             @Test
             @DisplayName("DROP DDL을 리턴한다.")
             void returnDDL() {
+                //given
                 EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>());
 
+                //when
                 String dropDDL = DDLQueryBuilderFactory.createQueryBuilder(DROP)
                         .prepareStatement(entityAttribute, sqlConverter);
 
+                //then
                 assertThat(dropDDL).isEqualTo("DROP TABLE two;");
             }
         }

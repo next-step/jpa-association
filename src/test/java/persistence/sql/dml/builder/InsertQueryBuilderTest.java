@@ -24,11 +24,16 @@ public class InsertQueryBuilderTest {
             @Test
             @DisplayName("적절한 statement를 반환한다.")
             void returnStatement() {
+                //given
                 Person person = new Person(1L, "민준", 29, "민준.com");
                 EntityAttribute entityAttribute =
                         EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
+
+                //when
                 String statement = insertQueryBuilder.prepareStatement(entityAttribute, person);
+
+                //then
                 assertThat(statement)
                         .isEqualTo("INSERT INTO entity_name( id, name, old ) VALUES ( '1', '민준', '29' )");
             }

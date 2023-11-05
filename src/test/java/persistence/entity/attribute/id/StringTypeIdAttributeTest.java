@@ -26,8 +26,13 @@ class StringTypeIdAttributeTest {
             @Test
             @DisplayName("아이디 필드를 파싱해서 메타데이터 상태를 가진다.")
             void holdMetaData() throws NoSuchFieldException {
+                //given
                 Field field = sample.getClass().getDeclaredField("id");
+
+                //when
                 StringTypeIdAttribute stringTypeIdAttribute = new StringTypeIdAttribute(field);
+
+                //then
                 Assertions.assertAll(
                         () -> assertThat(stringTypeIdAttribute.getColumnName()).isEqualTo("id"),
                         () -> assertThat(stringTypeIdAttribute.getFieldName()).isEqualTo("id"),
@@ -47,11 +52,15 @@ class StringTypeIdAttributeTest {
             @Test
             @DisplayName("DDL을 반환한다")
             void prepareDDL() throws NoSuchFieldException {
+                //given
                 Field field = sample.getClass().getDeclaredField("id");
 
                 StringTypeIdAttribute stringTypeIdAttribute = new StringTypeIdAttribute(field);
+
+                //when
                 String ddl = stringTypeIdAttribute.prepareDDL(new H2SqlConverter());
 
+                //then
                 assertThat(ddl).isEqualTo("id VARCHAR(255)");
             }
         }

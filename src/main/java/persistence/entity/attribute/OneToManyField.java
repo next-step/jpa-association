@@ -12,19 +12,19 @@ import java.util.Set;
 public class OneToManyField {
     private final Field field;
     private final String fieldName;
-    private final String resolvedJoinColumnName;
+    private final String joinColumnName;
     private final FetchType fetchType;
-    private final String tableName;
-    private final String idColumnName;
+    private final String ownerTableName;
+    private final String ownerIdAttribute;
     private final EntityAttribute entityAttribute;
 
-    public OneToManyField(Field field, String tableName, String idColumnName, Set<Class<?>> visitedEntities) {
+    public OneToManyField(Field field, String ownerTableName, String ownerIdAttribute, Set<Class<?>> visitedEntities) {
         this.field = field;
-        this.tableName = tableName;
-        this.idColumnName = idColumnName;
+        this.ownerTableName = ownerTableName;
+        this.ownerIdAttribute = ownerIdAttribute;
         this.fieldName = field.getName();
         this.fetchType = getFetchTypeFromField(field);
-        this.resolvedJoinColumnName = getJoinColumnNameFromField(field);
+        this.joinColumnName = getJoinColumnName(field);
         this.entityAttribute = getEntityAttributeFromField(field, visitedEntities);
     }
 
@@ -33,7 +33,7 @@ public class OneToManyField {
         return oneToMany.fetch();
     }
 
-    private String getJoinColumnNameFromField(Field field) {
+    private String getJoinColumnName(Field field) {
         Optional<JoinColumn> joinColumnOptional = Optional.ofNullable(field.getDeclaredAnnotation(jakarta.persistence.JoinColumn.class));
         return joinColumnOptional.map(JoinColumn::name).orElse(null);
     }
@@ -58,14 +58,18 @@ public class OneToManyField {
         return String.format("join %s as %s on %s.%s = %s.%s",
                 entityAttribute.getTableName(),
                 entityAttribute.getTableName(),
-                tableName,
-                idColumnName,
+                ownerTableName,
+                ownerIdAttribute,
                 entityAttribute.getTableName(),
                 entityAttribute.getIdAttribute().getColumnName());
     }
 
     public EntityAttribute getEntityAttribute() {
         return entityAttribute;
+    }
+
+    public String getJoinColumnName() {
+        return joinColumnName;
     }
 
     public Field getField() {

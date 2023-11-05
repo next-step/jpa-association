@@ -22,7 +22,11 @@ class IntegerTypeIdAttributeResolverTest {
             @Test
             @DisplayName("true를 반환한다")
             void supports() {
+                //given
+                //when
                 IdAttributeResolver resolver = new IntegerTypeIdAttributeResolver();
+
+                //then
                 assertThat(resolver.supports(Integer.class)).isTrue();
             }
         }
@@ -37,11 +41,14 @@ class IntegerTypeIdAttributeResolverTest {
             @Test
             @DisplayName("IntegerTypeIdAttribute를 반환한다")
             void returnAttribute() throws NoSuchFieldException {
+                //given
                 IdAttributeResolver resolver = new IntegerTypeIdAttributeResolver();
                 EntityFixtures.EntityWithIntegerId sample
                         = new EntityFixtures.EntityWithIntegerId(1, "민준", 29);
                 Field field = sample.getClass().getDeclaredField("id");
 
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() -> resolver.resolve(field));
             }
         }
@@ -56,14 +63,17 @@ class IntegerTypeIdAttributeResolverTest {
             @Test
             @DisplayName("인스턴스 아이디 필드에 아이디 벨류를 세팅한다.")
             void setIdToEntity() throws NoSuchFieldException, IllegalAccessException {
+                //given
                 IdAttributeResolver resolver = new IntegerTypeIdAttributeResolver();
                 EntityFixtures.EntityWithIntegerId sample
                         = new EntityFixtures.EntityWithIntegerId("민준", 29);
 
                 Field field = sample.getClass().getDeclaredField("id");
 
+                //when
                 resolver.setIdToEntity(sample, field, 10);
 
+                //then
                 assertThat(field.get(sample)).isEqualTo(10);
             }
         }

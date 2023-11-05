@@ -23,7 +23,11 @@ class IntegerTypeGeneralAttributeResolverTest {
             @Test
             @DisplayName("true를 반환한다")
             void supports() {
+                //given
+                //when
                 GeneralAttributeResolver resolver = new IntegerTypeGeneralAttributeResolver();
+
+                //then
                 assertThat(resolver.supports(Integer.class)).isTrue();
                 assertThat(resolver.supports(Long.class)).isFalse();
             }
@@ -39,11 +43,15 @@ class IntegerTypeGeneralAttributeResolverTest {
             @Test
             @DisplayName("IntegerTypeGeneralAttribute를 반환한다")
             void returnAttribute() throws NoSuchFieldException {
+                //given
                 GeneralAttributeResolver resolver = new IntegerTypeGeneralAttributeResolver();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
+
                 Field field = sample.getClass().getDeclaredField("age");
 
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() -> resolver.resolve(field));
             }
         }

@@ -24,6 +24,7 @@ class FirstCachesTest {
             @Test
             @DisplayName("일차캐시를 반환한다.")
             void returnFirstCache() {
+                //given
                 FirstCaches firstCaches = new FirstCaches();
 
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem(1L, "티비", 1);
@@ -32,8 +33,10 @@ class FirstCachesTest {
 
                 firstCaches.putFirstCache(order, "1");
 
+                //when
                 Object firstCache = firstCaches.getFirstCacheOrNull(EntityFixtures.Order.class, "1");
 
+                //then
                 assertThat(firstCache.toString())
                         .isEqualTo("Order{id=1, orderNumber='민준', orderItems=[OrderItem{id=1, product='티비', quantity=1}]}");
             }
@@ -45,10 +48,13 @@ class FirstCachesTest {
             @Test
             @DisplayName("null을 반환한다.")
             void returnNull() {
+                //given
                 FirstCaches firstCaches = new FirstCaches();
 
+                //when
                 Object firstCache = firstCaches.getFirstCacheOrNull(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
 
+                //then
                 assertThat(firstCache).isNull();
             }
         }
@@ -63,10 +69,14 @@ class FirstCachesTest {
             @Test
             @DisplayName("일차캐시에 인스턴스를 저장한다.")
             void putFirstCache() {
+                //given
                 FirstCaches firstCaches = new FirstCaches();
+
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() -> firstCaches.putFirstCache(sample, "1"));
             }
         }
@@ -77,12 +87,16 @@ class FirstCachesTest {
             @Test
             @DisplayName("일차캐시에 인스턴스를 저장하고, 연관된 인스턴스까지 같이 저장한다.")
             void putFirstCache() {
+                //given
                 FirstCaches firstCaches = new FirstCaches();
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem(1L, "티비", 1);
                 EntityFixtures.Order order
                         = new EntityFixtures.Order(1L, "민준", List.of(orderItem));
                 EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>());
 
+
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() -> firstCaches.putFirstCache(order, "1", entityAttribute));
             }
         }
@@ -97,12 +111,14 @@ class FirstCachesTest {
             @Test
             @DisplayName("엔트리 상태를 REMOVED로 변경한다.")
             void putFirstCache() {
+                //given
                 FirstCaches firstCaches = new FirstCaches();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
-
                 firstCaches.putFirstCache(sample, "1");
 
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() ->
                         firstCaches.remove(EntityFixtures.SampleOneWithValidAnnotation.class, "1"));
             }
