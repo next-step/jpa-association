@@ -6,6 +6,14 @@ import jakarta.persistence.*;
 @Table(name = "order_items")
 public class OrderItem {
 
+    protected OrderItem() {}
+
+    public OrderItem(String product, Integer quantity, Long orderId) {
+        this.product = product;
+        this.quantity = quantity;
+        this.orderId = orderId;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
