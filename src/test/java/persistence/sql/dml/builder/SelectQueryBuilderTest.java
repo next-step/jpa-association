@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import persistence.mock.PureDomain;
 import persistence.sql.meta.MetaFactory;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -37,5 +40,12 @@ class SelectQueryBuilderTest {
     void buildSelectWithJoinByPkQuery() {
         SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.of(MetaFactory.get(Order.class));
         assertThat(selectQueryBuilder.buildSelectWithJoinByPkQuery(1L)).isEqualTo("SELECT orders.id, orders.ordernumber, order_items.id, order_items.product, order_items.quantity, order_items.orderid FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE id=1;");
+    }
+
+    @Test
+    @DisplayName("SELECT 문 헤더에 명시한 컬럼목록을 문자열 리스트로 추출한다.")
+    void extractSelectColumns() {
+        List<String> extractSelectColumns = SelectQueryBuilder.extractSelectColumns("SELECT orders.id, orders.ordernumber, order_items.id, order_items.product, order_items.quantity, order_items.orderid FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE id=1;");
+        assertThat(extractSelectColumns).isEqualTo(Arrays.asList("orders.id", "orders.ordernumber", "order_items.id", "order_items.product", "order_items.quantity", "order_items.orderid"));
     }
 }
