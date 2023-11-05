@@ -18,7 +18,6 @@ public class EntityLoader<T> {
     private final DmlGenerator dmlGenerator;
     private final JdbcTemplate jdbcTemplate;
     private final EntityRowMapper<T> entityRowMapper;
-    private final EntityCollectionLoader entityCollectionLoader;
 
     public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         this.entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
@@ -27,7 +26,6 @@ public class EntityLoader<T> {
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
         this.entityRowMapper = new EntityRowMapper<>(clazz);
-        this.entityCollectionLoader = new EntityCollectionLoader(dmlGenerator, jdbcTemplate);
     }
 
     public Optional<T> loadById(final Object id) {
@@ -42,14 +40,12 @@ public class EntityLoader<T> {
             return Optional.empty();
         }
 
-        final T entity = result.get(0);
+        return Optional.of(result.get(0));
+    }
 
-        if (entityMetadata.hasLazyOneToManyColumn()) {
-            entityMetadata.getOneToManyColumns()
-                    .forEach(oneToManyColumn -> entityCollectionLoader.initLazyOneToMany(oneToManyColumn, entity, id));
-        }
-
-        return Optional.of(entity);
+    public List<T> loadAllByOwnerId(final String ownerColumnName, final Object ownerId) {
+        final String query = renderSelectByOwnerId(ownerColumnName, ownerId);
+        return jdbcTemplate.query(query, entityRowMapper::mapRow);
     }
 
     public String renderSelect(final Object id) {
@@ -58,6 +54,14 @@ public class EntityLoader<T> {
                 .column(entityMetadata)
                 .leftJoin(entityMetadata)
                 .where(idColumn.getNameWithAlias(), String.valueOf(id))
+                .build();
+    }
+
+    public String renderSelectByOwnerId(final String ownerColumnName, final Object ownerId) {
+        return dmlGenerator.select()
+                .table(tableName)
+                .column(entityMetadata)
+                .where(ownerColumnName, String.valueOf(ownerId))
                 .build();
     }
 }
