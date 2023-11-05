@@ -6,12 +6,15 @@ import jakarta.persistence.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
+import persistence.association.OneToManyAssociate;
 import persistence.exception.NoEntityException;
 
 public class EntityMeta {
     private final String tableName;
     private final EntityColumns entityColumns;
     private final EntityColumn pkColumn;
+    private final Optional<OneToManyAssociate> oneToManyAssociate;
     private final Class<?> entityClass;
 
     private EntityMeta(Class<?> entityClass) {
@@ -23,6 +26,7 @@ public class EntityMeta {
         this.entityColumns = new EntityColumns(entityClass.getDeclaredFields());
         this.pkColumn = entityColumns.pkColumn();
         this.entityClass = entityClass;
+        this.oneToManyAssociate = OneToManyAssociate.from(entityClass);
     }
 
     public static EntityMeta from(Class<?> entityClass) {
@@ -70,6 +74,17 @@ public class EntityMeta {
     public boolean isAutoIncrement() {
         final EntityColumn pkColumn = entityColumns.pkColumn();
         return GenerationType.IDENTITY.equals(pkColumn.getGenerationType());
+    }
+
+    public boolean hasOneToManyAssociate() {
+        return oneToManyAssociate.isPresent();
+    }
+
+    public OneToManyAssociate getOneToManyAssociate() {
+        if (oneToManyAssociate.isEmpty()) {
+            throw new IllegalArgumentException("OneToMany 필드가 없습니다.");
+        }
+        return oneToManyAssociate.get();
     }
 
 }

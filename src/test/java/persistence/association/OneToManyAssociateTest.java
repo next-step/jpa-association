@@ -1,17 +1,14 @@
 package persistence.association;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import java.lang.reflect.Field;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.meta.EntityMeta;
-import persistence.testFixtures.NoHasJoinColumnOrder;
-import persistence.testFixtures.Order;
-import persistence.testFixtures.OrderItem;
+import persistence.testFixtures.assosiate.NoHasJoinColumnOrder;
+import persistence.testFixtures.assosiate.Order;
+import persistence.testFixtures.assosiate.OrderItem;
 
 class OneToManyAssociateTest {
 

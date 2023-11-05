@@ -16,6 +16,10 @@ public class DMLQueryBuilder extends QueryBuilder {
         return dialect.getFromTableQuery(tableName);
     }
 
+    protected String getFromTableQuery(String tableName, String tableAlias) {
+        return getFromTableQuery(tableName) + " " + tableAlias + " ";
+    }
+
     protected String whereId(EntityColumn column, Object id) {
         if (column.isVarchar()) {
             return dialect.whereId(column.getName(), "'" + id + "'");

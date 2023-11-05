@@ -3,6 +3,7 @@ package persistence.sql.dml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import domain.Order;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,25 @@ class SelectQueryBuilderTest {
         //when & then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> select.findByIdQuery(null));
+    }
+
+    @Test
+    @DisplayName("조인을 이용한 조회")
+    void join() {
+        //given
+        SelectQueryBuilder select = QueryGenerator.of(Order.class, dialect).select();
+
+        //when
+        String sql = select.findAllQuery();
+
+        //then
+        assertThat(sql).isEqualTo("SELECT orders_0.id as orders_0_id, orders_0.orderNumber as orders_0_orderNumber"
+                + ", order_items_1.id as order_items_1_id"
+                + ", order_items_1.product as order_items_1_product"
+                + ", order_items_1.quantity as order_items_1_quantity"
+                + " FROM orders orders_0"
+                + " LEFT JOIN order_items order_items_1"
+                + " ON orders_0.id = order_items_1.id");
     }
 
 }

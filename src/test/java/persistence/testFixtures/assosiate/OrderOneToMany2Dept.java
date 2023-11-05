@@ -1,4 +1,4 @@
-package persistence.testFixtures;
+package persistence.testFixtures.assosiate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,8 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
-public class Order {
-
+public class OrderOneToMany2Dept {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,10 +20,7 @@ public class Order {
     private String orderNumber;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems;
 
-//    @OneToMany
-//    @JoinColumn(name = "order_item_id2")
-//    private List<OrderItem2> orderItem2;
+    @JoinColumn(name = "order_id")
+    private List<OrderItemOnToMany2Dept> orderList;
 }

@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import persistence.dialect.Dialect;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
@@ -11,8 +12,17 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         super(entityMeta, dialect);
     }
 
+
     public String findAllQuery() {
-        return selectQuery(getColumnsString(entityMeta)) + getFromTableQuery(entityMeta.getTableName());
+        if (entityMeta.hasOneToManyAssociate()) {
+            return selectQuery(getColumnsString(entityMeta))
+                    + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()))
+                    + new OneToManyJoinQueryBuilder(entityMeta).build();
+        }
+
+        return selectQuery(getColumnsBeforeString(entityMeta))
+                + getFromTableQuery(entityMeta.getTableName());
+
     }
 
     public String findByIdQuery(Object id) {
@@ -20,7 +30,7 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
             throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
         }
 
-        return selectQuery(getColumnsString(entityMeta))
+        return selectQuery(getColumnsBeforeString(entityMeta))
                 + getFromTableQuery(entityMeta.getTableName())
                 + whereId(getPkColumn(), id);
     }
@@ -29,12 +39,34 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         return dialect.select(fileNames);
     }
 
-    private String getColumnsString(EntityMeta entityMeta) {
+    private String getColumnsBeforeString(EntityMeta entityMeta) {
         return entityMeta.getEntityColumns()
                 .stream()
                 .map(EntityColumn::getName)
                 .collect(Collectors.joining(", "));
+    }
 
+    private String getColumnsString(EntityMeta entityMeta) {
+        return getColumnsStream(entityMeta, 0)
+                .collect(Collectors.joining(", "));
+
+    }
+
+    private Stream<String> convertColumnsSegnetureStream(EntityMeta entityMeta, int depth) {
+        final String tableName = entityMeta.getTableName()+ "_"  + depth;
+        return entityMeta.getEntityColumns()
+                .stream()
+                .map((it) -> tableName + "." + it.getName() + " as " + tableName + "_" + it.getName());
+    }
+
+    private Stream<String> getColumnsStream(EntityMeta entityMeta, int depth) {
+        final Stream<String> columnsNameStream = convertColumnsSegnetureStream(entityMeta, depth);
+
+        if (entityMeta.hasOneToManyAssociate()) {
+            return Stream.concat(columnsNameStream, getColumnsStream(entityMeta.getOneToManyAssociate().getManyEntityMeta(),depth + 1));
+        }
+
+        return columnsNameStream;
     }
 
 }
