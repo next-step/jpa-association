@@ -20,14 +20,17 @@ class SnapShotsTest {
             @Test
             @DisplayName("스냅샷을 반환한다.")
             void returnSnapShot() {
+                //given
                 SnapShots snapShots = new SnapShots();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
                 snapShots.putSnapShot(sample, "1");
 
+                //when
                 Object snapShot = snapShots.getSnapShotOrNull(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
 
+                //then
                 assertThat(snapShot.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
             }
         }
@@ -38,10 +41,13 @@ class SnapShotsTest {
             @Test
             @DisplayName("null을 반환한다.")
             void returnNull() {
+                //given
                 SnapShots snapShots = new SnapShots();
 
+                //when
                 Object snapShot = snapShots.getSnapShotOrNull(EntityFixtures.SampleOneWithValidAnnotation.class, "1");
 
+                //then
                 assertThat(snapShot).isNull();
             }
         }
@@ -56,10 +62,14 @@ class SnapShotsTest {
             @Test
             @DisplayName("스냅샷에 인스턴스의 복사본을 저장한고 반환한다.")
             void putSnapShot() {
+                //given
                 SnapShots snapShots = new SnapShots();
+
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
+                //when
+                //then
                 assertThat(snapShots.putSnapShot(sample, "1").toString())
                         .isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
             }
@@ -75,12 +85,15 @@ class SnapShotsTest {
             @Test
             @DisplayName("일차캐시에 인스턴스를 제거한다.")
             void putFirstCache() {
+                //given
                 FirstCaches firstCaches = new FirstCaches();
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation(1L, "민준", 29);
 
                 firstCaches.putFirstCache(sample, "1");
 
+                //when
+                //then
                 Assertions.assertDoesNotThrow(() ->
                         firstCaches.remove(EntityFixtures.SampleOneWithValidAnnotation.class, "1"));
             }

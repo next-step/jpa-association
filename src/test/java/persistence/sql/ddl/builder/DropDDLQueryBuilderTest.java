@@ -8,6 +8,8 @@ import persistence.entity.attribute.EntityAttribute;
 import persistence.sql.ddl.converter.SqlConverter;
 import persistence.sql.infra.H2SqlConverter;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static persistence.sql.common.DDLType.DROP;
 
@@ -25,11 +27,14 @@ public class DropDDLQueryBuilderTest {
             @Test
             @DisplayName("DROP DDL을 리턴한다.")
             void returnDDL() {
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class);
+                //given
+                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>());
 
+                //when
                 String dropDDL = DDLQueryBuilderFactory.createQueryBuilder(DROP)
                         .prepareStatement(entityAttribute, sqlConverter);
 
+                //then
                 assertThat(dropDDL).isEqualTo("DROP TABLE two;");
             }
         }

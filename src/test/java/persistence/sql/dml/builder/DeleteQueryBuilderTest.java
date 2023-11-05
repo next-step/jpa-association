@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
@@ -20,9 +22,14 @@ public class DeleteQueryBuilderTest {
             @Test
             @DisplayName("적절한 DML을 반환한다.")
             void returnDML() {
+                //given
                 DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
+
+                //then
                 String dml
-                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class), String.valueOf(1));
+                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>()), String.valueOf(1));
+
+                //then
                 assertThat(dml).isEqualTo("DELETE FROM two where id = 1");
             }
         }

@@ -11,12 +11,14 @@ public class StringTypeGeneralAttribute implements GeneralAttribute {
     private final String fieldName;
     private final String columnName;
     private final boolean nullable;
+    private final Field field;
 
     public StringTypeGeneralAttribute(Field field) {
         Column column = field.getDeclaredAnnotation(Column.class);
 
         validate(field.getType(), column);
 
+        this.field = field;
         this.length = column.length();
         this.fieldName = field.getName();
         this.columnName = column.name().isBlank() ? field.getName() : column.name();
@@ -39,6 +41,11 @@ public class StringTypeGeneralAttribute implements GeneralAttribute {
     @Override
     public String getFieldName() {
         return this.fieldName;
+    }
+
+    @Override
+    public Field getField() {
+        return this.field;
     }
 
     private void validate(Class<?> type, Column column) {

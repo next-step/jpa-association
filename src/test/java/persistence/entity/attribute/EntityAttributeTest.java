@@ -10,6 +10,8 @@ import persistence.sql.ddl.wrapper.CreateDDLWrapper;
 import persistence.sql.ddl.wrapper.DropDDLWrapper;
 import persistence.sql.infra.H2SqlConverter;
 
+import java.util.HashSet;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
@@ -26,9 +28,12 @@ public class EntityAttributeTest {
             @Test
             @DisplayName("EntityAttribute를 반환한다.")
             void returnEntityAttribute() {
+                //given
+                //when
                 EntityAttribute entityAttribute =
-                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class);
+                        EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>());
 
+                //then
                 Assertions.assertAll(
                         () -> assertThat(entityAttribute.getTableName())
                                 .isEqualTo("entity_name"),
@@ -48,9 +53,12 @@ public class EntityAttributeTest {
             @Test
             @DisplayName("예외를 반환한다.")
             void throwException() {
+                //given
+                //when
+                //then
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                EntityFixtures.EntityWithMultiIdAnnotation.class));
+                                EntityFixtures.EntityWithMultiIdAnnotation.class, new HashSet<>()));
             }
         }
 
@@ -60,9 +68,12 @@ public class EntityAttributeTest {
             @Test
             @DisplayName("예외를 반환한다.")
             void throwException() {
+                //given
+                //when
+                //then
                 Assertions.assertThrows(
                         IllegalStateException.class, () -> EntityAttribute.of(
-                                EntityFixtures.EntityWithOutEntityAnnotation.class));
+                                EntityFixtures.EntityWithOutEntityAnnotation.class, new HashSet<>()));
             }
         }
     }

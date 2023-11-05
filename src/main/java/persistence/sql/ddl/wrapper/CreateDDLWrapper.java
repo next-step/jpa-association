@@ -16,8 +16,11 @@ public class CreateDDLWrapper implements DDLWrapper {
 
     @Override
     public String wrap(String tableName, IdAttribute idAttribute, List<GeneralAttribute> generalAttributes) {
-        return String.format("CREATE TABLE %s ( %s );", tableName, idAttribute.prepareDDL(sqlConverter) + ", "
-                + generalAttributes.stream().map(generalAttribute -> generalAttribute.prepareDDL(sqlConverter))
-                .collect(Collectors.joining(", ")));
+        String generalDDLSource = generalAttributes.stream().map(generalAttribute -> generalAttribute.prepareDDL(sqlConverter))
+                .collect(Collectors.joining(", "));
+        String joinedGeneralDDL = generalDDLSource.isBlank() ? "" : ", " + generalDDLSource;
+
+        return String.format("CREATE TABLE %s ( %s );", tableName, idAttribute.prepareDDL(sqlConverter)
+                + joinedGeneralDDL);
     }
 }

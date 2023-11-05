@@ -1,4 +1,4 @@
-package persistence.sql.dml.builder;
+package persistence.sql.dml;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,9 +19,13 @@ public class WhereClauseTest {
             @Test
             @DisplayName("조건을 새로 생성한다.")
             void addCondition() {
+                //given
+                //when
                 WhereClause whereClause = new WhereClause();
                 whereClause.and("test", "test value");
-                assertThat(whereClause.toString()).isEqualTo(" WHERE test = 'test value'");
+
+                //then
+                assertThat(whereClause.prepareDML()).isEqualTo(" WHERE test = 'test value'");
             }
         }
 
@@ -32,11 +36,14 @@ public class WhereClauseTest {
             @Test
             @DisplayName("조건을 이어붙인다.")
             void addCondition() {
+                //given
+                //when
                 WhereClause whereClause = new WhereClause();
                 whereClause.and("test", "test value");
                 whereClause.and("민준", "1");
 
-                assertThat(whereClause.toString()).isEqualTo(" WHERE test = 'test value' AND 민준 = '1'");
+                //then
+                assertThat(whereClause.prepareDML()).isEqualTo(" WHERE test = 'test value' AND 민준 = '1'");
             }
         }
     }

@@ -16,11 +16,14 @@ class SimpleEntityEntryTest {
         @Test
         @DisplayName("상태를 변경한다.")
         void notThrow() {
+            //given
             EntityEntry simpleEntityEntry = new SimpleEntityEntry(Status.MANAGED);
 
+            //when
             simpleEntityEntry.updateStatus(Status.GONE);
             EntityEntry target = new SimpleEntityEntry(Status.GONE);
 
+            //then
             assertThat(simpleEntityEntry).isEqualTo(target);
         }
     }

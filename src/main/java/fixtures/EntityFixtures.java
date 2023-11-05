@@ -2,6 +2,8 @@ package fixtures;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 public class EntityFixtures {
     @Entity
     @Table(name = "entity_name")
@@ -155,6 +157,83 @@ public class EntityFixtures {
                     "id=" + id +
                     ", name='" + name + '\'' +
                     ", age=" + age +
+                    '}';
+        }
+    }
+
+    @Entity
+    @Table(name = "orders")
+    public static class Order {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @Column(name = "order_number")
+        private String orderNumber;
+
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn(name = "order_id")
+        private List<OrderItem> orderItems;
+
+        public Order(String orderNumber, List<OrderItem> orderItems) {
+            this.orderNumber = orderNumber;
+            this.orderItems = orderItems;
+        }
+
+        public Order(long id, String orderNumber, List<OrderItem> orderItems) {
+            this.id = id;
+            this.orderNumber = orderNumber;
+            this.orderItems = orderItems;
+        }
+
+        @Override
+        public String toString() {
+            return "Order{" +
+                    "id=" + id +
+                    ", orderNumber='" + orderNumber + '\'' +
+                    ", orderItems=" + orderItems +
+                    '}';
+        }
+
+        public Order() {
+
+        }
+    }
+
+    @Entity
+    @Table(name = "order_items")
+    public static class OrderItem {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @Column(name = "product")
+        private String product;
+
+        @Column(name = "quantity")
+        private Integer quantity;
+
+        public OrderItem(String product, Integer quantity) {
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        public OrderItem() {
+
+        }
+
+        public OrderItem(Long id, String product, Integer quantity) {
+            this.id = id;
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        @Override
+        public String toString() {
+            return "OrderItem{" +
+                    "id=" + id +
+                    ", product='" + product + '\'' +
+                    ", quantity=" + quantity +
                     '}';
         }
     }
