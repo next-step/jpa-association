@@ -2,6 +2,8 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -29,16 +31,25 @@ class EntityLoaderTest {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        EntityMeta personMeta = MetaFactory.get(Person.class);
         DialectFactory dialectFactory = DialectFactory.getInstance();
         ddlQueryGenerator = DdlQueryGenerator.of(dialectFactory.getDialect(jdbcTemplate.getDbmsName()));
+
+        EntityMeta personMeta = MetaFactory.get(Person.class);
+        EntityMeta orderMeta = MetaFactory.get(Order.class);
+        EntityMeta orderItemMeta = MetaFactory.get(OrderItem.class);
         jdbcTemplate.execute(ddlQueryGenerator.generateCreateQuery(personMeta));
+        jdbcTemplate.execute(ddlQueryGenerator.generateCreateQuery(orderMeta));
+        jdbcTemplate.execute(ddlQueryGenerator.generateCreateQuery(orderItemMeta));
     }
 
     @AfterEach
     void tearDown() {
         EntityMeta personMeta = MetaFactory.get(Person.class);
+        EntityMeta orderMeta = MetaFactory.get(Order.class);
+        EntityMeta orderItemMeta = MetaFactory.get(OrderItem.class);
         jdbcTemplate.execute(ddlQueryGenerator.generateDropQuery(personMeta));
+        jdbcTemplate.execute(ddlQueryGenerator.generateDropQuery(orderMeta));
+        jdbcTemplate.execute(ddlQueryGenerator.generateDropQuery(orderItemMeta));
         server.stop();
     }
 
