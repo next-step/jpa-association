@@ -38,8 +38,8 @@ public class OrderItem {
 }
 ```
 - [ ] Join Query 만들기
-  - [ ] 전체 조회 쿼리 작성
-    - [ ] JoinColumn 대응 
-      - [ ] JoinColumn의 ID 값으로 조인을 한다.
+  - [X] 전체 조회 쿼리 작성
+    - [X] JoinColumn 대응 
+      - [X] JoinColumn의 ID 값으로 조인을 한다.
   - [ ] id값을 가지고 조회하는 쿼리 작성 
 - [ ] Join Query 를 만들어 Entity화 해보기

@@ -68,13 +68,16 @@ class SelectQueryBuilderTest {
         String sql = select.findAllQuery();
 
         //then
-        assertThat(sql).isEqualTo("SELECT orders_0.id as orders_0_id, orders_0.orderNumber as orders_0_orderNumber"
+        assertThat(sql).isEqualTo("SELECT "
+                + "orders_0.id as orders_0_id"
+                + ", orders_0.orderNumber as orders_0_orderNumber"
+                + ", orders_0.order_id as orders_0_order_id"
                 + ", order_items_1.id as order_items_1_id"
                 + ", order_items_1.product as order_items_1_product"
                 + ", order_items_1.quantity as order_items_1_quantity"
                 + " FROM orders orders_0"
                 + " LEFT JOIN order_items order_items_1"
-                + " ON orders_0.id = order_items_1.id");
+                + " ON orders_0.order_id = order_items_1.id");
     }
 
 }

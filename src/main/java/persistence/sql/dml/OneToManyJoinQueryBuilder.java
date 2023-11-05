@@ -26,14 +26,13 @@ public class OneToManyJoinQueryBuilder extends QueryBuilder {
             return "";
         }
         final OneToManyAssociate oneToManyAssociate = entityMeta.getOneToManyAssociate();
-        final EntityColumn drivenPkColumn = entityMeta.getPkColumn();
         final EntityColumn joinPkColumn = oneToManyAssociate.getPkManyColumn();
 
         final String drivenTableSignature = tableNameSignature(entityMeta.getTableName(), depth);
         final String joinTableSignature = tableNameSignature(oneToManyAssociate.getManyEntityMeta().getTableName(), depth + 1);
 
         return dialect.leftJoin(oneToManyAssociate.getManyEntityMeta().getTableName(), joinTableSignature) +
-                columnSignature(drivenTableSignature, drivenPkColumn.getName()) + " = " + columnSignature(joinTableSignature, joinPkColumn.getName());
+                columnSignature(drivenTableSignature, oneToManyAssociate.joinColumnName()) + " = " + columnSignature(joinTableSignature, joinPkColumn.getName());
     }
 
     private Stream<String> generateJoinQueryStream(EntityMeta entityMeta, int depth) {
