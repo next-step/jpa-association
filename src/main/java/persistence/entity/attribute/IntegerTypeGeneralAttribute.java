@@ -49,6 +49,7 @@ public class IntegerTypeGeneralAttribute implements GeneralAttribute {
         return this.fieldName;
     }
 
+    @Override
     public Field getField() {
         return this.field;
     }

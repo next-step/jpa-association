@@ -54,16 +54,6 @@ public class OneToManyField {
         return EntityAttribute.of(fieldType, visitedEntities);
     }
 
-    public String prepareJoinDML() {
-        return String.format("join %s as %s on %s.%s = %s.%s",
-                entityAttribute.getTableName(),
-                entityAttribute.getTableName(),
-                ownerTableName,
-                ownerIdAttribute,
-                entityAttribute.getTableName(),
-                entityAttribute.getIdAttribute().getColumnName());
-    }
-
     public EntityAttribute getEntityAttribute() {
         return entityAttribute;
     }

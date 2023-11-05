@@ -23,10 +23,10 @@ class JoinClauseTest {
             @DisplayName("적절한 조인 DML을 제공한다.")
             void returnJoinDML() {
                 //given
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>());
+                EntityAttribute owner = EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>());
 
                 //when
-                JoinClause joinClause = new JoinClause(entityAttribute.getOneToManyFields());
+                JoinClause joinClause = new JoinClause(owner.getTableName(), owner.getIdAttribute(), owner.getOneToManyFields());
 
                 //then
                 assertThat(joinClause.toString()).isEqualTo(" join order_items as order_items on orders.id = order_items.id");

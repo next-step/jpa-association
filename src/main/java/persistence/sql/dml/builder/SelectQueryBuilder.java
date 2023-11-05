@@ -18,7 +18,8 @@ public class SelectQueryBuilder {
     }
 
     public static SelectQueryBuilder of(EntityAttribute entityAttribute) {
-        JoinClause joinClause = new JoinClause(entityAttribute.getOneToManyFields());
+        JoinClause joinClause = new JoinClause(entityAttribute.getTableName(),
+                entityAttribute.getIdAttribute(), entityAttribute.getOneToManyFields());
         WhereClause whereClause = new WhereClause();
         return new SelectQueryBuilder(entityAttribute, joinClause, whereClause);
     }
