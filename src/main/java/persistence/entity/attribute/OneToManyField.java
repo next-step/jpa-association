@@ -62,6 +62,10 @@ public class OneToManyField {
         return joinColumnName;
     }
 
+    public FetchType getFetchType() {
+        return fetchType;
+    }
+
     public Field getField() {
         return field;
     }

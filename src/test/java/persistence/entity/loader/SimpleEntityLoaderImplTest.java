@@ -56,27 +56,32 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
 
         @Nested
         @DisplayName("@OneToMany(fetch = FetchType.EAGER)가 붙은 클래스정보와 아이디가 주어지면")
-        public class withOneToManyAnnotatedInstance {
+        public class test {
             @Test
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
                 EntityLoader entityLoader = new SimpleEntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
-                EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1);
-                EntityFixtures.Order order = new EntityFixtures.Order("1324", List.of(orderItem));
+                EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1, 1L);
+                EntityFixtures.OrderItem orderItem2 = new EntityFixtures.OrderItem("세탁기", 2, 1L);
+                EntityFixtures.Order order = new EntityFixtures.Order("1324", List.of(orderItem, orderItem2));
+
+
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
 
                 setUpFixtureTable(EntityFixtures.OrderItem.class, new H2SqlConverter());
                 setUpFixtureTable(EntityFixtures.Order.class, new H2SqlConverter());
 
                 simpleEntityPersister.insert(orderItem);
+                simpleEntityPersister.insert(orderItem2);
                 simpleEntityPersister.insert(order);
 
                 //when
                 EntityFixtures.Order retrievedOrder = simpleEntityPersister.load(EntityFixtures.Order.class, "1");
 
                 //then
-                assertThat(retrievedOrder.toString()).isEqualTo("Order{id=1, orderNumber='1324', orderItems=[OrderItem{id=1, product='티비', quantity=1}]}");
+                assertThat(retrievedOrder.toString())
+                        .isEqualTo("Order{id=1, orderNumber='1324', orderItems=[OrderItem{id=1, product='티비', quantity=1, orderId=1}, OrderItem{id=1, product='세탁기', quantity=2, orderId=1}]}");
             }
         }
     }

@@ -213,9 +213,18 @@ public class EntityFixtures {
         @Column(name = "quantity")
         private Integer quantity;
 
+        @Column(name = "order_id")
+        private Long orderId;
+
         public OrderItem(String product, Integer quantity) {
             this.product = product;
             this.quantity = quantity;
+        }
+
+        public OrderItem(String product, Integer quantity, Long orderId) {
+            this.product = product;
+            this.quantity = quantity;
+            this.orderId = orderId;
         }
 
         public OrderItem() {
@@ -234,6 +243,7 @@ public class EntityFixtures {
                     "id=" + id +
                     ", product='" + product + '\'' +
                     ", quantity=" + quantity +
+                    ", orderId=" + orderId +
                     '}';
         }
     }

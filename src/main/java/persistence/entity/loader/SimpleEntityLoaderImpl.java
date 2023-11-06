@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 
+import static persistence.entity.loader.MapperResolverHolder.COLLECTION_MAPPER_RESOLVERS;
 import static persistence.entity.loader.MapperResolverHolder.MAPPER_RESOLVERS;
 
 public class SimpleEntityLoaderImpl implements EntityLoader {
@@ -37,23 +38,49 @@ public class SimpleEntityLoaderImpl implements EntityLoader {
 
     private <T> T mapResultSetToEntity(Class<T> clazz, ResultSet resultSet) {
         try {
+            T instance = instantiateClass(clazz);
+
             if (!resultSet.next()) {
                 return null;
             }
 
-            T instance = instantiateClass(clazz);
+            mapAttributes(clazz, resultSet, instance);
 
-            for (Field field : instance.getClass().getDeclaredFields()) {
-                for (MapperResolver mapperResolver : MAPPER_RESOLVERS) {
-                    if (mapperResolver.supports(field)) {
-                        mapperResolver.map(instance, field, resultSet);
-                    }
-                }
-            }
+            do {
+                mapCollectionAttributes(clazz, resultSet, instance);
+            } while (resultSet.next());
 
             return instance;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private <T> void mapCollectionAttributes(Class<T> clazz, ResultSet resultSet, T instance) {
+        for (Field field : clazz.getDeclaredFields()) {
+            mapCollectionAttribute(resultSet, instance, field);
+        }
+    }
+
+    private <T> void mapCollectionAttribute(ResultSet resultSet, T instance, Field field) {
+        for (MapperResolver mapperResolver : COLLECTION_MAPPER_RESOLVERS) {
+            if (mapperResolver.supports(field)) {
+                mapperResolver.map(instance, field, resultSet);
+            }
+        }
+    }
+
+    private <T> void mapAttributes(Class<T> clazz, ResultSet resultSet, T instance) {
+        for (Field field : clazz.getDeclaredFields()) {
+            mapAttribute(resultSet, instance, field);
+        }
+    }
+
+    private <T> void mapAttribute(ResultSet resultSet, T instance, Field field) {
+        for (MapperResolver mapperResolver : MAPPER_RESOLVERS) {
+            if (mapperResolver.supports(field)) {
+                mapperResolver.map(instance, field, resultSet);
+            }
         }
     }
 

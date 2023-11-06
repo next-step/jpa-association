@@ -1,13 +1,16 @@
 package persistence.entity.loader;
 
+import fixtures.HelloTarget;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import net.sf.cglib.proxy.Enhancer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import static persistence.entity.loader.MapperResolverHolder.MAPPER_RESOLVERS;
 
@@ -19,40 +22,21 @@ public class OneToManyFieldMapper implements MapperResolver {
     }
 
     @Override
-    public <T> void map(T instance, Field field, ResultSet resultSet) {
-        try {
-            Type fieldArgType = getCollectionFieldType(field);
+    public void map(Object instance, Field field, ResultSet resultSet) {
+        FetchType fetchType = field.getAnnotation(OneToMany.class).fetch();
 
-            Class<?> oneToManyFieldClass = (Class<?>) fieldArgType;
-
-            List<Object> oneToManyInstances = new ArrayList<>();
-
-            Object oneToManyInstance = mapResultSetToOneToManyAnnotatedField(resultSet, oneToManyFieldClass);
-            oneToManyInstances.add(oneToManyInstance);
-
-            field.setAccessible(true);
-            try {
-                field.set(instance, oneToManyInstances);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (fetchType == FetchType.LAZY) {
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(HelloTarget.class);
         }
-    }
 
-    private Object mapResultSetToOneToManyAnnotatedField(ResultSet resultSet, Class<?> oneToManyFieldClass) {
         try {
-            Object instance = oneToManyFieldClass.getConstructor().newInstance();
+            Class<?> fieldArgType = getCollectionFieldType(field);
+            field.setAccessible(true);
 
-            for (Field field : oneToManyFieldClass.getDeclaredFields()) {
-                for (MapperResolver mapperResolver : MAPPER_RESOLVERS) {
-                    if (mapperResolver.supports(field)) {
-                        mapperResolver.map(instance, field, resultSet);
-                    }
-                }
-            }
-            return instance;
+            Collection<Object> collection = getOrCreateCollection(instance, field);
+            Object oneToManyInstance = mapResultSetToOneToManyAnnotatedField(resultSet, fieldArgType);
+            collection.add(oneToManyInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,5 +57,31 @@ public class OneToManyFieldMapper implements MapperResolver {
             throw new RuntimeException(e);
         }
         throw new IllegalArgumentException("제네릭 타입을 찾지 못했습니다.");
+    }
+
+    private Collection<Object> getOrCreateCollection(Object entityInstance, Field field) throws IllegalAccessException {
+        Collection<Object> collection = (Collection<Object>) field.get(entityInstance);
+        if (collection == null) {
+            collection = new ArrayList<>();
+            field.set(entityInstance, collection);
+        }
+        return collection;
+    }
+
+    private Object mapResultSetToOneToManyAnnotatedField(ResultSet resultSet, Class<?> oneToManyFieldClass) {
+        try {
+            Object instance = oneToManyFieldClass.getConstructor().newInstance();
+
+            for (Field field : oneToManyFieldClass.getDeclaredFields()) {
+                for (MapperResolver mapperResolver : MAPPER_RESOLVERS) {
+                    if (mapperResolver.supports(field)) {
+                        mapperResolver.map(instance, field, resultSet);
+                    }
+                }
+            }
+            return instance;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
