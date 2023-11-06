@@ -10,13 +10,13 @@ import persistence.testFixtures.assosiate.NoHasJoinColumnOrder;
 import persistence.testFixtures.assosiate.Order;
 import persistence.testFixtures.assosiate.OrderItem;
 
-class OneToManyAssociateTest {
+class OneToManyAssociationTest {
 
     @Test
     @DisplayName("연관관계 엔티티를 생성한다")
     void createAssociate() throws Exception {
         //given
-        OneToManyAssociate oneToManyColumn = OneToManyAssociate.from(Order.class).get();
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation.from(Order.class).get();
 
         //when
         final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
@@ -33,7 +33,7 @@ class OneToManyAssociateTest {
     @DisplayName("JoinColumn이 없는 연관관계 엔티티를 생성한다")
     void noJoinColumnCreateAssociate() throws Exception {
         //given
-        OneToManyAssociate oneToManyColumn = OneToManyAssociate.from(NoHasJoinColumnOrder.class).get();
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation.from(NoHasJoinColumnOrder.class).get();
 
         //when
         final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
@@ -49,7 +49,7 @@ class OneToManyAssociateTest {
     @Test
     @DisplayName("연관관계가 없는 엔티티를 확인한다.")
     void noAssociate() throws Exception {
-        assertThat(OneToManyAssociate.from(OrderItem.class)).isEmpty();
+        assertThat(OneToManyAssociation.from(OrderItem.class)).isEmpty();
     }
 
 }

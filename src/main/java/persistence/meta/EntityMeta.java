@@ -2,31 +2,31 @@ package persistence.meta;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
-import persistence.association.OneToManyAssociate;
+import persistence.association.OneToManyAssociation;
 import persistence.exception.NoEntityException;
 
 public class EntityMeta {
-    private final String tableName;
+    private final TableName tableName;
     private final EntityColumns entityColumns;
     private final EntityColumn pkColumn;
-    private final Optional<OneToManyAssociate> oneToManyAssociate;
     private final Class<?> entityClass;
+
+    private final Optional<OneToManyAssociation> oneToManyAssociation;
 
     private EntityMeta(Class<?> entityClass) {
         if (entityClass == null || entityClass.getAnnotation(Entity.class) == null) {
             throw new NoEntityException();
         }
 
-        this.tableName = createTableName(entityClass);
+        this.tableName = TableName.from(entityClass);
         this.entityColumns = new EntityColumns(entityClass.getDeclaredFields());
         this.pkColumn = entityColumns.pkColumn();
         this.entityClass = entityClass;
-        this.oneToManyAssociate = OneToManyAssociate.from(entityClass);
+        this.oneToManyAssociation = OneToManyAssociation.from(entityClass);
     }
 
     public static EntityMeta from(Class<?> entityClass) {
@@ -48,15 +48,9 @@ public class EntityMeta {
         }
     }
 
-    private String createTableName(Class<?> entityClass) {
-        if (!entityClass.isAnnotationPresent(Table.class) || entityClass.getAnnotation(Table.class).name().isBlank()) {
-            return entityClass.getSimpleName();
-        }
-        return entityClass.getAnnotation(Table.class).name();
-    }
 
     public String getTableName() {
-        return tableName;
+        return tableName.getValue();
     }
 
     public List<EntityColumn> getEntityColumns() {
@@ -77,14 +71,14 @@ public class EntityMeta {
     }
 
     public boolean hasOneToManyAssociate() {
-        return oneToManyAssociate.isPresent();
+        return oneToManyAssociation.isPresent();
     }
 
-    public OneToManyAssociate getOneToManyAssociate() {
-        if (oneToManyAssociate.isEmpty()) {
+    public OneToManyAssociation getOneToManyAssociation() {
+        if (oneToManyAssociation.isEmpty()) {
             throw new IllegalArgumentException("OneToMany 필드가 없습니다.");
         }
-        return oneToManyAssociate.get();
+        return oneToManyAssociation.get();
     }
 
 }

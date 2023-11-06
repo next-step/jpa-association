@@ -9,11 +9,11 @@ import java.util.Optional;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
-public class OneToManyAssociate {
+public class OneToManyAssociation {
     private final EntityMeta manyEntityMeta;
     private final Field field;
 
-    private OneToManyAssociate(Class<?> clazz) {
+    private OneToManyAssociation(Class<?> clazz) {
         final Optional<Field> oneToManyField = getOneToManyField(clazz);
         if (oneToManyField.isEmpty()) {
             throw new IllegalArgumentException("해당 엔티티는 OneToMany 관계가 없습니다.");
@@ -28,12 +28,11 @@ public class OneToManyAssociate {
                 .findFirst();
     }
 
-
-    public static Optional<OneToManyAssociate> from(Class<?> clazz) {
+    public static Optional<OneToManyAssociation> from(Class<?> clazz) {
         if (getOneToManyField(clazz).isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(new OneToManyAssociate(clazz));
+        return Optional.of(new OneToManyAssociation(clazz));
     }
 
     private EntityMeta generateManyEntityMeta(ParameterizedType genericType) {
