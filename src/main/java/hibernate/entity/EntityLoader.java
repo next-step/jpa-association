@@ -1,6 +1,5 @@
 package hibernate.entity;
 
-import hibernate.dml.SelectAllQueryBuilder;
 import hibernate.dml.SelectQueryBuilder;
 import hibernate.entity.meta.EntityClass;
 import jdbc.JdbcTemplate;
@@ -12,7 +11,6 @@ public class EntityLoader {
 
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
-    private final SelectAllQueryBuilder selectAllQueryBuilder = SelectAllQueryBuilder.INSTANCE;
 
     public EntityLoader(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -31,7 +29,7 @@ public class EntityLoader {
     }
 
     public <T> List<T> findAll(final EntityClass<T> entityClass) {
-        final String query = selectAllQueryBuilder.generateQuery(entityClass.tableName(), entityClass.getFieldNames());
+        final String query = selectQueryBuilder.generateAllQuery(entityClass.tableName(), entityClass.getFieldNames());
         return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
     }
 }

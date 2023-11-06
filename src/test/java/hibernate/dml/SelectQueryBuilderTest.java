@@ -52,6 +52,38 @@ class SelectQueryBuilderTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    void select_all쿼리를_생성한다() {
+        // given
+        String expected = "select id, nick_name from test_entity;";
+
+        // when
+        String actual = selectQueryBuilder.generateAllQuery("test_entity", List.of("id", "nick_name"));
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void join_select_all쿼리를_생성한다() throws NoSuchFieldException {
+        // given
+        String expected = "select orders.id, orders.orderNumber, orderItem.id, orderItem.produce, orderItem.quantity " +
+                "from orders " +
+                "join orderItem on orders.id = orderItem.order_id;";
+
+        // when
+        String actual = selectQueryBuilder.generateAllQuery(
+                "orders",
+                List.of("id", "orderNumber"),
+                new EntityField(Order.class.getDeclaredField("id")),
+                Map.of("orderItem", List.of("id", "produce", "quantity")),
+                Map.of("orderItem", "order_id")
+        );
+
+        // then
+        assertThat(actual).isEqualTo(expected);
+    }
+
     @Entity
     @Table(name = "test_entity")
     static class TestEntity {

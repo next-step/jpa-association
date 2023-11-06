@@ -10,6 +10,7 @@ public class SelectQueryBuilder {
 
     public static final SelectQueryBuilder INSTANCE = new SelectQueryBuilder();
 
+    private static final String SELECT_ALL_QUERY = "select %s from %s;";
     private static final String SELECT_QUERY = "select %s from %s where %s = %s;";
 
     private static final String SELECT_QUERY_COLUMN_DELIMITER = ", ";
@@ -26,6 +27,11 @@ public class SelectQueryBuilder {
         return String.format(SELECT_QUERY, parseColumnQueries(fieldNames), tableName, entityId.getFieldName(), id);
     }
 
+    public String generateAllQuery(final String tableName, final List<String> fieldNames) {
+        return String.format(SELECT_ALL_QUERY, parseColumnQueries(fieldNames), tableName);
+    }
+
+
     public String generateQuery(
             final String tableName,
             final List<String> fieldNames,
@@ -34,6 +40,29 @@ public class SelectQueryBuilder {
             final Map<String, List<String>> joinTableFields,
             final Map<String, Object> joinTableIds
     ) {
+        return generateDefaultQuery(tableName, fieldNames, entityId, joinTableFields, joinTableIds)
+                .append(" ")
+                .append("where ")
+                .append(parseColumnQuery(tableName, entityId.getFieldName()))
+                .append(" = ")
+                .append(id)
+                .append(";")
+                .toString();
+    }
+
+    public String generateAllQuery(
+            final String tableName,
+            final List<String> fieldNames,
+            final EntityColumn entityId,
+            final Map<String, List<String>> joinTableFields,
+            final Map<String, Object> joinTableIds
+    ) {
+        return generateDefaultQuery(tableName, fieldNames, entityId, joinTableFields, joinTableIds)
+                .append(";")
+                .toString();
+    }
+
+    private StringBuilder generateDefaultQuery(String tableName, List<String> fieldNames, EntityColumn entityId, Map<String, List<String>> joinTableFields, Map<String, Object> joinTableIds) {
         final List<String> parsedFieldNames = fieldNames.stream()
                 .map(fieldName -> parseColumnQuery(tableName, fieldName))
                 .collect(Collectors.toList());
@@ -52,15 +81,9 @@ public class SelectQueryBuilder {
                 .append(tableName)
                 .append(" ");
         if (!joinTableFields.isEmpty()) {
-            queryBuilder.append(parseJoinTableQuery(tableName, entityId, joinTableIds))
-                    .append(" ");
+            queryBuilder.append(parseJoinTableQuery(tableName, entityId, joinTableIds));
         }
-        queryBuilder.append("where ")
-                .append(parseColumnQuery(tableName, entityId.getFieldName()))
-                .append(" = ")
-                .append(id)
-                .append(";");
-        return queryBuilder.toString();
+        return queryBuilder;
     }
 
     private String parseColumnQueries(final List<String> fieldNames) {
