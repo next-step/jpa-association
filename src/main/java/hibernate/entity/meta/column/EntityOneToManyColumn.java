@@ -55,7 +55,7 @@ public class EntityOneToManyColumn implements EntityJoinColumn {
     }
 
     @Override
-    public void assignFieldValue(final Object entity, final Object value) {
+    public void addFieldValue(final Object entity, final Object value) {
         try {
             field.setAccessible(true);
             List<Object> objects = (List<Object>) field.get(entity);
@@ -66,6 +66,20 @@ public class EntityOneToManyColumn implements EntityJoinColumn {
             } else {
                 objects.add(value);
             }
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("필드값에 접근할 수 없습니다.");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Entity 객체에 일치하는 필드값이 없습니다.");
+        } finally {
+            field.setAccessible(false);
+        }
+    }
+
+    @Override
+    public void assignFieldValue(Object entity, Object value) {
+        try {
+            field.setAccessible(true);
+            field.set(entity, value);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("필드값에 접근할 수 없습니다.");
         } catch (IllegalArgumentException e) {

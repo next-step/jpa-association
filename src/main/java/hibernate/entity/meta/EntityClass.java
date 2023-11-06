@@ -2,15 +2,14 @@ package hibernate.entity.meta;
 
 import hibernate.entity.meta.column.EntityColumn;
 import hibernate.entity.meta.column.EntityColumns;
-import hibernate.entity.meta.column.EntityJoinColumn;
-import hibernate.entity.meta.column.EntityJoinColumns;
 import jakarta.persistence.Entity;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class EntityClass<T> {
 
@@ -18,7 +17,6 @@ public class EntityClass<T> {
 
     private final EntityTableName tableName;
     private final EntityColumns entityColumns;
-    private final EntityJoinColumns manyToOneColumns;
     private final Class<T> clazz;
 
     private EntityClass(final Class<T> clazz) {
@@ -27,7 +25,6 @@ public class EntityClass<T> {
         }
         this.tableName = new EntityTableName(clazz);
         this.entityColumns = new EntityColumns(clazz.getDeclaredFields());
-        this.manyToOneColumns = EntityJoinColumns.oneToManyColumns(clazz.getDeclaredFields());
         this.clazz = clazz;
     }
 
@@ -77,27 +74,20 @@ public class EntityClass<T> {
         return entityColumns.getFieldNames();
     }
 
-    public List<EntityJoinColumn> getEagerJoinColumn() {
-        return manyToOneColumns.getEagerValues();
+    public Field[] getFields() {
+        return clazz.getDeclaredFields();
     }
 
-    public Map<String, List<String>> getEagerJoinTableFields() {
-        return manyToOneColumns.getEagerValues()
-                .stream()
-                .map(EntityJoinColumn::getEntityClass)
-                .collect(Collectors.toMap(
-                        entityClass -> entityClass.tableName.getValue(),
-                        EntityClass::getFieldNames
-                ));
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EntityClass<?> that = (EntityClass<?>) o;
+        return Objects.equals(clazz, that.clazz);
     }
 
-
-    public Map<String, Object> getEagerJoinTableIds() {
-        return manyToOneColumns.getEagerValues()
-                .stream()
-                .collect(Collectors.toMap(
-                        entityJoinColumn -> entityJoinColumn.getEntityClass().tableName.getValue(),
-                        EntityJoinColumn::getJoinColumnName
-                ));
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz);
     }
 }

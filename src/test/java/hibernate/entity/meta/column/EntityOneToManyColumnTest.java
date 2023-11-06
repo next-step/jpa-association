@@ -38,7 +38,7 @@ class EntityOneToManyColumnTest {
 
         // when
         new EntityOneToManyColumn(TestEntity.class.getDeclaredField("childEntities"))
-                .assignFieldValue(givenEntity, new ChildEntity());
+                .addFieldValue(givenEntity, new ChildEntity());
 
         // then
         assertThat(givenEntity.childEntities).hasSize(1);
@@ -53,7 +53,7 @@ class EntityOneToManyColumnTest {
 
         // when
         new EntityOneToManyColumn(TestEntity.class.getDeclaredField("childEntities"))
-                .assignFieldValue(givenEntity, new ChildEntity());
+                .addFieldValue(givenEntity, new ChildEntity());
 
         // then
         assertThat(givenEntity.childEntities).hasSize(2);

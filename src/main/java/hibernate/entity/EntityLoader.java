@@ -1,9 +1,14 @@
 package hibernate.entity;
 
 import hibernate.dml.SelectQueryBuilder;
+import hibernate.entity.collection.PersistentCollection;
 import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityJoinColumn;
+import hibernate.entity.meta.column.EntityJoinColumns;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
 
 import java.util.List;
 
@@ -17,19 +22,35 @@ public class EntityLoader {
     }
 
     public <T> T find(final EntityClass<T> entityClass, final Object id) {
+        EntityJoinColumns entityJoinColumns = EntityJoinColumns.oneToManyColumns(entityClass);
         final String query = selectQueryBuilder.generateQuery(
                 entityClass.tableName(),
                 entityClass.getFieldNames(),
                 entityClass.getEntityId(),
                 id,
-                entityClass.getEagerJoinTableFields(),
-                entityClass.getEagerJoinTableIds()
-        );
-        return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
+                entityJoinColumns.getEagerJoinTableFields(),
+                entityJoinColumns.getEagerJoinTableIds()
+        );System.out.println(query);
+        T instance = jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
+
+        List<EntityJoinColumn> lazyJoinColumns = entityJoinColumns.getLazyValues();
+        for (EntityJoinColumn lazyJoinColumn : lazyJoinColumns) {
+            Enhancer enhancer = generateEnhancer(lazyJoinColumn.getEntityClass());
+            lazyJoinColumn.assignFieldValue(instance, enhancer.create());
+        }
+        return instance;
     }
 
     public <T> List<T> findAll(final EntityClass<T> entityClass) {
         final String query = selectQueryBuilder.generateAllQuery(entityClass.tableName(), entityClass.getFieldNames());
+        System.out.println(query);
         return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
+    }
+
+    private <T> Enhancer generateEnhancer(EntityClass<T> entityClass) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(List.class);
+        enhancer.setCallback((LazyLoader) () -> new PersistentCollection<>(entityClass, EntityLoader.this));
+        return enhancer;
     }
 }
