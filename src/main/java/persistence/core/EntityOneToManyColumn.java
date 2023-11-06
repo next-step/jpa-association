@@ -66,21 +66,24 @@ public class EntityOneToManyColumn implements EntityAssociatedColumn {
         return field.getName() + DELIMITER + entityMetadata.getIdColumnName();
     }
 
+    private EntityMetadata<?> getAssociatedEntityMetadata() {
+        return EntityMetadataProvider.getInstance().getEntityMetadata(this.joinColumnType);
+    }
+
+    @Override
     public List<String> getAssociatedEntityColumnNamesWithAlias() {
         final EntityMetadata<?> associatedEntityMetadata = getAssociatedEntityMetadata();
         return associatedEntityMetadata.getColumnNamesWithAlias();
     }
 
+    @Override
     public String getNameWithAliasAssociatedEntity() {
         return getAssociatedEntityTableName() + ALIAS_DELIMITER + this.getName();
     }
 
+    @Override
     public String getAssociatedEntityTableName() {
         return getAssociatedEntityMetadata().getTableName();
-    }
-
-    private EntityMetadata<?> getAssociatedEntityMetadata() {
-        return EntityMetadataProvider.getInstance().getEntityMetadata(this.joinColumnType);
     }
 
     @Override

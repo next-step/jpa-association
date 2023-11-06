@@ -1,6 +1,5 @@
 package persistence.core;
 
-import persistence.entity.EntityScanner;
 import persistence.exception.PersistenceException;
 
 import java.util.Map;

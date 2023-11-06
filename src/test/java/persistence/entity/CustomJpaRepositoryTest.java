@@ -7,6 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.Application;
 import persistence.IntegrationTestEnvironment;
+import persistence.core.EntityScanner;
+import persistence.entity.manager.EntityManager;
+import persistence.entity.manager.EntityManagerFactory;
+import persistence.entity.manager.SimpleEntityManagerFactory;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 

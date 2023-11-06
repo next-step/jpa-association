@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import persistence.core.EntityMetadataProvider;
+import persistence.entity.manager.EntityManager;
 import persistence.util.ReflectionUtils;
 
 import java.util.Objects;

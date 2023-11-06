@@ -12,8 +12,12 @@ public class EntityFieldMapper implements EntityColumnsMapper {
 
     private final List<EntityFieldColumn> columns;
 
-    public EntityFieldMapper(final List<EntityFieldColumn> columns) {
-        this.columns = columns;
+    private EntityFieldMapper(final List<EntityFieldColumn> fieldColumns) {
+        this.columns = fieldColumns;
+    }
+
+    public static EntityColumnsMapper of(final List<EntityFieldColumn> fieldColumns) {
+        return new EntityFieldMapper(fieldColumns);
     }
 
     @Override

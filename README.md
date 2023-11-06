@@ -57,3 +57,30 @@ public class CustomSelect {
 <br>`FetchType.EAGER 인 경우`
 - [x] RowMapper 를 left join 시에도 적용 가능하게 변경
 - [x] Order 조회해서 Entity 화 및 검증
+
+### 2단계 - LazyLoading by Proxy
+- 요구사항 1 - CGLib Proxy 적용 
+  - 도움 사이트 - [CGLIB를 이용한 프록시 객체 만들기](https://javacan.tistory.com/entry/114)
+```java
+class HelloTarget {
+    public String sayHello(String name) {
+        return "Hello " + name;
+    }
+
+    public String sayHi(String name) {
+        return "Hi " + name;
+    }
+
+    public String sayThankYou(String name) {
+        return "Thank You " + name;
+    }
+}
+```
+- [x] CGLib 의존성을 추가한다.
+- [x] 위의 HelloTarget class 를 CGLib Proxy 객체로 생성한다.
+- [x] HelloTarget 메서드의 결과를 CGLib Proxy 메서드를 이용해 대문자로 반환하도록 한다.
+- [x] CGLib Proxy 도움 사이트를 보며 다양하게 써본다.
+
+- 요구사항 2 - 조회 시 프록시 객체를 사용해 적용해보자
+- [x] Entity 를 Load 할시 OneToManyColumn 이 Lazy 인 경우 Proxy 객체를 생성해서 넣어둔다.
+- [x] OneToManyColumn 의 메서드 호출 시 load 한다.
