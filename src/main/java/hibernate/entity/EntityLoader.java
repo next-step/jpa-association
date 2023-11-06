@@ -30,7 +30,7 @@ public class EntityLoader {
                 id,
                 entityJoinColumns.getEagerJoinTableFields(),
                 entityJoinColumns.getEagerJoinTableIds()
-        );System.out.println(query);
+        );
         T instance = jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
 
         List<EntityJoinColumn> lazyJoinColumns = entityJoinColumns.getLazyValues();
@@ -43,7 +43,6 @@ public class EntityLoader {
 
     public <T> List<T> findAll(final EntityClass<T> entityClass) {
         final String query = selectQueryBuilder.generateAllQuery(entityClass.tableName(), entityClass.getFieldNames());
-        System.out.println(query);
         return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
     }
 
