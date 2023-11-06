@@ -7,6 +7,7 @@ import hibernate.entity.EntityLoader;
 import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.*;
 import jdbc.JdbcTemplate;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,12 @@ class PersistentCollectionTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         jdbcTemplate.execute(CreateQueryBuilder.INSTANCE.generateQuery(EntityClass.getInstance(TestEntity.class)));
+    }
+
+    @AfterAll
+    static void afterAll() {
+        jdbcTemplate.execute("drop table test_entity;");
+        server.stop();
     }
 
     @Test
