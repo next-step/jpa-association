@@ -23,3 +23,8 @@ where orders.id = ?;
   - EAGER인 EntityJoinColumn들을 반환한다.
 - RowMapper
   - EagerJoinColumn이 있는 경우 select 결과에서 즉시로딩된 값을 assign해준다.
+
+## 3단계 - OneToMany (FetchType.LAZY)
+- SelectQueryBuilder
+  - SelectAllQueryBuilder의 모든 기능을 이관한다
+  - join절을 사용한 select all 쿼리를 생성한다.
