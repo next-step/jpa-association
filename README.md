@@ -34,3 +34,5 @@ where orders.id = ?;
     - 모든 메소드는 실행 전 load를 실행해야 한다.
       - load 여부가 false인 경우 entityLoader로 부터 load하여 value에 넣는다.
       - load 여부가 true인 경우 return하여 보유중인 value를 사용한다.
+- EntityClass
+  - Lazy JoinColumns을 반환한다.
