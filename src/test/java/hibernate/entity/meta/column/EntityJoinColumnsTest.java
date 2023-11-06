@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityJoinColumnsTest {
 
-
     @Test
     void oneToMany어노테이션이_달린_Eager컬럼만_가져온다() {
         List<EntityJoinColumn> actual = oneToManyColumns(TestEntity.class.getDeclaredFields())
@@ -19,6 +18,16 @@ class EntityJoinColumnsTest {
         assertAll(
                 () -> assertThat(actual).hasSize(1),
                 () -> assertThat(actual.get(0).getFetchType()).isEqualTo(FetchType.EAGER)
+        );
+    }
+
+    @Test
+    void oneToMany어노테이션이_달린_LAZY컬럼만_가져온다() {
+        List<EntityJoinColumn> actual = oneToManyColumns(TestEntity.class.getDeclaredFields())
+                .getLazyValues();
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual.get(0).getFetchType()).isEqualTo(FetchType.LAZY)
         );
     }
 

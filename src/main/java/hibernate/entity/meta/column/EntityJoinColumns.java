@@ -30,4 +30,10 @@ public class EntityJoinColumns {
                 .filter(value -> value.getFetchType() == FetchType.EAGER)
                 .collect(Collectors.toList());
     }
+
+    public List<EntityJoinColumn> getLazyValues() {
+        return values.stream()
+                .filter(value -> value.getFetchType() == FetchType.LAZY)
+                .collect(Collectors.toList());
+    }
 }
