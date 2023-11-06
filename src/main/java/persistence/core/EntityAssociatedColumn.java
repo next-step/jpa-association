@@ -15,7 +15,7 @@ public interface EntityAssociatedColumn extends EntityColumn {
 
     default boolean isFetchTypeLazy() {
         return this.getFetchType().equals(FetchType.LAZY);
-    };
+    }
 
     Class<?> getJoinColumnType();
 }
