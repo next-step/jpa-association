@@ -23,6 +23,9 @@ public class JdbcTemplate {
 
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            if (!resultSet.next()) {
+                return null;
+            }
             return rowMapper.mapRow(resultSet);
         } catch (Exception e) {
             throw new RuntimeException(e);
