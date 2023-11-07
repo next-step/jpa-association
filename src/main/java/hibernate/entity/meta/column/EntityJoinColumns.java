@@ -35,6 +35,11 @@ public class EntityJoinColumns {
         );
     }
 
+    public boolean hasEagerFetchType() {
+        return values.stream()
+                .anyMatch(values -> values.getFetchType() == FetchType.EAGER);
+    }
+
     public List<EntityJoinColumn> getEagerValues() {
         return values.stream()
                 .filter(value -> value.getFetchType() == FetchType.EAGER)

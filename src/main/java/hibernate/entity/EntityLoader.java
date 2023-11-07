@@ -23,15 +23,7 @@ public class EntityLoader {
 
     public <T> T find(final EntityClass<T> entityClass, final Object id) {
         EntityJoinColumns entityJoinColumns = EntityJoinColumns.oneToManyColumns(entityClass);
-        final String query = selectQueryBuilder.generateQuery(
-                entityClass.tableName(),
-                entityClass.getFieldNames(),
-                entityClass.getEntityId(),
-                id,
-                entityJoinColumns.getEagerJoinTableFields(),
-                entityJoinColumns.getEagerJoinTableIds()
-        );
-        T instance = jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
+        T instance = getInstance(entityClass, id, entityJoinColumns);
 
         if (entityJoinColumns.hasLazyFetchType()) {
             setLazyJoinColumns(entityJoinColumns.getLazyValues(), instance);
@@ -42,6 +34,35 @@ public class EntityLoader {
     public <T> List<T> findAll(final EntityClass<T> entityClass) {
         final String query = selectQueryBuilder.generateAllQuery(entityClass.tableName(), entityClass.getFieldNames());
         return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
+    }
+
+    private <T> T getInstance(EntityClass<T> entityClass, Object id, EntityJoinColumns entityJoinColumns) {
+        if (entityJoinColumns.hasEagerFetchType()) {
+            return queryWithEagerColumn(entityClass, id, entityJoinColumns);
+        }
+        return queryOnlyEntity(entityClass, id);
+    }
+
+    private <T> T queryWithEagerColumn(EntityClass<T> entityClass, Object id, EntityJoinColumns entityJoinColumns) {
+        final String query = selectQueryBuilder.generateQuery(
+                entityClass.tableName(),
+                entityClass.getFieldNames(),
+                entityClass.getEntityId(),
+                id,
+                entityJoinColumns.getEagerJoinTableFields(),
+                entityJoinColumns.getEagerJoinTableIds()
+        );
+        return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
+    }
+
+    private <T> T queryOnlyEntity(EntityClass<T> entityClass, Object id) {
+        final String query = selectQueryBuilder.generateQuery(
+                entityClass.tableName(),
+                entityClass.getFieldNames(),
+                entityClass.getEntityId(),
+                id
+        );
+        return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
     }
 
     private <T> void setLazyJoinColumns(List<EntityJoinColumn> lazyJoinColumns, T instance) {
