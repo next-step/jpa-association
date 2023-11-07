@@ -3,6 +3,8 @@ package hibernate.entity.meta.column;
 import hibernate.entity.meta.EntityClass;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,18 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityJoinColumnsTest {
 
+    @ParameterizedTest
+    @CsvSource(value = {
+            "hibernate.entity.meta.column.EntityJoinColumnsTest$TestEntity,true",
+            "hibernate.entity.meta.column.EntityJoinColumnsTest$NoChildEntity,false"
+    })
+    void EAGER가_컬럼에_있는지_확인한다(final String className, final boolean expected) throws ClassNotFoundException {
+        Class<?> inputClass = Class.forName(className);
+        boolean actual = oneToManyColumns(EntityClass.getInstance(inputClass))
+                .hasEagerFetchType();
+        assertThat(actual).isEqualTo(expected);
+    }
+
     @Test
     void oneToMany어노테이션이_달린_Eager컬럼만_가져온다() {
         List<EntityJoinColumn> actual = oneToManyColumns(EntityClass.getInstance(TestEntity.class))
@@ -22,6 +36,19 @@ class EntityJoinColumnsTest {
                 () -> assertThat(actual.get(0).getFetchType()).isEqualTo(FetchType.EAGER)
         );
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "hibernate.entity.meta.column.EntityJoinColumnsTest$TestEntity,true",
+            "hibernate.entity.meta.column.EntityJoinColumnsTest$NoChildEntity,false"
+    })
+    void LAZY가_컬럼에_있는지_확인한다(final String className, final boolean expected) throws ClassNotFoundException {
+        Class<?> inputClass = Class.forName(className);
+        boolean actual = oneToManyColumns(EntityClass.getInstance(inputClass))
+                .hasLazyFetchType();
+        assertThat(actual).isEqualTo(expected);
+    }
+
 
     @Test
     void oneToMany어노테이션이_달린_LAZY컬럼만_가져온다() {
@@ -53,6 +80,12 @@ class EntityJoinColumnsTest {
                 () -> assertThat(actual).hasSize(1),
                 () -> assertThat(actual.get("order_items")).isEqualTo("order_id")
         );
+    }
+
+    @Entity
+    static class NoChildEntity {
+        @Id
+        private Long id;
     }
 
     @Entity
