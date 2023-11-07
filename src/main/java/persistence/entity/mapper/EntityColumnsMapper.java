@@ -9,7 +9,7 @@ public abstract class EntityColumnsMapper {
     private EntityColumnsMapper nextMapper;
 
     public EntityColumnsMapper next(final EntityColumnsMapper mapper) {
-        if (this.nextMapper == null) {
+        if (Objects.isNull(this.nextMapper)) {
             this.nextMapper = mapper;
         } else {
             this.nextMapper.next(mapper);
