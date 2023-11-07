@@ -82,6 +82,12 @@ public class EntityColumns implements Iterable<EntityColumn> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public List<EntityOneToManyColumn> getEagerOneToManyColumns() {
+        return this.getOneToManyColumns().stream()
+                .filter(EntityAssociatedColumn::isFetchTypeEager)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
     public List<EntityFieldColumn> getFieldColumns() {
         return this.columns.stream()
                 .filter(EntityColumn::isField)
@@ -101,4 +107,6 @@ public class EntityColumns implements Iterable<EntityColumn> {
     public int hashCode() {
         return Objects.hash(columns);
     }
+
+
 }

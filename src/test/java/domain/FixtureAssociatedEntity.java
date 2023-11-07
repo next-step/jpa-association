@@ -45,6 +45,20 @@ public class FixtureAssociatedEntity {
     }
 
     @Entity
+    public static class WithTwoOneToManyColumns {
+        @Id
+        private Long id;
+
+        @OneToMany
+        @JoinColumn(name = "join_pk")
+        List<WithId> lazyWithIds;
+
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn
+        List<WithId> eagerWithIds;
+    }
+
+    @Entity
     public static class WithOneToManyInsertableFalse {
         @Id
         private Long id;

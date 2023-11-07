@@ -83,6 +83,17 @@ class EntityColumnsTest {
     }
 
     @Test
+    @DisplayName("EntityColumns.getEagerOneToManyColumns 를 통해 OneToMany(Eager) 컬럼들을 조회할 수 있다.")
+    void getEagerOneToManyColumnsTest() throws Exception {
+        mockClass = FixtureAssociatedEntity.WithTwoOneToManyColumns.class;
+
+        final EntityColumns columns = new EntityColumns(mockClass, tableName);
+        final EntityOneToManyColumn eagerColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("eagerWithIds"), tableName);
+
+        assertThatIterable(columns.getEagerOneToManyColumns()).containsExactly(eagerColumn);
+    }
+
+    @Test
     @DisplayName("EntityColumns.getFieldColumns 를 통해 일반 컬럼들을 조회할 수 있다.")
     void entityColumnsGetFieldColumnsTest() throws Exception {
         mockClass = FixtureAssociatedEntity.OrderItem.class;
