@@ -27,13 +27,11 @@ public class CreateQueryBuilder {
     }
 
     public String build() {
-        return new StringBuilder()
-                .append(CREATE_HEADER)
-                .append(entityMeta.getTableName())
-                .append(" (")
-                .append(buildColumnDefinitions())
-                .append(");")
-                .toString();
+        return CREATE_HEADER +
+                entityMeta.getTableName() +
+                " (" +
+                buildColumnDefinitions() +
+                ");";
     }
 
     private String buildColumnDefinitions() {
