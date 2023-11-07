@@ -29,11 +29,11 @@ public class ColumnBuilder {
 
     private List<String> toSql() {
         List<String> sqlElements = new ArrayList<>();
-        ColumnMetas exceptTransientColumns = columnMetas.exceptTransient();
-        ColumnMetas exceptJoin = exceptTransientColumns.exceptJoin();
-        exceptJoin.forEach(
-                columnMeta -> sqlElements.add(toSql(columnMeta))
-        );
+        columnMetas.exceptTransient()
+                .exceptJoin()
+                .forEach(
+                        columnMeta -> sqlElements.add(toSql(columnMeta))
+                );
         return sqlElements;
     }
 
