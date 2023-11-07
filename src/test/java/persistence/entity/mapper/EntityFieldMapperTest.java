@@ -26,7 +26,7 @@ class EntityFieldMapperTest {
         rs.addRow("1");
         rs.next();
 
-        entityFieldMapper.mapColumns(rs, order);
+        entityFieldMapper.mapColumnsInternal(rs, order);
 
         assertThat(order.getOrderNumber()).isEqualTo("1");
     }

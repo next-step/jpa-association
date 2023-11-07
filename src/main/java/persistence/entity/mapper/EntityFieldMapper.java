@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class EntityFieldMapper implements EntityColumnsMapper {
+public class EntityFieldMapper extends EntityColumnsMapper {
 
     private final List<EntityFieldColumn> columns;
 
@@ -21,7 +21,7 @@ public class EntityFieldMapper implements EntityColumnsMapper {
     }
 
     @Override
-    public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
+    public <T> void mapColumnsInternal(final ResultSet resultSet, final T instance) throws SQLException {
         for (final EntityColumn column : columns) {
             final String fieldName = column.getFieldName();
             final String columnName = column.getName();

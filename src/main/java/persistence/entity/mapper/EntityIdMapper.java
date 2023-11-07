@@ -6,7 +6,7 @@ import persistence.util.ReflectionUtils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class EntityIdMapper implements EntityColumnsMapper {
+public class EntityIdMapper extends EntityColumnsMapper {
 
     private final EntityIdColumn idColumn;
 
@@ -19,7 +19,7 @@ public class EntityIdMapper implements EntityColumnsMapper {
     }
 
     @Override
-    public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
+    public <T> void mapColumnsInternal(final ResultSet resultSet, final T instance) throws SQLException {
         final String fieldName = idColumn.getFieldName();
         final String columnName = idColumn.getName();
         final Object object = resultSet.getObject(columnName);

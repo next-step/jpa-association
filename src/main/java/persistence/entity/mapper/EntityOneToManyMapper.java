@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class EntityOneToManyMapper implements EntityColumnsMapper {
+public class EntityOneToManyMapper extends EntityColumnsMapper {
 
     private final List<EntityOneToManyColumn> oneToManyColumns;
     private final MapperCollectionStrategies collectionStrategies;
@@ -22,7 +22,7 @@ public class EntityOneToManyMapper implements EntityColumnsMapper {
     }
 
     @Override
-    public <T> void mapColumns(final ResultSet resultSet, final T instance) throws SQLException {
+    public <T> void mapColumnsInternal(final ResultSet resultSet, final T instance) throws SQLException {
         for (final EntityOneToManyColumn column : oneToManyColumns) {
             if(column.isFetchTypeLazy()) {
                 return;
