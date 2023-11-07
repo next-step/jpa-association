@@ -40,50 +40,40 @@ public class SelectQueryBuilder {
     }
 
     public String buildSelectAllQuery() {
-        return new StringBuilder()
-                .append(getSelectHeaderQuery())
-                .append(";")
-                .toString();
+        return getSelectHeaderQuery() +
+                ";";
     }
 
     public String buildSelectByPkQuery(Object pkObject) {
-        return new StringBuilder()
-                .append(getSelectHeaderQuery())
-                .append(whereClauseBuilder.buildPkClause(pkObject))
-                .append(";")
-                .toString();
+        return getSelectHeaderQuery() +
+                whereClauseBuilder.buildPkClause(pkObject) +
+                ";";
     }
 
     private String getSelectHeaderQuery() {
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         ColumnMetas exceptTransient = columnMetas.exceptTransient();
         ColumnMetas exceptJoin = exceptTransient.exceptJoin();
-        return new StringBuilder()
-                .append(SELECT)
-                .append(exceptJoin.getColumnsClause())
-                .append(FROM)
-                .append(entityMeta.getTableName())
-                .toString();
+        return SELECT +
+                exceptJoin.getColumnsClause() +
+                FROM +
+                entityMeta.getTableName();
     }
 
     public String buildSelectWithJoinByPkQuery(Object pkObject) {
-        return new StringBuilder()
-                .append(getSelectHeaderQueryWithJoin())
-                .append(joinClauseBuilder.build())
-                .append(whereClauseBuilder.buildPkClauseWithAlias(pkObject))
-                .append(";")
-                .toString();
+        return getSelectHeaderQueryWithJoin() +
+                joinClauseBuilder.build() +
+                whereClauseBuilder.buildPkClauseWithAlias(pkObject) +
+                ";";
     }
 
     private String getSelectHeaderQueryWithJoin() {
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         ColumnMetas exceptTransient = columnMetas.exceptTransient();
-        return new StringBuilder()
-                .append(SELECT)
-                .append(exceptTransient.getJoinColumnsClause(entityMeta.getTableName()))
-                .append(FROM)
-                .append(entityMeta.getTableName())
-                .toString();
+        return SELECT +
+                exceptTransient.getJoinColumnsClause(entityMeta.getTableName()) +
+                FROM +
+                entityMeta.getTableName();
     }
 
 }

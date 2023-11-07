@@ -48,15 +48,13 @@ public class JoinClauseBuilder {
     }
 
     private String buildColumnClause(ColumnMeta joinColumnMeta) {
-        return new StringBuilder()
-                .append(entityMeta.getTableName())
-                .append(DOT)
-                .append(entityMeta.getPkColumnName())
-                .append(EQUAL)
-                .append(joinColumnMeta.getJoinTableName())
-                .append(DOT)
-                .append(joinColumnMeta.getJoinColumnName())
-                .toString();
+        return entityMeta.getTableName() +
+                DOT +
+                entityMeta.getPkColumnName() +
+                EQUAL +
+                joinColumnMeta.getJoinTableName() +
+                DOT +
+                joinColumnMeta.getJoinColumnName();
     }
 
 }

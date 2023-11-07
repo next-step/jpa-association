@@ -33,17 +33,15 @@ public class InsertQueryBuilder {
     }
 
     public String build() {
-        return new StringBuilder()
-                .append(INSERT_HEADER)
-                .append(entityMeta.getTableName())
-                .append(" (")
-                .append(columnsClause(columnValues.columns()))
-                .append(") ")
-                .append(VALUES)
-                .append(" (")
-                .append(valuesClause(columnValues.values()))
-                .append(");")
-                .toString();
+        return INSERT_HEADER +
+                entityMeta.getTableName() +
+                " (" +
+                columnsClause(columnValues.columns()) +
+                ") " +
+                VALUES +
+                " (" +
+                valuesClause(columnValues.values()) +
+                ");";
     }
 
     private String columnsClause(List<String> columns) {

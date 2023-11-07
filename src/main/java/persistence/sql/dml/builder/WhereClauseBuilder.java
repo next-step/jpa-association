@@ -36,10 +36,8 @@ public class WhereClauseBuilder {
         if (columnValues.isEmpty()) {
             return StringConstant.EMPTY_STRING;
         }
-        return new StringBuilder()
-                .append(WHERE)
-                .append(String.join(AND, buildValueConditions()))
-                .toString();
+        return WHERE +
+                String.join(AND, buildValueConditions());
     }
 
     public String buildPkClause(Object pkObject) {
@@ -56,10 +54,8 @@ public class WhereClauseBuilder {
         if (columnValues.isEmpty()) {
             return StringConstant.EMPTY_STRING;
         }
-        return new StringBuilder()
-                .append(WHERE)
-                .append(String.join(AND, buildValueConditions(entityMeta.getTableName())))
-                .toString();
+        return WHERE +
+                String.join(AND, buildValueConditions(entityMeta.getTableName()));
     }
 
     private List<String> buildValueConditions() {

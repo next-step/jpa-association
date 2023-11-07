@@ -2,7 +2,6 @@ package persistence.sql.dml.builder;
 
 import persistence.sql.dml.ColumnValues;
 import persistence.sql.meta.EntityMeta;
-import persistence.sql.util.StringConstant;
 
 import java.util.List;
 
@@ -33,20 +32,16 @@ public class UpdateQueryBuilder {
     }
 
     public String buildUpdateQuery(Object entity) {
-        return new StringBuilder()
-                .append(buildUpdateHeaderQuery(entity))
-                .append(whereClauseBuilder.appendPkClause(entity).build())
-                .append(";")
-                .toString();
+        return buildUpdateHeaderQuery(entity) +
+                whereClauseBuilder.appendPkClause(entity).build() +
+                ";";
     }
 
     private String buildUpdateHeaderQuery(Object entity) {
-        return new StringBuilder()
-                .append(UPDATE)
-                .append(entityMeta.getTableName())
-                .append(SET)
-                .append(buildSetClause(entity))
-                .toString();
+        return UPDATE +
+                entityMeta.getTableName() +
+                SET +
+                buildSetClause(entity);
     }
 
     private String buildSetClause(Object entity) {

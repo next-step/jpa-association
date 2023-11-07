@@ -27,33 +27,25 @@ public class DeleteQueryBuilder {
     }
 
     public String buildDeleteAllQuery() {
-        return new StringBuilder()
-                .append(getDeleteHeaderQuery())
-                .append(";")
-                .toString();
+        return getDeleteHeaderQuery() +
+                ";";
     }
 
     public String buildDeleteByPkQuery(Object pkObject) {
-        return new StringBuilder()
-                .append(getDeleteHeaderQuery())
-                .append(whereClauseBuilder.buildPkClause(pkObject))
-                .append(";")
-                .toString();
+        return getDeleteHeaderQuery() +
+                whereClauseBuilder.buildPkClause(pkObject) +
+                ";";
     }
 
     public String buildDeleteQuery(Object entity) {
-        return new StringBuilder()
-                .append(getDeleteHeaderQuery())
-                .append(whereClauseBuilder.appendPkClause(entity).build())
-                .append(";")
-                .toString();
+        return getDeleteHeaderQuery() +
+                whereClauseBuilder.appendPkClause(entity).build() +
+                ";";
     }
 
     private String getDeleteHeaderQuery() {
-        return new StringBuilder()
-                .append(DELETE)
-                .append(FROM)
-                .append(entityMeta.getTableName())
-                .toString();
+        return DELETE +
+                FROM +
+                entityMeta.getTableName();
     }
 }
