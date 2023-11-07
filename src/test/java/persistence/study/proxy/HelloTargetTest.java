@@ -19,11 +19,24 @@ public class HelloTargetTest {
     }
 
     @Test
-    @DisplayName("Proxy 객체 기능테스트 : 문자를 모두 대문자로 변환해 출력")
-    void printProxy() {
+    @DisplayName("Proxy 객체 기능테스트 : Method Interceptor 를 활용해 문자를 모두 대문자로 변환해 출력")
+    void printProxyMethodInterceptor() {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(HelloTarget.class);
         enhancer.setCallback(new MethodUpperCaseInterceptor());
+        HelloTarget helloTargetProxy = (HelloTarget) enhancer.create();
+
+        assertThat(helloTargetProxy.sayHello("Lim")).isEqualTo("HELLO LIM");
+        assertThat(helloTargetProxy.sayHi("Lim")).isEqualTo("HI LIM");
+        assertThat(helloTargetProxy.sayThankYou("Lim")).isEqualTo("THANK YOU LIM");
+    }
+
+    @Test
+    @DisplayName("Proxy 객체 기능테스트 : Dispatcher 프록시를 활용해 문자를 모두 대문자로 변환해 출력")
+    void printProxyDispatcher() {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(HelloTarget.class);
+        enhancer.setCallback(new UpperCaseDispatcher());
         HelloTarget helloTargetProxy = (HelloTarget) enhancer.create();
 
         assertThat(helloTargetProxy.sayHello("Lim")).isEqualTo("HELLO LIM");
