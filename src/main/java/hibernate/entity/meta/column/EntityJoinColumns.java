@@ -57,7 +57,6 @@ public class EntityJoinColumns {
                 ));
     }
 
-
     public Map<String, Object> getEagerJoinTableIds() {
         return getEagerValues()
                 .stream()
