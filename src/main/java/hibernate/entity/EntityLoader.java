@@ -1,7 +1,7 @@
 package hibernate.entity;
 
 import hibernate.dml.SelectQueryBuilder;
-import hibernate.entity.collection.PersistentCollection;
+import hibernate.entity.collection.PersistentList;
 import hibernate.entity.meta.EntityClass;
 import hibernate.entity.meta.column.EntityJoinColumn;
 import hibernate.entity.meta.column.EntityJoinColumns;
@@ -49,7 +49,7 @@ public class EntityLoader {
     private <T> Enhancer generateEnhancer(EntityClass<T> entityClass) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(List.class);
-        enhancer.setCallback((LazyLoader) () -> new PersistentCollection<>(entityClass, EntityLoader.this));
+        enhancer.setCallback((LazyLoader) () -> new PersistentList<>(entityClass, EntityLoader.this));
         return enhancer;
     }
 }

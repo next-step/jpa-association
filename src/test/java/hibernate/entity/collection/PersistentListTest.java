@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PersistentCollectionTest {
+class PersistentListTest {
 
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
@@ -43,7 +43,7 @@ class PersistentCollectionTest {
         jdbcTemplate.execute("insert into test_entity (id, nick_name, age) values (2, '진영최', 29)");
 
         // when
-        int actual = new PersistentCollection<>(EntityClass.getInstance(TestEntity.class), entityLoader)
+        int actual = new PersistentList<>(EntityClass.getInstance(TestEntity.class), entityLoader)
                 .size();
 
         // then
