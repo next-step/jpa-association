@@ -41,6 +41,11 @@ public class EntityJoinColumns {
                 .collect(Collectors.toList());
     }
 
+    public boolean hasLazyFetchType() {
+        return values.stream()
+                .anyMatch(values -> values.getFetchType() == FetchType.LAZY);
+    }
+
     public List<EntityJoinColumn> getLazyValues() {
         return values.stream()
                 .filter(value -> value.getFetchType() == FetchType.LAZY)

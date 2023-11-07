@@ -33,10 +33,8 @@ public class EntityLoader {
         );
         T instance = jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
 
-        List<EntityJoinColumn> lazyJoinColumns = entityJoinColumns.getLazyValues();
-        for (EntityJoinColumn lazyJoinColumn : lazyJoinColumns) {
-            Enhancer enhancer = generateEnhancer(lazyJoinColumn.getEntityClass());
-            lazyJoinColumn.assignFieldValue(instance, enhancer.create());
+        if (entityJoinColumns.hasLazyFetchType()) {
+            setLazyJoinColumns(entityJoinColumns.getLazyValues(), instance);
         }
         return instance;
     }
@@ -44,6 +42,13 @@ public class EntityLoader {
     public <T> List<T> findAll(final EntityClass<T> entityClass) {
         final String query = selectQueryBuilder.generateAllQuery(entityClass.tableName(), entityClass.getFieldNames());
         return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
+    }
+
+    private <T> void setLazyJoinColumns(List<EntityJoinColumn> lazyJoinColumns, T instance) {
+        for (EntityJoinColumn lazyJoinColumn : lazyJoinColumns) {
+            Enhancer enhancer = generateEnhancer(lazyJoinColumn.getEntityClass());
+            lazyJoinColumn.assignFieldValue(instance, enhancer.create());
+        }
     }
 
     private <T> Enhancer generateEnhancer(EntityClass<T> entityClass) {
