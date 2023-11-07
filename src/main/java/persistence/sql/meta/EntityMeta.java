@@ -4,6 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import persistence.sql.util.StringUtils;
 
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 public class EntityMeta {
 
     private final Class<?> clazz;
@@ -28,6 +31,19 @@ public class EntityMeta {
             return tableAnnotation.name();
         }
         return clazz.getSimpleName().toLowerCase();
+    }
+
+    public String getPkColumnName() {
+        ColumnMetas idColumns = columnMetas.idColumns();
+        Stream<ColumnMeta> columnMetaStream = StreamSupport.stream(idColumns.spliterator(), false);
+        return columnMetaStream
+                .findAny()
+                .map(ColumnMeta::getColumnName)
+                .orElseThrow();
+    }
+
+    public Class<?> getInnerClass() {
+        return clazz;
     }
 
     public ColumnMetas getColumnMetas() {

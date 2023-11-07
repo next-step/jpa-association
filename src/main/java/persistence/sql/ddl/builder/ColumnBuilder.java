@@ -29,22 +29,21 @@ public class ColumnBuilder {
 
     private List<String> toSql() {
         List<String> sqlElements = new ArrayList<>();
-        ColumnMetas exceptTransientColumns = columnMetas.exceptTransient();
-        exceptTransientColumns.forEach(
-                columnMeta -> sqlElements.add(toSql(columnMeta))
-        );
+        columnMetas.exceptTransient()
+                .exceptJoin()
+                .forEach(
+                        columnMeta -> sqlElements.add(toSql(columnMeta))
+                );
         return sqlElements;
     }
 
     private String toSql(ColumnMeta columnMeta) {
-        return new StringBuilder()
-                .append(columnMeta.getColumnName())
-                .append(BLANK)
-                .append(getSqlType(columnMeta))
-                .append(getGenerationStrategy(columnMeta))
-                .append(getPrimaryKey(columnMeta))
-                .append(getNullable(columnMeta))
-                .toString();
+        return columnMeta.getColumnName() +
+                BLANK +
+                getSqlType(columnMeta) +
+                getGenerationStrategy(columnMeta) +
+                getPrimaryKey(columnMeta) +
+                getNullable(columnMeta);
     }
 
 

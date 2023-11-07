@@ -36,6 +36,9 @@ public class EntityRowMapper<T> implements RowMapper<T> {
         if (columnMeta.isTransient()) {
             return;
         }
+        if (columnMeta.isJoinColumn()) {
+            return;
+        }
         field.setAccessible(true);
         try {
             Object fieldValue = resultSet.getObject(columnMeta.getColumnName());

@@ -24,10 +24,8 @@ public class DropQueryBuilder {
     }
 
     public String build() {
-        return new StringBuilder()
-                .append(DROP_HEADER)
-                .append(entityMeta.getTableName())
-                .append(";")
-                .toString();
+        return DROP_HEADER +
+                entityMeta.getTableName() +
+                ";";
     }
 }

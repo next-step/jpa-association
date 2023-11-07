@@ -73,6 +73,9 @@ public class ColumnValues {
         if (columnMeta.isTransient()) {
             return;
         }
+        if (columnMeta.isJoinColumn()) {
+            return;
+        }
         columnValueMap.put(columnMeta, getColumnValue(object, field));
     }
 
@@ -116,6 +119,12 @@ public class ColumnValues {
     public List<String> buildValueConditions() {
         return elements.keySet().stream()
                 .map(columnMeta -> buildValueCondition(columnMeta.getColumnName(), elements.get(columnMeta)))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> buildValueConditions(String alias) {
+        return elements.keySet().stream()
+                .map(columnMeta -> buildValueCondition(alias + StringConstant.DOT + columnMeta.getColumnName(), elements.get(columnMeta)))
                 .collect(Collectors.toList());
     }
 

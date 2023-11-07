@@ -29,6 +29,13 @@ public class ColumnMetas implements Iterable<ColumnMeta> {
         return new ColumnMetas(exceptTransient);
     }
 
+    public ColumnMetas exceptJoin() {
+        List<ColumnMeta> exceptTransient = values.stream()
+                .filter(columnMeta -> !columnMeta.isJoinColumn())
+                .collect(Collectors.toList());
+        return new ColumnMetas(exceptTransient);
+    }
+
     public ColumnMetas idColumns() {
         List<ColumnMeta> exceptTransient = values.stream()
                 .filter(ColumnMeta::isId)
@@ -37,15 +44,43 @@ public class ColumnMetas implements Iterable<ColumnMeta> {
     }
 
     public String getColumnsClause() {
-        List<String> columnNames = values.stream()
+        return String.join(StringConstant.COLUMN_JOIN, getColumnNames());
+    }
+
+    private List<String> getColumnNames() {
+        return values.stream()
                 .map(ColumnMeta::getColumnName)
                 .collect(Collectors.toList());
+    }
+
+    public String getJoinColumnsClause(String masterEntityName) {
+        List<String> columnNames = exceptJoin().getColumnNamesWithAlias(masterEntityName);
+        List<String> joinColumnNames = values.stream()
+                .filter(ColumnMeta::isJoinColumn)
+                .map(joinColumn -> {
+                    EntityMeta joinTableEntityMeta = joinColumn.getJoinTableEntityMeta();
+                    ColumnMetas columnMetas = joinTableEntityMeta.getColumnMetas();
+                    return columnMetas.getJoinColumnsClause(joinTableEntityMeta.getTableName());
+                })
+                .collect(Collectors.toList());
+        columnNames.addAll(joinColumnNames);
         return String.join(StringConstant.COLUMN_JOIN, columnNames);
+    }
+
+    private List<String> getColumnNamesWithAlias(String alias) {
+        return values.stream()
+                .map(columnMeta -> alias + StringConstant.DOT + columnMeta.getColumnName())
+                .collect(Collectors.toList());
     }
 
     public boolean hasAutoGenId() {
         return values.stream()
                 .anyMatch(ColumnMeta::isGenerationTypeIdentity);
+    }
+
+    public boolean hasJoinEntity() {
+        return values.stream()
+                .anyMatch(ColumnMeta::isJoinColumn);
     }
 
     @Override
