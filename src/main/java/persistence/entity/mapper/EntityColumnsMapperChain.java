@@ -12,7 +12,7 @@ public class EntityColumnsMapperChain {
     private EntityColumnsMapperChain(final EntityColumns columns) {
         this.mapper = EntityIdMapper.of(columns.getId())
                 .next(EntityFieldMapper.of(columns.getFieldColumns()))
-                .next(EntityOneToManyMapper.of(columns.getOneToManyColumns()));
+                .next(EntityOneToManyMapper.of(columns.getEagerOneToManyColumns()));
     }
 
     public static EntityColumnsMapperChain of(final EntityColumns columns) {

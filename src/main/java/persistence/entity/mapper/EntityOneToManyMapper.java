@@ -24,10 +24,6 @@ public class EntityOneToManyMapper extends EntityColumnsMapper {
     @Override
     public <T> void mapColumnsInternal(final ResultSet resultSet, final T instance) throws SQLException {
         for (final EntityOneToManyColumn column : oneToManyColumns) {
-            if(column.isFetchTypeLazy()) {
-                return;
-            }
-
             final Collection<Object> oneToManyFieldCollection = getOneToManyFieldCollection(instance, column);
             final Class<?> joinColumnType = column.getJoinColumnType();
             final EntityMetadata<?> innerEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(joinColumnType);
