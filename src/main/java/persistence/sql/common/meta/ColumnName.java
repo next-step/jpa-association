@@ -1,6 +1,8 @@
 package persistence.sql.common.meta;
 
 import jakarta.persistence.Column;
+import utils.StringUtils;
+
 import java.lang.reflect.Field;
 
 public class ColumnName {
@@ -21,10 +23,10 @@ public class ColumnName {
      * 없을 경우 기존 field명을 반환합니다.
      */
     private String extractName(Field field) {
-        String columnName = field.getName();
+        String columnName = StringUtils.camelToSnake(field.getName());
 
         if (field.isAnnotationPresent(Column.class)
-            && !"".equals(field.getDeclaredAnnotation(Column.class).name())) {
+                && !"".equals(field.getDeclaredAnnotation(Column.class).name())) {
             columnName = field.getDeclaredAnnotation(Column.class).name();
         }
 

@@ -22,9 +22,9 @@ public class Values {
      * 값을 ','으로 이어 한 문자열로 반환합니다. 예) "홍길동, 13, F"
      */
     public String getValuesWithComma() {
-        return StringUtils.withComma(Arrays.stream(values)
+        return Arrays.stream(values)
             .map(Value::getValue)
-            .toArray(String[]::new));
+            .collect(Collectors.joining(", "));
     }
 
     /**
