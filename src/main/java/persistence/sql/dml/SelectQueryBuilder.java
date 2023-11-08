@@ -2,7 +2,6 @@ package persistence.sql.dml;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import persistence.association.OneToManyAssociation;
 import persistence.dialect.Dialect;
 import persistence.meta.EntityMeta;
 
@@ -54,14 +53,11 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
                 .stream()
                 .map((it) -> generateColumString(tableName, it.getName()));
 
-        if (!entityMeta.hasOneToManyAssociate()) {
+        if (!entityMeta.hasForeignerColumn()) {
             return columns;
         }
-        OneToManyAssociation oneToManyAssociate = entityMeta.getOneToManyAssociation();
 
-        return Stream.concat(columns,
-                Stream.of(generateColumString(tableName, oneToManyAssociate.joinColumnName()))
-        );
+        return Stream.concat(Stream.of(generateColumString(tableName, entityMeta.getForeignerColumn().getName())), columns);
     }
 
     private Stream<String> getColumnsStream(EntityMeta entityMeta, int depth) {

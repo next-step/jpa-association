@@ -31,7 +31,7 @@ public class OneToManyJoinQueryBuilder extends QueryBuilder {
         final String joinTableSignature = tableNameSignature(oneToManyAssociate.getManyEntityMeta().getTableName(), depth + 1);
 
         return dialect.leftJoin(oneToManyAssociate.getManyEntityMeta().getTableName(), joinTableSignature) +
-                columnSignature(drivenTableSignature, oneToManyAssociate.joinColumnName()) + " = " + columnSignature(joinTableSignature, joinPkColumn.getName());
+                columnSignature(drivenTableSignature, joinPkColumn.getName()) + " = " + columnSignature(joinTableSignature, oneToManyAssociate.foreignerColumnName());
     }
 
     private Stream<String> generateJoinQueryStream(EntityMeta entityMeta, int depth) {

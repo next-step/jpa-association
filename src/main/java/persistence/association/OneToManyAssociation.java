@@ -5,39 +5,35 @@ import jakarta.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
-import java.util.Optional;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
+import persistence.meta.ForeignerColumn;
 
 public class OneToManyAssociation {
+    private final EntityColumn pkColumn;
     private final EntityMeta manyEntityMeta;
     private final Field field;
 
-    private OneToManyAssociation(Class<?> clazz) {
-        final Optional<Field> oneToManyField = getOneToManyField(clazz);
-        if (oneToManyField.isEmpty()) {
-            throw new IllegalArgumentException("해당 엔티티는 OneToMany 관계가 없습니다.");
+    private OneToManyAssociation(Field oneField, EntityColumn pkColumn) {
+        if (!hasOneToManyField(oneField)) {
+            throw new IllegalArgumentException("해당 필드는 OneToMany 어노테이션이 있어야 합니다.");
         }
-        this.field = oneToManyField.get();
-        this.manyEntityMeta = generateManyEntityMeta((ParameterizedType) field.getGenericType());
+
+        this.field = oneField;
+        this.pkColumn = pkColumn;
+        final Class<?> manyAssociationType = getFieldGenericType(oneField);
+        final ForeignerColumn foreignerColumn = ForeignerColumn.of(manyAssociationType, pkColumn.getField(), joinColumnName());
+        this.manyEntityMeta = EntityMeta.createManyEntityMeta(manyAssociationType , foreignerColumn);
+
+    }
+    public static OneToManyAssociation of(Class<?> clazz, EntityMeta entityMeta) {
+        return new OneToManyAssociation(getOneField(clazz), entityMeta.getPkColumn());
     }
 
-    private static Optional<Field> getOneToManyField(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(OneToMany.class))
-                .findFirst();
+    public static OneToManyAssociation of(Field oneField, EntityColumn pkColumn) {
+        return new OneToManyAssociation(oneField, pkColumn);
     }
 
-    public static Optional<OneToManyAssociation> from(Class<?> clazz) {
-        if (getOneToManyField(clazz).isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(new OneToManyAssociation(clazz));
-    }
-
-    private EntityMeta generateManyEntityMeta(ParameterizedType genericType) {
-        return EntityMeta.from((Class<?>) genericType.getActualTypeArguments()[0]);
-    }
     public EntityMeta getManyEntityMeta() {
         return manyEntityMeta;
     }
@@ -49,11 +45,35 @@ public class OneToManyAssociation {
         return field.isAnnotationPresent(JoinColumn.class);
     }
 
-    public String joinColumnName() {
-        if (isHasJoinColumn()) {
-            return field.getAnnotation(JoinColumn.class).name();
+
+    private String joinColumnName() {
+        final JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
+        if (joinColumn == null || joinColumn.name().isBlank()) {
+            return pkColumn.getName();
         }
-        return manyEntityMeta.getTableName() + "_" + manyEntityMeta.getPkColumn().getName();
+        return joinColumn.name();
     }
+
+    public String foreignerColumnName() {
+        return manyEntityMeta
+                .getForeignerColumn()
+                .getName();
+    }
+
+    private Class<?> getFieldGenericType(Field field) {
+        return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+    }
+
+    private static Field getOneField(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(OneToManyAssociation::hasOneToManyField)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 클래스는 OneToMany 어노테이션이 있어야 합니다."));
+    }
+
+    private static boolean hasOneToManyField(Field it) {
+        return it.isAnnotationPresent(OneToMany.class);
+    }
+
 
 }
