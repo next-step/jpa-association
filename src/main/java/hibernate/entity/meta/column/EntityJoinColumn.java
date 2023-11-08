@@ -11,5 +11,7 @@ public interface EntityJoinColumn {
 
     EntityClass<?> getEntityClass();
 
+    void addFieldValue(Object entity, Object value);
+
     void assignFieldValue(Object entity, Object value);
 }

@@ -1,10 +1,14 @@
 package hibernate.entity;
 
-import hibernate.dml.SelectAllQueryBuilder;
 import hibernate.dml.SelectQueryBuilder;
+import hibernate.entity.collection.PersistentList;
 import hibernate.entity.meta.EntityClass;
+import hibernate.entity.meta.column.EntityJoinColumn;
+import hibernate.entity.meta.column.EntityJoinColumns;
 import jdbc.JdbcTemplate;
 import jdbc.ReflectionRowMapper;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
 
 import java.util.List;
 
@@ -12,26 +16,66 @@ public class EntityLoader {
 
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.INSTANCE;
-    private final SelectAllQueryBuilder selectAllQueryBuilder = SelectAllQueryBuilder.INSTANCE;
 
     public EntityLoader(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     public <T> T find(final EntityClass<T> entityClass, final Object id) {
+        EntityJoinColumns entityJoinColumns = EntityJoinColumns.oneToManyColumns(entityClass);
+        T instance = getInstance(entityClass, id, entityJoinColumns);
+
+        if (entityJoinColumns.hasLazyFetchType()) {
+            setLazyJoinColumns(entityJoinColumns.getLazyValues(), instance);
+        }
+        return instance;
+    }
+
+    public <T> List<T> findAll(final EntityClass<T> entityClass) {
+        final String query = selectQueryBuilder.generateAllQuery(entityClass.tableName(), entityClass.getFieldNames());
+        return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
+    }
+
+    private <T> T getInstance(EntityClass<T> entityClass, Object id, EntityJoinColumns entityJoinColumns) {
+        if (entityJoinColumns.hasEagerFetchType()) {
+            return queryWithEagerColumn(entityClass, id, entityJoinColumns);
+        }
+        return queryOnlyEntity(entityClass, id);
+    }
+
+    private <T> T queryWithEagerColumn(EntityClass<T> entityClass, Object id, EntityJoinColumns entityJoinColumns) {
         final String query = selectQueryBuilder.generateQuery(
                 entityClass.tableName(),
                 entityClass.getFieldNames(),
                 entityClass.getEntityId(),
                 id,
-                entityClass.getEagerJoinTableFields(),
-                entityClass.getEagerJoinTableIds()
+                entityJoinColumns.getEagerJoinTableFields(),
+                entityJoinColumns.getEagerJoinTableIds()
         );
         return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
     }
 
-    public <T> List<T> findAll(final EntityClass<T> entityClass) {
-        final String query = selectAllQueryBuilder.generateQuery(entityClass.tableName(), entityClass.getFieldNames());
-        return jdbcTemplate.query(query, ReflectionRowMapper.getInstance(entityClass));
+    private <T> T queryOnlyEntity(EntityClass<T> entityClass, Object id) {
+        final String query = selectQueryBuilder.generateQuery(
+                entityClass.tableName(),
+                entityClass.getFieldNames(),
+                entityClass.getEntityId(),
+                id
+        );
+        return jdbcTemplate.queryForObject(query, ReflectionRowMapper.getInstance(entityClass));
+    }
+
+    private <T> void setLazyJoinColumns(List<EntityJoinColumn> lazyJoinColumns, T instance) {
+        for (EntityJoinColumn lazyJoinColumn : lazyJoinColumns) {
+            Enhancer enhancer = generateEnhancer(lazyJoinColumn.getEntityClass());
+            lazyJoinColumn.assignFieldValue(instance, enhancer.create());
+        }
+    }
+
+    private <T> Enhancer generateEnhancer(EntityClass<T> entityClass) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(List.class);
+        enhancer.setCallback((LazyLoader) () -> new PersistentList<>(entityClass, EntityLoader.this));
+        return enhancer;
     }
 }

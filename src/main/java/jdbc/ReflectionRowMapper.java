@@ -3,6 +3,7 @@ package jdbc;
 import hibernate.entity.meta.EntityClass;
 import hibernate.entity.meta.column.EntityColumn;
 import hibernate.entity.meta.column.EntityJoinColumn;
+import hibernate.entity.meta.column.EntityJoinColumns;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +31,8 @@ public class ReflectionRowMapper<T> implements RowMapper<T> {
         List<EntityColumn> entityColumns = entityClass.getEntityColumns();
         setEachColumn(entityColumns, instance, resultSet, entityClass.tableName());
 
-        List<EntityJoinColumn> eagerJoinColumns = entityClass.getEagerJoinColumn();
+        List<EntityJoinColumn> eagerJoinColumns = EntityJoinColumns.oneToManyColumns(entityClass)
+                .getEagerValues();
         if (eagerJoinColumns.isEmpty()) {
             return instance;
         }
@@ -51,7 +53,7 @@ public class ReflectionRowMapper<T> implements RowMapper<T> {
             Object subInstance = eagerJoinClass.newInstance();
             List<EntityColumn> subEntityColumns = eagerJoinClass.getEntityColumns();
             setEachColumn(subEntityColumns, subInstance, resultSet, eagerJoinClass.tableName());
-            eagerJoinColumn.assignFieldValue(instance, subInstance);
+            eagerJoinColumn.addFieldValue(instance, subInstance);
         }
     }
 
