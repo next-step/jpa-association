@@ -60,6 +60,18 @@ public class ColumnMeta {
         return false;
     }
 
+    public boolean isJoinFetchTypeLazy() {
+        if (field.isAnnotationPresent(OneToMany.class)) {
+            OneToMany oneToMany = field.getDeclaredAnnotation(OneToMany.class);
+            return oneToMany.fetch() == FetchType.LAZY;
+        }
+        if (field.isAnnotationPresent(ManyToOne.class)) {
+            ManyToOne manyToOne = field.getDeclaredAnnotation(ManyToOne.class);
+            return manyToOne.fetch() == FetchType.LAZY;
+        }
+        return false;
+    }
+
     public String getColumnName() {
         Column columnAnnotation = field.getDeclaredAnnotation(Column.class);
         if (columnAnnotation != null && !StringUtils.isNullOrEmpty(columnAnnotation.name())) {
