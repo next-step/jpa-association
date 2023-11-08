@@ -52,6 +52,9 @@ public class EntityLoader {
                 List<Object> childEntities = jdbcTemplate.query(selectQuery, JoinEntityRowMapper.of(joinTableEntityMeta, selectQuery));
                 setChildEntities(entity, columnMeta, childEntities);
             }
+            if (columnMeta.isJoinFetchTypeLazy()) {
+                // TODO : LazyLoading Proxy 객체 생성하여 set
+            }
         });
     }
 
