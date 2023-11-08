@@ -1,7 +1,7 @@
 package persistence.entity.mapper;
 
 import persistence.core.EntityColumns;
-import persistence.core.EntityMetadataProvider;
+import persistence.core.EntityMetadata;
 import persistence.exception.PersistenceException;
 import persistence.util.ReflectionUtils;
 
@@ -12,10 +12,13 @@ public class EntityRowMapper<T> {
     private final Class<T> clazz;
     private final EntityColumnsMapperChain entityColumnsMapperChain;
 
-    public EntityRowMapper(final Class<T> clazz) {
-        final EntityColumns columns = EntityMetadataProvider.getInstance().getEntityMetadata(clazz).getColumns();
+    private EntityRowMapper(final Class<T> clazz, final EntityColumns entityColumns) {
         this.clazz = clazz;
-        this.entityColumnsMapperChain = EntityColumnsMapperChain.of(columns);
+        this.entityColumnsMapperChain = EntityColumnsMapperChain.of(entityColumns);
+    }
+
+    public static <T> EntityRowMapper<T> of(final EntityMetadata<T> entityMetadata) {
+        return new EntityRowMapper<>(entityMetadata.getType(), entityMetadata.getColumns());
     }
 
     public T mapRow(final ResultSet resultSet) {

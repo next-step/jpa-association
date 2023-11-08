@@ -132,6 +132,10 @@ public class EntityMetadata<T> {
         return this.clazz.equals(clazz);
     }
 
+    public Class<T> getType() {
+        return this.clazz;
+    }
+
     public boolean hasAssociatedOf(final EntityMetadata<?> entityMetadata) {
         return oneToManyColumns.stream()
                 .anyMatch(entityOneToManyColumn -> entityMetadata.isType(entityOneToManyColumn.getJoinColumnType()));
@@ -157,4 +161,6 @@ public class EntityMetadata<T> {
     public int hashCode() {
         return Objects.hash(clazz, tableName, columns, idColumn, oneToManyColumns);
     }
+
+
 }

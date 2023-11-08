@@ -25,7 +25,7 @@ public class EntityLoader<T> {
         this.idColumn = entityMetadata.getIdColumn();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
-        this.entityRowMapper = new EntityRowMapper<>(clazz);
+        this.entityRowMapper = EntityRowMapper.of(entityMetadata);
     }
 
     public Optional<T> loadById(final Object id) {
