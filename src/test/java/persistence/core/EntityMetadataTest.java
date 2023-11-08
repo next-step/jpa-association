@@ -180,5 +180,18 @@ class EntityMetadataTest {
             softly.assertThat(withOneToManyEntityMetadata.getLazyOneToManyColumns()).hasSize(1);
         });
     }
+    @Test
+    @DisplayName("getLazyOneToManyColumns 를 통해 해당 Entity 의 OneToMany(Eager) 컬럼들을 반환 받을 수 있다.")
+    void getEagerOneToManyColumnsTest() {
+        mockClass = FixtureAssociatedEntity.Order.class;
+
+        final EntityMetadata<?> entityMetadata = new EntityMetadata<>(mockClass);
+        final EntityMetadata<?> withOneToManyEntityMetadata = new EntityMetadata<>(FixtureAssociatedEntity.WithOneToMany.class);
+
+        assertSoftly(softly->{
+            softly.assertThat(entityMetadata.getEagerOneToManyColumns()).hasSize(1);
+            softly.assertThat(withOneToManyEntityMetadata.getEagerOneToManyColumns()).hasSize(0);
+        });
+    }
 
 }

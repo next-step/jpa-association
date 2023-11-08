@@ -131,6 +131,12 @@ public class EntityMetadata<T> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public List<EntityOneToManyColumn> getEagerOneToManyColumns() {
+        return this.oneToManyColumns.stream()
+                .filter(EntityAssociatedColumn::isFetchTypeEager)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
 
     public boolean isType(final Class<?> clazz) {
         return this.clazz.equals(clazz);

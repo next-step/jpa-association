@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import jakarta.persistence.FetchType;
 import persistence.core.EntityMetadata;
 import persistence.core.EntityOneToManyColumn;
 
@@ -23,8 +22,8 @@ public class LeftJoinClauseBuilder {
     }
 
     public LeftJoinClauseBuilder addJoin(final EntityMetadata<?> entityMetadata) {
-        final Map<String, String> joinOnClause = entityMetadata.getOneToManyColumns().stream()
-                .filter(entityOneToManyColumn -> entityOneToManyColumn.getFetchType().equals(FetchType.EAGER))
+        final Map<String, String> joinOnClause = entityMetadata.getEagerOneToManyColumns()
+                .stream()
                 .collect(Collectors.toMap(
                         EntityOneToManyColumn::getAssociatedEntityTableName,
                         entityOneToManyColumn -> getJoinOnCondition(entityMetadata, entityOneToManyColumn)
