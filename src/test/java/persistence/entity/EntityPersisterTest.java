@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
 import persistence.sql.dml.Query;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
@@ -198,8 +200,9 @@ class EntityPersisterTest {
 
         final TableName tableName = TableName을_생성함(clazz);
         final Columns columns = Columns을_생성함(clazz);
+        final JoinColumn joinColumn = JoinColumn을_생성함(clazz);
 
-        return query.select("findById", tableName, columns, id);
+        return query.select("findById", tableName, columns, joinColumn, id);
     }
 
     private <T> void 데이터를_저장함(T t) {

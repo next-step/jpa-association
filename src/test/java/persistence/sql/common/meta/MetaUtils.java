@@ -19,6 +19,10 @@ public class MetaUtils {
         return Columns.of(tClass.getDeclaredFields());
     }
 
+    public static <T> JoinColumn JoinColumn을_생성함(Class<T> tClass) {
+        return JoinColumn.of(tClass.getDeclaredFields());
+    }
+
     public static <T> Values Values을_생성함(T t) {
         return Values.of(t);
     }

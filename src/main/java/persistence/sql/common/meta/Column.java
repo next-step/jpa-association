@@ -1,6 +1,7 @@
 package persistence.sql.common.meta;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
@@ -20,7 +21,7 @@ public class Column {
     }
 
     public static Column of(Field field) {
-        if(isTransient(field)) {
+        if (isTransient(field)) {
             return null;
         }
 
@@ -30,6 +31,7 @@ public class Column {
     public static Column[] of(Field[] fields) {
         return Arrays.stream(fields)
                 .filter(field -> !isTransient(field))
+                .filter(field -> !isJoin(field))
                 .map(Column::of)
                 .toArray(Column[]::new);
     }
@@ -46,6 +48,10 @@ public class Column {
      */
     private static boolean isTransient(Field field) {
         return field.isAnnotationPresent(Transient.class);
+    }
+
+    private static boolean isJoin(Field field) {
+        return field.isAnnotationPresent(OneToMany.class);
     }
 
     public String getName() {
