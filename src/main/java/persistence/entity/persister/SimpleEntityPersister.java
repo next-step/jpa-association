@@ -25,12 +25,13 @@ public class SimpleEntityPersister implements EntityPersister {
 
     @Override
     public <T> T load(Class<T> clazz, String id) {
-        return entityLoader.load(clazz, id);
+        EntityAttribute entityAttribute = EntityAttribute.of(clazz, new HashSet<>());
+        return entityLoader.load(clazz, entityAttribute.getIdAttribute().getColumnName(), id);
     }
 
     @Override
     public <T> T update(T old, T updated) {
-        EntityAttribute entityAttribute = EntityAttribute.of(old.getClass(),new HashSet<>());
+        EntityAttribute entityAttribute = EntityAttribute.of(old.getClass(), new HashSet<>());
 
         String sql = UpdateQueryBuilder.of(old, updated, entityAttribute).prepareStatement();
 
@@ -43,7 +44,7 @@ public class SimpleEntityPersister implements EntityPersister {
 
     @Override
     public <T> T insert(T instance) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(),new HashSet<>());
+        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(), new HashSet<>());
         IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
         String sql = new InsertQueryBuilder().prepareStatement(entityAttribute, instance);
@@ -61,7 +62,7 @@ public class SimpleEntityPersister implements EntityPersister {
 
     @Override
     public <T> void remove(T instance, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(),new HashSet<>());
+        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(), new HashSet<>());
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         String deleteDML = deleteQueryBuilder.prepareStatement(entityAttribute, id);
         jdbcTemplate.execute(deleteDML);

@@ -1,9 +1,7 @@
 package persistence.entity.loader;
 
-import fixtures.HelloTarget;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-import net.sf.cglib.proxy.Enhancer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -11,27 +9,28 @@ import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import static persistence.entity.loader.MapperResolverHolder.MAPPER_RESOLVERS;
+public class EagerLoadingOneToManyFieldMapper implements MapperResolver {
+    private final List<MapperResolver> MAPPER_RESOLVERS;
 
-public class OneToManyFieldMapper implements MapperResolver {
+    public EagerLoadingOneToManyFieldMapper(List<MapperResolver> mapperResolvers) {
+        this.MAPPER_RESOLVERS = mapperResolvers;
+    }
 
     @Override
     public Boolean supports(Field field) {
-        return field.isAnnotationPresent(OneToMany.class);
+        if (field.isAnnotationPresent(OneToMany.class)) {
+            return field.getAnnotation(OneToMany.class).fetch() == FetchType.EAGER;
+        }
+        return false;
     }
 
     @Override
     public void map(Object instance, Field field, ResultSet resultSet) {
-        FetchType fetchType = field.getAnnotation(OneToMany.class).fetch();
-
-        if (fetchType == FetchType.LAZY) {
-            Enhancer enhancer = new Enhancer();
-            enhancer.setSuperclass(HelloTarget.class);
-        }
+        Class<?> fieldArgType = getCollectionFieldType(field);
 
         try {
-            Class<?> fieldArgType = getCollectionFieldType(field);
             field.setAccessible(true);
 
             Collection<Object> collection = getOrCreateCollection(instance, field);

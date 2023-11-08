@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,5 +69,18 @@ public class OneToManyField {
 
     public Field getField() {
         return field;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OneToManyField)) return false;
+        OneToManyField that = (OneToManyField) o;
+        return Objects.equals(joinColumnName, that.joinColumnName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(joinColumnName);
     }
 }

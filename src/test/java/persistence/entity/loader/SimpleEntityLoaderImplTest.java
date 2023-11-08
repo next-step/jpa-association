@@ -26,7 +26,7 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
 
     @Nested
     @DisplayName("load 메소드는")
-    class findById {
+    class load {
         @Nested
         @DisplayName("클래스정보와 아이디가 주어지면")
         public class withInstance {
@@ -47,7 +47,7 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
 
                 //when
                 EntityFixtures.SampleOneWithValidAnnotation retrieved =
-                        simpleEntityLoaderImpl.load(EntityFixtures.SampleOneWithValidAnnotation.class, inserted.getId().toString());
+                        simpleEntityLoaderImpl.load(EntityFixtures.SampleOneWithValidAnnotation.class, "id", inserted.getId().toString());
 
                 //then
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");

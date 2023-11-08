@@ -48,10 +48,7 @@ public class SelectQueryBuilderTest {
                         .prepareStatement();
 
                 //then
-                assertThat(dml).isEqualTo("SELECT * FROM orders as orders " +
-                        "join order_items as order_items " +
-                        "on orders.id = order_items.id " +
-                        "WHERE orders.id = '1'");
+                assertThat(dml).isEqualTo("SELECT * FROM orders as orders join order_items as order_items on orders.id = order_items.order_id WHERE orders.id = '1'");
             }
         }
     }
