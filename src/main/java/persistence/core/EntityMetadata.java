@@ -27,6 +27,10 @@ public class EntityMetadata<T> {
         this.oneToManyColumns = this.columns.getOneToManyColumns();
     }
 
+    public static <T> EntityMetadata<T> from(final Class<T> clazz) {
+        return new EntityMetadata<>(clazz);
+    }
+
     private void validate(final Class<T> clazz) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new PersistenceException(clazz.getName() + "은 Entity 클래스가 아닙니다.");

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.context.EntityKey;
 import persistence.context.EntitySnapshots;
+import persistence.core.EntityMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -23,7 +24,7 @@ class EntitySnapshotsTest {
     void setUp() {
         entitySnapshots = new EntitySnapshots();
         fixture = FixturePerson.create(1L);
-        fixtureEntityKey = new EntityKey(Person.class, 1L);
+        fixtureEntityKey = EntityKey.of(EntityMetadata.from(Person.class), 1L);
     }
 
     @Test
