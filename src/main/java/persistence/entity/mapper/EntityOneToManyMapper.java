@@ -1,11 +1,14 @@
 package persistence.entity.mapper;
 
-import persistence.core.*;
+import persistence.core.EntityColumn;
+import persistence.core.EntityOneToManyColumn;
 import persistence.util.ReflectionUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class EntityOneToManyMapper extends EntityColumnsMapper {
 
@@ -23,17 +26,16 @@ public class EntityOneToManyMapper extends EntityColumnsMapper {
 
     @Override
     public <T> void mapColumnsInternal(final ResultSet resultSet, final T instance) throws SQLException {
-        for (final EntityOneToManyColumn column : oneToManyColumns) {
-            final Collection<Object> oneToManyFieldCollection = getOneToManyFieldCollection(instance, column);
-            final Class<?> joinColumnType = column.getJoinColumnType();
-            final EntityMetadata<?> innerEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(joinColumnType);
+        for (final EntityOneToManyColumn oneToManyColumn : oneToManyColumns) {
+            final Collection<Object> oneToManyFieldCollection = getOneToManyFieldCollection(instance, oneToManyColumn);
+            final Class<?> joinColumnType = oneToManyColumn.getJoinColumnType();
 
             do {
                 final Object innerInstance = ReflectionUtils.createInstance(joinColumnType);
 
-                for (final EntityColumn innerEntityColumn : innerEntityMetadata.getColumns()) {
-                    final String fieldName = innerEntityColumn.getFieldName();
-                    final String columnName = innerEntityColumn.getNameWithAlias();
+                for (final EntityColumn associatedEntityColumn : oneToManyColumn.getAssociatedEntityColumns()) {
+                    final String fieldName = associatedEntityColumn.getFieldName();
+                    final String columnName = associatedEntityColumn.getNameWithAlias();
                     final Object object = resultSet.getObject(columnName);
                     ReflectionUtils.injectField(innerInstance, fieldName, object);
                 }
@@ -41,7 +43,7 @@ public class EntityOneToManyMapper extends EntityColumnsMapper {
                 oneToManyFieldCollection.add(innerInstance);
             } while (resultSet.next());
 
-            ReflectionUtils.injectField(instance, column.getFieldName(), oneToManyFieldCollection);
+            ReflectionUtils.injectField(instance, oneToManyColumn.getFieldName(), oneToManyFieldCollection);
         }
 
     }

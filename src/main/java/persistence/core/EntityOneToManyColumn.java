@@ -6,7 +6,6 @@ import jakarta.persistence.OneToMany;
 import persistence.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -62,28 +61,8 @@ public class EntityOneToManyColumn implements EntityAssociatedColumn {
     }
 
     private String guessJoinColumnName(final Field field) {
-        final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(joinColumnType);
+        final EntityMetadata<?> entityMetadata = getAssociatedEntityMetadata();
         return field.getName() + DELIMITER + entityMetadata.getIdColumnName();
-    }
-
-    private EntityMetadata<?> getAssociatedEntityMetadata() {
-        return EntityMetadataProvider.getInstance().getEntityMetadata(this.joinColumnType);
-    }
-
-    @Override
-    public List<String> getAssociatedEntityColumnNamesWithAlias() {
-        final EntityMetadata<?> associatedEntityMetadata = getAssociatedEntityMetadata();
-        return associatedEntityMetadata.getColumnNamesWithAlias();
-    }
-
-    @Override
-    public String getNameWithAliasAssociatedEntity() {
-        return getAssociatedEntityTableName() + ALIAS_DELIMITER + this.getName();
-    }
-
-    @Override
-    public String getAssociatedEntityTableName() {
-        return getAssociatedEntityMetadata().getTableName();
     }
 
     @Override

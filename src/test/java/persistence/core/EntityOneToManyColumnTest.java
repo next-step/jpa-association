@@ -14,13 +14,14 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 class EntityOneToManyColumnTest {
 
     private Class<?> mockClass;
+
     @Test
     @DisplayName("EntityAssociatedColumn 을 통해 @OneToMany 필드의 정보를 가진 객체를 생성할 수 있다.")
     void defaultAssociatedEntityTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.WithOneToMany.class;
         final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToMany");
 
-        assertSoftly(softly->{
+        assertSoftly(softly -> {
             softly.assertThat(associatedColumn.getFetchType()).isEqualTo(FetchType.LAZY);
             softly.assertThat(associatedColumn.getName()).isEqualTo("withIds_id");
             softly.assertThat(associatedColumn.getFieldName()).isEqualTo("withIds");
@@ -45,7 +46,7 @@ class EntityOneToManyColumnTest {
         mockClass = FixtureAssociatedEntity.WithOneToManyJoinColumn.class;
         final EntityAssociatedColumn associatedColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("withIds"), "WithOneToManyJoinColumn");
 
-        assertSoftly(softly->{
+        assertSoftly(softly -> {
             softly.assertThat(associatedColumn.getName()).isEqualTo("join_pk");
             softly.assertThat(associatedColumn.getFieldName()).isEqualTo("withIds");
             softly.assertThat(associatedColumn.getJoinColumnType()).isEqualTo(FixtureAssociatedEntity.WithId.class);
@@ -71,6 +72,27 @@ class EntityOneToManyColumnTest {
     }
 
     @Test
+    @DisplayName("getAssociatedEntityMetadata 를 통해 연관관계 Entity 의 Metadata 를 반환 받을 수 있다.")
+    void getAssociatedEntityMetadataTest() throws NoSuchFieldException {
+        mockClass = FixtureAssociatedEntity.Order.class;
+        final EntityOneToManyColumn entityOneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("orderItems"), "WithOneToManyNullableFalse");
+
+        assertThat(entityOneToManyColumn.getAssociatedEntityMetadata())
+                .isEqualTo(EntityMetadata.from(FixtureAssociatedEntity.OrderItem.class));
+    }
+
+    @Test
+    @DisplayName("getAssociatedEntityColumns 를 통해 연관관계 Entity column 들을 반환 받을 수 있다.")
+    void getAssociatedEntityColumnsTest() throws NoSuchFieldException {
+        mockClass = FixtureAssociatedEntity.Order.class;
+        final EntityOneToManyColumn entityOneToManyColumn = new EntityOneToManyColumn(mockClass.getDeclaredField("orderItems"), "WithOneToManyNullableFalse");
+
+        assertThat(entityOneToManyColumn.getAssociatedEntityColumns())
+                .extracting(EntityColumn::getName)
+                .containsExactly("id", "product", "quantity");
+    }
+
+    @Test
     @DisplayName("getAssociatedEntityColumnNamesWithAlias 를 통해 연관관계 Entity column 들을 Alias 와 함께 반환 받을 수 있다.")
     void getAssociatedEntityColumnNamesWithAliasTest() throws NoSuchFieldException {
         mockClass = FixtureAssociatedEntity.Order.class;
@@ -79,6 +101,7 @@ class EntityOneToManyColumnTest {
         assertThat(entityOneToManyColumn.getAssociatedEntityColumnNamesWithAlias())
                 .containsExactly("order_items.id", "order_items.product", "order_items.quantity");
     }
+
     @Test
     @DisplayName("getNameWithAliasAssociatedEntity 를 통해 연관관계 Entity 의 id Column 이름을 Alias 와 함께 반환 받을 수 있다.")
     void getNameWithAliasAssociatedEntityTest() throws NoSuchFieldException {
@@ -88,6 +111,7 @@ class EntityOneToManyColumnTest {
         assertThat(entityOneToManyColumn.getNameWithAliasAssociatedEntity())
                 .isEqualTo("order_items.order_id");
     }
+
     @Test
     @DisplayName("getAssociatedEntityTableName 를 통해 연관관계 Entity 의 tableName 을 반환 받을 수 있다.")
     void getAssociatedEntityTableNameTest() throws NoSuchFieldException {
