@@ -47,7 +47,7 @@ public class EntityLoader {
         EntityMeta entityMeta = MetaFactory.get(entity.getClass());
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         columnMetas.forEach(columnMeta -> {
-            if (columnMeta.isJoinColumn()) {
+            if (columnMeta.isJoinFetchTypeEager()) {
                 EntityMeta joinTableEntityMeta = columnMeta.getJoinTableEntityMeta();
                 List<Object> childEntities = jdbcTemplate.query(selectQuery, JoinEntityRowMapper.of(joinTableEntityMeta, selectQuery));
                 setChildEntities(entity, columnMeta, childEntities);
