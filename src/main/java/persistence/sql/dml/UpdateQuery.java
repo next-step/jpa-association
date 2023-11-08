@@ -28,7 +28,7 @@ class UpdateQuery {
     }
 
     private String getTableQuery() {
-        return String.format(DEFAULT_UPDATE_COLUMN_QUERY, tableName.getValue(), setChangeField());
+        return String.format(DEFAULT_UPDATE_COLUMN_QUERY, tableName.getName(), setChangeField());
     }
 
     private String setChangeField() {
@@ -36,7 +36,7 @@ class UpdateQuery {
     }
 
     private String getCondition() {
-        String condition = ConditionBuilder.getCondition(columns.getIdName(), arg);
+        String condition = ConditionBuilder.getCondition(columns.getIdName(), arg, null);
         return condition.replace(" id ", " " + setConditionField("id") + " ");
     }
 

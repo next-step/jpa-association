@@ -16,7 +16,7 @@ class ConditionBuilderTest {
         final Object value = 3L;
 
         //when
-        String result = ConditionBuilder.getCondition(fieldName, value);
+        String result = ConditionBuilder.getCondition(fieldName, value, null);
 
         //then
         assertThat(result).isEqualTo(expectedResult);

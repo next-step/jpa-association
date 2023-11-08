@@ -161,13 +161,13 @@ class DatabaseImplTest {
         final TableName tableName = TableName.of(tClass);
         final Columns columns = Columns.of(tClass.getDeclaredFields());
 
-        return database.executeQuery(query.select(methodName, tableName, columns, null));
+        return database.executeQuery(query.select(methodName, tableName, columns, null, null));
     }
 
     private <T> ResultSet find(Class<T> tClass, String methodName, Object... args) throws SQLException {
         final TableName tableName = TableName.of(tClass);
         final Columns columns = Columns.of(tClass.getDeclaredFields());
 
-        return database.executeQuery(query.select(methodName, tableName, columns, args));
+        return database.executeQuery(query.select(methodName, tableName, columns, null, args));
     }
 }

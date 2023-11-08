@@ -29,7 +29,7 @@ class InsertQuery {
     }
 
     private String parseColumns() {
-        return String.format(DEFAULT_INSERT_COLUMN_QUERY, tableName.getValue(), columns.getColumnsWithComma());
+        return String.format(DEFAULT_INSERT_COLUMN_QUERY, tableName.getName(), columns.getColumnsWithComma());
     }
 
     private String parseValues() {
