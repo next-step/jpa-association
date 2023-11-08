@@ -4,7 +4,6 @@ import jdbc.JdbcTemplate;
 import persistence.core.EntityColumns;
 import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.entity.mapper.EntityColumnsMapper;
 import persistence.entity.mapper.EntityIdMapper;
 import persistence.sql.dml.DmlGenerator;

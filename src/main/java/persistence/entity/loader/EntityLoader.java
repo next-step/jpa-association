@@ -3,7 +3,6 @@ package persistence.entity.loader;
 import jdbc.JdbcTemplate;
 import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.entity.mapper.EntityRowMapper;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
