@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import persistence.core.EntityMetadata;
 import persistence.exception.PersistenceException;
 
 import java.util.ArrayList;
@@ -16,12 +15,6 @@ public class SelectClauseBuilder {
 
     public static SelectClauseBuilder builder() {
         return new SelectClauseBuilder();
-    }
-
-    public SelectClauseBuilder add(final EntityMetadata<?> entityMetadata) {
-        final List<String> columnClause = entityMetadata.getColumnNamesWithAlias();
-        selectColumns.addAll(columnClause);
-        return this;
     }
 
     public SelectClauseBuilder add(final String column) {

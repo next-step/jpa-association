@@ -54,7 +54,7 @@ public class EntityLoader<T> {
     public String renderSelect(final Object id) {
         return dmlGenerator.select()
                 .table(tableName)
-                .column(entityMetadata)
+                .column(entityMetadata.getColumnNamesWithAlias())
                 .leftJoin(entityMetadata)
                 .where(idColumn.getNameWithAlias(), String.valueOf(id))
                 .build();
@@ -63,7 +63,7 @@ public class EntityLoader<T> {
     public String renderSelectByOwnerId(final String ownerColumnName, final Object ownerId) {
         return dmlGenerator.select()
                 .table(tableName)
-                .column(entityMetadata)
+                .column(entityMetadata.getColumnNamesWithAlias())
                 .where(ownerColumnName, String.valueOf(ownerId))
                 .build();
     }

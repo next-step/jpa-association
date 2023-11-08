@@ -29,11 +29,6 @@ public class SelectQueryBuilder {
         return this;
     }
 
-    public SelectQueryBuilder column(final EntityMetadata<?> entityMetadata) {
-        this.selectClauseBuilder.add(entityMetadata);
-        return this;
-    }
-
     public SelectQueryBuilder column(final String column) {
         this.selectClauseBuilder.add(column);
         return this;
