@@ -56,7 +56,7 @@ public class SimpleEntityManagerFactory implements EntityManagerFactory {
 
     @Override
     public EntityManager createEntityManager() {
-        return new SimpleEntityManager(entityPersisters, entityLoaders, entityProxyFactory);
+        return new SimpleEntityManager(entityMetadataProvider, entityPersisters, entityLoaders, entityProxyFactory);
     }
 }
 
