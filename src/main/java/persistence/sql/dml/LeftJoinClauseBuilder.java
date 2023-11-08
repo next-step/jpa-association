@@ -1,42 +1,26 @@
 package persistence.sql.dml;
 
-import persistence.core.EntityMetadata;
-import persistence.core.EntityOneToManyColumn;
-
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class LeftJoinClauseBuilder {
 
-    private final Map<String, String> joinData;
+    private final Map<String, OnClauseBuilder> joinData;
+    private final SelectQueryBuilder owner;
 
-    private LeftJoinClauseBuilder() {
+    private LeftJoinClauseBuilder(final SelectQueryBuilder selectQueryBuilder) {
+        this.owner = selectQueryBuilder;
         this.joinData = new LinkedHashMap<>();
     }
 
-    public static LeftJoinClauseBuilder builder() {
-        return new LeftJoinClauseBuilder();
+    public static LeftJoinClauseBuilder builder(final SelectQueryBuilder selectQueryBuilder) {
+        return new LeftJoinClauseBuilder(selectQueryBuilder);
     }
 
-    public LeftJoinClauseBuilder addJoin(final EntityMetadata<?> entityMetadata) {
-        final Map<String, String> joinOnClause = entityMetadata.getEagerOneToManyColumns()
-                .stream()
-                .collect(Collectors.toMap(
-                        EntityOneToManyColumn::getAssociatedEntityTableName,
-                        entityOneToManyColumn -> getJoinOnCondition(entityMetadata, entityOneToManyColumn)
-                ));
-        joinData.putAll(joinOnClause);
-        return this;
-    }
-
-
-    private String getJoinOnCondition(final EntityMetadata<?> entityMetadata, final EntityOneToManyColumn entityOneToManyColumn) {
-        return entityMetadata.getIdColumnNameWithAlias()
-                + " = "
-                + entityOneToManyColumn.getNameWithAliasAssociatedEntity();
+    public OnClauseBuilder leftJoin(final String tableName) {
+        final OnClauseBuilder onClauseBuilder = OnClauseBuilder.builder(owner);
+        joinData.put(tableName, onClauseBuilder);
+        return onClauseBuilder;
     }
 
     public String build() {
@@ -44,13 +28,12 @@ public class LeftJoinClauseBuilder {
             return "";
         }
         final StringBuilder builder = new StringBuilder();
-        builder.append(" left join ");
-        final List<String> columns = new ArrayList<>(joinData.keySet());
-        for (final String column : columns) {
-            builder.append(column)
-                    .append(" on ")
-                    .append(joinData.get(column));
-        }
+        joinData.forEach((joinTableName, onClauseBuilder) ->
+                builder.append(" left join ")
+                        .append(joinTableName)
+                        .append(onClauseBuilder.build())
+        );
+
         return builder.toString();
     }
 
