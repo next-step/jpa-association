@@ -42,7 +42,7 @@ public class SimpleEntityManagerFactory implements EntityManagerFactory {
         return entityClasses.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        clazz -> new EntityPersister(clazz, dmlGenerator, jdbcTemplate)
+                        clazz -> EntityPersister.of(entityMetadataProvider.getEntityMetadata(clazz), dmlGenerator, jdbcTemplate)
                 ));
     }
 
