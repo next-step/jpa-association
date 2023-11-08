@@ -2,11 +2,13 @@ package jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTemplate {
+
     private final Connection connection;
 
     public JdbcTemplate(final Connection connection) {
@@ -21,8 +23,32 @@ public class JdbcTemplate {
         }
     }
 
+    public <T> T executeReturning(final String sql, final RowMapper<T> rowMapper) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            if (!resultSet.next()) {
+                throw new SQLException();
+            }
+
+            return rowMapper.mapRow(resultSet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void executeUpdate(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            if (!resultSet.next()) {
+                throw new SQLException();
+            }
+
             return rowMapper.mapRow(resultSet);
         } catch (Exception e) {
             throw new RuntimeException(e);
