@@ -10,6 +10,7 @@ import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import persistence.core.EntityMetadata;
 import persistence.exception.PersistenceException;
 
 import java.sql.Types;
@@ -29,7 +30,7 @@ class EntityLoaderTest {
         final Class<Person> clazz = Person.class;
         final SimpleResultSet rs = createBaseResultSet();
         rs.addRow(1L, "min", 30, "jongmin4943@gmail.com");
-        final EntityLoader<Person> entityLoader = new EntityLoader<>(clazz, new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        final EntityLoader<Person> entityLoader = EntityLoader.of(EntityMetadata.from(clazz), new MockDmlGenerator(), new MockJdbcTemplate(rs));
 
         final Optional<Person> result = entityLoader.loadById(1L);
 
@@ -48,7 +49,7 @@ class EntityLoaderTest {
     void loadByIdEmptyTest() {
         final Class<Person> clazz = Person.class;
         final SimpleResultSet rs = createBaseResultSet();
-        final EntityLoader<Person> entityLoader = new EntityLoader<>(clazz, new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        final EntityLoader<Person> entityLoader = EntityLoader.of(EntityMetadata.from(clazz), new MockDmlGenerator(), new MockJdbcTemplate(rs));
 
         final Optional<Person> result = entityLoader.loadById(Integer.MAX_VALUE);
 
@@ -62,7 +63,7 @@ class EntityLoaderTest {
         final SimpleResultSet rs = createBaseResultSet();
         rs.addRow(1L, "min", 30, "jongmin4943@gmail.com");
         rs.addRow(1L, "test", 20, "test@test.com");
-        final EntityLoader<Person> entityLoader = new EntityLoader<>(clazz, new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        final EntityLoader<Person> entityLoader = EntityLoader.of(EntityMetadata.from(clazz), new MockDmlGenerator(), new MockJdbcTemplate(rs));
 
         assertThatThrownBy(() -> entityLoader.loadById(1L)).isInstanceOf(PersistenceException.class);
     }
@@ -72,7 +73,7 @@ class EntityLoaderTest {
     void renderSelectTest() {
         final Class<Order> clazz = Order.class;
         final SimpleResultSet rs = createBaseResultSet();
-        final EntityLoader<Order> entityLoader = new EntityLoader<>(clazz, new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        final EntityLoader<Order> entityLoader = EntityLoader.of(EntityMetadata.from(clazz), new MockDmlGenerator(), new MockJdbcTemplate(rs));
 
         assertThat(entityLoader.renderSelect(1L)).isEqualTo("select orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity from orders left join order_items on orders.id = order_items.order_id where orders.id=1");
     }
@@ -81,7 +82,7 @@ class EntityLoaderTest {
     @DisplayName("loadAllByOwnerId 를 통해 owner id 를 가진 객체들을 조회할 수 있다.")
     void loadAllByOwnerIdTest() {
         final SimpleResultSet rs = createLazyOrderItemResultSet();
-        final EntityLoader<OrderLazyItem> entityLoader = new EntityLoader<>(OrderLazyItem.class, new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        final EntityLoader<OrderLazyItem> entityLoader = EntityLoader.of(EntityMetadata.from(OrderLazyItem.class), new MockDmlGenerator(), new MockJdbcTemplate(rs));
 
         final List<OrderLazyItem> orderItems = entityLoader.loadAllByOwnerId("lazy_order_id", 777L);
 
@@ -99,7 +100,7 @@ class EntityLoaderTest {
     @DisplayName("loadByOwnerId 를 통해 owner id where 조건문이 추가된 query 를 생성 할 수 있다.")
     void renderSelectByOwnerIdTest() {
         final SimpleResultSet rs = createLazyOrderItemResultSet();
-        final EntityLoader<OrderLazyItem> entityLoader = new EntityLoader<>(OrderLazyItem.class, new MockDmlGenerator(), new MockJdbcTemplate(rs));
+        final EntityLoader<OrderLazyItem> entityLoader = EntityLoader.of(EntityMetadata.from(OrderLazyItem.class), new MockDmlGenerator(), new MockJdbcTemplate(rs));
 
         final String query = entityLoader.renderSelectByOwnerId("lazy_order_id", 1L);
 

@@ -19,13 +19,17 @@ public class EntityLoader<T> {
     private final JdbcTemplate jdbcTemplate;
     private final EntityRowMapper<T> entityRowMapper;
 
-    public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
-        this.entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+    private EntityLoader(final EntityMetadata<T> entityMetadata, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        this.entityMetadata = entityMetadata;
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
         this.entityRowMapper = EntityRowMapper.of(entityMetadata);
+    }
+
+    public static <T> EntityLoader<T> of(final EntityMetadata<T> entityMetadata, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        return new EntityLoader<>(entityMetadata, dmlGenerator, jdbcTemplate);
     }
 
     public Optional<T> loadById(final Object id) {

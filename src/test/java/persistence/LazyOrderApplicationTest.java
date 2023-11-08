@@ -25,15 +25,16 @@ public class LazyOrderApplicationTest extends IntegrationTestEnvironment {
 
     @BeforeEach
     void setUp() {
-        final EntityMetadata<OrderLazy> lazyOrderEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderLazy.class);
-        final EntityMetadata<OrderLazyItem> lazyOrderItemEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderLazyItem.class);
+        final EntityMetadataProvider entityMetadataProvider = EntityMetadataProvider.getInstance();
+        final EntityMetadata<OrderLazy> lazyOrderEntityMetadata = entityMetadataProvider.getEntityMetadata(OrderLazy.class);
+        final EntityMetadata<OrderLazyItem> lazyOrderItemEntityMetadata = entityMetadataProvider.getEntityMetadata(OrderLazyItem.class);
         final String createLazyOrderDdl = ddlGenerator.generateCreateDdl(lazyOrderEntityMetadata);
         final String createOrderItemDdl = ddlGenerator.generateCreateDdl(lazyOrderItemEntityMetadata);
         jdbcTemplate.execute(createLazyOrderDdl);
         jdbcTemplate.execute(createOrderItemDdl);
         saveDummyOrder();
         saveDummyOrderItems();
-        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(new EntityScanner(Application.class), persistenceEnvironment);
+        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(entityMetadataProvider, new EntityScanner(Application.class), persistenceEnvironment);
         entityManager = entityManagerFactory.createEntityManager();
 
     }

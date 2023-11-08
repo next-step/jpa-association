@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.Application;
 import persistence.IntegrationTestEnvironment;
+import persistence.core.EntityMetadataProvider;
 import persistence.core.EntityScanner;
 import persistence.exception.PersistenceException;
 
@@ -22,7 +23,8 @@ class SimpleEntityManagerTest extends IntegrationTestEnvironment {
 
     @BeforeEach
     void setUp() {
-        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(new EntityScanner(Application.class), persistenceEnvironment);
+        final EntityMetadataProvider entityMetadataProvider = EntityMetadataProvider.getInstance();
+        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(entityMetadataProvider, new EntityScanner(Application.class), persistenceEnvironment);
         entityManager = entityManagerFactory.createEntityManager();
     }
 

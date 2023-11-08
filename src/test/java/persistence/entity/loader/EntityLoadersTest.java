@@ -8,10 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.Application;
+import persistence.core.EntityMetadata;
 import persistence.core.EntityScanner;
 import persistence.sql.dml.DmlGenerator;
 
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ class EntityLoadersTest {
     private EntityLoaders entityLoaders;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() {
         entityLoaders = new EntityLoaders(initEntityLoaders(new MockDmlGenerator(), new MockJdbcTemplate()));
     }
 
@@ -32,7 +32,7 @@ class EntityLoadersTest {
         return entityScanner.getEntityClasses().stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        clazz -> new EntityLoader<>(clazz, dmlGenerator, jdbcTemplate)
+                        clazz -> EntityLoader.of(EntityMetadata.from(clazz), dmlGenerator, jdbcTemplate)
                 ));
     }
 

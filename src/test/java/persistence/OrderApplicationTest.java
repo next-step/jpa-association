@@ -22,15 +22,16 @@ public class OrderApplicationTest extends IntegrationTestEnvironment {
 
     @BeforeEach
     void setUp() {
-        final EntityMetadata<Order> orderEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Order.class);
-        final EntityMetadata<OrderItem> orderItemEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(OrderItem.class);
+        final EntityMetadataProvider entityMetadataProvider = EntityMetadataProvider.getInstance();
+        final EntityMetadata<Order> orderEntityMetadata = entityMetadataProvider.getEntityMetadata(Order.class);
+        final EntityMetadata<OrderItem> orderItemEntityMetadata = entityMetadataProvider.getEntityMetadata(OrderItem.class);
         final String createOrderDdl = ddlGenerator.generateCreateDdl(orderEntityMetadata);
         final String createOrderItemDdl = ddlGenerator.generateCreateDdl(orderItemEntityMetadata);
         jdbcTemplate.execute(createOrderDdl);
         jdbcTemplate.execute(createOrderItemDdl);
         saveDummyOrder();
         saveDummyOrderItems();
-        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(new EntityScanner(Application.class), persistenceEnvironment);
+        final EntityManagerFactory entityManagerFactory = new SimpleEntityManagerFactory(entityMetadataProvider, new EntityScanner(Application.class), persistenceEnvironment);
         entityManager = entityManagerFactory.createEntityManager();
 
     }
