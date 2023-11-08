@@ -9,9 +9,11 @@ import java.util.Set;
 
 public class DdlGenerator {
 
+    private final EntityMetadataProvider entityMetadataProvider;
     private final Dialect dialect;
 
-    public DdlGenerator(final Dialect dialect) {
+    public DdlGenerator(final EntityMetadataProvider entityMetadataProvider, final Dialect dialect) {
+        this.entityMetadataProvider = entityMetadataProvider;
         this.dialect = dialect;
     }
 
@@ -49,7 +51,7 @@ public class DdlGenerator {
 
     private String generateAssociatedColumnsClause(final EntityMetadata<?> entityMetadata) {
         final StringBuilder builder = new StringBuilder();
-        final Set<EntityMetadata<?>> allAssociatedEntitiesMetadata = EntityMetadataProvider.getInstance().getAllAssociatedEntitiesMetadata(entityMetadata);
+        final Set<EntityMetadata<?>> allAssociatedEntitiesMetadata = entityMetadataProvider.getAllAssociatedEntitiesMetadata(entityMetadata);
         allAssociatedEntitiesMetadata.forEach(associatedEntityMetadata ->
                 associatedEntityMetadata.getOneToManyColumns().forEach(entityOneToManyColumn ->
                         builder.append(entityOneToManyColumn.getName())

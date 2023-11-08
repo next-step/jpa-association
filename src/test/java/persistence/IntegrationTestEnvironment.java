@@ -35,7 +35,7 @@ public abstract class IntegrationTestEnvironment {
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         persistenceEnvironment = new PersistenceEnvironment(server, new H2Dialect());
-        ddlGenerator = new DdlGenerator(persistenceEnvironment.getDialect());
+        ddlGenerator = new DdlGenerator(EntityMetadataProvider.getInstance(), persistenceEnvironment.getDialect());
         dmlGenerator = new DmlGenerator(persistenceEnvironment.getDialect());
 
         personEntityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(Person.class);
