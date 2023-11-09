@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +55,26 @@ class SelectQueryTest {
 
         //when
         String q = query.select(methodName, tableName, columns, joinColumn, null);
+
+        //then
+        assertThat(q.matches(wildcardPattern)).isTrue();
+    }
+
+    @Test
+    @DisplayName("@OneToMay의 경우 join문으로 select문 생성")
+    void oneToMany() {
+        //given
+        final Class<Order> aClass = Order.class;
+        final String methodName = "findById";
+
+        final TableName tableName = TableName을_생성함(aClass);
+        final Columns columns = Columns을_생성함(aClass);
+        final JoinColumn joinColumn = JoinColumn을_생성함(aClass);
+
+        String wildcardPattern = "SELECT .*\\.id, .*\\.order_number, .*\\.order_id FROM orders .* JOIN order_items .* ON .*\\.id = .*\\.order_id WHERE .*\\.id = 1";
+
+        //when
+        String q = query.select(methodName, tableName, columns, joinColumn, 1);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();

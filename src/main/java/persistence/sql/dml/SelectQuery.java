@@ -70,7 +70,7 @@ class SelectQuery {
         List<String> conditionList = ConditionUtils.getWordsFromCamelCase(conditionText);
 
         String condition = ConditionBuilder.getCondition(conditionList, args, tableName.getAlias());
-        return condition.replace(".id ", " " + setConditionField("id") + " ");
+        return condition.replace(".id ", setConditionField("id") + " ");
     }
 
     private boolean isCondition() {
