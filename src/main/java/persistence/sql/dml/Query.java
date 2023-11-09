@@ -28,6 +28,10 @@ public final class Query {
         return INSTANCE.selectQuery.get(methodName, tableName, columns, joinColumn, args);
     }
 
+    public String selectAll(String methodName, TableName tableName, Columns columns) {
+        return INSTANCE.selectQuery.getAll(methodName, tableName, columns);
+    }
+
     public String insert(TableName tableName, Columns columns, Values values) {
         return INSTANCE.insertQuery.get(tableName, columns, values);
     }

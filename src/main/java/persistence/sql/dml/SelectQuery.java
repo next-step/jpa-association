@@ -20,6 +20,14 @@ class SelectQuery {
 
     SelectQuery() { }
 
+    String getAll(String methodName, TableName tableName, Columns columns) {
+        this.methodName = methodName;
+        this.tableName = tableName;
+        this.columns = columns;
+
+        return combine();
+    }
+
     String get(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object... args) {
         this.methodName = methodName;
         this.tableName = tableName;

@@ -29,8 +29,8 @@ public class EntityLoader<T> {
     }
 
     public List<T> findAll() {
-        String q = query.select(new Object() {
-        }.getClass().getEnclosingMethod().getName(), tableName, columns, null, null);
+        String q = query.selectAll(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
         return jdbcTemplate.query(q, resultMapper);
     }
