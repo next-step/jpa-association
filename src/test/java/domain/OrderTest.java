@@ -41,7 +41,7 @@ class OrderTest {
     }
 
     @Test
-    @DisplayName("오류 없이 join selectrㅏ 되는지 확인")
+    @DisplayName("오류 없이 join select가 되는지 확인")
     void ii() {
         //when & then
         assertDoesNotThrow(() -> entityManager.find(Order.class, 1L));

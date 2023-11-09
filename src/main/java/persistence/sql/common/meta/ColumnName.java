@@ -1,11 +1,12 @@
 package persistence.sql.common.meta;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import java.lang.reflect.Field;
 import utils.StringUtils;
 
-import java.lang.reflect.Field;
-
 public class ColumnName {
+
     private final String fieldName;
     private final String name;
 
@@ -25,12 +26,39 @@ public class ColumnName {
     private String extractName(Field field) {
         String columnName = StringUtils.camelToSnake(field.getName());
 
-        if (field.isAnnotationPresent(Column.class)
-                && !"".equals(field.getDeclaredAnnotation(Column.class).name())) {
-            columnName = field.getDeclaredAnnotation(Column.class).name();
+        if (retrieveNameFromColumn(field) != null) {
+            return retrieveNameFromColumn(field);
+        }
+
+        if (retrieveNameFromJoinColumn(field) != null) {
+            return retrieveNameFromJoinColumn(field);
         }
 
         return columnName;
+    }
+
+    private String retrieveNameFromColumn(Field field) {
+        if (!field.isAnnotationPresent(Column.class)) {
+            return null;
+        }
+
+        if ("".equals(field.getDeclaredAnnotation(Column.class).name())) {
+            return null;
+        }
+
+        return field.getDeclaredAnnotation(Column.class).name();
+    }
+
+    private String retrieveNameFromJoinColumn(Field field) {
+        if (!field.isAnnotationPresent(JoinColumn.class)) {
+            return null;
+        }
+
+        if ("".equals(field.getDeclaredAnnotation(JoinColumn.class).name())) {
+            return null;
+        }
+
+        return field.getDeclaredAnnotation(JoinColumn.class).name();
     }
 
     public String getFieldName() {
