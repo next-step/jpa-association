@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -16,7 +15,6 @@ import java.sql.SQLException;
 import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -137,7 +135,7 @@ class QueryDmlTest {
             insert(person);
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns, joinColumn),
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectAllQuery("findAll", tableName, columns),
                 new ResultMapper<>(SelectPerson.class));
             SelectPerson result = personList.get(0);
 
@@ -167,7 +165,7 @@ class QueryDmlTest {
 
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns, joinColumn)
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectAllQuery("findAll", tableName, columns)
                 , new ResultMapper<>(SelectPerson.class));
 
             //then
@@ -183,7 +181,7 @@ class QueryDmlTest {
 
             //when & then
             assertThrows(InvalidEntityException.class,
-                () -> jdbcTemplate.query(getSelectQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
+                () -> jdbcTemplate.query(getSelectAllQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
         }
 
         @AfterEach
@@ -225,7 +223,7 @@ class QueryDmlTest {
             String q = query.delete(tableName, columns, id);
             jdbcTemplate.execute(q);
 
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery(selectPersonClass, "findById", id)
                     , new ResultMapper<>(SelectPerson.class));
 
             //then
@@ -273,7 +271,7 @@ class QueryDmlTest {
             //when
             String q = query.update(values, tableName, columns, id);
             jdbcTemplate.execute(q);
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns, joinColumn),
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery("findAll", tableName, columns),
                 new ResultMapper<>(clazz));
 
             //then
@@ -296,11 +294,11 @@ class QueryDmlTest {
         server.stop();
     }
 
-    private String getSelectQuery(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn) {
-        return query.select(methodName, tableName, columns, joinColumn, null);
+    private String getSelectAllQuery(String methodName, TableName tableName, Columns columns) {
+        return query.selectAll(methodName, tableName, columns);
     }
 
-    private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
+    private <T> String getSelectAllQuery(Class<T> tClass, String methodName, Object... args) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
         final JoinColumn joinColumn = JoinColumn을_생성함(tClass);

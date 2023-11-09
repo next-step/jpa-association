@@ -37,7 +37,7 @@ class SelectQueryTest {
 
         //when & then
         assertThrows(InvalidEntityException.class
-            , () -> query.select(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass), JoinColumn을_생성함(aClass), null));
+            , () -> query.selectAll(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass)));
     }
 
     @Test
@@ -54,7 +54,7 @@ class SelectQueryTest {
         String wildcardPattern = "SELECT .*\\.id, .*\\.nick_name, .*\\.old, .*\\.email FROM NonExistentTablePerson .*";
 
         //when
-        String q = query.select(methodName, tableName, columns, joinColumn, null);
+        String q = query.selectAll(methodName, tableName, columns);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();
@@ -88,13 +88,12 @@ class SelectQueryTest {
 
         final TableName tableName = TableName을_생성함(aClass);
         final Columns columns = Columns을_생성함(aClass);
-        final JoinColumn joinColumn = JoinColumn을_생성함(aClass);
 
         String wildcardPattern = "SELECT .*\\.id, .*\\.nick_name, .*\\.old, .*\\.email FROM users .*";
 
         //when
-        String q = query.select(new Object() {
-        }.getClass().getEnclosingMethod().getName(), tableName, columns, joinColumn, null);
+        String q = query.selectAll(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();
