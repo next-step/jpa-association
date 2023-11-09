@@ -2,7 +2,6 @@ package persistence.context;
 
 import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.exception.PersistenceException;
 
 import java.util.Objects;
@@ -12,16 +11,19 @@ public class EntityKey {
     private final String tableName;
     private final EntityIdColumn idColumn;
 
-    public EntityKey(final Class<?> clazz, final Object key) {
+    private EntityKey(final Object key, final String tableName, final EntityIdColumn idColumn) {
         validate(key);
-        final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+        this.tableName = tableName;
+        this.idColumn = idColumn;
         this.key = key;
-        this.tableName = entityMetadata.getTableName();
-        this.idColumn = entityMetadata.getIdColumn();
+    }
+
+    public static EntityKey of(final EntityMetadata<?> entityMetadata, final Object key) {
+        return new EntityKey(key, entityMetadata.getTableName(), entityMetadata.getIdColumn());
     }
 
     private void validate(final Object key) {
-        if(Objects.isNull(key)) {
+        if (Objects.isNull(key)) {
             throw new PersistenceException("Entity key 생성시 key value 는 null 일 수 없습니다.");
         }
     }

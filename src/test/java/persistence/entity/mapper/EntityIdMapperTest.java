@@ -26,7 +26,7 @@ class EntityIdMapperTest {
         rs.addRow(1L);
         rs.next();
 
-        entityIdMapper.mapColumns(rs, order);
+        entityIdMapper.mapColumnsInternal(rs, order);
 
         assertThat(order.getId()).isEqualTo(1L);
     }

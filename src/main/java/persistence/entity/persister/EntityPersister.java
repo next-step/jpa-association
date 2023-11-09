@@ -4,7 +4,6 @@ import jdbc.JdbcTemplate;
 import persistence.core.EntityColumns;
 import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
 import persistence.entity.mapper.EntityColumnsMapper;
 import persistence.entity.mapper.EntityIdMapper;
 import persistence.sql.dml.DmlGenerator;
@@ -21,8 +20,7 @@ public class EntityPersister {
     private final JdbcTemplate jdbcTemplate;
     private final EntityColumnsMapper entityIdMapper;
 
-    public EntityPersister(final Class<?> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
-        final EntityMetadata<?> entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+    private EntityPersister(final EntityMetadata<?> entityMetadata, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.columns = entityMetadata.getColumns();
@@ -30,6 +28,10 @@ public class EntityPersister {
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
         this.entityIdMapper = EntityIdMapper.of(entityMetadata.getIdColumn());
+    }
+
+    public static EntityPersister of(final EntityMetadata<?> entityMetadata, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        return new EntityPersister(entityMetadata, dmlGenerator, jdbcTemplate);
     }
 
     public void insert(final Object entity) {

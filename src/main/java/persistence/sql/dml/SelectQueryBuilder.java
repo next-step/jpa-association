@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import persistence.core.EntityMetadata;
 import persistence.dialect.Dialect;
 import persistence.dialect.PageQuery;
 import persistence.exception.PersistenceException;
@@ -21,16 +20,11 @@ public class SelectQueryBuilder {
         this.selectClauseBuilder = SelectClauseBuilder.builder();
         this.whereClauseBuilder = WhereClauseBuilder.builder();
         this.dialect = dialect;
-        this.leftJoinClauseBuilder = LeftJoinClauseBuilder.builder();
+        this.leftJoinClauseBuilder = LeftJoinClauseBuilder.builder(this);
     }
 
     public SelectQueryBuilder table(final String tableName) {
         this.tableName = tableName;
-        return this;
-    }
-
-    public SelectQueryBuilder column(final EntityMetadata<?> entityMetadata) {
-        this.selectClauseBuilder.add(entityMetadata);
         return this;
     }
 
@@ -44,9 +38,8 @@ public class SelectQueryBuilder {
         return this;
     }
 
-    public SelectQueryBuilder leftJoin(final EntityMetadata<?> entityMetadata) {
-        leftJoinClauseBuilder.addJoin(entityMetadata);
-        return this;
+    public OnClauseBuilder leftJoin(final String tableName) {
+        return leftJoinClauseBuilder.leftJoin(tableName);
     }
 
     public SelectQueryBuilder where(final String column, final String data) {

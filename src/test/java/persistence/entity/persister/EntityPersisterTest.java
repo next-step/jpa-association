@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import persistence.core.EntityMetadata;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,8 +23,8 @@ class EntityPersisterTest {
     private Person fixturePerson;
 
     @BeforeEach
-    void setUp() throws SQLException {
-        entityPersister = new EntityPersister(Person.class, new MockDmlGenerator(), new MockJdbcTemplate());
+    void setUp() {
+        entityPersister = EntityPersister.of(EntityMetadata.from(Person.class), new MockDmlGenerator(), new MockJdbcTemplate());
         fixturePerson = FixturePerson.create(1L);
     }
 

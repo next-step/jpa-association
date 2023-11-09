@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.Application;
+import persistence.core.EntityMetadata;
 import persistence.core.EntityScanner;
 import persistence.sql.dml.DmlGenerator;
 
@@ -32,7 +33,7 @@ class EntityPersistersTest {
         return entityScanner.getEntityClasses().stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        clazz -> new EntityPersister(clazz, dmlGenerator, jdbcTemplate)
+                        clazz -> EntityPersister.of(EntityMetadata.from(clazz), dmlGenerator, jdbcTemplate)
                 ));
     }
 

@@ -1,6 +1,7 @@
 package persistence.entity.manager;
 
 import jdbc.JdbcTemplate;
+import persistence.core.EntityMetadataProvider;
 import persistence.core.EntityScanner;
 import persistence.core.PersistenceEnvironment;
 import persistence.entity.loader.EntityLoader;
@@ -16,12 +17,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SimpleEntityManagerFactory implements EntityManagerFactory {
+    private final EntityMetadataProvider entityMetadataProvider;
     private final EntityPersisters entityPersisters;
     private final EntityLoaders entityLoaders;
     private final EntityProxyFactory entityProxyFactory;
 
 
-    public SimpleEntityManagerFactory(final EntityScanner entityScanner, final PersistenceEnvironment persistenceEnvironment) {
+    public SimpleEntityManagerFactory(final EntityMetadataProvider entityMetadataProvider, final EntityScanner entityScanner, final PersistenceEnvironment persistenceEnvironment) {
+        this.entityMetadataProvider = entityMetadataProvider;
+
         final List<Class<?>> entityClasses = entityScanner.getEntityClasses();
         final DmlGenerator dmlGenerator = persistenceEnvironment.getDmlGenerator();
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(persistenceEnvironment.getConnection());
@@ -38,7 +42,7 @@ public class SimpleEntityManagerFactory implements EntityManagerFactory {
         return entityClasses.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        clazz -> new EntityPersister(clazz, dmlGenerator, jdbcTemplate)
+                        clazz -> EntityPersister.of(entityMetadataProvider.getEntityMetadata(clazz), dmlGenerator, jdbcTemplate)
                 ));
     }
 
@@ -46,13 +50,13 @@ public class SimpleEntityManagerFactory implements EntityManagerFactory {
         return entityClasses.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        clazz -> new EntityLoader<>(clazz, dmlGenerator, jdbcTemplate)
+                        clazz -> EntityLoader.of(entityMetadataProvider.getEntityMetadata(clazz), dmlGenerator, jdbcTemplate)
                 ));
     }
 
     @Override
     public EntityManager createEntityManager() {
-        return new SimpleEntityManager(entityPersisters, entityLoaders, entityProxyFactory);
+        return new SimpleEntityManager(entityMetadataProvider, entityPersisters, entityLoaders, entityProxyFactory);
     }
 }
 

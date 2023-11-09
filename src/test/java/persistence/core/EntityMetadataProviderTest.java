@@ -63,6 +63,6 @@ class EntityMetadataProviderTest {
 
         final Set<EntityMetadata<?>> allAssociatedEntitiesMetadata = entityMetadataProvider.getAllAssociatedEntitiesMetadata(entityMetadata);
 
-        assertThat(allAssociatedEntitiesMetadata).hasSize(5);
+        assertThat(allAssociatedEntitiesMetadata).hasSize(6);
     }
 }

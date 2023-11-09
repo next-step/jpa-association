@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import persistence.context.EntityCache;
 import persistence.context.EntityKey;
+import persistence.core.EntityMetadata;
 
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ class EntityCacheTest {
     void setUp() {
         entityCache = new EntityCache();
         fixture = FixturePerson.create(1L);
-        entityKey = new EntityKey(Person.class, 1L);
+        entityKey = EntityKey.of(EntityMetadata.from(Person.class), 1L);
 
     }
 
@@ -62,7 +63,7 @@ class EntityCacheTest {
     @Test
     @DisplayName("entityCache.containsKey 를 통해 cache 에 해당 key 가 존재하는지 여부를 반환 받을 수 있다.")
     void entityCacheContainsKeyTest() {
-        final EntityKey newKey = new EntityKey(Person.class, 2L);
+        final EntityKey newKey = EntityKey.of(EntityMetadata.from(Person.class), 2L);
 
         entityCache.add(entityKey, fixture);
 

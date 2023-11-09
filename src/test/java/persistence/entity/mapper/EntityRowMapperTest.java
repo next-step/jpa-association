@@ -9,6 +9,7 @@ import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import persistence.core.EntityMetadata;
 
 import java.sql.SQLException;
 import java.sql.Types;
@@ -23,7 +24,7 @@ class EntityRowMapperTest {
     @DisplayName("EntityRowMapper 를 이용해 Person 객체를 ResultSet 으로 부터 생성 할 수 있다.")
     void personRowMappingTest() throws SQLException {
         final Class<Person> clazz = Person.class;
-        final EntityRowMapper<Person> entityRowMapper = new EntityRowMapper<>(clazz);
+        final EntityRowMapper<Person> entityRowMapper = EntityRowMapper.of(new EntityMetadata<>(clazz));
         final SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("id", Types.BIGINT, 10, 0);
         rs.addColumn("nick_name", Types.VARCHAR, 255, 0);
@@ -46,7 +47,7 @@ class EntityRowMapperTest {
     @DisplayName("EntityRowMapper 를 이용해 객체를 ResultSet 으로 부터 생성 할 수 있다.")
     void rowMappingTest() throws SQLException {
         final Class<Order> clazz = Order.class;
-        final EntityRowMapper<Order> entityRowMapper = new EntityRowMapper<>(clazz);
+        final EntityRowMapper<Order> entityRowMapper = EntityRowMapper.of(new EntityMetadata<>(clazz));
         final SimpleResultSet rs = mockOrderSimpleResultSet();
 
         final Order order = entityRowMapper.mapRow(rs);

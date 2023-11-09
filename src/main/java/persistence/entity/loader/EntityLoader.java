@@ -3,10 +3,11 @@ package persistence.entity.loader;
 import jdbc.JdbcTemplate;
 import persistence.core.EntityIdColumn;
 import persistence.core.EntityMetadata;
-import persistence.core.EntityMetadataProvider;
+import persistence.core.EntityOneToManyColumn;
 import persistence.entity.mapper.EntityRowMapper;
 import persistence.exception.PersistenceException;
 import persistence.sql.dml.DmlGenerator;
+import persistence.sql.dml.SelectQueryBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +20,17 @@ public class EntityLoader<T> {
     private final JdbcTemplate jdbcTemplate;
     private final EntityRowMapper<T> entityRowMapper;
 
-    public EntityLoader(final Class<T> clazz, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
-        this.entityMetadata = EntityMetadataProvider.getInstance().getEntityMetadata(clazz);
+    private EntityLoader(final EntityMetadata<T> entityMetadata, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        this.entityMetadata = entityMetadata;
         this.tableName = entityMetadata.getTableName();
         this.idColumn = entityMetadata.getIdColumn();
         this.dmlGenerator = dmlGenerator;
         this.jdbcTemplate = jdbcTemplate;
-        this.entityRowMapper = new EntityRowMapper<>(clazz);
+        this.entityRowMapper = EntityRowMapper.of(entityMetadata);
+    }
+
+    public static <T> EntityLoader<T> of(final EntityMetadata<T> entityMetadata, final DmlGenerator dmlGenerator, final JdbcTemplate jdbcTemplate) {
+        return new EntityLoader<>(entityMetadata, dmlGenerator, jdbcTemplate);
     }
 
     public Optional<T> loadById(final Object id) {
@@ -49,18 +54,27 @@ public class EntityLoader<T> {
     }
 
     public String renderSelect(final Object id) {
-        return dmlGenerator.select()
+        final SelectQueryBuilder queryBuilder = dmlGenerator.select()
                 .table(tableName)
-                .column(entityMetadata)
-                .leftJoin(entityMetadata)
+                .column(entityMetadata.getColumnNamesWithAlias());
+
+        entityMetadata.getEagerOneToManyColumns()
+                .forEach(entityOneToManyColumn -> bindOneToManyJoinClause(queryBuilder, entityOneToManyColumn));
+
+        return queryBuilder
                 .where(idColumn.getNameWithAlias(), String.valueOf(id))
                 .build();
+    }
+
+    private void bindOneToManyJoinClause(final SelectQueryBuilder queryBuilder, final EntityOneToManyColumn entityOneToManyColumn) {
+        queryBuilder.leftJoin(entityOneToManyColumn.getAssociatedEntityTableName())
+                .on(entityMetadata.getIdColumnNameWithAlias(), entityOneToManyColumn.getNameWithAliasAssociatedEntity());
     }
 
     public String renderSelectByOwnerId(final String ownerColumnName, final Object ownerId) {
         return dmlGenerator.select()
                 .table(tableName)
-                .column(entityMetadata)
+                .column(entityMetadata.getColumnNamesWithAlias())
                 .where(ownerColumnName, String.valueOf(ownerId))
                 .build();
     }

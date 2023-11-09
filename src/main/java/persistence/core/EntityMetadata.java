@@ -27,6 +27,10 @@ public class EntityMetadata<T> {
         this.oneToManyColumns = this.columns.getOneToManyColumns();
     }
 
+    public static <T> EntityMetadata<T> from(final Class<T> clazz) {
+        return new EntityMetadata<>(clazz);
+    }
+
     private void validate(final Class<T> clazz) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new PersistenceException(clazz.getName() + "은 Entity 클래스가 아닙니다.");
@@ -127,9 +131,19 @@ public class EntityMetadata<T> {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public List<EntityOneToManyColumn> getEagerOneToManyColumns() {
+        return this.oneToManyColumns.stream()
+                .filter(EntityAssociatedColumn::isFetchTypeEager)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
 
     public boolean isType(final Class<?> clazz) {
         return this.clazz.equals(clazz);
+    }
+
+    public Class<T> getType() {
+        return this.clazz;
     }
 
     public boolean hasAssociatedOf(final EntityMetadata<?> entityMetadata) {
@@ -157,4 +171,6 @@ public class EntityMetadata<T> {
     public int hashCode() {
         return Objects.hash(clazz, tableName, columns, idColumn, oneToManyColumns);
     }
+
+
 }

@@ -10,6 +10,7 @@ import org.h2.tools.SimpleResultSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import persistence.core.EntityMetadata;
 import persistence.core.EntityOneToManyColumn;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.EntityLoaders;
@@ -29,7 +30,7 @@ class EntityProxyFactoryTest {
 
         public MockEntityLoaders() {
             super(Map.of(
-                    OrderLazyItem.class, new EntityLoader<>(OrderLazyItem.class, new MockDmlGenerator(), new MockJdbcTemplate(createOrderItemResultSet())))
+                    OrderLazyItem.class, EntityLoader.of(EntityMetadata.from(OrderLazyItem.class), new MockDmlGenerator(), new MockJdbcTemplate(createOrderItemResultSet())))
             );
         }
     }

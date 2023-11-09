@@ -37,7 +37,7 @@ class EntityOneToManyMapperTest {
         rs.addRow(5L, "testProduct05", 50);
         rs.next();
 
-        entityOneToManyMapper.mapColumns(rs, order);
+        entityOneToManyMapper.mapColumnsInternal(rs, order);
 
         final List<FixtureAssociatedEntity.OrderItem> orderItems = order.getOrderItems();
         assertSoftly(softly -> {
