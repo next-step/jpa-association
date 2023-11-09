@@ -2,18 +2,16 @@ package persistence.entity.loader;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.LazyLoader;
 import persistence.entity.attribute.EntityAttributes;
+import persistence.entity.attribute.OneToManyField;
 import persistence.entity.attribute.id.IdAttribute;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Optional;
 
-public class LazyLoadingOneToManyFieldMapper implements MapperResolver {
+public class LazyLoadingOneToManyFieldMapper implements CollectionMapperResolver {
     private final EntityAttributes entityAttributes;
     private final CollectionLoader collectionLoader;
 
@@ -31,31 +29,37 @@ public class LazyLoadingOneToManyFieldMapper implements MapperResolver {
     }
 
     @Override
-    public <T> void map(T instance, Field field, ResultSet resultSet) {
+    public <T> void map(T instance, OneToManyField oneToManyField, ResultSet resultSet) {
+        Field field = oneToManyField.getField();
         IdAttribute ownerIdAttribute = entityAttributes.findEntityAttribute(instance.getClass())
                 .getIdAttribute();
 
         Class<?> fieldArgType = getCollectionFieldType(field);
 
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(fieldArgType);
-        enhancer.setCallback(new LazyLoader() {
-            @Override
-            public Object loadObject() throws Exception {
-                Object targetClass = collectionLoader.loadCollection(fieldArgType, ownerIdAttribute.getColumnName(),
-                        getInstanceIdAsString(instance, field));
+        if (List.class.isAssignableFrom(field.getType())) {
+            List proxyList = (List) Proxy.newProxyInstance(
+                    fieldArgType.getClassLoader(),
+                    new Class[]{List.class},
+                    new InvocationHandler() {
+                        private List target = null;
 
-                field.set(instance, targetClass);
-
-                return targetClass;
+                        @Override
+                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                            if (target == null) {
+                                target = collectionLoader.loadCollection(fieldArgType, oneToManyField.getJoinColumnName(),
+                                        getInstanceIdAsString(instance, ownerIdAttribute.getField()));
+                            }
+                            return method.invoke(target, args);
+                        }
+                    });
+            try {
+                field.setAccessible(true);
+                field.set(instance, proxyList);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
-        });
-
-        Object proxy = enhancer.create();
-        try {
-            field.set(instance, proxy);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } else {
+            throw new IllegalArgumentException("OneToMany 관계는 List 타입만 지원합니다.");
         }
     }
 

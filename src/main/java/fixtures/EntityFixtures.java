@@ -247,4 +247,92 @@ public class EntityFixtures {
                     '}';
         }
     }
+
+    @Entity
+    @Table(name = "team")
+    public static class Team {
+        public Long getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return "Team{" +
+                    "id=" + id +
+                    ", members=" + members +
+                    '}';
+        }
+
+        public List<Member> getMembers() {
+            return members;
+        }
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @OneToMany(fetch = FetchType.LAZY)
+        @JoinColumn(name = "team_id")
+        private List<Member> members;
+
+        public Team() {
+        }
+
+        public Team(List<Member> member) {
+            this.members = member;
+        }
+
+        public Team(Long id, List<Member> member) {
+            this.id = id;
+            this.members = member;
+        }
+    }
+
+    @Entity
+    @Table(name = "member")
+    public static class Member {
+        @Override
+        public String toString() {
+            return "Member{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", teamId=" + teamId +
+                    '}';
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @Column(name = "name")
+        private String name;
+
+        @Column(name = "team_id")
+        private Long teamId;
+
+        public Member() {
+        }
+
+        public Member(String name) {
+            this.name = name;
+        }
+
+        public Member(String name, Long teamId) {
+            this.name = name;
+            this.teamId = teamId;
+        }
+
+        public Member(Long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
 }

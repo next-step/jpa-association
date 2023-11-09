@@ -2,6 +2,7 @@ package persistence.entity.loader;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import persistence.entity.attribute.OneToManyField;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class EagerLoadingOneToManyFieldMapper implements MapperResolver {
+public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolver {
     private final List<MapperResolver> MAPPER_RESOLVERS;
 
     public EagerLoadingOneToManyFieldMapper(List<MapperResolver> mapperResolvers) {
@@ -27,7 +28,8 @@ public class EagerLoadingOneToManyFieldMapper implements MapperResolver {
     }
 
     @Override
-    public void map(Object instance, Field field, ResultSet resultSet) {
+    public void map(Object instance, OneToManyField oneToManyField, ResultSet resultSet) {
+        Field field = oneToManyField.getField();
         Class<?> fieldArgType = getCollectionFieldType(field);
 
         try {

@@ -84,5 +84,37 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
                         .isEqualTo("Order{id=1, orderNumber='1324', orderItems=[OrderItem{id=1, product='티비', quantity=1, orderId=1}, OrderItem{id=1, product='세탁기', quantity=2, orderId=1}]}");
             }
         }
+
+        @Nested
+        @DisplayName("@OneToMany(fetch = FetchType.LAZY)가 붙은 클래스정보와 아이디가 주어지면")
+        public class withLazyProxy {
+            @Test
+            @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
+            void returnData() throws SQLException {
+                //given
+                EntityLoader entityLoader = new SimpleEntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
+
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+
+                setUpFixtureTable(EntityFixtures.Member.class, new H2SqlConverter());
+                setUpFixtureTable(EntityFixtures.Team.class, new H2SqlConverter());
+
+                EntityFixtures.Member member1 = new EntityFixtures.Member("사람1", 1L);
+                EntityFixtures.Member member2 = new EntityFixtures.Member("사람2", 1L);
+                EntityFixtures.Member insertedMember1 = simpleEntityPersister.insert(member1);
+                EntityFixtures.Member insertedMember2 = simpleEntityPersister.insert(member2);
+
+                EntityFixtures.Team team = new EntityFixtures.Team(List.of(insertedMember1, insertedMember2));
+
+                simpleEntityPersister.insert(team);
+
+                //when
+                EntityFixtures.Team loadedTeam = simpleEntityPersister.load(EntityFixtures.Team.class, "1");
+
+                //then
+                assertThat(loadedTeam.toString())
+                        .isEqualTo("Team{id=1, members=[Member{id=1, name='사람1', teamId=1}, Member{id=2, name='사람2', teamId=1}]}");
+            }
+        }
     }
 }

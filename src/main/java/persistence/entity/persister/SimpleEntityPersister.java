@@ -14,6 +14,7 @@ import java.util.HashSet;
 
 import static persistence.entity.attribute.resolver.AttributeResolverHolder.ID_ATTRIBUTE_RESOLVERS;
 
+
 public class SimpleEntityPersister implements EntityPersister {
     private final JdbcTemplate jdbcTemplate;
     private final EntityLoader entityLoader;

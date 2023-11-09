@@ -17,6 +17,9 @@ public class EntityAttributes {
         entityAttributeCenter.put(EntityFixtures.EntityWithStringId.class, EntityAttribute.of(EntityFixtures.EntityWithStringId.class, createReferenceTracingLog()));
         entityAttributeCenter.put(EntityFixtures.SampleOneWithValidAnnotation.class, EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, createReferenceTracingLog()));
         entityAttributeCenter.put(EntityFixtures.SampleTwoWithValidAnnotation.class, EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class, createReferenceTracingLog()));
+        entityAttributeCenter.put(EntityFixtures.Team.class, EntityAttribute.of(EntityFixtures.Team.class, createReferenceTracingLog()));
+        entityAttributeCenter.put(EntityFixtures.Member.class, EntityAttribute.of(EntityFixtures.Member.class, createReferenceTracingLog()));
+
     }
 
     private static HashSet<Class<?>> createReferenceTracingLog() {
