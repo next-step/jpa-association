@@ -57,4 +57,12 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
+    public <T> T queryForAll(final String sql, final RowMapper<T> rowMapper) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            return rowMapper.mapRow(resultSet);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

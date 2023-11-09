@@ -3,7 +3,6 @@ package persistence.association;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.meta.EntityMeta;
@@ -45,14 +44,4 @@ class OneToManyAssociationTest {
             assertThat(manyEntityMeta.getTableName()).isEqualTo("order_items");
         });
     }
-
-    @Test
-    @Disabled
-    @DisplayName("연관관계가 없는 엔티티를 확인한다.")
-    void noAssociate() throws Exception {
-//        assertThatIllegalArgumentException().isThrownBy(() -> {
-//            OneToManyAssociation.of(OrderItem.class);
-//        });
-    }
-
 }

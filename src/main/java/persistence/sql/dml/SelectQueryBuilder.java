@@ -11,9 +11,8 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         super(entityMeta, dialect);
     }
 
-
     public String findAllQuery() {
-        if (entityMeta.hasOneToManyAssociate()) {
+        if (entityMeta.hasOneToManyAssociation()) {
             return selectQuery(getColumnsString(entityMeta))
                     + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()))
                     + new OneToManyJoinQueryBuilder(entityMeta).build();
@@ -27,13 +26,9 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         if (id == null) {
             throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
         }
-        if (entityMeta.hasOneToManyAssociate()) {
-            return findAllQuery()
-                    + whereId(tableNameSignature(entityMeta.getTableName()) ,getPkColumn(), id);
-        }
 
         return findAllQuery()
-                + whereId(tableNameSignature(entityMeta.getTableName()) ,getPkColumn(), id);
+                + whereId(tableNameSignature(entityMeta.getTableName()), getPkColumn(), id);
     }
 
     private String selectQuery(String fileNames) {
@@ -63,7 +58,7 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
     private Stream<String> getColumnsStream(EntityMeta entityMeta, int depth) {
         final Stream<String> columnsNameStream = convertColumnsSegnetureStream(entityMeta, depth);
 
-        if (entityMeta.hasOneToManyAssociate()) {
+        if (entityMeta.hasOneToManyAssociation()) {
             return Stream.concat(columnsNameStream, getColumnsStream(entityMeta.getOneToManyAssociation().getManyEntityMeta(),depth + 1));
         }
 

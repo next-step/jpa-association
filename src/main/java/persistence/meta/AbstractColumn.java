@@ -110,4 +110,8 @@ public abstract class AbstractColumn {
     public Field getField() {
         return field;
     }
+
+    public String getColumnNameSignature(String tableName, int depth) {
+        return tableName + "_" + depth + "_" + getName();
+    }
 }

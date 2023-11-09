@@ -16,6 +16,9 @@ import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.Person;
+import persistence.testFixtures.assosiate.Order;
+import persistence.testFixtures.assosiate.OrderItem;
+import util.InitTestDataLoader;
 
 class EntityLoaderTest {
 
@@ -30,6 +33,9 @@ class EntityLoaderTest {
         dialect = new FakeDialect();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
+        InitTestDataLoader loader = new InitTestDataLoader(jdbcTemplate);
+        loader.load("init.SQL");
+
     }
 
     @Test
@@ -113,9 +119,56 @@ class EntityLoaderTest {
         });
     }
 
+    @Test
+    @DisplayName("OneToMany 관계의 엔티티를 조회한다.")
+    void oneToMany() {
+        //given
+        EntityMeta entityMeta = EntityMeta.from(Order.class);
+        EntityMapper entityMapper = new EntityMapper(entityMeta);
+        QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, entityMapper);
+
+        //when
+        final Order order = entityLoader.find(Order.class, 1L);
+
+        //then
+        assertSoftly((it) -> {
+            it.assertThat(order.getId()).isEqualTo(1L);
+            it.assertThat(order.getOrderItems()).hasSize(2);
+            it.assertThat(order.getOrderNumber()).isEqualTo("order-number-1");
+        });
+
+    }
+
+    @Test
+    @DisplayName("OneToMany 관계의 엔티티를 조회한다.")
+    void oneToManyFindALL() {
+        //given
+        EntityMeta entityMeta = EntityMeta.from(Order.class);
+        EntityMapper entityMapper = new EntityMapper(entityMeta);
+        QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, entityMapper);
+
+        //when
+        final List<Order> orders = entityLoader.findAll(Order.class);
+
+        //then
+        assertSoftly((it) -> {
+            it.assertThat(orders).hasSize(2);
+            it.assertThat(orders).extracting("id").contains(1L, 2L);
+            it.assertThat(orders).extracting("orderNumber").contains("order-number-1", "order-number-2");
+            it.assertThat(orders.get(0).getOrderItems()).hasSize(2);
+            it.assertThat(orders.get(1).getOrderItems()).hasSize(2);
+        });
+
+    }
+
     @AfterEach
     void cleanUp() throws Exception {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());
+        jdbcTemplate.execute(QueryGenerator.of(OrderItem.class, dialect).drop());
+        jdbcTemplate.execute(QueryGenerator.of(Order.class, dialect).drop());
+        server.stop();
     }
 
 }

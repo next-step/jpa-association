@@ -10,7 +10,7 @@ import persistence.sql.QueryBuilder;
 public class OneToManyJoinQueryBuilder extends QueryBuilder {
     public OneToManyJoinQueryBuilder(EntityMeta entityMeta) {
         super(entityMeta);
-        if (!entityMeta.hasOneToManyAssociate()) {
+        if (!entityMeta.hasOneToManyAssociation()) {
             throw new IllegalArgumentException("해당 엔티티는 OneToMany 관계가 없습니다.");
         }
     }
@@ -21,7 +21,7 @@ public class OneToManyJoinQueryBuilder extends QueryBuilder {
     }
 
     private String generateJoinQuery(EntityMeta entityMeta, int depth) {
-        if (!entityMeta.hasOneToManyAssociate()) {
+        if (!entityMeta.hasOneToManyAssociation()) {
             return "";
         }
         final OneToManyAssociation oneToManyAssociate = entityMeta.getOneToManyAssociation();
@@ -36,7 +36,7 @@ public class OneToManyJoinQueryBuilder extends QueryBuilder {
 
     private Stream<String> generateJoinQueryStream(EntityMeta entityMeta, int depth) {
         Stream<String> joinString = Stream.of(generateJoinQuery(entityMeta, depth));
-        if (entityMeta.hasOneToManyAssociate()) {
+        if (entityMeta.hasOneToManyAssociation()) {
             return Stream.concat(joinString,
                     generateJoinQueryStream(entityMeta.getOneToManyAssociation().getManyEntityMeta(), depth + 1));
         }

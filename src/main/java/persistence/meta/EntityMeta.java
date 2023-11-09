@@ -81,7 +81,7 @@ public class EntityMeta {
         return GenerationType.IDENTITY.equals(pkColumn.getGenerationType());
     }
 
-    public boolean hasOneToManyAssociate() {
+    public boolean hasOneToManyAssociation() {
         return oneToManyAssociation != null;
     }
 
@@ -97,6 +97,10 @@ public class EntityMeta {
 
     public ForeignerColumn getForeignerColumn() {
         return foreignerColumn;
+    }
+
+    public Class<?> getEntityClass() {
+        return entityClass;
     }
 
     public boolean hasForeignerColumn() {

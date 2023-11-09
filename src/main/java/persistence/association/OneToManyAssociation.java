@@ -12,20 +12,22 @@ import persistence.meta.ForeignerColumn;
 public class OneToManyAssociation {
     private final EntityColumn pkColumn;
     private final EntityMeta manyEntityMeta;
-    private final Field field;
+    private final Field oneField;
 
     private OneToManyAssociation(Field oneField, EntityColumn pkColumn) {
         if (!hasOneToManyField(oneField)) {
             throw new IllegalArgumentException("해당 필드는 OneToMany 어노테이션이 있어야 합니다.");
         }
 
-        this.field = oneField;
+        this.oneField = oneField;
         this.pkColumn = pkColumn;
         final Class<?> manyAssociationType = getFieldGenericType(oneField);
-        final ForeignerColumn foreignerColumn = ForeignerColumn.of(manyAssociationType, pkColumn.getField(), joinColumnName());
-        this.manyEntityMeta = EntityMeta.createManyEntityMeta(manyAssociationType , foreignerColumn);
+        final ForeignerColumn foreignerColumn = ForeignerColumn.of(manyAssociationType, pkColumn.getField(),
+                joinColumnName());
+        this.manyEntityMeta = EntityMeta.createManyEntityMeta(manyAssociationType, foreignerColumn);
 
     }
+
     public static OneToManyAssociation of(Class<?> clazz, EntityMeta entityMeta) {
         return new OneToManyAssociation(getOneField(clazz), entityMeta.getPkColumn());
     }
@@ -41,13 +43,13 @@ public class OneToManyAssociation {
     public EntityColumn getPkManyColumn() {
         return manyEntityMeta.getPkColumn();
     }
+
     public boolean isHasJoinColumn() {
-        return field.isAnnotationPresent(JoinColumn.class);
+        return oneField.isAnnotationPresent(JoinColumn.class);
     }
 
-
     private String joinColumnName() {
-        final JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
+        final JoinColumn joinColumn = oneField.getAnnotation(JoinColumn.class);
         if (joinColumn == null || joinColumn.name().isBlank()) {
             return pkColumn.getName();
         }
@@ -69,6 +71,10 @@ public class OneToManyAssociation {
                 .filter(OneToManyAssociation::hasOneToManyField)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 클래스는 OneToMany 어노테이션이 있어야 합니다."));
+    }
+
+    public Field getOneField() {
+        return oneField;
     }
 
     private static boolean hasOneToManyField(Field it) {

@@ -34,8 +34,8 @@ public class EntityLoader {
 
         log.info(query);
 
-        return jdbcTemplate.query(query,
-                (resultSet) -> entityMapper.resultSetToEntity(tClass, resultSet));
+        return jdbcTemplate.queryForAll(query,
+                (resultSet) -> entityMapper.resultSetToEntityAll(tClass, resultSet));
     }
 
 

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import persistence.exception.NoEntityException;
 import persistence.testFixtures.NoHasEntity;
 import persistence.testFixtures.Person;
+import persistence.testFixtures.assosiate.Order;
+import persistence.testFixtures.assosiate.OrderItem;
 
 class EntityMetaTest {
 
@@ -47,6 +49,19 @@ class EntityMetaTest {
         assertSoftly((it -> {
             it.assertThat(copyEntity == person).isFalse();
             it.assertThat(copyEntity).isEqualTo(person);
+        }));
+    }
+
+    @Test
+    @DisplayName("해당 oneToMany 연관 관계 인지 테스트")
+    void isOneToManyAssociation() {
+        EntityMeta order = EntityMeta.from(Order.class);
+        EntityMeta orderItem = EntityMeta.from(OrderItem.class);
+
+
+        assertSoftly((it -> {
+            it.assertThat(order.hasOneToManyAssociation()).isTrue();
+            it.assertThat(orderItem.hasOneToManyAssociation()).isFalse();
         }));
     }
 

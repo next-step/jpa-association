@@ -42,4 +42,4 @@ public class OrderItem {
     - [X] JoinColumn 대응 
       - [X] JoinColumn의 ID 값으로 조인을 한다.
   - [X] id값을 가지고 조회하는 쿼리 작성 
-- [ ] Join Query 를 만들어 Entity화 해보기
+- [X] Join Query 를 만들어 Entity화 해보기
