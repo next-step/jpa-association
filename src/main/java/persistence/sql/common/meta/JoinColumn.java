@@ -1,5 +1,6 @@
 package persistence.sql.common.meta;
 
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 
 import java.lang.reflect.Field;
@@ -8,11 +9,15 @@ import java.util.Arrays;
 
 public class JoinColumn {
     private TableName tableName;
-    private Column column;
+    private Columns columns;
+    private Column targetColumn;
+    private FetchType fetchType;
 
-    public JoinColumn(TableName tableName, Column column) {
+    public JoinColumn(TableName tableName, Columns columns, Column targetColumn, FetchType fetchType) {
         this.tableName = tableName;
-        this.column = column;
+        this.columns = columns;
+        this.targetColumn = targetColumn;
+        this.fetchType = fetchType;
     }
 
     public static JoinColumn of(Field[] fields) {
@@ -27,7 +32,17 @@ public class JoinColumn {
 
         Class<?> clazz = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 
-        return new JoinColumn(TableName.of(clazz), Column.of(field));
+        return new JoinColumn(TableName.of(clazz), Columns.of(clazz.getDeclaredFields()), Column.of(field), extractFetchType(field));
+    }
+
+    public static FetchType extractFetchType(Field field) {
+        FetchType fetch = field.getAnnotation(OneToMany.class).fetch();
+
+        if(fetch == null) {
+            return FetchType.EAGER;
+        }
+
+        return fetch;
     }
 
     public String getTableName() {
@@ -39,6 +54,14 @@ public class JoinColumn {
     }
 
     public String getJoinColumn() {
-        return column.getName();
+        return targetColumn.getName();
+    }
+
+    public Columns getColumns() {
+        return columns;
+    }
+
+    public boolean isEager() {
+        return fetchType.equals(FetchType.EAGER);
     }
 }

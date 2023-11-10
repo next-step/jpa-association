@@ -61,7 +61,15 @@ class SelectQuery {
     }
 
     private String parseSelectFiled() {
-        return columns.getColumnsWithComma(tableName.getAlias(), joinColumn);
+        if(joinColumn == null) {
+            return columns.getColumnsWithComma(tableName.getAlias());
+        }
+
+        if(!joinColumn.isEager()) {
+            //TODO: LAZY 작성 필요
+        }
+        
+        return String.join(", ", columns.getColumnsWithComma(tableName.getAlias()), joinColumn.getColumns().getColumnsWithComma(joinColumn.getTableAlias()));
     }
 
     private String parseWhere() {

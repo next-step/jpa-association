@@ -1,23 +1,23 @@
 package persistence.sql.dml;
 
-import domain.Order;
-import domain.Person;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import persistence.exception.InvalidEntityException;
-import domain.NonExistentTablePerson;
-import domain.NotEntityPerson;
-import domain.SelectPerson;
-import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.JoinColumn;
-import persistence.sql.common.meta.TableName;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
 import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+
+import domain.NonExistentTablePerson;
+import domain.NotEntityPerson;
+import domain.Order;
+import domain.Person;
+import domain.SelectPerson;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import persistence.exception.InvalidEntityException;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.JoinColumn;
+import persistence.sql.common.meta.TableName;
 
 class SelectQueryTest {
 
@@ -61,7 +61,7 @@ class SelectQueryTest {
     }
 
     @Test
-    @DisplayName("@OneToMay의 경우 join문으로 select문 생성")
+    @DisplayName("@OneToMany 즉시 조회 join문으로 select문 생성")
     void oneToMany() {
         //given
         final Class<Order> aClass = Order.class;
@@ -71,13 +71,13 @@ class SelectQueryTest {
         final Columns columns = Columns을_생성함(aClass);
         final JoinColumn joinColumn = JoinColumn을_생성함(aClass);
 
-        String wildcardPattern = "SELECT .*\\.id, .*\\.order_number, .*\\.order_id FROM orders .* JOIN order_items .* ON .*\\.id = .*\\.order_id WHERE .*\\.id = 1";
+        String expectedQuery = "SELECT .*\\.id, .*\\.order_number, .*\\.id, .*\\.product, .*\\.quantity FROM orders .* JOIN order_items .* ON .*\\.id = .*\\.order_id WHERE .*\\.id = 1";
 
         //when
         String q = query.select(methodName, tableName, columns, joinColumn, 1);
 
         //then
-        assertThat(q.matches(wildcardPattern)).isTrue();
+        assertThat(q.matches(expectedQuery)).isTrue();
     }
 
     @Test

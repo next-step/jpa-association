@@ -9,6 +9,7 @@ import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.DatabasePerson;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.junit.jupiter.api.AfterAll;
@@ -20,13 +21,12 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import domain.DatabasePerson;
-import persistence.sql.common.meta.JoinColumn;
-import persistence.sql.ddl.DmlQuery;
-import persistence.sql.dml.Query;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
+import persistence.sql.ddl.DmlQuery;
+import persistence.sql.dml.Query;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DatabaseImplTest {
@@ -56,11 +56,11 @@ class DatabaseImplTest {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     @DisplayName("database 인터페이스를 통한 insert 성공")
     void insert() {
         //given
-        final Long id = 3L;
+        final Long id = 444L;
         final String name = "name";
         final int age = 30;
         final String email = "zz";
@@ -73,16 +73,18 @@ class DatabaseImplTest {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     @DisplayName("database 인터페이스를 통한 findAll로 모든 list 조회")
-    void findAll() throws SQLException {
+    void findAll() throws SQLException, InterruptedException {
         //given
         final String methodName = "findAll";
 
         final int count = 10;
-        for (int i = count; i < 20; i++) {
+        for (int i = 0; i < count; i++) {
             insert(new DatabasePerson(Integer.toUnsignedLong(i), "name", 30, "email", 1));
         }
+
+        Thread.sleep(5000);
 
         //when
         ResultSet resultSet = findAll(tClass, methodName);
