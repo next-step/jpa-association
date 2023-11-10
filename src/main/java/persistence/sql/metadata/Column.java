@@ -1,7 +1,11 @@
 package persistence.sql.metadata;
 
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import persistence.dialect.Dialect;
+import persistence.sql.metadata.association.Association;
+import persistence.sql.metadata.association.AssociationType;
 
 import java.lang.reflect.Field;
 
@@ -18,6 +22,8 @@ public class Column {
 
     private final Object value;
 
+    private final Association association;
+
     public Column(Field field, Object value) {
         this.name = findName(field);
         this.type = field.getType();
@@ -25,6 +31,7 @@ public class Column {
         this.isTransient = field.isAnnotationPresent(Transient.class);
         this.convertedValue = convertValueToString(value);
         this.value = value;
+        this.association = findAssociation(field);
     }
 
     public String getName() {
@@ -41,6 +48,10 @@ public class Column {
 
     public Object getValue() {
         return value;
+    }
+
+    public Association getAssociation() {
+        return association;
     }
 
     public String buildColumnsWithConstraint(Dialect dialect) {
@@ -92,5 +103,17 @@ public class Column {
         }
 
         return String.valueOf(value);
+    }
+
+    private Association findAssociation(Field field) {
+        if(field.isAnnotationPresent(OneToMany.class)) {
+            return AssociationType.OneToMany.createdAssociation(field);
+        }
+
+        if(field.isAnnotationPresent(ManyToOne.class)) {
+            return AssociationType.ManyToOne.createdAssociation(field);
+        }
+
+        return null;
     }
 }
