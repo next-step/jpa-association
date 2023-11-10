@@ -9,7 +9,7 @@ import persistence.context.PersistenceContext;
 import persistence.context.PersistenceContextImpl;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.loader.EntityLoader;
-import persistence.entity.loader.SimpleEntityLoaderImpl;
+import persistence.entity.loader.SimpleEntityLoader;
 import persistence.entity.manager.EntityManagerImpl;
 import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.infra.H2SqlConverter;
@@ -35,7 +35,7 @@ class CustomJpaRepositoryTest extends DatabaseTest {
 
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);

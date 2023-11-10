@@ -3,7 +3,6 @@ package persistence.entity.attribute.id;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -27,14 +26,6 @@ public class IntegerTypeIdAttribute implements IdAttribute {
         this.fieldName = field.getName();
         this.columnName = columnName;
         this.generationType = generationType;
-    }
-
-    @Override
-    public String prepareDDL(SqlConverter sqlConverter) {
-        String component = (columnName.isBlank() ? fieldName : columnName) + " " +
-                sqlConverter.convert(Integer.class) + " " +
-                sqlConverter.convert(generationType.getClass());
-        return component.trim();
     }
 
     @Override

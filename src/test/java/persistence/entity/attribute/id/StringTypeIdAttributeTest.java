@@ -42,27 +42,4 @@ class StringTypeIdAttributeTest {
             }
         }
     }
-
-    @Nested
-    @DisplayName("prepareDDL 메소드는")
-    class prepareDDL {
-        @Nested
-        @DisplayName("sqlConverter 컨버터가 주어지면")
-        class sqlConverter {
-            @Test
-            @DisplayName("DDL을 반환한다")
-            void prepareDDL() throws NoSuchFieldException {
-                //given
-                Field field = sample.getClass().getDeclaredField("id");
-
-                StringTypeIdAttribute stringTypeIdAttribute = new StringTypeIdAttribute(field);
-
-                //when
-                String ddl = stringTypeIdAttribute.prepareDDL(new H2SqlConverter());
-
-                //then
-                assertThat(ddl).isEqualTo("id VARCHAR(255)");
-            }
-        }
-    }
 }

@@ -30,18 +30,6 @@ public class JdbcTemplate {
         }
     }
 
-    public <T> List<T> queryForList(final String sql, final RowMapper<T> rowMapper) {
-        List<T> results = new ArrayList<>();
-        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            while (resultSet.next()) {
-                results.add(rowMapper.mapRow(resultSet));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return results;
-    }
-
     public <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             final List<T> result = new ArrayList<>();
@@ -49,6 +37,14 @@ public class JdbcTemplate {
                 result.add(rowMapper.mapRow(resultSet));
             }
             return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> List<T> queryList(final String sql, final RowsMapper<T> rowsMapper) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            return rowsMapper.mapRow(resultSet);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -38,7 +38,7 @@ class FirstCachesTest {
 
                 //then
                 assertThat(firstCache.toString())
-                        .isEqualTo("Order{id=1, orderNumber='민준', orderItems=[OrderItem{id=1, product='티비', quantity=1}]}");
+                        .isEqualTo("Order{id=1, orderNumber='민준', orderItems=[OrderItem{id=1, product='티비', quantity=1, orderId=null}]}");
             }
         }
 

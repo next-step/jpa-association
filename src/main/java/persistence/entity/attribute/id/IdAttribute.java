@@ -1,13 +1,11 @@
 package persistence.entity.attribute.id;
 
 import jakarta.persistence.GenerationType;
-import persistence.sql.ddl.converter.SqlConverter;
+import persistence.entity.attribute.Attribute;
 
 import java.lang.reflect.Field;
 
-public interface IdAttribute {
-    String prepareDDL(SqlConverter sqlConverter);
-
+public interface IdAttribute extends Attribute {
     Field getField();
 
     String getColumnName();
