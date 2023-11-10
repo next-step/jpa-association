@@ -8,7 +8,9 @@ import persistence.meta.EntityMeta;
 
 public class EntityOneToManyPath {
     private static final int START_PATH_LEVEL = 0;
+
     private final Map<Integer, List<Object>> path = new HashMap<>();
+
     public EntityOneToManyPath(EntityMeta entityMeta, Object rootEntity) {
         path.put(START_PATH_LEVEL, List.of(rootEntity));
         pathSearch(entityMeta, START_PATH_LEVEL );
@@ -19,7 +21,7 @@ public class EntityOneToManyPath {
             path.put(level, new ArrayList<>());
         }
 
-        if (!entityMeta.hasOneToManyAssociation()) {
+        if (!hasNextPath(entityMeta)) {
             return;
         }
 
@@ -37,6 +39,10 @@ public class EntityOneToManyPath {
 
     public int totalLevel() {
         return path.size();
+    }
+
+    private boolean hasNextPath(EntityMeta entityMeta) {
+        return entityMeta.hasOneToManyAssociation();
     }
 
 }
