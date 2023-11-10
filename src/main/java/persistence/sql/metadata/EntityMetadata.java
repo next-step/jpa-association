@@ -33,6 +33,10 @@ public class EntityMetadata {
         return id.getValue();
     }
 
+    public String getIdName() {
+        return id.getName();
+    }
+
     public boolean isNewEntity() {
         return id.getValue() == null;
     }
@@ -51,5 +55,9 @@ public class EntityMetadata {
 
     public String buildWhereWithPKClause() {
         return columns.buildWhereWithPKClause();
+    }
+
+    public String[] buildJoinClauses() {
+        return columns.buildJoinClauses();
     }
 }

@@ -21,6 +21,8 @@ public class DmlQueryBuilder {
 
 	private static final String WHERE_CLAUSE = " WHERE %s";
 
+	private static final String JOIN_CLAUSE = " JOIN %s = %s.%s";
+
 	private DmlQueryBuilder() {
 
 	}
@@ -64,10 +66,15 @@ public class DmlQueryBuilder {
 		)
 		);
 
-		return format(SELECT_COMMAND, "*", entityMetadata.getTableName() + wherePKClause(entityMetadata));
+		return format(SELECT_COMMAND, "*", entityMetadata.getTableName() + joinClause(entityMetadata) + wherePKClause(entityMetadata));
 	}
 
 	public String wherePKClause(EntityMetadata entityMetadata) {
 		return format(WHERE_CLAUSE, entityMetadata.buildWhereWithPKClause());
+	}
+
+	public String joinClause(EntityMetadata entityMetadata) {
+		return Arrays.stream(entityMetadata.buildJoinClauses()).map(x -> format(JOIN_CLAUSE, x, entityMetadata.getTableName(), entityMetadata.getIdName()))
+				.collect(Collectors.joining("/n"));
 	}
 }

@@ -1,10 +1,12 @@
 package persistence.sql.metadata;
 
 import persistence.dialect.Dialect;
+import persistence.sql.metadata.association.Association;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Columns {
@@ -55,6 +57,14 @@ public class Columns {
                 .map(x -> x.getName() + " = " + x.getConvertedValue())
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public String[] buildJoinClauses() {
+        return columns.stream()
+                .map(Column::getAssociation)
+                .filter(Objects::nonNull)
+                .map(Association::buildJoinClause)
+                .toArray(String[]::new);
     }
 
     public Column getId() {

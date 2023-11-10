@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,16 +40,25 @@ class DmlQueryBuilderTest {
 
 	@DisplayName("Person 객체로 PK 조건의 SELECT 쿼리 생성 테스트")
 	@Test
-	void test_buildFindAllQuery() {
+	void test_selectQuery() {
 		assertEquals(
 				queryBuilder.selectQuery(Person.class, "1"),
 				"SELECT * FROM users WHERE id = 1;"
 		);
 	}
 
+	@DisplayName("Order 객체로 JOIN 절을 포함한 SELECT 쿼리 생성 테스트")
+	@Test
+	void test_selectQueryWithJoinQuery() {
+		assertEquals(
+				queryBuilder.selectQuery(Order.class, "1"),
+				"SELECT * FROM orders JOIN order_items ON order_items.order_id = orders.id WHERE id = 1;"
+		);
+	}
+
 	@DisplayName("Person 객체로 PK 조건의 UPDATE 쿼리 생성 테스트")
 	@Test
-	void test_buildByIdQuery() {
+	void test_updateQuery() {
 		Person updatePerson = new Person("update", 2, "update@email.com", 0);
 
 		assertEquals(queryBuilder.updateQuery(
