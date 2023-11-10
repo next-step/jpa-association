@@ -2,12 +2,17 @@ package persistence.entity.loader;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.OneToManyField;
 import persistence.entity.attribute.id.IdAttribute;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,21 +42,12 @@ public class LazyLoadingOneToManyFieldMapper implements CollectionMapperResolver
         Class<?> fieldArgType = getCollectionFieldType(field);
 
         if (List.class.isAssignableFrom(field.getType())) {
-            List proxyList = (List) Proxy.newProxyInstance(
-                    fieldArgType.getClassLoader(),
-                    new Class[]{List.class},
-                    new InvocationHandler() {
-                        private List target = null;
+            Enhancer enhancer = new Enhancer();
+            enhancer.setSuperclass(ArrayList.class);
+            enhancer.setCallback((LazyLoader) () -> collectionLoader.loadCollection(fieldArgType, oneToManyField.getJoinColumnName(),
+                    getInstanceIdAsString(instance, ownerIdAttribute.getField())));
 
-                        @Override
-                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            if (target == null) {
-                                target = collectionLoader.loadCollection(fieldArgType, oneToManyField.getJoinColumnName(),
-                                        getInstanceIdAsString(instance, ownerIdAttribute.getField()));
-                            }
-                            return method.invoke(target, args);
-                        }
-                    });
+            List proxyList = (List) enhancer.create();
             try {
                 field.setAccessible(true);
                 field.set(instance, proxyList);

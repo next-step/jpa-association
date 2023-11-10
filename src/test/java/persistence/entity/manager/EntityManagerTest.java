@@ -12,7 +12,7 @@ import persistence.context.PersistenceContextImpl;
 import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.loader.EntityLoader;
-import persistence.entity.loader.SimpleEntityLoaderImpl;
+import persistence.entity.loader.SimpleEntityLoader;
 import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.infra.H2SqlConverter;
@@ -50,7 +50,7 @@ public class EntityManagerTest extends DatabaseTest {
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
                 jdbcTemplate.execute(insertDML);
 
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -84,7 +84,7 @@ public class EntityManagerTest extends DatabaseTest {
                         = new InsertQueryBuilder().prepareStatement(entityAttribute, sample);
                 jdbcTemplate.execute(insertDML);
 
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -115,7 +115,7 @@ public class EntityManagerTest extends DatabaseTest {
 
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);
@@ -147,7 +147,7 @@ public class EntityManagerTest extends DatabaseTest {
 
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
 
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
                 EntityAttributes entityAttributes = new EntityAttributes();
                 PersistenceContext persistenceContext = new PersistenceContextImpl(simpleEntityPersister, entityAttributes);

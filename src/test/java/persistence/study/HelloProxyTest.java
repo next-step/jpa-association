@@ -3,7 +3,6 @@ package persistence.study;
 import fixtures.HelloTarget;
 import net.sf.cglib.proxy.Enhancer;
 import org.junit.jupiter.api.Test;
-import persistence.proxy.ConvertToUpperCaseInterceptor;
 
 public class HelloProxyTest {
 

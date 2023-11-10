@@ -2,6 +2,8 @@ package persistence.entity.loader;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.OneToManyField;
 
 import java.lang.reflect.Field;
@@ -10,13 +12,14 @@ import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolver {
-    private final List<MapperResolver> MAPPER_RESOLVERS;
+    private final LoaderMapper loaderMapper;
+    private final EntityAttributes entityAttributes;
 
-    public EagerLoadingOneToManyFieldMapper(List<MapperResolver> mapperResolvers) {
-        this.MAPPER_RESOLVERS = mapperResolvers;
+    public EagerLoadingOneToManyFieldMapper(LoaderMapper loaderMapper, EntityAttributes entityAttributes) {
+        this.loaderMapper = loaderMapper;
+        this.entityAttributes = entityAttributes;
     }
 
     @Override
@@ -36,8 +39,8 @@ public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolve
             field.setAccessible(true);
 
             Collection<Object> collection = getOrCreateCollection(instance, field);
-            Object oneToManyInstance = mapResultSetToOneToManyAnnotatedField(resultSet, fieldArgType);
-            collection.add(oneToManyInstance);
+            Object oneToManyFieldInstance = mapResultSetToOneToManyAnnotatedField(resultSet, fieldArgType);
+            collection.add(oneToManyFieldInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -71,16 +74,12 @@ public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolve
 
     private Object mapResultSetToOneToManyAnnotatedField(ResultSet resultSet, Class<?> oneToManyFieldClass) {
         try {
-            Object instance = oneToManyFieldClass.getConstructor().newInstance();
+            EntityAttribute oneToManyFieldEntityAttribute = entityAttributes.findEntityAttribute(oneToManyFieldClass);
+            Object oneToManyFieldInstance = oneToManyFieldClass.getConstructor().newInstance();
 
-            for (Field field : oneToManyFieldClass.getDeclaredFields()) {
-                for (MapperResolver mapperResolver : MAPPER_RESOLVERS) {
-                    if (mapperResolver.supports(field)) {
-                        mapperResolver.map(instance, field, resultSet);
-                    }
-                }
-            }
-            return instance;
+            loaderMapper.mapAttributes(oneToManyFieldEntityAttribute, resultSet, oneToManyFieldInstance);
+
+            return oneToManyFieldInstance;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

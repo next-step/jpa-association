@@ -18,10 +18,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Nested
 @DisplayName("EntityLoader 클래스의")
-public class SimpleEntityLoaderImplTest extends DatabaseTest {
+public class SimpleEntityLoaderTest extends DatabaseTest {
     private final EntityAttributes entityAttributes = new EntityAttributes();
 
-    public SimpleEntityLoaderImplTest() throws SQLException {
+    public SimpleEntityLoaderTest() throws SQLException {
     }
 
     @Nested
@@ -38,16 +38,16 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
 
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
-                SimpleEntityLoaderImpl simpleEntityLoaderImpl = new SimpleEntityLoaderImpl(jdbcTemplate, entityAttributes);
+                SimpleEntityLoader simpleEntityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
 
                 //when
                 EntityFixtures.SampleOneWithValidAnnotation retrieved =
-                        simpleEntityLoaderImpl.load(EntityFixtures.SampleOneWithValidAnnotation.class, "id", inserted.getId().toString());
+                        simpleEntityLoader.load(EntityFixtures.SampleOneWithValidAnnotation.class, "id", inserted.getId().toString());
 
                 //then
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
@@ -61,7 +61,7 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1, 1L);
                 EntityFixtures.OrderItem orderItem2 = new EntityFixtures.OrderItem("세탁기", 2, 1L);
                 EntityFixtures.Order order = new EntityFixtures.Order("1324", List.of(orderItem, orderItem2));
@@ -92,7 +92,7 @@ public class SimpleEntityLoaderImplTest extends DatabaseTest {
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
-                EntityLoader entityLoader = new SimpleEntityLoaderImpl(new JdbcTemplate(server.getConnection()), entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
 
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
 

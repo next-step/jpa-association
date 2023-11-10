@@ -5,14 +5,13 @@ import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
-public class SimpleEntityLoaderImpl implements EntityLoader {
+public class SimpleEntityLoader implements EntityLoader {
     private final JdbcTemplate jdbcTemplate;
     private final EntityAttributes entityAttributes;
-    private final LoaderHelper loaderHelper;
+    private final LoaderMapper loaderHelper;
 
-    public SimpleEntityLoaderImpl(JdbcTemplate jdbcTemplate,
-                                  EntityAttributes entityAttributes) {
-        this.loaderHelper = new LoaderHelper(entityAttributes, new SimpleCollectionLoader(jdbcTemplate, entityAttributes));
+    public SimpleEntityLoader(JdbcTemplate jdbcTemplate, EntityAttributes entityAttributes) {
+        this.loaderHelper = new LoaderMapper(entityAttributes, new SimpleCollectionLoader(jdbcTemplate, entityAttributes));
         this.jdbcTemplate = jdbcTemplate;
         this.entityAttributes = entityAttributes;
     }

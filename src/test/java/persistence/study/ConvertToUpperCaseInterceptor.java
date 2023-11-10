@@ -1,4 +1,4 @@
-package persistence.proxy;
+package persistence.study;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;

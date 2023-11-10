@@ -10,10 +10,10 @@ import java.util.List;
 public class SimpleCollectionLoader implements CollectionLoader {
     private final JdbcTemplate jdbcTemplate;
     private final EntityAttributes entityAttributes;
-    private final LoaderHelper loaderHelper;
+    private final LoaderMapper loaderHelper;
 
     public SimpleCollectionLoader(JdbcTemplate jdbcTemplate, EntityAttributes entityAttributes) {
-        this.loaderHelper = new LoaderHelper(entityAttributes, this);
+        this.loaderHelper = new LoaderMapper(entityAttributes, this);
         this.jdbcTemplate = jdbcTemplate;
         this.entityAttributes = entityAttributes;
     }
