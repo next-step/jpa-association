@@ -4,6 +4,7 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.dml.Query;
 
@@ -14,6 +15,7 @@ public class EntityLoader<T> {
     private final ResultMapper<T> resultMapper;
     private final TableName tableName;
     private final Columns columns;
+    private final JoinColumn joinColumn;
 
     EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
         this.query = query;
@@ -23,10 +25,11 @@ public class EntityLoader<T> {
 
         this.tableName = TableName.of(tClass);
         this.columns = Columns.of(tClass.getDeclaredFields());
+        this.joinColumn = JoinColumn.of(tClass.getDeclaredFields());
     }
 
     public List<T> findAll() {
-        String q = query.select(new Object() {
+        String q = query.selectAll(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns);
 
         return jdbcTemplate.query(q, resultMapper);
@@ -34,12 +37,12 @@ public class EntityLoader<T> {
 
     public <I> T findById(I input) {
         String q = query.select(new Object() {
-        }.getClass().getEnclosingMethod().getName(), tableName, columns, input);
+        }.getClass().getEnclosingMethod().getName(), tableName, columns, joinColumn, input);
 
         return jdbcTemplate.queryForObject(q, resultMapper);
     }
 
     public <I> int getHashCode(I input) {
-        return query.select("findById", tableName, columns, input).hashCode();
+        return query.select("findById", tableName, columns, joinColumn, input).hashCode();
     }
 }

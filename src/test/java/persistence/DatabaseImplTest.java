@@ -3,7 +3,9 @@ package persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 import database.DatabaseServer;
 import database.H2;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import domain.DatabasePerson;
+import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.ddl.DmlQuery;
 import persistence.sql.dml.Query;
 import persistence.sql.common.instance.Values;
@@ -146,9 +149,9 @@ class DatabaseImplTest {
     }
 
     private <T> void insert(T t) throws SQLException {
-        final TableName tableName = TableName.of(t.getClass());
-        final Columns columns = Columns.of(t.getClass().getDeclaredFields());
-        final Values values = Values.of(t);
+        final TableName tableName = TableName을_생성함(t);
+        final Columns columns = Columns을_생성함(t);
+        final Values values = Values을_생성함(t);
 
         database.execute(query.insert(tableName, columns, values));
     }
@@ -158,16 +161,17 @@ class DatabaseImplTest {
     }
 
     private <T> ResultSet findAll(Class<T> tClass, String methodName) throws SQLException {
-        final TableName tableName = TableName.of(tClass);
-        final Columns columns = Columns.of(tClass.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
 
-        return database.executeQuery(query.select(methodName, tableName, columns, null));
+        return database.executeQuery(query.selectAll(methodName, tableName, columns));
     }
 
     private <T> ResultSet find(Class<T> tClass, String methodName, Object... args) throws SQLException {
-        final TableName tableName = TableName.of(tClass);
-        final Columns columns = Columns.of(tClass.getDeclaredFields());
+        final TableName tableName = TableName을_생성함(tClass);
+        final Columns columns = Columns을_생성함(tClass);
+        final JoinColumn joinColumn = JoinColumn을_생성함(tClass);
 
-        return database.executeQuery(query.select(methodName, tableName, columns, args));
+        return database.executeQuery(query.select(methodName, tableName, columns, joinColumn, args));
     }
 }

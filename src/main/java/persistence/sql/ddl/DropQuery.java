@@ -21,6 +21,6 @@ class DropQuery {
     }
 
     private String combineQuery() {
-        return String.format(DEFAULT_DROP_QUERY, tableName.getValue());
+        return String.format(DEFAULT_DROP_QUERY, tableName.getName());
     }
 }

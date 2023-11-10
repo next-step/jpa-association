@@ -4,12 +4,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import persistence.exception.InvalidEntityException;
 
+import java.time.LocalDateTime;
+
 public class TableName {
 
-    private final String value;
+    private final String name;
+    private final String alias;
 
     private <T> TableName(Class<T> tClass) {
-        this.value = parseTableName(tClass);
+        this.name = parseTableName(tClass);
+        this.alias = name + Math.abs(LocalDateTime.now().hashCode());
     }
 
     public static <T> TableName of(Class<T> tClass) {
@@ -59,7 +63,11 @@ public class TableName {
         return tClass.getSimpleName();
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 }

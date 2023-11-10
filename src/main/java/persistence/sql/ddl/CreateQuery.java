@@ -32,7 +32,7 @@ class CreateQuery {
      * 해당 Class를 분석하여 CREATE QUERY로 조합합니다.
      */
     private String combineQuery() {
-        return String.format(DEFAULT_CREATE_QUERY, tableName.getValue(),
+        return String.format(DEFAULT_CREATE_QUERY, tableName.getName(),
             columns.getConstraintsWithColumns() + createColumns());
     }
 

@@ -25,8 +25,8 @@ class TableNameTest {
 
         //then
         assertSoftly(softAssertions -> {
-            softAssertions.assertThat(result.getValue()).isEqualTo("users");
-            softAssertions.assertThat(result.getValue()).isNotEqualTo("Person");
+            softAssertions.assertThat(result.getName()).isEqualTo("users");
+            softAssertions.assertThat(result.getName()).isNotEqualTo("Person");
         });
     }
 
@@ -50,6 +50,6 @@ class TableNameTest {
         TableName result = TableName을_생성함(clazz);
 
         //then
-        assertThat(result.getValue()).isEqualTo("NonExistentTablePerson");
+        assertThat(result.getName()).isEqualTo("NonExistentTablePerson");
     }
 }

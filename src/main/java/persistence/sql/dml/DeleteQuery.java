@@ -26,10 +26,10 @@ class DeleteQuery {
     }
 
     private String getTableQuery() {
-        return String.format(DEFAULT_DELETE_QUERY, tableName.getValue());
+        return String.format(DEFAULT_DELETE_QUERY, tableName.getName());
     }
 
     private String getCondition() {
-        return ConditionBuilder.getCondition(columns.getIdName(), arg);
+        return ConditionBuilder.getCondition(columns.getIdName(), arg, null);
     }
 }

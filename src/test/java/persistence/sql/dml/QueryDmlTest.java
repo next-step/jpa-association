@@ -1,11 +1,11 @@
 package persistence.sql.dml;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,6 +28,7 @@ import domain.NotEntityPerson;
 import domain.SelectPerson;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
 
@@ -129,11 +129,13 @@ class QueryDmlTest {
 
             final TableName tableName = TableName을_생성함(person);
             final Columns columns = Columns을_생성함(person);
+            final JoinColumn joinColumn = JoinColumn을_생성함(person.getClass());
+
 
             insert(person);
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns),
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectAllQuery("findAll", tableName, columns),
                 new ResultMapper<>(SelectPerson.class));
             SelectPerson result = personList.get(0);
 
@@ -159,9 +161,11 @@ class QueryDmlTest {
 
             final TableName tableName = TableName을_생성함(person1);
             final Columns columns = Columns을_생성함(person1);
+            final JoinColumn joinColumn = JoinColumn을_생성함(person1.getClass());
+
 
             //when
-            List<SelectPerson> personList = jdbcTemplate.query(getSelectQuery("findAll", tableName, columns)
+            List<SelectPerson> personList = jdbcTemplate.query(getSelectAllQuery("findAll", tableName, columns)
                 , new ResultMapper<>(SelectPerson.class));
 
             //then
@@ -177,7 +181,7 @@ class QueryDmlTest {
 
             //when & then
             assertThrows(InvalidEntityException.class,
-                () -> jdbcTemplate.query(getSelectQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
+                () -> jdbcTemplate.query(getSelectAllQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
         }
 
         @AfterEach
@@ -219,7 +223,7 @@ class QueryDmlTest {
             String q = query.delete(tableName, columns, id);
             jdbcTemplate.execute(q);
 
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery(selectPersonClass, "findById", id)
                     , new ResultMapper<>(SelectPerson.class));
 
             //then
@@ -261,12 +265,13 @@ class QueryDmlTest {
             Class<SelectPerson> clazz = SelectPerson.class;
             final TableName tableName = TableName을_생성함(clazz);
             final Columns columns = Columns을_생성함(clazz);
+            final JoinColumn joinColumn = JoinColumn을_생성함(clazz);
             final Values values = Values을_생성함(expected);
 
             //when
             String q = query.update(values, tableName, columns, id);
             jdbcTemplate.execute(q);
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery("findAll", tableName, columns),
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery("findAll", tableName, columns),
                 new ResultMapper<>(clazz));
 
             //then
@@ -289,15 +294,16 @@ class QueryDmlTest {
         server.stop();
     }
 
-    private String getSelectQuery(String methodName, TableName tableName, Columns columns) {
-        return query.select(methodName, tableName, columns, null);
+    private String getSelectAllQuery(String methodName, TableName tableName, Columns columns) {
+        return query.selectAll(methodName, tableName, columns);
     }
 
-    private <T> String getSelectQuery(Class<T> tClass, String methodName, Object... args) {
+    private <T> String getSelectAllQuery(Class<T> tClass, String methodName, Object... args) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
+        final JoinColumn joinColumn = JoinColumn을_생성함(tClass);
 
-        return query.select(methodName, tableName, columns, args);
+        return query.select(methodName, tableName, columns, joinColumn, args);
     }
 
     private <T> void 테이블을_생성함(Class<T> tClass) {

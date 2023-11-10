@@ -1,12 +1,8 @@
 package utils;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtils {
-    public static String withComma(String[] input) {
-        return String.join(", ", input);
-    }
 
     /**
      * Object가 문자열인 경우 콜론과 함께 반환합니다.
@@ -19,14 +15,21 @@ public final class StringUtils {
         String v = value.toString();
         String type = value.getClass().getSimpleName();
 
-        if(!pattern.matcher(v).find()) {
+        if (!pattern.matcher(v).find()) {
             v = String.format("'%s'", value);
         }
 
-        if(type.equals("String") || type.equals("char") || type.equals("Character")) {
+        if (type.equals("String") || type.equals("char") || type.equals("Character")) {
             v = String.format("'%s'", value);
         }
 
         return v;
+    }
+
+    public static String camelToSnake(String input) {
+        if (input == null) {
+            return null;
+        }
+        return input.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase();
     }
 }
