@@ -3,7 +3,6 @@ package persistence.entity.attribute.id;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 import java.util.Optional;

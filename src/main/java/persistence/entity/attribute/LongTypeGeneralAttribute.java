@@ -1,7 +1,6 @@
 package persistence.entity.attribute;
 
 import jakarta.persistence.Column;
-import persistence.sql.ddl.converter.SqlConverter;
 
 import java.lang.reflect.Field;
 
