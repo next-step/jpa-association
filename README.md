@@ -43,3 +43,11 @@ public class OrderItem {
       - [X] JoinColumn의 ID 값으로 조인을 한다.
   - [X] id값을 가지고 조회하는 쿼리 작성 
 - [X] Join Query 를 만들어 Entity화 해보기
+
+--- 
+### 2단계 - LazyLoading by Proxy
+- [X] 요구사항 1 - CGLib Proxy 적용
+  - [X] 대문자로 반환하도록 한다.
+  
+- [ ] 요구사항 2 - 조회 시 프록시 객체를 사용해 적용해보자
+  - 테스트 코드를 통해서 프록시 객체를 호출 했을 때와 하지 않았을 때를 비교해보자
