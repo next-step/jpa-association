@@ -33,10 +33,8 @@ public class LoaderMapper {
                 return null;
             }
 
-            mapAttributes(entityAttribute, resultSet, instance);
-
             do {
-                mapCollectionAttributes(entityAttribute, resultSet, instance);
+                mapIdAndGeneralAttributes(entityAttribute, resultSet, instance);
             } while (resultSet.next());
 
             return instance;
@@ -60,7 +58,8 @@ public class LoaderMapper {
 
                 if (instance == null) {
                     instance = instantiateClass(clazz);
-                    mapAttributes(entityAttribute, resultSet, instance);
+                    mapIdAttribute(resultSet, instance, entityAttribute.getIdAttribute());
+                    mapGeneralAttribute(resultSet, instance, entityAttribute.getGeneralAttributes());
                 }
 
                 mapCollectionAttributes(entityAttribute, resultSet, instance);
@@ -73,9 +72,10 @@ public class LoaderMapper {
         return new ArrayList<>(loadedEntities.values());
     }
 
-    public <T> void mapAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
+    public <T> void mapIdAndGeneralAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
         mapIdAttribute(resultSet, instance, entityAttribute.getIdAttribute());
         mapGeneralAttribute(resultSet, instance, entityAttribute.getGeneralAttributes());
+        mapCollectionAttributes(entityAttribute, resultSet, instance);
     }
 
     private <T> void mapIdAttribute(ResultSet resultSet, T instance, IdAttribute idAttribute) {
