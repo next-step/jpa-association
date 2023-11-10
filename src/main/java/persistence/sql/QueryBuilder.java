@@ -51,4 +51,16 @@ public abstract class QueryBuilder {
     protected String combinedQuery(String... queries) {
         return combinedQuery(Arrays.asList(queries));
     }
+
+    protected String columnSignature(String tableNameSignature, String columnName) {
+        return tableNameSignature + "." + columnName;
+    }
+
+    protected String tableNameSignature(String tableName) {
+        return tableNameSignature(tableName, 0);
+    }
+    protected String tableNameSignature(String tableName, int depth) {
+        return tableName + "_" + depth;
+    }
+
 }

@@ -87,12 +87,9 @@ public class RepositoryTest {
                                     //then
                                     assertSoftly((it) -> {
                                         it.assertThat(persons).hasSize(2);
-                                        it.assertThat(persons.get(0).getName()).isEqualTo(person.getName());
-                                        it.assertThat(persons.get(0).getAge()).isEqualTo(person.getAge());
-                                        it.assertThat(persons.get(0).getEmail()).isEqualTo(person.getEmail());
-                                        it.assertThat(persons.get(1).getName()).isEqualTo(person2.getName());
-                                        it.assertThat(persons.get(1).getAge()).isEqualTo(person2.getAge());
-                                        it.assertThat(persons.get(1).getEmail()).isEqualTo(person2.getEmail());
+                                        it.assertThat(persons).extracting("name").contains(person.getName(), person2.getName());
+                                        it.assertThat(persons).extracting("age").contains(person.getAge(), person2.getAge());
+                                        it.assertThat(persons).extracting("email").contains(person.getEmail(), person2.getEmail());
                                     });
                                 }))
                         )

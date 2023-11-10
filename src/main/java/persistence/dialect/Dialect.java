@@ -69,5 +69,7 @@ public abstract class Dialect {
         return "UPDATE " + tableName + " SET ";
     }
 
-
+    public String leftJoin(String tableName, String tableAlias) {
+        return " LEFT JOIN " + tableName + " " + tableAlias + " ON ";
+    }
 }

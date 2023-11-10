@@ -2,31 +2,47 @@ package persistence.meta;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import persistence.association.OneToManyAssociation;
 import persistence.exception.NoEntityException;
 
 public class EntityMeta {
-    private final String tableName;
+    private final TableName tableName;
     private final EntityColumns entityColumns;
     private final EntityColumn pkColumn;
     private final Class<?> entityClass;
+    private OneToManyAssociation oneToManyAssociation;
+    private ForeignerColumn foreignerColumn;
 
     private EntityMeta(Class<?> entityClass) {
         if (entityClass == null || entityClass.getAnnotation(Entity.class) == null) {
             throw new NoEntityException();
         }
-
-        this.tableName = createTableName(entityClass);
+        this.tableName = TableName.from(entityClass);
         this.entityColumns = new EntityColumns(entityClass.getDeclaredFields());
         this.pkColumn = entityColumns.pkColumn();
         this.entityClass = entityClass;
+
+        findOneToManyFiled(entityClass).ifPresent(field ->
+                this.oneToManyAssociation = OneToManyAssociation.of(field, pkColumn));
+    }
+
+    private EntityMeta(Class<?> entityClass, ForeignerColumn foreignerColumn) {
+        this(entityClass);
+        this.foreignerColumn = foreignerColumn;
     }
 
     public static EntityMeta from(Class<?> entityClass) {
         return new EntityMeta(entityClass);
+    }
+
+    public static EntityMeta createManyEntityMeta(Class<?> entityClass, ForeignerColumn foreignerColumn) {
+        return new EntityMeta(entityClass, foreignerColumn);
     }
 
     public <T> T createCopyEntity(T entity) {
@@ -44,15 +60,8 @@ public class EntityMeta {
         }
     }
 
-    private String createTableName(Class<?> entityClass) {
-        if (!entityClass.isAnnotationPresent(Table.class) || entityClass.getAnnotation(Table.class).name().isBlank()) {
-            return entityClass.getSimpleName();
-        }
-        return entityClass.getAnnotation(Table.class).name();
-    }
-
     public String getTableName() {
-        return tableName;
+        return tableName.getValue();
     }
 
     public List<EntityColumn> getEntityColumns() {
@@ -72,4 +81,29 @@ public class EntityMeta {
         return GenerationType.IDENTITY.equals(pkColumn.getGenerationType());
     }
 
+    public boolean hasOneToManyAssociation() {
+        return oneToManyAssociation != null;
+    }
+
+    public OneToManyAssociation getOneToManyAssociation() {
+        return oneToManyAssociation;
+    }
+
+    private Optional<Field> findOneToManyFiled(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(OneToMany.class))
+                .findFirst();
+    }
+
+    public ForeignerColumn getForeignerColumn() {
+        return foreignerColumn;
+    }
+
+    public Class<?> getEntityClass() {
+        return entityClass;
+    }
+
+    public boolean hasForeignerColumn() {
+        return foreignerColumn != null;
+    }
 }

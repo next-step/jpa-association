@@ -1,5 +1,6 @@
 package persistence.meta;
 
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class EntityColumns {
 
     private List<EntityColumn> extractColumns(Field[] fields) {
         return Arrays.stream(fields)
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
+                .filter(field -> !field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(OneToMany.class))
                 .map(EntityColumn::new)
                 .collect(Collectors.toList());
     }
