@@ -8,6 +8,7 @@ import persistence.sql.metadata.association.Association;
 import persistence.sql.metadata.association.AssociationType;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class Column {
     private final String name;
@@ -38,10 +39,6 @@ public class Column {
         return name;
     }
 
-    public boolean isNotTransient() {
-        return !isTransient;
-    }
-
     public String getConvertedValue() {
         return convertedValue;
     }
@@ -55,6 +52,10 @@ public class Column {
     }
 
     public String buildColumnsWithConstraint(Dialect dialect) {
+        if(hasAssociation()) {
+            return null;
+        }
+
         return new StringBuilder()
                 .append(name + " " + findType(dialect))
                 .append(constraint.buildNullable())
@@ -68,7 +69,11 @@ public class Column {
             return false;
         }
 
-        return !isTransient && !constraint.isPrimaryKey();
+        return !isTransient && !constraint.isPrimaryKey() && !hasAssociation();
+    }
+
+    public boolean checkPossibleToBeCreate() {
+        return !isTransient && !hasAssociation();
     }
 
     public boolean isPrimaryKey() {
@@ -115,5 +120,9 @@ public class Column {
         }
 
         return null;
+    }
+
+    public boolean hasAssociation() {
+        return Objects.nonNull(association);
     }
 }

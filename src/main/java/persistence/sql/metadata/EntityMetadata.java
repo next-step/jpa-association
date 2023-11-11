@@ -54,7 +54,7 @@ public class EntityMetadata {
     }
 
     public String buildWhereWithPKClause() {
-        return columns.buildWhereWithPKClause();
+        return getTableName() + "." + columns.buildWhereWithPKClause();
     }
 
     public String[] buildJoinClauses() {

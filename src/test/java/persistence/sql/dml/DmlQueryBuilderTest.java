@@ -25,7 +25,7 @@ class DmlQueryBuilderTest {
 	void test_deleteQuery() {
 		assertEquals(
 				queryBuilder.deleteQuery(entityMetadata),
-				"DELETE FROM users WHERE id = 1;"
+				"DELETE FROM users WHERE users.id = 1;"
 		);
 	}
 
@@ -43,7 +43,7 @@ class DmlQueryBuilderTest {
 	void test_selectQuery() {
 		assertEquals(
 				queryBuilder.selectQuery(Person.class, "1"),
-				"SELECT * FROM users WHERE id = 1;"
+				"SELECT * FROM users WHERE users.id = 1;"
 		);
 	}
 
@@ -52,7 +52,7 @@ class DmlQueryBuilderTest {
 	void test_selectQueryWithJoinQuery() {
 		assertEquals(
 				queryBuilder.selectQuery(Order.class, "1"),
-				"SELECT * FROM orders JOIN order_items ON order_items.order_id = orders.id WHERE id = 1;"
+				"SELECT * FROM orders JOIN order_items ON order_items.order_id = orders.id WHERE orders.id = 1;"
 		);
 	}
 
@@ -70,6 +70,6 @@ class DmlQueryBuilderTest {
 						throw new RuntimeException(e);
 					}
 				}).collect(Collectors.toList())), entityMetadata),
-				"UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE id = 1;");
+				"UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE users.id = 1;");
 	}
 }

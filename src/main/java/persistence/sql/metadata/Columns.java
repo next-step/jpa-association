@@ -18,7 +18,7 @@ public class Columns {
 
     public String buildColumnsWithConstraint(Dialect dialect) {
         return columns.stream()
-                .filter(Column::isNotTransient)
+                .filter(Column::checkPossibleToBeCreate)
                 .map(x -> x.buildColumnsWithConstraint(dialect))
                 .collect(Collectors.joining(", "));
     }
@@ -42,13 +42,6 @@ public class Columns {
                 .filter(Column::checkPossibleToBeValue)
                 .map(x -> x.getName() + " = " + x.getConvertedValue())
                 .collect(Collectors.joining(", "));
-    }
-
-    public String buildWhereClause() {
-        return columns.stream()
-                .filter(Column::isNotTransient)
-                .map(x -> x.getName() + " = " + x.getConvertedValue())
-                .collect(Collectors.joining(" AND "));
     }
 
     public String buildWhereWithPKClause() {
