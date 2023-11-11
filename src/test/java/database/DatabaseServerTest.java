@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.mapper.TestEntityRowMapper;
 import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.infra.H2SqlConverter;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -32,7 +32,8 @@ public class DatabaseServerTest extends DatabaseTest {
 
                 InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();
 
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
+                EntityAttributes entityAttributes = new EntityAttributes();
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleOneWithValidAnnotation.class);
 
                 EntityFixtures.SampleOneWithValidAnnotation entityOne =
                         new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);

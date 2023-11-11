@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
+import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.infra.H2SqlConverter;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @Nested
-@DisplayName("EntityLoader 클래스의")
+@DisplayName("SimpleEntityLoader 클래스의")
 public class SimpleEntityLoaderTest extends DatabaseTest {
     private final EntityAttributes entityAttributes = new EntityAttributes();
 
@@ -39,15 +40,17 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
                         = new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
                 EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
                 SimpleEntityLoader simpleEntityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
 
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleOneWithValidAnnotation.class);
+
                 //when
                 EntityFixtures.SampleOneWithValidAnnotation retrieved =
-                        simpleEntityLoader.load(EntityFixtures.SampleOneWithValidAnnotation.class, "id", inserted.getId().toString());
+                        simpleEntityLoader.load(entityAttribute, "id", inserted.getId().toString());
 
                 //then
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
@@ -66,8 +69,7 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
                 EntityFixtures.OrderItem orderItem2 = new EntityFixtures.OrderItem("세탁기", 2, 1L);
                 EntityFixtures.Order order = new EntityFixtures.Order("1324", List.of(orderItem, orderItem2));
 
-
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 setUpFixtureTable(EntityFixtures.OrderItem.class, new H2SqlConverter());
                 setUpFixtureTable(EntityFixtures.Order.class, new H2SqlConverter());
@@ -94,7 +96,7 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
                 //given
                 EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
 
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 setUpFixtureTable(EntityFixtures.Member.class, new H2SqlConverter());
                 setUpFixtureTable(EntityFixtures.Team.class, new H2SqlConverter());

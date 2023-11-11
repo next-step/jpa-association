@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.sql.infra.H2SqlConverter;
-
-import java.util.HashSet;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static persistence.sql.common.DDLType.CREATE;
@@ -16,6 +15,7 @@ import static persistence.sql.common.DDLType.CREATE;
 @Nested
 @DisplayName("CreateDDLQueryBuilder 클래스의")
 public class CreateDDLQueryBuilderTest extends DatabaseTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
 
     @Nested
     @DisplayName("prepareStatement 메소드는")
@@ -27,7 +27,7 @@ public class CreateDDLQueryBuilderTest extends DatabaseTest {
             @DisplayName("CREATE DDL을 리턴한다.")
             void returnDDL() {
                 //given
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class,new HashSet<>());
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleOneWithValidAnnotation.class);
 
                 //when
                 String ddl = DDLQueryBuilderFactory.createQueryBuilder(CREATE)

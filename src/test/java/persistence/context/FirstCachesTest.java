@@ -6,8 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 
-import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -15,6 +15,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Nested
 @DisplayName("FirstCaches 클래스의")
 class FirstCachesTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
+
     @Nested
     @DisplayName("getFirstCache 메소드는")
     class getFirstCache {
@@ -92,8 +94,8 @@ class FirstCachesTest {
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem(1L, "티비", 1);
                 EntityFixtures.Order order
                         = new EntityFixtures.Order(1L, "민준", List.of(orderItem));
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>());
 
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.Order.class);
 
                 //when
                 //then

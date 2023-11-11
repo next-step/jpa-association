@@ -77,7 +77,7 @@ public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolve
             EntityAttribute oneToManyFieldEntityAttribute = entityAttributes.findEntityAttribute(oneToManyFieldClass);
             Object oneToManyFieldInstance = oneToManyFieldClass.getConstructor().newInstance();
 
-            loaderMapper.mapIdAndGeneralAttributes(oneToManyFieldEntityAttribute, resultSet, oneToManyFieldInstance);
+            loaderMapper.mapResultSetToAttributes(oneToManyFieldEntityAttribute, resultSet, oneToManyFieldInstance);
 
             return oneToManyFieldInstance;
         } catch (Exception e) {

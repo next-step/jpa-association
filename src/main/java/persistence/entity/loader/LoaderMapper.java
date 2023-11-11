@@ -24,17 +24,16 @@ public class LoaderMapper {
         this.entityAttributes = entityAttributes;
     }
 
-    public <T> T mapResultSetToEntity(Class<T> clazz, ResultSet resultSet) {
+    public <T> T mapResultSetToEntity(EntityAttribute entityAttribute, ResultSet resultSet) {
         try {
-            EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
-            T instance = instantiateClass(clazz);
-
             if (!resultSet.next()) {
                 return null;
             }
 
+            T instance = instantiateClass((Class<T>) entityAttribute.getClazz());
+
             do {
-                mapIdAndGeneralAttributes(entityAttribute, resultSet, instance);
+                mapResultSetToAttributes(entityAttribute, resultSet, instance);
             } while (resultSet.next());
 
             return instance;
@@ -43,10 +42,9 @@ public class LoaderMapper {
         }
     }
 
-    public <T> List<T> mapResultSetToList(Class<T> clazz, ResultSet resultSet) {
+    public <T> List<T> mapResultSetToList(EntityAttribute entityAttribute, ResultSet resultSet) {
         Map<String, T> loadedEntities = new HashMap<>();
 
-        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
         try {
             if (!resultSet.next()) {
                 return null;
@@ -57,7 +55,7 @@ public class LoaderMapper {
                 T instance = loadedEntities.get(id);
 
                 if (instance == null) {
-                    instance = instantiateClass(clazz);
+                    instance = instantiateClass((Class<T>) entityAttribute.getClazz());
                     mapIdAttribute(resultSet, instance, entityAttribute.getIdAttribute());
                     mapGeneralAttribute(resultSet, instance, entityAttribute.getGeneralAttributes());
                 }
@@ -72,7 +70,7 @@ public class LoaderMapper {
         return new ArrayList<>(loadedEntities.values());
     }
 
-    public <T> void mapIdAndGeneralAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
+    public <T> void mapResultSetToAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
         mapIdAttribute(resultSet, instance, entityAttribute.getIdAttribute());
         mapGeneralAttribute(resultSet, instance, entityAttribute.getGeneralAttributes());
         mapCollectionAttributes(entityAttribute, resultSet, instance);

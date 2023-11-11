@@ -2,6 +2,7 @@ package persistence.entity.persister;
 
 import jdbc.JdbcTemplate;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.id.IdAttribute;
 import persistence.entity.attribute.resolver.IdAttributeResolver;
 import persistence.entity.loader.EntityLoader;
@@ -10,7 +11,6 @@ import persistence.sql.dml.builder.InsertQueryBuilder;
 import persistence.sql.dml.builder.UpdateQueryBuilder;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
 
 import static persistence.entity.attribute.resolver.AttributeResolverHolder.ID_ATTRIBUTE_RESOLVERS;
 
@@ -18,21 +18,25 @@ import static persistence.entity.attribute.resolver.AttributeResolverHolder.ID_A
 public class SimpleEntityPersister implements EntityPersister {
     private final JdbcTemplate jdbcTemplate;
     private final EntityLoader entityLoader;
+    private final EntityAttributes entityAttributes;
 
-    public SimpleEntityPersister(JdbcTemplate jdbcTemplate, EntityLoader entityLoader) {
+    public SimpleEntityPersister(JdbcTemplate jdbcTemplate,
+                                 EntityLoader entityLoader,
+                                 EntityAttributes entityAttributes) {
         this.jdbcTemplate = jdbcTemplate;
         this.entityLoader = entityLoader;
+        this.entityAttributes = entityAttributes;
     }
 
     @Override
     public <T> T load(Class<T> clazz, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz, new HashSet<>());
-        return entityLoader.load(clazz, entityAttribute.getIdAttribute().getColumnName(), id);
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
+        return entityLoader.load(entityAttribute, entityAttribute.getIdAttribute().getColumnName(), id);
     }
 
     @Override
     public <T> T update(T old, T updated) {
-        EntityAttribute entityAttribute = EntityAttribute.of(old.getClass(), new HashSet<>());
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(old.getClass());
 
         String sql = UpdateQueryBuilder.of(old, updated, entityAttribute).prepareStatement();
 
@@ -45,7 +49,8 @@ public class SimpleEntityPersister implements EntityPersister {
 
     @Override
     public <T> T insert(T instance) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(), new HashSet<>());
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(instance.getClass());
+
         IdAttribute idAttribute = entityAttribute.getIdAttribute();
 
         String sql = new InsertQueryBuilder().prepareStatement(entityAttribute, instance);
@@ -63,7 +68,7 @@ public class SimpleEntityPersister implements EntityPersister {
 
     @Override
     public <T> void remove(T instance, String id) {
-        EntityAttribute entityAttribute = EntityAttribute.of(instance.getClass(), new HashSet<>());
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(instance.getClass());
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         String deleteDML = deleteQueryBuilder.prepareStatement(entityAttribute, id);
         jdbcTemplate.execute(deleteDML);

@@ -4,6 +4,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
+import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.OneToManyField;
 import persistence.entity.attribute.id.IdAttribute;
@@ -36,15 +37,17 @@ public class LazyLoadingOneToManyFieldMapper implements CollectionMapperResolver
     @Override
     public <T> void map(T instance, OneToManyField oneToManyField, ResultSet resultSet) {
         Field field = oneToManyField.getField();
+
+        EntityAttribute oneToManyFieldEntityAttribute = oneToManyField.getEntityAttribute();
+
         IdAttribute ownerIdAttribute = entityAttributes.findEntityAttribute(instance.getClass())
                 .getIdAttribute();
-
-        Class<?> fieldArgType = getCollectionFieldType(field);
 
         if (List.class.isAssignableFrom(field.getType())) {
             Enhancer enhancer = new Enhancer();
             enhancer.setSuperclass(ArrayList.class);
-            enhancer.setCallback((LazyLoader) () -> collectionLoader.loadCollection(fieldArgType, oneToManyField.getJoinColumnName(),
+            enhancer.setCallback((LazyLoader) () -> collectionLoader.loadCollection(
+                    oneToManyFieldEntityAttribute, oneToManyField.getJoinColumnName(),
                     getInstanceIdAsString(instance, ownerIdAttribute.getField())));
 
             List proxyList = (List) enhancer.create();

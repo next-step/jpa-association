@@ -251,22 +251,6 @@ public class EntityFixtures {
     @Entity
     @Table(name = "team")
     public static class Team {
-        public Long getId() {
-            return id;
-        }
-
-        @Override
-        public String toString() {
-            return "Team{" +
-                    "id=" + id +
-                    ", members=" + members +
-                    '}';
-        }
-
-        public List<Member> getMembers() {
-            return members;
-        }
-
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
@@ -286,20 +270,27 @@ public class EntityFixtures {
             this.id = id;
             this.members = member;
         }
+
+        public Long getId() {
+            return id;
+        }
+
+        public List<Member> getMembers() {
+            return members;
+        }
+
+        @Override
+        public String toString() {
+            return "Team{" +
+                    "id=" + id +
+                    ", members=" + members +
+                    '}';
+        }
     }
 
     @Entity
     @Table(name = "member")
     public static class Member {
-        @Override
-        public String toString() {
-            return "Member{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", teamId=" + teamId +
-                    '}';
-        }
-
         public Long getId() {
             return id;
         }
@@ -333,6 +324,15 @@ public class EntityFixtures {
         public Member(Long id, String name) {
             this.id = id;
             this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return "Member{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", teamId=" + teamId +
+                    '}';
         }
     }
 }

@@ -5,10 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.sql.ddl.converter.SqlConverter;
 import persistence.sql.infra.H2SqlConverter;
-
-import java.util.HashSet;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static persistence.sql.common.DDLType.DROP;
@@ -17,6 +16,7 @@ import static persistence.sql.common.DDLType.DROP;
 @DisplayName("DropDDLQueryBuilder 클래스의")
 public class DropDDLQueryBuilderTest {
     private final SqlConverter sqlConverter = new H2SqlConverter();
+    private final EntityAttributes entityAttributes = new EntityAttributes();
 
     @Nested
     @DisplayName("prepareStatement 메소드는")
@@ -28,7 +28,7 @@ public class DropDDLQueryBuilderTest {
             @DisplayName("DROP DDL을 리턴한다.")
             void returnDDL() {
                 //given
-                EntityAttribute entityAttribute = EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>());
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleTwoWithValidAnnotation.class);
 
                 //when
                 String dropDDL = DDLQueryBuilderFactory.createQueryBuilder(DROP)

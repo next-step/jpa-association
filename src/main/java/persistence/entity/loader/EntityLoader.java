@@ -1,5 +1,7 @@
 package persistence.entity.loader;
 
+import persistence.entity.attribute.EntityAttribute;
+
 public interface EntityLoader {
-    <T> T load(Class<T> clazz, String columnName, String id);
+    <T> T load(EntityAttribute entityAttribute, String columnName, String id);
 }
