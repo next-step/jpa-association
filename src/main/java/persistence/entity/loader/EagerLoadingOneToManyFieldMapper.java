@@ -3,23 +3,18 @@ package persistence.entity.loader;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.OneToManyField;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolver {
     private final LoaderMapper loaderMapper;
-    private final EntityAttributes entityAttributes;
 
-    public EagerLoadingOneToManyFieldMapper(LoaderMapper loaderMapper, EntityAttributes entityAttributes) {
+    public EagerLoadingOneToManyFieldMapper(LoaderMapper loaderMapper) {
         this.loaderMapper = loaderMapper;
-        this.entityAttributes = entityAttributes;
     }
 
     @Override
@@ -31,36 +26,18 @@ public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolve
     }
 
     @Override
-    public void map(Object instance, OneToManyField oneToManyField, ResultSet resultSet) {
+    public void map(EntityAttribute entityAttribute, Object instance, OneToManyField oneToManyField, ResultSet resultSet) {
         Field field = oneToManyField.getField();
-        Class<?> fieldArgType = getCollectionFieldType(field);
 
         try {
             field.setAccessible(true);
 
             Collection<Object> collection = getOrCreateCollection(instance, field);
-            Object oneToManyFieldInstance = mapResultSetToOneToManyAnnotatedField(resultSet, fieldArgType);
+            Object oneToManyFieldInstance = mapResultSetToOneToManyAnnotatedField(resultSet, oneToManyField.getEntityAttribute());
             collection.add(oneToManyFieldInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Class<?> getCollectionFieldType(Field field) {
-        try {
-            Type genericFieldType = field.getGenericType();
-
-            if (genericFieldType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) genericFieldType;
-                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                if (actualTypeArguments.length == 1 && actualTypeArguments[0] instanceof Class<?>) {
-                    return (Class<?>) actualTypeArguments[0];
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        throw new IllegalArgumentException("제네릭 타입을 찾지 못했습니다.");
     }
 
     private Collection<Object> getOrCreateCollection(Object entityInstance, Field field) throws IllegalAccessException {
@@ -72,10 +49,9 @@ public class EagerLoadingOneToManyFieldMapper implements CollectionMapperResolve
         return collection;
     }
 
-    private Object mapResultSetToOneToManyAnnotatedField(ResultSet resultSet, Class<?> oneToManyFieldClass) {
+    private Object mapResultSetToOneToManyAnnotatedField(ResultSet resultSet, EntityAttribute oneToManyFieldEntityAttribute) {
         try {
-            EntityAttribute oneToManyFieldEntityAttribute = entityAttributes.findEntityAttribute(oneToManyFieldClass);
-            Object oneToManyFieldInstance = oneToManyFieldClass.getConstructor().newInstance();
+            Object oneToManyFieldInstance = oneToManyFieldEntityAttribute.getClazz().getConstructor().newInstance();
 
             loaderMapper.mapResultSetToAttributes(oneToManyFieldEntityAttribute, resultSet, oneToManyFieldInstance);
 

@@ -1,7 +1,6 @@
 package persistence.entity.loader;
 
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.GeneralAttribute;
 import persistence.entity.attribute.OneToManyField;
 import persistence.entity.attribute.id.IdAttribute;
@@ -14,14 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 public class LoaderMapper {
-    private final EntityAttributes entityAttributes;
     private final List<CollectionMapperResolver> COLLECTION_MAPPER_RESOLVERS = new ArrayList<>();
 
-    public LoaderMapper(EntityAttributes entityAttributes, CollectionLoader collectionLoader) {
-        COLLECTION_MAPPER_RESOLVERS.add(new EagerLoadingOneToManyFieldMapper(this, entityAttributes));
-        COLLECTION_MAPPER_RESOLVERS.add(new LazyLoadingOneToManyFieldMapper(entityAttributes, collectionLoader));
-
-        this.entityAttributes = entityAttributes;
+    public LoaderMapper(CollectionLoader collectionLoader) {
+        COLLECTION_MAPPER_RESOLVERS.add(new EagerLoadingOneToManyFieldMapper(this));
+        COLLECTION_MAPPER_RESOLVERS.add(new LazyLoadingOneToManyFieldMapper(collectionLoader));
     }
 
     public <T> T mapResultSetToEntity(EntityAttribute entityAttribute, ResultSet resultSet) {
@@ -100,14 +96,14 @@ public class LoaderMapper {
 
     private <T> void mapCollectionAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
         for (OneToManyField oneToManyField : entityAttribute.getOneToManyFields()) {
-            mapCollectionAttribute(resultSet, instance, oneToManyField);
+            mapCollectionAttribute(entityAttribute, resultSet, instance, oneToManyField);
         }
     }
 
-    private <T> void mapCollectionAttribute(ResultSet resultSet, T instance, OneToManyField oneToManyField) {
+    private <T> void mapCollectionAttribute(EntityAttribute entityAttribute, ResultSet resultSet, T instance, OneToManyField oneToManyField) {
         for (CollectionMapperResolver collectionMapperResolver : COLLECTION_MAPPER_RESOLVERS) {
             if (collectionMapperResolver.supports(oneToManyField.getField())) {
-                collectionMapperResolver.map(instance, oneToManyField, resultSet);
+                collectionMapperResolver.map(entityAttribute, instance, oneToManyField, resultSet);
             }
         }
     }

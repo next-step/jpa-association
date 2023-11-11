@@ -11,7 +11,7 @@ public class SimpleEntityLoader implements EntityLoader {
     private final LoaderMapper loaderMapper;
 
     public SimpleEntityLoader(JdbcTemplate jdbcTemplate, EntityAttributes entityAttributes) {
-        this.loaderMapper = new LoaderMapper(entityAttributes, new SimpleCollectionLoader(jdbcTemplate, entityAttributes));
+        this.loaderMapper = new LoaderMapper(new SimpleCollectionLoader(jdbcTemplate));
         this.jdbcTemplate = jdbcTemplate;
         this.entityAttributes = entityAttributes;
     }

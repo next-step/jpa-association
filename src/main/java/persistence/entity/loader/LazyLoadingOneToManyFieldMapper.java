@@ -5,24 +5,19 @@ import jakarta.persistence.OneToMany;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.OneToManyField;
 import persistence.entity.attribute.id.IdAttribute;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class LazyLoadingOneToManyFieldMapper implements CollectionMapperResolver {
-    private final EntityAttributes entityAttributes;
     private final CollectionLoader collectionLoader;
 
-    public LazyLoadingOneToManyFieldMapper(EntityAttributes entityAttributes, CollectionLoader collectionLoader) {
-        this.entityAttributes = entityAttributes;
+    public LazyLoadingOneToManyFieldMapper(CollectionLoader collectionLoader) {
         this.collectionLoader = collectionLoader;
     }
 
@@ -35,13 +30,12 @@ public class LazyLoadingOneToManyFieldMapper implements CollectionMapperResolver
     }
 
     @Override
-    public <T> void map(T instance, OneToManyField oneToManyField, ResultSet resultSet) {
+    public <T> void map(EntityAttribute entityAttribute, T instance, OneToManyField oneToManyField, ResultSet resultSet) {
         Field field = oneToManyField.getField();
 
         EntityAttribute oneToManyFieldEntityAttribute = oneToManyField.getEntityAttribute();
 
-        IdAttribute ownerIdAttribute = entityAttributes.findEntityAttribute(instance.getClass())
-                .getIdAttribute();
+        IdAttribute ownerIdAttribute = entityAttribute.getIdAttribute();
 
         if (List.class.isAssignableFrom(field.getType())) {
             Enhancer enhancer = new Enhancer();
@@ -60,23 +54,6 @@ public class LazyLoadingOneToManyFieldMapper implements CollectionMapperResolver
         } else {
             throw new IllegalArgumentException("OneToMany 관계는 List 타입만 지원합니다.");
         }
-    }
-
-    private Class<?> getCollectionFieldType(Field field) {
-        try {
-            Type genericFieldType = field.getGenericType();
-
-            if (genericFieldType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) genericFieldType;
-                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                if (actualTypeArguments.length == 1 && actualTypeArguments[0] instanceof Class<?>) {
-                    return (Class<?>) actualTypeArguments[0];
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        throw new IllegalArgumentException("제네릭 타입을 찾지 못했습니다.");
     }
 
     private <T> String getInstanceIdAsString(T instance, Field idField) {
