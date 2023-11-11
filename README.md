@@ -52,3 +52,10 @@ public class OrderItem {
 - [X] 요구사항 2 - 조회 시 프록시 객체를 사용해 적용해보자
   - 테스트 코드를 통해서 프록시 객체를 호출 했을 때와 하지 않았을 때를 비교해보자
   - cglib proxy는 다양한 콜백을 지원한다. 적절한 콜백 메서드를 찾아서 사용해 보자
+
+---
+### 3단계 - OneToMany (FetchType.LAZY)
+- [ ] 테이블에 임의의 데이터를 넣고 가져오기
+- [ ] Proxy 를 활용해 Lazy loading 을 구현
+- [ ] Query 확인
+- [ ] Entity 객체 만들어 보기 
