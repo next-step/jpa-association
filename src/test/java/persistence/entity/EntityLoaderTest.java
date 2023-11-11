@@ -32,7 +32,6 @@ class EntityLoaderTest {
         server.start();
         dialect = new FakeDialect();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
         InitTestDataLoader loader = new InitTestDataLoader(jdbcTemplate);
         loader.load("init.SQL");
 
@@ -67,10 +66,7 @@ class EntityLoaderTest {
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator,
                 new EntityMapper(EntityMeta.from(Person.class)));
 
-        Person person = new Person("이름", 19, "asd@gmail.com");
-        Person person2 = new Person("이름", 19, "asd@gmail.com");
-        jdbcTemplate.execute(queryGenerator.insert().build(person));
-        jdbcTemplate.execute(queryGenerator.insert().build(person2));
+
 
         //when
         final List<Person> personList = entityLoader.findAll(Person.class);
@@ -78,12 +74,10 @@ class EntityLoaderTest {
         //then
         assertSoftly((it) -> {
             it.assertThat(personList).hasSize(2);
-            it.assertThat(personList.get(0).getName()).isEqualTo(person.getName());
-            it.assertThat(personList.get(0).getAge()).isEqualTo(person.getAge());
-            it.assertThat(personList.get(0).getEmail()).isEqualTo(person.getEmail());
-            it.assertThat(personList.get(1).getName()).isEqualTo(person2.getName());
-            it.assertThat(personList.get(1).getAge()).isEqualTo(person2.getAge());
-            it.assertThat(personList.get(1).getEmail()).isEqualTo(person2.getEmail());
+            it.assertThat(personList).extracting("id").contains(-1L, -2L);
+            it.assertThat(personList).extracting("name").contains("user-1", "user-2");
+            it.assertThat(personList).extracting("age").contains(10, 20);
+            it.assertThat(personList).extracting("email").contains("userEmail", "userEmail2");
         });
     }
 
@@ -93,7 +87,7 @@ class EntityLoaderTest {
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate, QueryGenerator.of(Person.class, dialect),
                 new EntityMapper(EntityMeta.from(Person.class)));
 
-        Person person = entityLoader.find(Person.class, 1L);
+        Person person = entityLoader.find(Person.class, 0);
 
         assertThat(person).isNull();
     }
