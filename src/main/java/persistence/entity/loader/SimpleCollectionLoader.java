@@ -19,9 +19,9 @@ public class SimpleCollectionLoader implements CollectionLoader {
     }
 
     @Override
-    public <T> List<T> loadCollection(EntityAttribute entityAttribute, String columnName, String id) {
+    public <T> List<T> loadCollection(EntityAttribute entityAttribute, String queryColumnName, String queryValue) {
         String sql = SelectQueryBuilder.of(entityAttribute)
-                .where(entityAttribute.getTableName(), columnName, id)
+                .where(entityAttribute.getTableName(), queryColumnName, queryValue)
                 .prepareStatement();
 
         return jdbcTemplate.queryList(sql,

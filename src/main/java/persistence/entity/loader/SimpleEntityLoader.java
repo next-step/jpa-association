@@ -17,10 +17,10 @@ public class SimpleEntityLoader implements EntityLoader {
     }
 
     @Override
-    public <T> T load(EntityAttribute entityAttribute, String columnName, String id) {
+    public <T> T load(EntityAttribute entityAttribute, String queryColumnName, String queryValue) {
 
         String sql = SelectQueryBuilder.of(entityAttribute)
-                .where(entityAttribute.getTableName(), columnName, id)
+                .where(entityAttribute.getTableName(), queryColumnName, queryValue)
                 .prepareStatement();
 
         return jdbcTemplate.queryForObject(sql,
