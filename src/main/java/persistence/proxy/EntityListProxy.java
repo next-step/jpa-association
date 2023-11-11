@@ -8,11 +8,9 @@ import java.util.*;
 public class EntityListProxy<T> implements List<T> {
 
     private List<T> entityList;
-    private EntityLoader entityLoader;
-    private EntityMeta entityMeta;
-    private String selectQuery;
-
-    protected EntityListProxy() {}
+    private final EntityLoader entityLoader;
+    private final EntityMeta entityMeta;
+    private final String selectQuery;
 
     private EntityListProxy(EntityLoader entityLoader, EntityMeta entityMeta, String selectQuery) {
         this.entityLoader = entityLoader;
