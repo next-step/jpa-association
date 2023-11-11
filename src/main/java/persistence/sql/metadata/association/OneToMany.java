@@ -28,6 +28,11 @@ public class OneToMany implements Association{
 		return table.getName() + " ON " + table.getName() + "." + joinColumnName;
 	}
 
+	@Override
+	public Class<?> getType() {
+		return type;
+	}
+
 	private String findJoinColumnName(Field field) {
 		return field.getDeclaredAnnotation(JoinColumn.class).name();
 	}
