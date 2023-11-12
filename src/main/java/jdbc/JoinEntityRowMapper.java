@@ -67,7 +67,8 @@ public class JoinEntityRowMapper<T> implements RowMapper<T> {
         Map<String, Object> resultValueMap = new HashMap<>();
         for (int i = startRowIndex; i <= endRowIndex; i++) {
             ResultSetMetaData metaData = resultSet.getMetaData();
-            resultValueMap.put(metaData.getColumnName(i), resultSet.getObject(i));
+            String columnName = metaData.getColumnName(i);
+            resultValueMap.put(columnName.toLowerCase(), resultSet.getObject(i));
         }
         return resultValueMap;
     }
