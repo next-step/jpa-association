@@ -102,7 +102,7 @@ class EntityLoaderTest {
 
         assertThat(orderItems).isNotNull();
         assertThat(orderItems.size()).isEqualTo(3);
-        assertThat(orderItems.getClass().toString()).contains("EnhancerByCGLIB");
+        assertThat(orderItems.get(0).getProduct()).isEqualTo(OrderItemFixtureFactory.getFixtures().get(0).getProduct());
     }
 
 }
