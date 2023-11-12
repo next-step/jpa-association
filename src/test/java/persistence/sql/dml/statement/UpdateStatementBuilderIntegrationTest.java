@@ -20,7 +20,7 @@ import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.JdbcTemplate;
-import persistence.sql.dml.clause.WherePredicate;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
 
 @DisplayName("UPDATE 쿼리 생성 통합 테스트")
@@ -75,7 +75,7 @@ class UpdateStatementBuilderIntegrationTest {
         Object emailValue;
 
         final String selectSql = SelectStatementBuilder.builder()
-            .select(james.getClass(), new H2ColumnType())
+            .selectFrom(james.getClass(), new H2ColumnType())
             .where(WherePredicate.of("id", 1, new EqualOperator()))
             .build();
 

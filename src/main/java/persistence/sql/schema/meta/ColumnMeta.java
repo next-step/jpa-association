@@ -1,8 +1,9 @@
-package persistence.sql.schema;
+package persistence.sql.schema.meta;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Transient;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,11 +11,14 @@ import persistence.sql.dialect.ColumnType;
 import persistence.sql.schema.constraint.Constraint;
 import persistence.sql.schema.constraint.NotNullConstraint;
 import persistence.sql.schema.constraint.PrimaryKeyConstraint;
+import persistence.sql.schema.relation.Relation;
 
 public class ColumnMeta {
 
     private static final String COLUMN_FORMAT = "%s %s";
     private static final String COLUMN_FORMAT_WITH_CONSTRAINT = "%s %s %s";
+
+    private final Field field;
 
     private final String columnName;
 
@@ -26,24 +30,37 @@ public class ColumnMeta {
 
     private final Class<?> columnTypeClass;
 
-    private ColumnMeta(String columnName, String columnTypeName, String columnConstraint, boolean isPrimaryKey, Class<?> columnTypeClass) {
+    private final Relation relation;
+
+    private ColumnMeta(
+        Field field, String columnName, String columnTypeName, String columnConstraint,
+        boolean isPrimaryKey,
+        Class<?> columnTypeClass,
+        Relation relation
+    ) {
+        this.field = field;
         this.columnName = columnName;
         this.columnType = columnTypeName;
         this.columnConstraint = columnConstraint;
         this.isPrimaryKey = isPrimaryKey;
         this.columnTypeClass = columnTypeClass;
+        this.relation = relation;
     }
 
     public static ColumnMeta of(Field field, ColumnType columnType) {
         return new ColumnMeta(
+            field,
             getColumnName(field),
             columnType.getFieldType(field),
-            joiningConstraint(
-                new PrimaryKeyConstraint(field, columnType), new NotNullConstraint(field)
-            ),
+            joiningConstraint(new PrimaryKeyConstraint(field, columnType), new NotNullConstraint(field)),
             PrimaryKeyConstraint.isPrimaryKey(field),
-            field.getType()
+            field.getType(),
+            Relation.of(field, columnType)
         );
+    }
+
+    public String getFieldName() {
+        return field.getName();
     }
 
     public String getColumn() {
@@ -66,8 +83,28 @@ public class ColumnMeta {
         return field.isAnnotationPresent(Transient.class);
     }
 
+    public static boolean isCollection(Field field) {
+        return Collection.class.isAssignableFrom(field.getType());
+    }
+
     public boolean isPrimaryKey() {
         return this.isPrimaryKey;
+    }
+
+    public Class<?> getJoinColumnTableType() {
+        return this.relation.getJoinTableType();
+    }
+
+    public String getJoinColumnName() {
+        return this.relation.getJoinColumnName();
+    }
+
+    public boolean hasRelation() {
+        return this.relation.hasRelation();
+    }
+
+    public boolean isLazyLoading() {
+        return this.relation.isLazyLoading();
     }
 
     private static String getColumnName(Field field) {

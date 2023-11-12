@@ -20,7 +20,7 @@ import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.JdbcTemplate;
-import persistence.sql.dml.clause.WherePredicate;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
 
 @DisplayName("SELECT 문 생성 통합 테스트")
@@ -66,7 +66,7 @@ class SelectStatementBuilderIntegrationTest {
         //when
         int totalRowCount;
         final String selectStatement = SelectStatementBuilder.builder()
-            .select(SelectStatementBuilderFixture.class, new H2ColumnType())
+            .selectFrom(SelectStatementBuilderFixture.class, new H2ColumnType())
             .build();
 
         try (final ResultSet resultSet = jdbcTemplate.executeQuery(selectStatement)) {
@@ -102,7 +102,7 @@ class SelectStatementBuilderIntegrationTest {
         final int conditionValue = 1;
 
         final String selectStatementById = SelectStatementBuilder.builder()
-            .select(SelectStatementBuilderFixture.class, new H2ColumnType())
+            .selectFrom(SelectStatementBuilderFixture.class, new H2ColumnType())
             .where(WherePredicate.of(conditionColumnName, conditionValue, new EqualOperator()))
             .build();
 
