@@ -5,7 +5,6 @@ import jdbc.JdbcTemplate;
 import jdbc.JoinEntityRowMapper;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
-import persistence.proxy.EntityListProxy;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectFactory;
 import persistence.sql.dml.DmlQueryGenerator;
@@ -60,8 +59,7 @@ public class EntityLoader {
                 setChildEntities(entity, columnMeta, childEntities);
             }
             if (columnMeta.isJoinFetchTypeLazy()) {
-                EntityMeta joinTableEntityMeta = columnMeta.getJoinTableEntityMeta();
-                List<Object> childEntities = getProxyEntity(joinTableEntityMeta, selectQuery);
+                List<Object> childEntities = getProxyEntity(columnMeta, selectQuery);
                 setChildEntities(entity, columnMeta, childEntities);
             }
         });
@@ -78,10 +76,10 @@ public class EntityLoader {
         }
     }
 
-    private <T> List<T> getProxyEntity(EntityMeta joinTableEntityMeta, String selectQuery) {
+    private <T> List<T> getProxyEntity(ColumnMeta joinColumnMeta, String selectQuery) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(List.class);
-        enhancer.setCallback((LazyLoader) () -> EntityListProxy.of(this, joinTableEntityMeta, selectQuery));
+        enhancer.setSuperclass(joinColumnMeta.getJavaType());
+        enhancer.setCallback((LazyLoader) () -> selectChildEntities(joinColumnMeta.getJoinTableEntityMeta(), selectQuery));
         return (List<T>) enhancer.create();
     }
 }
