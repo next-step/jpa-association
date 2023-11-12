@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import persistence.dialect.Dialect;
 import persistence.exception.FieldEmptyException;
+import persistence.meta.AbstractColumn;
 import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
@@ -27,7 +28,7 @@ public class DMLQueryBuilder extends QueryBuilder {
         return dialect.whereId(column.getName(), id.toString());
     }
 
-    protected String whereId(String tableName ,EntityColumn column, Object id) {
+    protected String whereId(String tableName, AbstractColumn column, Object id) {
         String columnName = columnSignature(tableName, column.getName());
         if (column.isVarchar()) {
             return dialect.whereId(columnName, "'" + id + "'");

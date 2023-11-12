@@ -31,6 +31,20 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
                 + whereId(tableNameSignature(entityMeta.getTableName()), getPkColumn(), id);
     }
 
+    public String findByForeignerId(Object id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
+        }
+        final EntityMeta manyEntityMeta = entityMeta
+                .getOneToManyAssociation()
+                .getManyEntityMeta();
+
+
+        return selectQuery(getColumnsString(manyEntityMeta))
+                + getFromTableQuery(manyEntityMeta.getTableName(), tableNameSignature(manyEntityMeta.getTableName()))
+                + whereId(tableNameSignature(manyEntityMeta.getTableName()), manyEntityMeta.getForeignerColumn(), id);
+    }
+
     private String selectQuery(String fileNames) {
         return dialect.select(fileNames);
     }

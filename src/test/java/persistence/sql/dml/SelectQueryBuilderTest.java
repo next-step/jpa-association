@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import domain.Order;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,7 +77,6 @@ class SelectQueryBuilderTest {
         //when
         String sql = select.findAllQuery();
 
-
         //then
         assertThat(sql).isEqualTo("SELECT "
                 + "orders_0.id as orders_0_id"
@@ -114,4 +114,32 @@ class SelectQueryBuilderTest {
         );
     }
 
+    @Test
+    @DisplayName("외래키를 기준으로 조회")
+    void findByForeignerId() {
+        //given
+        SelectQueryBuilder select = QueryGenerator.of(Order.class, dialect).select();
+
+        //when
+        String sql = select.findByForeignerId(1L);
+
+        //then
+        assertThat(sql).isEqualTo("SELECT order_items_0.order_id as order_items_0_order_id,"
+                + " order_items_0.id as order_items_0_id,"
+                + " order_items_0.product as order_items_0_product,"
+                + " order_items_0.quantity as order_items_0_quantity "
+                + "FROM order_items order_items_0 WHERE order_items_0.order_id = 1");
+    }
+
+    @Test
+    @DisplayName("외래키의 ID가 없으면 예외가 발생한다.")
+    void findByForeignerIdException() {
+        //given
+        SelectQueryBuilder select = QueryGenerator.of(Order.class, dialect).select();
+
+        //when & then
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> select.findByForeignerId(null));
+
+    }
 }
