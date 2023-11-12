@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -24,8 +25,8 @@ public final class Query {
         return INSTANCE;
     }
 
-    public String select(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object... args) {
-        return INSTANCE.selectQuery.get(methodName, tableName, columns, joinColumn, args);
+    public String select(EntityMeta entityMeta) {
+        return INSTANCE.selectQuery.get(entityMeta);
     }
 
     public String selectAll(String methodName, TableName tableName, Columns columns) {

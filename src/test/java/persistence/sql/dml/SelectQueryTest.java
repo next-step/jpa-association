@@ -14,6 +14,7 @@ import domain.SelectPerson;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityMeta;
 import persistence.exception.InvalidEntityException;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -49,7 +50,6 @@ class SelectQueryTest {
 
         final TableName tableName = TableName을_생성함(aClass);
         final Columns columns = Columns을_생성함(aClass);
-        final JoinColumn joinColumn = JoinColumn을_생성함(aClass);
 
         String wildcardPattern = "SELECT .*\\.id, .*\\.nick_name, .*\\.old, .*\\.email FROM NonExistentTablePerson .*";
 
@@ -73,8 +73,10 @@ class SelectQueryTest {
 
         String expectedQuery = "SELECT .*\\.id, .*\\.order_number, .*\\.id, .*\\.product, .*\\.quantity FROM orders .* JOIN order_items .* ON .*\\.id = .*\\.order_id WHERE .*\\.id = 1";
 
+        final EntityMeta entityMeta = EntityMeta.selectMeta(methodName, tableName, columns, joinColumn, 1);
+
         //when
-        String q = query.select(methodName, tableName, columns, joinColumn, 1);
+        String q = query.select(entityMeta);
 
         //then
         assertThat(q.matches(expectedQuery)).isTrue();
@@ -110,8 +112,10 @@ class SelectQueryTest {
 
         String wildcardPattern = "SELECT .*\\.select_person_id, .*\\.nick_name, .*\\.old, .*\\.email FROM selectPerson .* WHERE .*\\.select_person_id = 1";
 
+        final EntityMeta entityMeta = EntityMeta.selectMeta("findById", tableName, columns, joinColumn, 1L);
+
         //when
-        String q = query.select("findById", tableName, columns, joinColumn, 1L);
+        String q = query.select(entityMeta);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();

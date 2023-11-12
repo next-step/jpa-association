@@ -10,16 +10,15 @@ class ConditionBuilder {
     private static final String CONDITION_AND = "AND";
     private static final String DEFAULT_EQUALS = "=";
 
-    public static String getCondition(List<String> conditionList, Object[] args, String alias) {
+    public static String getCondition(List<String> conditionList, Object arg, String alias) {
         return IntStream.range(0, conditionList.size())
                 .mapToObj(i -> {
                     if (i % 2 == 0) {
-                        return getCondition(conditionList.get(i), args[i], alias);
+                        return getCondition(conditionList.get(i), arg, alias);
                     }
 
                     return CONDITION_AND;
                 }).collect(Collectors.joining(" "));
-
     }
 
     public static String getCondition(String fieldName, Object args, String alias) {

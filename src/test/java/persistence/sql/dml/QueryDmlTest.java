@@ -22,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityMeta;
 import persistence.exception.InvalidEntityException;
 import domain.InsertPerson;
 import domain.NotEntityPerson;
@@ -179,9 +180,12 @@ class QueryDmlTest {
             final Class<NotEntityPerson> aClass = NotEntityPerson.class;
             final String methodName = "findAll";
 
+            final TableName tableName = TableName을_생성함(aClass);
+            final Columns columns = Columns을_생성함(aClass);
+
             //when & then
             assertThrows(InvalidEntityException.class,
-                () -> jdbcTemplate.query(getSelectAllQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
+                () -> jdbcTemplate.query(getSelectAllQuery(methodName, tableName, columns), new ResultMapper<>(SelectPerson.class)));
         }
 
         @AfterEach
@@ -223,7 +227,7 @@ class QueryDmlTest {
             String q = query.delete(tableName, columns, id);
             jdbcTemplate.execute(q);
 
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery(selectPersonClass, "findById", id)
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
                     , new ResultMapper<>(SelectPerson.class));
 
             //then
@@ -298,12 +302,14 @@ class QueryDmlTest {
         return query.selectAll(methodName, tableName, columns);
     }
 
-    private <T> String getSelectAllQuery(Class<T> tClass, String methodName, Object... args) {
+    private <T> String getSelectQuery(Class<T> tClass, String methodName, Object arg) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
         final JoinColumn joinColumn = JoinColumn을_생성함(tClass);
 
-        return query.select(methodName, tableName, columns, joinColumn, args);
+        final EntityMeta entityMeta = EntityMeta.selectMeta(methodName, tableName, columns, joinColumn, arg);
+
+        return query.select(entityMeta);
     }
 
     private <T> void 테이블을_생성함(Class<T> tClass) {

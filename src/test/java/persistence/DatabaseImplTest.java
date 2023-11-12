@@ -21,6 +21,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -79,12 +80,13 @@ class DatabaseImplTest {
         //given
         final String methodName = "findAll";
 
-        final int count = 10;
-        for (int i = 0; i < count; i++) {
-            insert(new DatabasePerson(Integer.toUnsignedLong(i), "name", 30, "email", 1));
-        }
+        final int count = 5;
 
-        Thread.sleep(5000);
+        insert(new DatabasePerson(11L, "name", 30, "email", 1));
+        insert(new DatabasePerson(12L, "name", 30, "email", 1));
+        insert(new DatabasePerson(13L, "name", 30, "email", 1));
+        insert(new DatabasePerson(14L, "name", 30, "email", 1));
+        insert(new DatabasePerson(15L, "name", 30, "email", 1));
 
         //when
         ResultSet resultSet = findAll(tClass, methodName);
@@ -169,11 +171,13 @@ class DatabaseImplTest {
         return database.executeQuery(query.selectAll(methodName, tableName, columns));
     }
 
-    private <T> ResultSet find(Class<T> tClass, String methodName, Object... args) throws SQLException {
+    private <T> ResultSet find(Class<T> tClass, String methodName, Object arg) throws SQLException {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
         final JoinColumn joinColumn = JoinColumn을_생성함(tClass);
 
-        return database.executeQuery(query.select(methodName, tableName, columns, joinColumn, args));
+        final EntityMeta entityMeta = EntityMeta.selectMeta(methodName, tableName, columns, joinColumn, arg);
+
+        return database.executeQuery(query.select(entityMeta));
     }
 }

@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityMeta;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
@@ -16,7 +17,7 @@ class SelectQuery {
     private TableName tableName;
     private Columns columns;
     private JoinColumn joinColumn;
-    private Object[] args;
+    private Object arg;
 
     SelectQuery() { }
 
@@ -28,12 +29,22 @@ class SelectQuery {
         return combine();
     }
 
-    String get(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object... args) {
+    String get(EntityMeta entityMeta) {
+        this.methodName = entityMeta.getMethodName();
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
+        this.joinColumn = entityMeta.getJoinColumn();
+        this.arg = entityMeta.getArg();
+
+        return combine();
+    }
+
+    String get(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object arg) {
         this.methodName = methodName;
         this.tableName = tableName;
         this.columns = columns;
         this.joinColumn = joinColumn;
-        this.args = args;
+        this.arg = arg;
 
         return combine();
     }
@@ -77,7 +88,7 @@ class SelectQuery {
         String conditionText = methodName.replace("find", "").replace("By", "");
         List<String> conditionList = ConditionUtils.getWordsFromCamelCase(conditionText);
 
-        String condition = ConditionBuilder.getCondition(conditionList, args, tableName.getAlias());
+        String condition = ConditionBuilder.getCondition(conditionList, arg, tableName.getAlias());
         return condition.replace(".id ", setConditionField("id") + " ");
     }
 
