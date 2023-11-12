@@ -1,5 +1,6 @@
-package persistence.association;
+package persistence.entity;
 
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import java.lang.reflect.Field;

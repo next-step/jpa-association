@@ -1,4 +1,4 @@
-package persistence.association;
+package persistence.entity.loader;
 
 import java.util.ArrayList;
 import java.util.HashMap;

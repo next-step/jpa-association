@@ -2,7 +2,7 @@ package persistence.sql.dml;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import persistence.association.OneToManyAssociation;
+import persistence.entity.OneToManyAssociation;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryBuilder;
