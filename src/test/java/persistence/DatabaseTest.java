@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.attribute.EntityAttribute;
+import persistence.entity.attribute.EntityAttributes;
 import persistence.mapper.StringRowMapper;
 import persistence.sql.common.DDLType;
 import persistence.sql.ddl.builder.DDLQueryBuilder;
@@ -15,7 +16,6 @@ import persistence.sql.ddl.builder.DDLQueryBuilderFactory;
 import persistence.sql.ddl.converter.SqlConverter;
 
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
 
 public class DatabaseTest {
@@ -44,7 +44,8 @@ public class DatabaseTest {
 
     protected void setUpFixtureTable(Class<?> clazz, SqlConverter sqlConverter) {
         DDLQueryBuilder queryBuilder = DDLQueryBuilderFactory.createQueryBuilder(DDLType.CREATE);
-        EntityAttribute entityAttribute = EntityAttribute.of(clazz,new HashSet<>());
+        EntityAttributes entityAttributes = new EntityAttributes();
+        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
         jdbcTemplate.execute(queryBuilder.prepareStatement(entityAttribute, sqlConverter));
     }
 }

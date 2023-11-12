@@ -1,7 +1,6 @@
 package persistence.entity.loader;
 
 import persistence.entity.attribute.EntityAttribute;
-import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.attribute.GeneralAttribute;
 import persistence.entity.attribute.OneToManyField;
 import persistence.entity.attribute.id.IdAttribute;
@@ -14,27 +13,23 @@ import java.util.List;
 import java.util.Map;
 
 public class LoaderMapper {
-    private final EntityAttributes entityAttributes;
     private final List<CollectionMapperResolver> COLLECTION_MAPPER_RESOLVERS = new ArrayList<>();
 
-    public LoaderMapper(EntityAttributes entityAttributes, CollectionLoader collectionLoader) {
-        COLLECTION_MAPPER_RESOLVERS.add(new EagerLoadingOneToManyFieldMapper(this, entityAttributes));
-        COLLECTION_MAPPER_RESOLVERS.add(new LazyLoadingOneToManyFieldMapper(entityAttributes, collectionLoader));
-
-        this.entityAttributes = entityAttributes;
+    public LoaderMapper(CollectionLoader collectionLoader) {
+        COLLECTION_MAPPER_RESOLVERS.add(new EagerLoadingOneToManyFieldMapper(this));
+        COLLECTION_MAPPER_RESOLVERS.add(new LazyLoadingOneToManyFieldMapper(collectionLoader));
     }
 
-    public <T> T mapResultSetToEntity(Class<T> clazz, ResultSet resultSet) {
+    public <T> T mapResultSetToEntity(EntityAttribute entityAttribute, ResultSet resultSet) {
         try {
-            EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
-            T instance = instantiateClass(clazz);
-
             if (!resultSet.next()) {
                 return null;
             }
 
+            T instance = instantiateClass((Class<T>) entityAttribute.getClazz());
+
             do {
-                mapIdAndGeneralAttributes(entityAttribute, resultSet, instance);
+                mapResultSetToAttributes(entityAttribute, resultSet, instance);
             } while (resultSet.next());
 
             return instance;
@@ -43,10 +38,9 @@ public class LoaderMapper {
         }
     }
 
-    public <T> List<T> mapResultSetToList(Class<T> clazz, ResultSet resultSet) {
+    public <T> List<T> mapResultSetToList(EntityAttribute entityAttribute, ResultSet resultSet) {
         Map<String, T> loadedEntities = new HashMap<>();
 
-        EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(clazz);
         try {
             if (!resultSet.next()) {
                 return null;
@@ -57,7 +51,7 @@ public class LoaderMapper {
                 T instance = loadedEntities.get(id);
 
                 if (instance == null) {
-                    instance = instantiateClass(clazz);
+                    instance = instantiateClass((Class<T>) entityAttribute.getClazz());
                     mapIdAttribute(resultSet, instance, entityAttribute.getIdAttribute());
                     mapGeneralAttribute(resultSet, instance, entityAttribute.getGeneralAttributes());
                 }
@@ -72,7 +66,7 @@ public class LoaderMapper {
         return new ArrayList<>(loadedEntities.values());
     }
 
-    public <T> void mapIdAndGeneralAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
+    public <T> void mapResultSetToAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
         mapIdAttribute(resultSet, instance, entityAttribute.getIdAttribute());
         mapGeneralAttribute(resultSet, instance, entityAttribute.getGeneralAttributes());
         mapCollectionAttributes(entityAttribute, resultSet, instance);
@@ -102,14 +96,14 @@ public class LoaderMapper {
 
     private <T> void mapCollectionAttributes(EntityAttribute entityAttribute, ResultSet resultSet, T instance) {
         for (OneToManyField oneToManyField : entityAttribute.getOneToManyFields()) {
-            mapCollectionAttribute(resultSet, instance, oneToManyField);
+            mapCollectionAttribute(entityAttribute, resultSet, instance, oneToManyField);
         }
     }
 
-    private <T> void mapCollectionAttribute(ResultSet resultSet, T instance, OneToManyField oneToManyField) {
+    private <T> void mapCollectionAttribute(EntityAttribute entityAttribute, ResultSet resultSet, T instance, OneToManyField oneToManyField) {
         for (CollectionMapperResolver collectionMapperResolver : COLLECTION_MAPPER_RESOLVERS) {
             if (collectionMapperResolver.supports(oneToManyField.getField())) {
-                collectionMapperResolver.map(instance, oneToManyField, resultSet);
+                collectionMapperResolver.map(entityAttribute, instance, oneToManyField, resultSet);
             }
         }
     }

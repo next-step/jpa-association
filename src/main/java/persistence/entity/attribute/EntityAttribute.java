@@ -28,17 +28,17 @@ public class EntityAttribute {
             String tableName,
             IdAttribute idAttribute,
             List<GeneralAttribute> generalAttributes,
-            List<OneToManyField> oneToManies,
+            List<OneToManyField> oneToManyFields,
             Class<?> clazz
     ) {
         this.tableName = tableName;
         this.generalAttributes = generalAttributes;
         this.idAttribute = idAttribute;
-        this.oneToManyFields = oneToManies;
+        this.oneToManyFields = oneToManyFields;
         this.clazz = clazz;
     }
 
-    public static EntityAttribute of(Class<?> clazz, Set<Class<?>> visitedEntities) {
+    static EntityAttribute of(Class<?> clazz, Set<Class<?>> visitedEntities) {
         String tableName = Optional.ofNullable(clazz.getAnnotation(Table.class))
                 .map(Table::name)
                 .orElse(clazz.getSimpleName());

@@ -5,14 +5,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
-
-import java.util.HashSet;
+import persistence.entity.attribute.EntityAttributes;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
 @DisplayName("JoinClause 클래스의")
 class JoinClauseTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
+
     @Nested
     @DisplayName("생성자는")
     class constructor {
@@ -23,7 +24,7 @@ class JoinClauseTest {
             @DisplayName("적절한 조인 DML을 제공한다.")
             void returnJoinDML() {
                 //given
-                EntityAttribute owner = EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>());
+                EntityAttribute owner = entityAttributes.findEntityAttribute(EntityFixtures.Order.class);
 
                 //when
                 JoinClause joinClause = new JoinClause(owner.getTableName(), owner.getIdAttribute(), owner.getOneToManyFields());

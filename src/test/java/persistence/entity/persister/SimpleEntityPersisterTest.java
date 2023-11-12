@@ -35,8 +35,8 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
                 //given
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 //when
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
@@ -60,8 +60,8 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
                 //given
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
                 EntityFixtures.SampleOneWithValidAnnotation updatedSample
@@ -89,8 +89,8 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
                 //given
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
@@ -113,8 +113,8 @@ public class SimpleEntityPersisterTest extends DatabaseTest {
                 //given
                 setUpFixtureTable(EntityFixtures.SampleOneWithValidAnnotation.class, new H2SqlConverter());
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 simpleEntityPersister.insert(sample);
 

@@ -4,15 +4,15 @@ import fixtures.EntityFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.entity.attribute.EntityAttribute;
-
-import java.util.HashSet;
+import persistence.entity.attribute.EntityAttributes;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Nested
 @DisplayName("DeleteQueryBuilder 클래스의")
 public class DeleteQueryBuilderTest {
+    private final EntityAttributes entityAttributes = new EntityAttributes();
+
     @Nested
     @DisplayName("prepareStatement 클래스의")
     public class prepareStatement {
@@ -25,9 +25,10 @@ public class DeleteQueryBuilderTest {
                 //given
                 DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
 
-                //then
-                String dml
-                        = deleteQueryBuilder.prepareStatement(EntityAttribute.of(EntityFixtures.SampleTwoWithValidAnnotation.class,new HashSet<>()), String.valueOf(1));
+                //when
+                String dml = deleteQueryBuilder.prepareStatement(
+                        entityAttributes.findEntityAttribute(EntityFixtures.SampleTwoWithValidAnnotation.class),
+                        String.valueOf(1));
 
                 //then
                 assertThat(dml).isEqualTo("DELETE FROM two where id = 1");

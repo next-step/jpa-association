@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.DatabaseTest;
+import persistence.entity.attribute.EntityAttribute;
 import persistence.entity.attribute.EntityAttributes;
 import persistence.entity.persister.SimpleEntityPersister;
 import persistence.sql.infra.H2SqlConverter;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @Nested
-@DisplayName("EntityLoader 클래스의")
+@DisplayName("SimpleEntityLoader 클래스의")
 public class SimpleEntityLoaderTest extends DatabaseTest {
     private final EntityAttributes entityAttributes = new EntityAttributes();
 
@@ -38,16 +39,18 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
-                SimpleEntityLoader simpleEntityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
+                SimpleEntityLoader simpleEntityLoader = new SimpleEntityLoader(jdbcTemplate);
+
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleOneWithValidAnnotation.class);
 
                 //when
                 EntityFixtures.SampleOneWithValidAnnotation retrieved =
-                        simpleEntityLoader.load(EntityFixtures.SampleOneWithValidAnnotation.class, "id", inserted.getId().toString());
+                        simpleEntityLoader.load(entityAttribute, "id", inserted.getId().toString());
 
                 //then
                 assertThat(retrieved.toString()).isEqualTo("SampleOneWithValidAnnotation{id=1, name='민준', age=29}");
@@ -61,13 +64,12 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
-                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()));
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1, 1L);
                 EntityFixtures.OrderItem orderItem2 = new EntityFixtures.OrderItem("세탁기", 2, 1L);
                 EntityFixtures.Order order = new EntityFixtures.Order("1324", List.of(orderItem, orderItem2));
 
-
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 setUpFixtureTable(EntityFixtures.OrderItem.class, new H2SqlConverter());
                 setUpFixtureTable(EntityFixtures.Order.class, new H2SqlConverter());
@@ -92,9 +94,9 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
-                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()));
 
-                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader);
+                SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 setUpFixtureTable(EntityFixtures.Member.class, new H2SqlConverter());
                 setUpFixtureTable(EntityFixtures.Team.class, new H2SqlConverter());

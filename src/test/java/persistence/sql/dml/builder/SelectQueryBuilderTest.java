@@ -5,8 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.entity.attribute.EntityAttribute;
-
-import java.util.HashSet;
+import persistence.entity.attribute.EntityAttributes;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -26,8 +25,9 @@ public class SelectQueryBuilderTest {
             void returnDmlWithWhereClause() {
                 //given
                 //when
-                String dml = SelectQueryBuilder.of(EntityAttribute.of(EntityFixtures.SampleOneWithValidAnnotation.class, new HashSet<>()))
-                        .where("id", "1").prepareStatement();
+                EntityAttributes entityAttributes = new EntityAttributes();
+                EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleOneWithValidAnnotation.class);
+                String dml = SelectQueryBuilder.of(entityAttribute).where("id", "1").prepareStatement();
 
                 //then
                 assertThat(dml).isEqualTo("SELECT * FROM entity_name as entity_name WHERE id = '1'");
@@ -43,7 +43,8 @@ public class SelectQueryBuilderTest {
             void returnDmlWithWhereClause() {
                 //given
                 //when
-                String dml = SelectQueryBuilder.of(EntityAttribute.of(EntityFixtures.Order.class, new HashSet<>()))
+                EntityAttributes entityAttributes = new EntityAttributes();
+                String dml = SelectQueryBuilder.of(entityAttributes.findEntityAttribute(EntityFixtures.Order.class))
                         .where("orders", "id", "1")
                         .prepareStatement();
 
