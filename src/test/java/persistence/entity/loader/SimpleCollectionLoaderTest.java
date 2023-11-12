@@ -33,7 +33,7 @@ class SimpleCollectionLoaderTest extends DatabaseTest {
                 setUpFixtureTable(EntityFixtures.Order.class, new H2SqlConverter());
                 setUpFixtureTable(EntityFixtures.OrderItem.class, new H2SqlConverter());
 
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
                 CollectionLoader collectionLoader = new SimpleCollectionLoader(jdbcTemplate);
                 EntityPersister entityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
                 EntityFixtures.OrderItem orderItemOne = new EntityFixtures.OrderItem("티비", 1, 1L);

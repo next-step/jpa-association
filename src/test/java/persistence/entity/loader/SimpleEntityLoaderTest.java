@@ -39,12 +39,12 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
                 EntityFixtures.SampleOneWithValidAnnotation sample
                         = new EntityFixtures.SampleOneWithValidAnnotation("민준", 29);
 
-                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(jdbcTemplate);
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
                 EntityFixtures.SampleOneWithValidAnnotation inserted = simpleEntityPersister.insert(sample);
 
-                SimpleEntityLoader simpleEntityLoader = new SimpleEntityLoader(jdbcTemplate, entityAttributes);
+                SimpleEntityLoader simpleEntityLoader = new SimpleEntityLoader(jdbcTemplate);
 
                 EntityAttribute entityAttribute = entityAttributes.findEntityAttribute(EntityFixtures.SampleOneWithValidAnnotation.class);
 
@@ -64,7 +64,7 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
-                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()));
                 EntityFixtures.OrderItem orderItem = new EntityFixtures.OrderItem("티비", 1, 1L);
                 EntityFixtures.OrderItem orderItem2 = new EntityFixtures.OrderItem("세탁기", 2, 1L);
                 EntityFixtures.Order order = new EntityFixtures.Order("1324", List.of(orderItem, orderItem2));
@@ -94,7 +94,7 @@ public class SimpleEntityLoaderTest extends DatabaseTest {
             @DisplayName("연관관계가 매핑된 객체를 찾아온다.")
             void returnData() throws SQLException {
                 //given
-                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()), entityAttributes);
+                EntityLoader entityLoader = new SimpleEntityLoader(new JdbcTemplate(server.getConnection()));
 
                 SimpleEntityPersister simpleEntityPersister = new SimpleEntityPersister(jdbcTemplate, entityLoader, entityAttributes);
 
