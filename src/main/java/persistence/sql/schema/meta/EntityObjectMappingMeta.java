@@ -1,4 +1,4 @@
-package persistence.sql.schema;
+package persistence.sql.schema.meta;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -109,6 +109,10 @@ public class EntityObjectMappingMeta {
 
     public Object tableClause() {
         return entityClassMappingMeta.tableClause();
+    }
+
+    public EntityClassMappingMeta getEntityClassMappingMeta() {
+        return entityClassMappingMeta;
     }
 
     public List<Entry<ColumnMeta, ValueMeta>> getDifferMetaEntryList(EntityObjectMappingMeta objectMappingMeta) {

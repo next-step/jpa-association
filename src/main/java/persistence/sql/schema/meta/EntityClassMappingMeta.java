@@ -1,4 +1,4 @@
-package persistence.sql.schema;
+package persistence.sql.schema.meta;
 
 import jakarta.persistence.Entity;
 import java.lang.reflect.Constructor;
@@ -35,6 +35,10 @@ public class EntityClassMappingMeta {
         return new EntityClassMappingMeta(TableMeta.of(entityClazz), getColumnMetasFromEntity(entityClazz, columnType));
     }
 
+    public TableMeta getTableMeta() {
+        return tableMeta;
+    }
+
     public String tableClause() {
         return this.tableMeta.getTableName();
     }
@@ -49,7 +53,18 @@ public class EntityClassMappingMeta {
 
     public List<Field> getMappingFieldList() {
         return columnMetaMap.keySet().stream()
-            .filter(field -> !ColumnMeta.isTransient(field))
+            .filter(field -> !ColumnMeta.isTransient(field) )
+            .filter(field -> !ColumnMeta.isCollection(field))
+            .collect(Collectors.toList());
+    }
+
+    public boolean hasRelation() {
+        return columnMetaMap.values().stream().anyMatch(ColumnMeta::hasRelation);
+    }
+
+    public List<ColumnMeta> getRelationColumnMetaList() {
+        return columnMetaMap.values().stream()
+            .filter(ColumnMeta::hasRelation)
             .collect(Collectors.toList());
     }
 
