@@ -27,11 +27,9 @@ public class OneToManyEntityMapper extends EntityMapper {
             loadManyEntity(path, resultSet);
         } while (isNextRow(resultSet));
 
-
         return entityLoad(path, instance);
     }
 
-    @Override
     public <T> List<T> findAllMapper(Class<T> tClass, ResultSet resultSet) {
         final Map<EntityKey, EntityOneToManyPath> context = new ConcurrentHashMap<>();
         List<T> list = new ArrayList<>();

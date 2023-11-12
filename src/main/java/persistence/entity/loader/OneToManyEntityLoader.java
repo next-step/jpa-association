@@ -11,10 +11,10 @@ public class OneToManyEntityLoader implements EntityLoader {
     private final Logger log = LoggerFactory.getLogger(OneToManyEntityLoader.class);
     private final JdbcTemplate jdbcTemplate;
     private final QueryGenerator queryGenerator;
-    private final EntityMapper oneToManyEntityMapper;
+    private final OneToManyEntityMapper oneToManyEntityMapper;
 
     public OneToManyEntityLoader(JdbcTemplate jdbcTemplate, QueryGenerator queryGenerator,
-                                 EntityMapper oneToManyEntityMapper) {
+                                 OneToManyEntityMapper oneToManyEntityMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.queryGenerator = queryGenerator;
         this.oneToManyEntityMapper = oneToManyEntityMapper;

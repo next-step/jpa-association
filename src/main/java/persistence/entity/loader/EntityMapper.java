@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import persistence.exception.NotFoundException;
 import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
@@ -19,9 +18,9 @@ public abstract class EntityMapper {
         this.entityMeta = entityMeta;
     }
 
-    public abstract <T> T findMapper(Class<T> tClass, ResultSet resultSet);
-
-    public abstract <T> List<T> findAllMapper(Class<T> tClass, ResultSet resultSet);
+    public <T> T findMapper(Class<T> tClass, ResultSet resultSet) {
+        return resultSetToEntity(tClass, resultSet);
+    }
 
     protected <T> T resultSetToEntity(Class<T> tClass, ResultSet resultSet) {
         return resultSetSingleToEntity(tClass, resultSet, ROOT_LEVEL_NUMBER);
