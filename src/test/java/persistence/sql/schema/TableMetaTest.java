@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.sql.schema.meta.TableMeta;
 
 @DisplayName("TableMeta 테스트")
 class TableMetaTest {

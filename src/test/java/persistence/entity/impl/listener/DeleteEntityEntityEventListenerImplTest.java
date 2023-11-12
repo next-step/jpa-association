@@ -16,13 +16,22 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.EntityManager;
-import persistence.entity.Event;
-import persistence.entity.EventListener;
+import persistence.entity.impl.event.EntityEvent;
+import persistence.entity.impl.event.EntityEventDispatcher;
+import persistence.entity.impl.event.EntityEventListener;
 import persistence.entity.EventSource;
 import persistence.entity.impl.EntityManagerImpl;
 import persistence.entity.impl.context.DefaultPersistenceContext;
-import persistence.entity.impl.event.DeleteEvent;
+import persistence.entity.impl.event.type.DeleteEntityEvent;
+import persistence.entity.impl.event.dispatcher.EntityEventDispatcherImpl;
+import persistence.entity.impl.event.listener.DeleteEntityEventListenerImpl;
+import persistence.entity.impl.event.listener.LoadEntityEventListenerImpl;
+import persistence.entity.impl.event.listener.MergeEntityEventListenerImpl;
+import persistence.entity.impl.event.listener.PersistEntityEventListenerImpl;
+import persistence.entity.impl.event.publisher.EntityEventPublisherImpl;
+import persistence.entity.impl.retrieve.EntityLoaderImpl;
 import persistence.entity.impl.store.EntityPersisterImpl;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
 import persistence.sql.ddl.generator.DropDDLQueryGenerator;
@@ -31,14 +40,14 @@ import persistence.sql.dml.Database;
 import persistence.sql.dml.JdbcTemplate;
 
 @DisplayName("DeleteEventListener 통합 테스트")
-class DeleteEventListenerImplTest {
+class DeleteEntityEntityEventListenerImplTest {
     private DatabaseServer server;
 
     private Database jdbcTemplate;
 
     private EventSource eventSource;
 
-    private EventListener deleteEventListener;
+    private EntityEventListener deleteEntityEventListener;
 
     private EntityManager entityManager;
 
@@ -48,13 +57,23 @@ class DeleteEventListenerImplTest {
         server.start();
 
         Connection connection = server.getConnection();
+        final H2ColumnType columnType = new H2ColumnType();
 
         final EntityPersisterImpl persister = new EntityPersisterImpl(connection);
-        final H2ColumnType columnType = new H2ColumnType();
-        deleteEventListener = new DeleteEventListenerImpl(persister, columnType);
+        final EntityLoaderImpl loader = new EntityLoaderImpl(connection);
+        deleteEntityEventListener = new DeleteEntityEventListenerImpl(persister, columnType);
         final DefaultPersistenceContext persistenceContext = new DefaultPersistenceContext(columnType);
         eventSource = persistenceContext;
-        entityManager = new EntityManagerImpl(connection, columnType, persistenceContext);
+
+        EntityEventDispatcher entityEventDispatcher = new EntityEventDispatcherImpl(
+            new LoadEntityEventListenerImpl(loader, columnType),
+            new MergeEntityEventListenerImpl(persister, columnType),
+            new PersistEntityEventListenerImpl(persister, columnType),
+            deleteEntityEventListener
+        );
+        EntityEventPublisher entityEventPublisher = new EntityEventPublisherImpl(entityEventDispatcher);
+
+        entityManager = new EntityManagerImpl(connection, columnType, persistenceContext, entityEventPublisher);
         jdbcTemplate = new JdbcTemplate(connection);
         CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(columnType);
         jdbcTemplate.execute(createDDLQueryGenerator.create(DeleteEventEntity.class));
@@ -75,10 +94,10 @@ class DeleteEventListenerImplTest {
         final DeleteEventEntity deleteEventEntity = new DeleteEventEntity();
         final Object savedEntity = entityManager.persist(deleteEventEntity);
 
-        Event deleteEvent = DeleteEvent.of(savedEntity, eventSource);
+        EntityEvent deleteEntityEvent = DeleteEntityEvent.of(savedEntity, eventSource);
 
         // expect
-        assertThatCode(() -> deleteEventListener.onEvent(deleteEvent))
+        assertThatCode(() -> deleteEntityEventListener.onEvent(deleteEntityEvent))
             .doesNotThrowAnyException();
     }
 
@@ -89,13 +108,13 @@ class DeleteEventListenerImplTest {
         final DeleteEventEntity deleteEventEntity = new DeleteEventEntity();
         final Object savedEntity = entityManager.persist(deleteEventEntity);
 
-        Event deleteEvent = DeleteEvent.of(savedEntity, eventSource);
+        EntityEvent deleteEntityEvent = DeleteEntityEvent.of(savedEntity, eventSource);
 
         // when
         eventSource.readOnly(savedEntity);
 
         // then
-        assertThatThrownBy(() -> deleteEventListener.onEvent(deleteEvent))
+        assertThatThrownBy(() -> deleteEntityEventListener.onEvent(deleteEntityEvent))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("해당 Entity는 삭제될 수 없습니다.");
     }

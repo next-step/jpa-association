@@ -4,12 +4,12 @@ import java.sql.Connection;
 import jdbc.JdbcTemplate;
 import persistence.entity.impl.EntityRowMapper;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.WherePredicate;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.statement.DeleteStatementBuilder;
 import persistence.sql.dml.statement.InsertStatementBuilder;
 import persistence.sql.dml.statement.UpdateStatementBuilder;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class EntityPersisterImpl implements EntityPersister {
 

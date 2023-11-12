@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import persistence.entity.impl.EntityIdentifier;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityClassMappingMeta;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class PersistenceCacheContext {
 

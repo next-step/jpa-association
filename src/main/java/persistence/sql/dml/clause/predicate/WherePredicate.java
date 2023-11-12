@@ -1,7 +1,7 @@
-package persistence.sql.dml.clause;
+package persistence.sql.dml.clause.predicate;
 
 import persistence.sql.dml.clause.operator.ComparisonOperator;
-import persistence.sql.schema.ValueMeta;
+import persistence.sql.schema.meta.ValueMeta;
 
 public class WherePredicate {
 

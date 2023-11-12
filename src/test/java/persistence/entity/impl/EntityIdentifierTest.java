@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 @DisplayName("EntityIdentifier 테스트")
 class EntityIdentifierTest {

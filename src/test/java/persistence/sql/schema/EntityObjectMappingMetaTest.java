@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.ColumnType;
 import persistence.sql.dialect.H2ColumnType;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 @DisplayName("EntityObjectMappingMeta 테스트")
 class EntityObjectMappingMetaTest {

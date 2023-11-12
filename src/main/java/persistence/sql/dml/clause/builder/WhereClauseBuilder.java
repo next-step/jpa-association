@@ -3,7 +3,7 @@ package persistence.sql.dml.clause.builder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import persistence.sql.dml.clause.WherePredicate;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.AndOperator;
 import persistence.sql.dml.clause.operator.LogicalOperator;
 import persistence.sql.dml.clause.operator.OrOperator;

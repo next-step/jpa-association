@@ -1,7 +1,7 @@
 package persistence.entity.impl;
 
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class SnapShot {
 

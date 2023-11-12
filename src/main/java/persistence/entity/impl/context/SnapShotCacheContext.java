@@ -5,8 +5,8 @@ import java.util.Map;
 import persistence.entity.impl.EntityIdentifier;
 import persistence.entity.impl.SnapShot;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityClassMappingMeta;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class SnapShotCacheContext {
     private final Map<EntityIdentifier, Object> contextSnapshotCacheMap;

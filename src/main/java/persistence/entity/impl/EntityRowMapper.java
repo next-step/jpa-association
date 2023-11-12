@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import jdbc.RowMapper;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityClassMappingMeta;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 public class EntityRowMapper<T> implements RowMapper<T> {
 

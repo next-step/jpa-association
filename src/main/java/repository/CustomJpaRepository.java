@@ -2,7 +2,7 @@ package repository;
 
 import java.util.Optional;
 import persistence.entity.EntityManager;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 

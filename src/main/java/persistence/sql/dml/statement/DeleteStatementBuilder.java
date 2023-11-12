@@ -1,10 +1,10 @@
 package persistence.sql.dml.statement;
 
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.WherePredicate;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.builder.WhereClauseBuilder;
 import persistence.sql.exception.PreconditionRequiredException;
-import persistence.sql.schema.EntityClassMappingMeta;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 public class DeleteStatementBuilder {
 

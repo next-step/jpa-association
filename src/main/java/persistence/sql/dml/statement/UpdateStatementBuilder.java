@@ -2,11 +2,11 @@ package persistence.sql.dml.statement;
 
 import java.util.stream.Collectors;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.WherePredicate;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.builder.WhereClauseBuilder;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.exception.PreconditionRequiredException;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class UpdateStatementBuilder {
 

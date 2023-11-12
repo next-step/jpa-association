@@ -16,7 +16,7 @@ import persistence.entity.type.EntityStatus;
 import persistence.sql.dialect.H2ColumnType;
 
 @DisplayName("EventSource 테스트")
-class EventSourceTest {
+class EntityEventSourceTest {
 
     private EventSource eventSource;
 

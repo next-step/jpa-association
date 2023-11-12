@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.exception.RequiredAnnotationException;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 @DisplayName("EntityMeta 테스트")
 class EntityClassMappingMetaTest {

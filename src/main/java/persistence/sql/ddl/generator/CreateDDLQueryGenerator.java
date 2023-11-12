@@ -2,7 +2,7 @@ package persistence.sql.ddl.generator;
 
 
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityClassMappingMeta;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 public class CreateDDLQueryGenerator {
 

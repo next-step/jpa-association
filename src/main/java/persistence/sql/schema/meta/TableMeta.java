@@ -1,4 +1,4 @@
-package persistence.sql.schema;
+package persistence.sql.schema.meta;
 
 import jakarta.persistence.Table;
 

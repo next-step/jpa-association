@@ -3,8 +3,8 @@ package persistence.sql.dml.statement;
 import java.util.List;
 import java.util.stream.Collectors;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.ColumnMeta;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.ColumnMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class InsertStatementBuilder {
 
