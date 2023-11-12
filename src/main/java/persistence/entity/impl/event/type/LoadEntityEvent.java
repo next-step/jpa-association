@@ -1,22 +1,22 @@
-package persistence.entity.impl.event;
+package persistence.entity.impl.event.type;
 
-import persistence.entity.Event;
 import persistence.entity.EventSource;
+import persistence.entity.impl.event.EntityEvent;
 
-public class LoadEvent implements Event {
+public class LoadEntityEvent implements EntityEvent {
 
     private final Object id;
     private final Class<?> clazz;
     private final EventSource eventSource;
 
-    private LoadEvent(EventSource eventSource, Class<?> clazz, Object id) {
+    private LoadEntityEvent(EventSource eventSource, Class<?> clazz, Object id) {
         this.clazz = clazz;
         this.eventSource = eventSource;
         this.id = id;
     }
 
-    public static LoadEvent of(Class<?> clazz, Object id, EventSource eventSource) {
-        return new LoadEvent(eventSource, clazz, id);
+    public static LoadEntityEvent of(Class<?> clazz, Object id, EventSource eventSource) {
+        return new LoadEntityEvent(eventSource, clazz, id);
     }
 
     @Override

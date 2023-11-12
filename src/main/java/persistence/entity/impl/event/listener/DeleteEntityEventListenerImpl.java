@@ -1,26 +1,26 @@
-package persistence.entity.impl.listener;
+package persistence.entity.impl.event.listener;
 
 import persistence.entity.EntityEntry;
-import persistence.entity.Event;
-import persistence.entity.EventListener;
+import persistence.entity.impl.event.EntityEvent;
+import persistence.entity.impl.event.EntityEventListener;
 import persistence.entity.EventSource;
 import persistence.entity.impl.store.EntityPersister;
 import persistence.sql.dialect.ColumnType;
 
-public class DeleteEventListenerImpl implements EventListener {
+public class DeleteEntityEventListenerImpl implements EntityEventListener {
 
     private final EntityPersister entityPersister;
     private final ColumnType columnType;
 
-    public DeleteEventListenerImpl(EntityPersister entityPersister, ColumnType columnType) {
+    public DeleteEntityEventListenerImpl(EntityPersister entityPersister, ColumnType columnType) {
         this.entityPersister = entityPersister;
         this.columnType = columnType;
     }
 
     @Override
-    public void onEvent(Event event) {
-        final Object entity = event.getEntity();
-        final EventSource eventSource = event.getEventSource();
+    public void onEvent(EntityEvent entityEvent) {
+        final Object entity = entityEvent.getEntity();
+        final EventSource eventSource = entityEvent.getEventSource();
 
         final EntityEntry entityEntry = eventSource.getEntityEntry(entity);
         if (entityEntry.isReadOnly()) {
@@ -35,7 +35,7 @@ public class DeleteEventListenerImpl implements EventListener {
     }
 
     @Override
-    public <T> T onEvent(Class<T> clazz, Event event) {
+    public <T> T onEvent(Class<T> clazz, EntityEvent entityEvent) {
         throw new RuntimeException("DeleteEventListener는 반환이 있는 이벤트를 지원하지 않습니다.");
     }
 

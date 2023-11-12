@@ -1,31 +1,31 @@
-package persistence.entity.impl.listener;
+package persistence.entity.impl.event.listener;
 
-import persistence.entity.Event;
-import persistence.entity.EventListener;
+import persistence.entity.impl.event.EntityEvent;
+import persistence.entity.impl.event.EntityEventListener;
 import persistence.entity.EventSource;
 import persistence.entity.impl.retrieve.EntityLoader;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
-public class LoadEventListenerImpl implements EventListener {
+public class LoadEntityEventListenerImpl implements EntityEventListener {
 
     private final EntityLoader entityLoader;
     private final ColumnType columnType;
 
-    public LoadEventListenerImpl(EntityLoader entityLoader, ColumnType columnType) {
+    public LoadEntityEventListenerImpl(EntityLoader entityLoader, ColumnType columnType) {
         this.entityLoader = entityLoader;
         this.columnType = columnType;
     }
 
     @Override
-    public void onEvent(Event event) {
+    public void onEvent(EntityEvent entityEvent) {
         throw new RuntimeException("LoadEvent는 반환값이 항상 존재합니다.");
     }
 
     @Override
-    public <T> T onEvent(Class<T> clazz, Event event) {
-        final T loadedEntity = entityLoader.load(clazz, event.getId(), columnType);
-        final EventSource eventSource = event.getEventSource();
+    public <T> T onEvent(Class<T> clazz, EntityEvent entityEvent) {
+        final T loadedEntity = entityLoader.load(clazz, entityEvent.getId(), columnType);
+        final EventSource eventSource = entityEvent.getEventSource();
         eventSource.loading(loadedEntity);
 
         syncPersistenceContext(eventSource, loadedEntity);

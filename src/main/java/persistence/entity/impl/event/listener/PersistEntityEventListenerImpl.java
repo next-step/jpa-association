@@ -1,31 +1,31 @@
-package persistence.entity.impl.listener;
+package persistence.entity.impl.event.listener;
 
-import persistence.entity.Event;
-import persistence.entity.EventListener;
+import persistence.entity.impl.event.EntityEvent;
+import persistence.entity.impl.event.EntityEventListener;
 import persistence.entity.EventSource;
 import persistence.entity.impl.store.EntityPersister;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityObjectMappingMeta;
+import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
-public class PersistEventListenerImpl implements EventListener {
+public class PersistEntityEventListenerImpl implements EntityEventListener {
 
     private final EntityPersister entityPersister;
     private final ColumnType columnType;
 
-    public PersistEventListenerImpl(EntityPersister entityPersister, ColumnType columnType) {
+    public PersistEntityEventListenerImpl(EntityPersister entityPersister, ColumnType columnType) {
         this.entityPersister = entityPersister;
         this.columnType = columnType;
     }
 
     @Override
-    public void onEvent(Event event) {
+    public void onEvent(EntityEvent entityEvent) {
         throw new RuntimeException("PersistEventListener는 반환값이 있는 이벤트만 처리할 수 있습니다.");
     }
 
     @Override
-    public <T> T onEvent(Class<T> clazz, Event event) {
-        final Object savedEntity = entityPersister.store(event.getEntity(), columnType);
-        final EventSource eventSource = event.getEventSource();
+    public <T> T onEvent(Class<T> clazz, EntityEvent entityEvent) {
+        final Object savedEntity = entityPersister.store(entityEvent.getEntity(), columnType);
+        final EventSource eventSource = entityEvent.getEventSource();
         eventSource.saving(savedEntity);
 
         syncPersistenceContext(eventSource, savedEntity);
