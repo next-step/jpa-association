@@ -14,6 +14,7 @@ public class OneToManyAssociation {
     private final EntityColumn pkColumn;
     private final EntityMeta manyEntityMeta;
     private final Field oneField;
+    private final FetchType fetchType;
 
     private OneToManyAssociation(Field oneField, EntityColumn pkColumn) {
         if (!hasOneToManyField(oneField)) {
@@ -22,6 +23,7 @@ public class OneToManyAssociation {
 
         this.oneField = oneField;
         this.pkColumn = pkColumn;
+        this.fetchType = oneField.getAnnotation(OneToMany.class).fetch();
         final Class<?> manyAssociationType = getFieldGenericType(oneField);
         final ForeignerColumn foreignerColumn = ForeignerColumn.of(manyAssociationType, pkColumn.getField(),
                 joinColumnName());
@@ -77,6 +79,11 @@ public class OneToManyAssociation {
     public Field getOneField() {
         return oneField;
     }
+
+    public boolean isLazy() {
+        return FetchType.LAZY.equals(fetchType);
+    }
+
 
     private static boolean hasOneToManyField(Field it) {
         return it.isAnnotationPresent(OneToMany.class);

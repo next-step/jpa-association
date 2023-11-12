@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import jdbc.JdbcTemplate;
 import persistence.dialect.Dialect;
+import persistence.entity.loader.EntityLoaderFactory;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 
@@ -16,7 +17,9 @@ public class EntityManagerFactory {
 
     private EntityManagerFactory(Set<Class<?>> entityClasses, JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.entityPersisteContext = initEntityPersisteContext(entityClasses, jdbcTemplate, dialect);
-        this.entityLoaderContext = initEntityLoaderContext(entityClasses, jdbcTemplate, dialect);
+        this.entityLoaderContext = initEntityLoaderContext(entityClasses, new EntityLoaderFactory(jdbcTemplate),
+                dialect);
+
     }
 
     public static EntityManagerFactory of(String packageName, JdbcTemplate jdbcTemplate, Dialect dialect) {
@@ -34,13 +37,14 @@ public class EntityManagerFactory {
         return new EntityPersisteContext(persiterContext);
     }
 
-    private EntityLoaderContext initEntityLoaderContext(Set<Class<?>> entityClasses, JdbcTemplate jdbcTemplate,
-                                                        Dialect dialect) {
+    private EntityLoaderContext initEntityLoaderContext(Set<Class<?>> entityClasses,
+                                                        EntityLoaderFactory entityLoaderFactory, Dialect dialect) {
         Map<Class<?>, EntityLoader> loaderContext = new ConcurrentHashMap<>();
         for (Class<?> clazz : entityClasses) {
             EntityMeta entityMeta = EntityMeta.from(clazz);
             QueryGenerator queryGenerator = QueryGenerator.of(entityMeta, dialect);
-            loaderContext.put(clazz, new EntityLoader(jdbcTemplate, queryGenerator, new EntityMapper(entityMeta)));
+            final EntityLoader entityLoader = entityLoaderFactory.create(entityMeta, queryGenerator);
+            loaderContext.put(clazz, entityLoader);
         }
         return new EntityLoaderContext(loaderContext);
     }

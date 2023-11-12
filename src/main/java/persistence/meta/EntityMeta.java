@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import persistence.association.OneToManyAssociation;
+import persistence.entity.OneToManyAssociation;
 import persistence.exception.NoEntityException;
 
 public class EntityMeta {
@@ -85,6 +85,15 @@ public class EntityMeta {
         return oneToManyAssociation != null;
     }
 
+    public boolean hasLazyOneToMayAssociation() {
+        return hasOneToManyAssociation() && oneToManyAssociation.isLazy();
+    }
+
+    public boolean hasEagerOneToMayAssociation() {
+        return hasOneToManyAssociation() && !oneToManyAssociation.isLazy();
+    }
+
+
     public OneToManyAssociation getOneToManyAssociation() {
         return oneToManyAssociation;
     }
@@ -106,4 +115,5 @@ public class EntityMeta {
     public boolean hasForeignerColumn() {
         return foreignerColumn != null;
     }
+
 }

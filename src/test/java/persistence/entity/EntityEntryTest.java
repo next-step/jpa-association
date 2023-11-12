@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
+import persistence.entity.loader.EntityLoaderFactory;
 import persistence.exception.ObjectNotFoundException;
 import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
@@ -127,7 +128,8 @@ class EntityEntryTest {
         EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
         final EntityMeta entityMeta = EntityMeta.from(person.getClass());
         final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
-        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, queryGenerator, new EntityMapper(entityMeta));
+        final EntityLoaderFactory entityLoaderFactory = new EntityLoaderFactory(jdbcTemplate);
+        EntityLoader entityLoader = entityLoaderFactory.create(entityMeta, queryGenerator);
 
         //when
         entityEntry.gone();
