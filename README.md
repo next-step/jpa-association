@@ -55,7 +55,7 @@ public class OrderItem {
 
 ---
 ### 3단계 - OneToMany (FetchType.LAZY)
-- [ ] 테이블에 임의의 데이터를 넣고 가져오기
-- [ ] Proxy 를 활용해 Lazy loading 을 구현
-- [ ] Query 확인
-- [ ] Entity 객체 만들어 보기 
+- [X] 테이블에 임의의 데이터를 넣고 가져오기
+- [X] Proxy 를 활용해 Lazy loading 을 구현
+- [X] Query 확인
+- [X] Entity 객체 만들어 보기 

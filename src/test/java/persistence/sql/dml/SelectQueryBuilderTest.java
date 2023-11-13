@@ -75,7 +75,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder select = QueryGenerator.of(Order.class, dialect).select();
 
         //when
-        String sql = select.findAllQuery();
+        String sql = select.findAllOneToManyQuery();
 
         //then
         assertThat(sql).isEqualTo("SELECT "
@@ -97,7 +97,7 @@ class SelectQueryBuilderTest {
         SelectQueryBuilder select = QueryGenerator.of(Order.class, dialect).select();
 
         //when
-        String sql = select.findByIdQuery(1L);
+        String sql = select.findByIdOneToManyQuery(1L);
 
         //then
         assertThat(sql).isEqualTo("SELECT "

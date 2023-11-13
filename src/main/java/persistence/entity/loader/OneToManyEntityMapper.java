@@ -66,7 +66,7 @@ public class OneToManyEntityMapper extends EntityMapper {
     private <T> T entityLoad(EntityOneToManyPath path, T instance) {
         OneToManyAssociation oneToManyAssociation = entityMeta.getOneToManyAssociation();
         for (int level = ASSOCIATION_START_LEVEL; level < path.totalLevel(); level++) {
-            setFieldValue(instance, oneToManyAssociation.getOneField().getName(), path.get(level));
+            setFieldValue(instance, oneToManyAssociation.getMappingField().getName(), path.get(level));
             oneToManyAssociation = oneToManyAssociation.getManyEntityMeta().getOneToManyAssociation();
         }
         return instance;

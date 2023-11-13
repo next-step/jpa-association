@@ -66,4 +66,21 @@ class OneToManyAssociationTest {
     }
 
 
+    @Test
+    @DisplayName("연관관계 엔티티의 pk컬럼을 가져온다")
+    void getManyPkColumn() {
+        //given
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation.of(Order.class, EntityMeta.from(Order.class));
+
+        //when
+        final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
+
+        //then
+        assertSoftly((it) -> {
+            it.assertThat(oneToManyColumn.getManyPkColumn().getName()).isEqualTo("id");
+            it.assertThat(manyEntityMeta).isNotNull();
+            it.assertThat(manyEntityMeta.getTableName()).isEqualTo("order_items");
+        });
+    }
+
 }

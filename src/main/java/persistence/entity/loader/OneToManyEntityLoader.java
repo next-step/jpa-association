@@ -22,7 +22,7 @@ public class OneToManyEntityLoader implements EntityLoader {
     public <T> T find(Class<T> tClass, Object id) {
         final String query = queryGenerator
                 .select()
-                .findByIdQuery(id);
+                .findByIdOneToManyQuery(id);
 
         log.info(query);
 
@@ -31,7 +31,7 @@ public class OneToManyEntityLoader implements EntityLoader {
     }
 
     public <T> List<T> findAll(Class<T> tClass) {
-        final String query = queryGenerator.select().findAllQuery();
+        final String query = queryGenerator.select().findAllOneToManyQuery();
 
         log.info(query);
 

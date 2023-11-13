@@ -14,11 +14,14 @@ public class EntityLoaderFactory {
 
     public EntityLoader create(EntityMeta entityMeta, QueryGenerator queryGenerator) {
         if (entityMeta.hasLazyOneToMayAssociation()) {
-            return new OneToManyLazyLoader(jdbcTemplate, queryGenerator, new OneToManyLazyMapper(entityMeta));
+            return new OneToManyLazyLoader(jdbcTemplate, queryGenerator,
+                    new OneToManyLazyMapper(entityMeta, jdbcTemplate, queryGenerator));
         }
+
         if (entityMeta.hasEagerOneToMayAssociation()) {
             return new OneToManyEntityLoader(jdbcTemplate, queryGenerator, new OneToManyEntityMapper(entityMeta));
         }
+
         return new SimpleEntityLoader(jdbcTemplate, queryGenerator, new SimpleEntityMapper(entityMeta));
     }
 

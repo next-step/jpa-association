@@ -12,7 +12,6 @@ import util.DataBaseTestSetUp;
 
 public class OneToManyEntityMapperTest extends DataBaseTestSetUp {
 
-
     @Test
     @DisplayName("oneToMany 엔터티와 ResultSet을 맵핑한다.")
     void resultSetToOneToManyEntity() {
@@ -21,7 +20,7 @@ public class OneToManyEntityMapperTest extends DataBaseTestSetUp {
 
         //when
         final Order order = jdbcTemplate.queryForObject(
-                QueryGenerator.of(Order.class, dialect).select().findByIdQuery(1L),
+                QueryGenerator.of(Order.class, dialect).select().findByIdOneToManyQuery(1L),
                 (rs) -> entityMapper.findMapper(Order.class, rs));
 
         //then
@@ -34,15 +33,14 @@ public class OneToManyEntityMapperTest extends DataBaseTestSetUp {
 
     @Test
     @DisplayName("다건 엔티티를 맵핑한다.")
-    void resultSetToOneToManyEntityAll() {
+    void resultSetToOneToManyEntityMany() {
         //given
         final OneToManyEntityMapper entityMapper = new OneToManyEntityMapper(EntityMeta.from(Order.class));
-        final String query = QueryGenerator.of(Order.class, dialect).select().findByIdQuery(1L);
-        System.out.println(query);
+        QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
+
 
         //when
-        final List<Order> orders = jdbcTemplate.queryForAll(
-                QueryGenerator.of(Order.class, dialect).select().findAllQuery(),
+        final List<Order> orders = jdbcTemplate.queryForAll(queryGenerator.select().findAllOneToManyQuery(),
                 (rs) -> entityMapper.findAllMapper(Order.class, rs));
 
         //then

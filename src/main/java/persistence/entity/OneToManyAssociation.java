@@ -13,46 +13,59 @@ import persistence.meta.ForeignerColumn;
 public class OneToManyAssociation {
     private final EntityColumn pkColumn;
     private final EntityMeta manyEntityMeta;
-    private final Field oneField;
+    private final Field mappingField;
     private final FetchType fetchType;
+    private final Class<?> manyAssociationClassType;
 
-    private OneToManyAssociation(Field oneField, EntityColumn pkColumn) {
-        if (!hasOneToManyField(oneField)) {
+    private OneToManyAssociation(Field mappingField, EntityColumn pkColumn) {
+        if (!hasOneToManyField(mappingField)) {
             throw new IllegalArgumentException("해당 필드는 OneToMany 어노테이션이 있어야 합니다.");
         }
 
-        this.oneField = oneField;
         this.pkColumn = pkColumn;
-        this.fetchType = oneField.getAnnotation(OneToMany.class).fetch();
-        final Class<?> manyAssociationType = getFieldGenericType(oneField);
-        final ForeignerColumn foreignerColumn = ForeignerColumn.of(manyAssociationType, pkColumn.getField(),
+        this.mappingField = mappingField;
+        this.manyAssociationClassType = getManyAssociationClassType(mappingField);
+        this.fetchType = mappingField.getAnnotation(OneToMany.class).fetch();
+
+        final ForeignerColumn foreignerColumn = ForeignerColumn.of(manyAssociationClassType, pkColumn.getField(),
                 joinColumnName());
-        this.manyEntityMeta = EntityMeta.createManyEntityMeta(manyAssociationType, foreignerColumn);
+        this.manyEntityMeta = EntityMeta.createManyEntityMeta(manyAssociationClassType, foreignerColumn);
 
-    }
-
-    public static OneToManyAssociation of(Class<?> clazz, EntityMeta entityMeta) {
-        return new OneToManyAssociation(getOneField(clazz), entityMeta.getPkColumn());
     }
 
     public static OneToManyAssociation of(Field oneField, EntityColumn pkColumn) {
         return new OneToManyAssociation(oneField, pkColumn);
     }
 
+    public static OneToManyAssociation of(Class<?> clazz, EntityMeta entityMeta) {
+        return new OneToManyAssociation(getMappingField(clazz), entityMeta.getPkColumn());
+    }
+
+    private static Field getMappingField(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(OneToManyAssociation::hasOneToManyField)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 클래스는 OneToMany 어노테이션이 있어야 합니다."));
+    }
+
     public EntityMeta getManyEntityMeta() {
         return manyEntityMeta;
     }
 
-    public EntityColumn getPkManyColumn() {
+    public EntityColumn getManyPkColumn() {
         return manyEntityMeta.getPkColumn();
     }
 
     public boolean isHasJoinColumn() {
-        return oneField.isAnnotationPresent(JoinColumn.class);
+        return mappingField.isAnnotationPresent(JoinColumn.class);
+    }
+
+    private Class<?> getManyAssociationClassType(Field mappingField) {
+        return (Class<?>) ((ParameterizedType) mappingField.getGenericType()).getActualTypeArguments()[0];
     }
 
     private String joinColumnName() {
-        final JoinColumn joinColumn = oneField.getAnnotation(JoinColumn.class);
+        final JoinColumn joinColumn = mappingField.getAnnotation(JoinColumn.class);
         if (joinColumn == null || joinColumn.name().isBlank()) {
             return pkColumn.getName();
         }
@@ -65,19 +78,13 @@ public class OneToManyAssociation {
                 .getName();
     }
 
-    private Class<?> getFieldGenericType(Field field) {
-        return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+    public Class<?> getManyAssociationClassType() {
+        return manyAssociationClassType;
     }
 
-    private static Field getOneField(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(OneToManyAssociation::hasOneToManyField)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 클래스는 OneToMany 어노테이션이 있어야 합니다."));
-    }
 
-    public Field getOneField() {
-        return oneField;
+    public Field getMappingField() {
+        return mappingField;
     }
 
     public boolean isLazy() {

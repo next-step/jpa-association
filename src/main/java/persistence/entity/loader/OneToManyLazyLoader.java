@@ -11,13 +11,13 @@ public class OneToManyLazyLoader implements EntityLoader {
     private final Logger log = LoggerFactory.getLogger(OneToManyLazyLoader.class);
     private final JdbcTemplate jdbcTemplate;
     private final QueryGenerator queryGenerator;
-    private final EntityMapper entityMapper;
+    private final OneToManyLazyMapper entityMapper;
 
     public OneToManyLazyLoader(JdbcTemplate jdbcTemplate, QueryGenerator queryGenerator,
-                               EntityMapper entityMapper) {
+                               OneToManyLazyMapper oneToManyLazyMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.queryGenerator = queryGenerator;
-        this.entityMapper = entityMapper;
+        this.entityMapper = oneToManyLazyMapper;
     }
 
     public <T> T find(Class<T> tClass, Object id) {
@@ -25,39 +25,20 @@ public class OneToManyLazyLoader implements EntityLoader {
                 .select()
                 .findByIdQuery(id);
 
-        log.info(query);
+        log.debug(query);
 
         return jdbcTemplate.queryForObject(query,
-                (resultSet) -> entityMapper.findMapper(tClass, resultSet));
+                (resultSet) -> entityMapper.findLazyMapper(tClass, resultSet));
     }
 
     public <T> List<T> findAll(Class<T> tClass) {
         final String query = queryGenerator.select().findAllQuery();
 
-        log.info(query);
+        log.debug(query);
 
         return jdbcTemplate.query(query,
-                (resultSet) -> entityMapper.findMapper(tClass, resultSet));
+                (resultSet) -> entityMapper.findLazyMapper(tClass, resultSet));
     }
-
-
-    //    public <T> T resultSetLazyManyEntity(Class<T> tClass, ResultSet resultSet, EntityLoader entityLoader, Callback callback) {
-//        final T instance = getInstance(tClass);
-//        final EntityMeta entityMeta = EntityMeta.from(tClass);
-//
-//        for (EntityColumn entityColumn : entityMeta.getEntityColumns()) {
-//            final String columnNameSignature = entityColumn.getColumnNameSignature(entityMeta.getTableName(), 0);
-//            final Object resultSetColumn = getLoadValue(resultSet, entityColumn, columnNameSignature);
-//            setFieldValue(instance, entityColumn.getFieldName(), resultSetColumn);
-//        }
-//
-//        final Field oneToManyAssociationFiled = entityMeta.getOneToManyAssociationFiled();
-//        Enhancer enhancer = new Enhancer();
-//        enhancer.setSuperclass(oneToManyAssociationFiled.getType());
-//        enhancer.setCallback((LazyLoader)() -> callback(););
-//
-//        return instance;
-//    }
 
 
 }
