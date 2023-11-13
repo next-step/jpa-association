@@ -3,6 +3,8 @@ package persistence.entity;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import jdbc.JoinEntityRowMapper;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectFactory;
 import persistence.sql.dml.DmlQueryGenerator;
@@ -42,14 +44,22 @@ public class EntityLoader {
         return entity;
     }
 
+    public List<Object> selectChildEntities(EntityMeta joinTableEntityMeta, String selectQuery) {
+        return jdbcTemplate.query(selectQuery, new JoinEntityRowMapper(joinTableEntityMeta.getInnerClass()));
+    }
+
     private <T> void setJoinTargets(T entity, Long id) {
         String selectQuery = dmlQueryGenerator.generateSelectWithJoinByPkQuery(entity.getClass(), id);
         EntityMeta entityMeta = MetaFactory.get(entity.getClass());
         ColumnMetas columnMetas = entityMeta.getColumnMetas();
         columnMetas.forEach(columnMeta -> {
-            if (columnMeta.isJoinColumn()) {
+            if (columnMeta.isJoinFetchTypeEager()) {
                 EntityMeta joinTableEntityMeta = columnMeta.getJoinTableEntityMeta();
-                List<Object> childEntities = jdbcTemplate.query(selectQuery, JoinEntityRowMapper.of(joinTableEntityMeta, selectQuery));
+                List<Object> childEntities = selectChildEntities(joinTableEntityMeta, selectQuery);
+                setChildEntities(entity, columnMeta, childEntities);
+            }
+            if (columnMeta.isJoinFetchTypeLazy()) {
+                List<Object> childEntities = getProxyEntity(columnMeta, selectQuery);
                 setChildEntities(entity, columnMeta, childEntities);
             }
         });
@@ -64,5 +74,12 @@ public class EntityLoader {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> List<T> getProxyEntity(ColumnMeta joinColumnMeta, String selectQuery) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(joinColumnMeta.getJavaType());
+        enhancer.setCallback((LazyLoader) () -> selectChildEntities(joinColumnMeta.getJoinTableEntityMeta(), selectQuery));
+        return (List<T>) enhancer.create();
     }
 }

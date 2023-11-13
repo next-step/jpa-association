@@ -24,4 +24,8 @@ public class OrderItem {
 
     @JoinColumn(name = "order_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Long orderId;
+
+    public String getProduct() {
+        return product;
+    }
 }
