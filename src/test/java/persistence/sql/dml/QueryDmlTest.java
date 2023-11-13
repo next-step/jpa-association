@@ -195,8 +195,10 @@ class QueryDmlTest {
             final TableName tableName = TableName을_생성함(clazz);
             final Columns columns = Columns을_생성함(clazz);
 
+            final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
             //when
-            String q = query.delete(tableName, columns, id);
+            String q = query.delete(entityMeta, id);
             jdbcTemplate.execute(q);
 
             SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)

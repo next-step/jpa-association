@@ -41,7 +41,7 @@ public final class Query {
         return INSTANCE.updateQuery.get(entityMeta, values, args);
     }
 
-    public String delete(TableName tableName, Columns columns, Object arg) {
-        return INSTANCE.deleteQuery.get(tableName, columns, arg);
+    public String delete(EntityMeta entityMeta, Object arg) {
+        return INSTANCE.deleteQuery.get(entityMeta, arg);
     }
 }

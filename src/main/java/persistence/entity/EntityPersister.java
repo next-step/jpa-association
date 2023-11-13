@@ -56,7 +56,8 @@ public class EntityPersister<T> {
     }
 
     public void delete(Object arg) {
-        String q = query.delete(tableName, columns, arg);
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+        String q = query.delete(entityMeta, arg);
 
         jdbcTemplate.execute(q);
     }

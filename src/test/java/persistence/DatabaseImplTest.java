@@ -165,7 +165,8 @@ class DatabaseImplTest {
     }
 
     private void delete(TableName tableName, Columns columns, Object args) throws SQLException {
-        database.execute(query.delete(tableName, columns, args));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+        database.execute(query.delete(entityMeta, args));
     }
 
     private <T> ResultSet findAll(Class<T> tClass, String methodName) throws SQLException {
