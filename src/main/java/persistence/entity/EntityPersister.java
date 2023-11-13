@@ -48,7 +48,8 @@ public class EntityPersister<T> {
     }
 
     public <I> void insert(I input) {
-        String q = query.insert(tableName, columns, getValues(input));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+        String q = query.insert(entityMeta, getValues(input));
 
         jdbcTemplate.execute(q);
     }

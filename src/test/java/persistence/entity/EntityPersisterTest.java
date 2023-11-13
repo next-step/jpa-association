@@ -212,6 +212,8 @@ class EntityPersisterTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values을_생성함(t);
 
-        jdbcTemplate.execute(query.insert(tableName, columns, values));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
+        jdbcTemplate.execute(query.insert(entityMeta, values));
     }
 }

@@ -88,6 +88,8 @@ class DatabaseImplTest {
         insert(new DatabasePerson(14L, "name", 30, "email", 1));
         insert(new DatabasePerson(15L, "name", 30, "email", 1));
 
+        Thread.sleep(5000);
+
         //when
         ResultSet resultSet = findAll(tClass, methodName);
         resultSet.last();
@@ -157,7 +159,9 @@ class DatabaseImplTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values을_생성함(t);
 
-        database.execute(query.insert(tableName, columns, values));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
+        database.execute(query.insert(entityMeta, values));
     }
 
     private void delete(TableName tableName, Columns columns, Object args) throws SQLException {

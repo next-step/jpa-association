@@ -3,10 +3,10 @@ package persistence.sql.dml;
 import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 
 public final class Query {
+
     private static final Query INSTANCE = new Query();
 
     private final SelectQuery selectQuery;
@@ -33,8 +33,8 @@ public final class Query {
         return INSTANCE.selectQuery.getAll(methodName, tableName, columns);
     }
 
-    public String insert(TableName tableName, Columns columns, Values values) {
-        return INSTANCE.insertQuery.get(tableName, columns, values);
+    public String insert(EntityMeta entityMeta, Values values) {
+        return INSTANCE.insertQuery.get(entityMeta, values);
     }
 
     public String update(Values values, TableName tableName, Columns columns, Object args) {

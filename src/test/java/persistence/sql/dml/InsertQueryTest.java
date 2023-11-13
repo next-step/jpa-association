@@ -3,6 +3,7 @@ package persistence.sql.dml;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityMeta;
 import persistence.exception.InvalidEntityException;
 import domain.NonExistentEntityPerson;
 import domain.NonExistentTablePerson;
@@ -33,8 +34,10 @@ class InsertQueryTest {
         final Columns columns = Columns을_생성함(person);
         final Values values = Values을_생성함(person);
 
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
         //when
-        String q = query.insert(tableName, columns, values);
+        String q = query.insert(entityMeta, values);
 
         //then
         assertSoftly(softAssertions -> {
@@ -42,19 +45,6 @@ class InsertQueryTest {
             softAssertions.assertThat(q).isNotEqualToIgnoringCase("index");
         });
 
-    }
-
-    @Test
-    @DisplayName("@Entity가 없는 객체의 경우 insert query 생성하지 않고 exception 발생")
-    void isNotEntity() {
-        //given
-        final NonExistentEntityPerson person = new NonExistentEntityPerson(1L, "name", 3);
-
-        //when & then
-        assertThrows(InvalidEntityException.class
-                , () -> query.insert(TableName을_생성함(person.getClass())
-                        , Columns을_생성함(person.getClass().getDeclaredFields())
-                        , Values을_생성함(person.getClass().getDeclaredFields())));
     }
 
     @Test
@@ -68,8 +58,10 @@ class InsertQueryTest {
         final Columns columns = Columns을_생성함(person);
         final Values values = Values을_생성함(person);
 
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
         //when
-        String q = query.insert(tableName, columns, values);
+        String q = query.insert(entityMeta, values);
 
         //then
         assertThat(q).isEqualTo(expectedQuery);

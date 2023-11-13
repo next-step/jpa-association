@@ -12,6 +12,11 @@ public class EntityMeta {
     private JoinColumn joinColumn;
     private Object arg;
 
+    public EntityMeta(TableName tableName, Columns columns) {
+        this.tableName = tableName;
+        this.columns = columns;
+    }
+
     public EntityMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object arg) {
         this.methodName = methodName;
         this.tableName = tableName;

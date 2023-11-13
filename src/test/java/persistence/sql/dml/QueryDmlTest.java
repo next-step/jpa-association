@@ -64,19 +64,6 @@ class QueryDmlTest {
         }
 
         @Test
-        @DisplayName("@Entity가 설정되어 있지 않은 경우 Query를 생성하지 않음")
-        void notEntity() {
-            //given
-            NotEntityPerson person = new NotEntityPerson(1L, "name", 3);
-
-            //when & then
-            assertThrows(InvalidEntityException.class
-                , () -> query.insert(TableName을_생성함(person.getClass())
-                    , Columns을_생성함(person.getClass().getDeclaredFields())
-                    , Values을_생성함(person.getClass().getDeclaredFields())));
-        }
-
-        @Test
         @DisplayName("성공적으로 insert 쿼리 생성하여 실행")
         void Success() {
             //given
@@ -92,8 +79,10 @@ class QueryDmlTest {
             final Columns columns = Columns을_생성함(person);
             final Values values = Values을_생성함(person);
 
+            final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
             //when
-            String q = query.insert(tableName, columns, values);
+            String q = query.insert(entityMeta, values);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(q));
@@ -171,21 +160,6 @@ class QueryDmlTest {
 
             //then
             assertThat(personList).size().isEqualTo(2);
-        }
-
-        @Test
-        @DisplayName("@Entity가 존재하지 않는 클래스의 select query 생성시 오류 출력")
-        void notEntity() {
-            //given
-            final Class<NotEntityPerson> aClass = NotEntityPerson.class;
-            final String methodName = "findAll";
-
-            final TableName tableName = TableName을_생성함(aClass);
-            final Columns columns = Columns을_생성함(aClass);
-
-            //when & then
-            assertThrows(InvalidEntityException.class,
-                () -> jdbcTemplate.query(getSelectAllQuery(methodName, tableName, columns), new ResultMapper<>(SelectPerson.class)));
         }
 
         @AfterEach
@@ -324,7 +298,9 @@ class QueryDmlTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values.of(t);
 
-        jdbcTemplate.execute(query.insert(tableName, columns, values));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
+        jdbcTemplate.execute(query.insert(entityMeta, values));
     }
 
     private <T> void dropTable(Class<T> tClass) {

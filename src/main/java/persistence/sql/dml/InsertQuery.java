@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
@@ -13,9 +14,9 @@ class InsertQuery {
 
     InsertQuery() { }
 
-    String get(TableName tableName, Columns columns, Values values) {
-        this.tableName = tableName;
-        this.columns = columns;
+    String get(EntityMeta entityMeta, Values values) {
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
         this.values = values;
 
         return combineQuery();
