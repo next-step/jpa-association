@@ -21,6 +21,14 @@ class SelectQuery {
 
     SelectQuery() { }
 
+    String getAll(EntityMeta entityMeta) {
+        this.methodName = entityMeta.getMethodName();
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
+
+        return combine();
+    }
+
     String getAll(String methodName, TableName tableName, Columns columns) {
         this.methodName = methodName;
         this.tableName = tableName;

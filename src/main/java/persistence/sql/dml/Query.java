@@ -29,6 +29,10 @@ public final class Query {
         return INSTANCE.selectQuery.get(entityMeta, arg);
     }
 
+    public String selectAll(EntityMeta entityMeta) {
+        return INSTANCE.selectQuery.getAll(entityMeta);
+    }
+
     public String selectAll(String methodName, TableName tableName, Columns columns) {
         return INSTANCE.selectQuery.getAll(methodName, tableName, columns);
     }

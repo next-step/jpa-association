@@ -173,7 +173,9 @@ class DatabaseImplTest {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
 
-        return database.executeQuery(query.selectAll(methodName, tableName, columns));
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns);
+
+        return database.executeQuery(query.selectAll(entityMeta));
     }
 
     private <T> ResultSet find(Class<T> tClass, String methodName, Object arg) throws SQLException {

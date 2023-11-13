@@ -274,7 +274,9 @@ class QueryDmlTest {
     }
 
     private String getSelectAllQuery(String methodName, TableName tableName, Columns columns) {
-        return query.selectAll(methodName, tableName, columns);
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns);
+
+        return query.selectAll(entityMeta);
     }
 
     private <T> String getSelectQuery(Class<T> tClass, String methodName, Object arg) {

@@ -23,6 +23,12 @@ public class EntityMeta {
         this.joinColumn = joinColumn;
     }
 
+    public EntityMeta(String methodName, TableName tableName, Columns columns) {
+        this.methodName = methodName;
+        this.tableName = tableName;
+        this.columns = columns;
+    }
+
     public static EntityMeta selectMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn) {
         return new EntityMeta(methodName, tableName, columns, joinColumn);
     }

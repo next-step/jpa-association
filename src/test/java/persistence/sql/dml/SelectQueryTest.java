@@ -30,18 +30,6 @@ class SelectQueryTest {
     }
 
     @Test
-    @DisplayName("@Entity 없는 클래스 select quert 생성시 오류")
-    void notEntity() {
-        //given
-        final Class<NotEntityPerson> aClass = NotEntityPerson.class;
-        final String methodName = "findAll";
-
-        //when & then
-        assertThrows(InvalidEntityException.class
-            , () -> query.selectAll(methodName, TableName을_생성함(aClass), Columns을_생성함(aClass)));
-    }
-
-    @Test
     @DisplayName("@Table name이 없을 경우 클래스 이름으로 select query 생성")
     void nonTableName() {
         //given
@@ -51,10 +39,12 @@ class SelectQueryTest {
         final TableName tableName = TableName을_생성함(aClass);
         final Columns columns = Columns을_생성함(aClass);
 
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns);
+
         String wildcardPattern = "SELECT .*\\.id, .*\\.nick_name, .*\\.old, .*\\.email FROM NonExistentTablePerson .*";
 
         //when
-        String q = query.selectAll(methodName, tableName, columns);
+        String q = query.selectAll(entityMeta);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();
@@ -93,9 +83,11 @@ class SelectQueryTest {
 
         String wildcardPattern = "SELECT .*\\.id, .*\\.nick_name, .*\\.old, .*\\.email FROM users .*";
 
-        //when
-        String q = query.selectAll(new Object() {
+        final EntityMeta entityMeta = new EntityMeta(new Object() {
         }.getClass().getEnclosingMethod().getName(), tableName, columns);
+
+        //when
+        String q = query.selectAll(entityMeta);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();
