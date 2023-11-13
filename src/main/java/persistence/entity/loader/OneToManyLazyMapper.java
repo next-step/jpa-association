@@ -7,12 +7,13 @@ import jdbc.JdbcTemplate;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.entity.OneToManyAssociation;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 
 public class OneToManyLazyMapper extends EntityMapper {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(OneToManyLazyMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(OneToManyLazyMapper.class);
     private final JdbcTemplate jdbcTemplate;
     private final QueryGenerator queryGenerator;
 
