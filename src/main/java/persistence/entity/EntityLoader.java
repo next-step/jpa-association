@@ -45,7 +45,7 @@ public class EntityLoader {
     }
 
     public List<Object> selectChildEntities(EntityMeta joinTableEntityMeta, String selectQuery) {
-        return jdbcTemplate.query(selectQuery, JoinEntityRowMapper.of(joinTableEntityMeta, selectQuery));
+        return jdbcTemplate.query(selectQuery, new JoinEntityRowMapper(joinTableEntityMeta.getInnerClass()));
     }
 
     private <T> void setJoinTargets(T entity, Long id) {
