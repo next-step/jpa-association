@@ -3,18 +3,14 @@ package persistence.sql.common.meta;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import persistence.exception.NotFoundIdException;
-import utils.StringUtils;
 
 public class Columns {
 
     private final Column[] value;
-    private final JoinColumn joinColumn;
 
     private Columns(Field[] fields) {
         this.value = Column.of(fields);
-        this.joinColumn = JoinColumn.of(fields);
     }
 
     public static Columns of(Field[] fields) {
@@ -42,23 +38,17 @@ public class Columns {
             .collect(Collectors.joining(", "));
     }
 
-    public String getColumnsWithComma(String alias, JoinColumn joinColumn) {
-        String columnStr = Arrays.stream(value)
-                .map(column -> alias + "." + column.getName())
-                .collect(Collectors.joining(", "));
-
-        if(joinColumn == null) {
-            return columnStr;
-        }
-
-        return String.join(", ", columnStr, joinColumn.getTableAlias() + "." + joinColumn.getJoinColumn());
+    public String getColumnsWithComma(String alias) {
+        return Arrays.stream(value)
+            .map(column -> alias + "." + column.getName())
+            .collect(Collectors.joining(", "));
     }
 
     public Column getIdEntity() {
         return Arrays.stream(value)
-                .filter(Column::isPrimaryKey)
-                .findFirst()
-                .orElseThrow(NotFoundIdException::new);
+            .filter(Column::isPrimaryKey)
+            .findFirst()
+            .orElseThrow(NotFoundIdException::new);
     }
 
     /**

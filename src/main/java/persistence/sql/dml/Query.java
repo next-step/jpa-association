@@ -1,11 +1,12 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 
 public final class Query {
+
     private static final Query INSTANCE = new Query();
 
     private final SelectQuery selectQuery;
@@ -24,23 +25,27 @@ public final class Query {
         return INSTANCE;
     }
 
-    public String select(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object... args) {
-        return INSTANCE.selectQuery.get(methodName, tableName, columns, joinColumn, args);
+    public String select(EntityMeta entityMeta, Object arg) {
+        return INSTANCE.selectQuery.get(entityMeta, arg);
+    }
+
+    public String selectAll(EntityMeta entityMeta) {
+        return INSTANCE.selectQuery.getAll(entityMeta);
     }
 
     public String selectAll(String methodName, TableName tableName, Columns columns) {
         return INSTANCE.selectQuery.getAll(methodName, tableName, columns);
     }
 
-    public String insert(TableName tableName, Columns columns, Values values) {
-        return INSTANCE.insertQuery.get(tableName, columns, values);
+    public String insert(EntityMeta entityMeta, Values values) {
+        return INSTANCE.insertQuery.get(entityMeta, values);
     }
 
-    public String update(Values values, TableName tableName, Columns columns, Object args) {
-        return INSTANCE.updateQuery.get(values, tableName, columns, args);
+    public String update(EntityMeta entityMeta, Values values, Object args) {
+        return INSTANCE.updateQuery.get(entityMeta, values, args);
     }
 
-    public String delete(TableName tableName, Columns columns, Object arg) {
-        return INSTANCE.deleteQuery.get(tableName, columns, arg);
+    public String delete(EntityMeta entityMeta, Object arg) {
+        return INSTANCE.deleteQuery.get(entityMeta, arg);
     }
 }

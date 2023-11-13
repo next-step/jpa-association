@@ -1,10 +1,10 @@
 package persistence.sql.common.meta;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import domain.SelectPerson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.SelectPerson;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ColumnsTest {
     @Test

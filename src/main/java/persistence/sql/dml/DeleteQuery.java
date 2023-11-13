@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityMeta;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 
@@ -13,9 +14,9 @@ class DeleteQuery {
 
     DeleteQuery() { }
 
-    String get(TableName tableName, Columns columns, Object arg) {
-        this.tableName = tableName;
-        this.columns = columns;
+    String get(EntityMeta entityMeta, Object arg) {
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
         this.arg = arg;
 
         return combine();

@@ -1,11 +1,11 @@
 package persistence.sql.dml;
 
+import java.util.List;
+import persistence.entity.EntityMeta;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import utils.ConditionUtils;
-
-import java.util.List;
 
 class SelectQuery {
 
@@ -16,9 +16,17 @@ class SelectQuery {
     private TableName tableName;
     private Columns columns;
     private JoinColumn joinColumn;
-    private Object[] args;
+    private Object arg;
 
     SelectQuery() { }
+
+    String getAll(EntityMeta entityMeta) {
+        this.methodName = entityMeta.getMethodName();
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
+
+        return combine();
+    }
 
     String getAll(String methodName, TableName tableName, Columns columns) {
         this.methodName = methodName;
@@ -28,12 +36,12 @@ class SelectQuery {
         return combine();
     }
 
-    String get(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object... args) {
-        this.methodName = methodName;
-        this.tableName = tableName;
-        this.columns = columns;
-        this.joinColumn = joinColumn;
-        this.args = args;
+    String get(EntityMeta entityMeta, Object arg) {
+        this.methodName = entityMeta.getMethodName();
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
+        this.joinColumn = entityMeta.getJoinColumn();
+        this.arg = arg;
 
         return combine();
     }
@@ -61,7 +69,15 @@ class SelectQuery {
     }
 
     private String parseSelectFiled() {
-        return columns.getColumnsWithComma(tableName.getAlias(), joinColumn);
+        if(joinColumn == null) {
+            return columns.getColumnsWithComma(tableName.getAlias());
+        }
+
+        if(!joinColumn.isEager()) {
+            //TODO: LAZY 작성 필요
+        }
+        
+        return String.join(", ", columns.getColumnsWithComma(tableName.getAlias()), joinColumn.getColumns().getColumnsWithComma(joinColumn.getTableAlias()));
     }
 
     private String parseWhere() {
@@ -69,7 +85,7 @@ class SelectQuery {
         String conditionText = methodName.replace("find", "").replace("By", "");
         List<String> conditionList = ConditionUtils.getWordsFromCamelCase(conditionText);
 
-        String condition = ConditionBuilder.getCondition(conditionList, args, tableName.getAlias());
+        String condition = ConditionBuilder.getCondition(conditionList, arg, tableName.getAlias());
         return condition.replace(".id ", setConditionField("id") + " ");
     }
 

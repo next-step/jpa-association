@@ -3,7 +3,6 @@ package persistence.sql.dml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
 import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
@@ -11,6 +10,8 @@ import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.InsertPerson;
+import domain.SelectPerson;
 import java.sql.SQLException;
 import java.util.List;
 import jdbc.JdbcTemplate;
@@ -22,10 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.exception.InvalidEntityException;
-import domain.InsertPerson;
-import domain.NotEntityPerson;
-import domain.SelectPerson;
+import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -63,19 +61,6 @@ class QueryDmlTest {
         }
 
         @Test
-        @DisplayName("@Entity가 설정되어 있지 않은 경우 Query를 생성하지 않음")
-        void notEntity() {
-            //given
-            NotEntityPerson person = new NotEntityPerson(1L, "name", 3);
-
-            //when & then
-            assertThrows(InvalidEntityException.class
-                , () -> query.insert(TableName을_생성함(person.getClass())
-                    , Columns을_생성함(person.getClass().getDeclaredFields())
-                    , Values을_생성함(person.getClass().getDeclaredFields())));
-        }
-
-        @Test
         @DisplayName("성공적으로 insert 쿼리 생성하여 실행")
         void Success() {
             //given
@@ -91,8 +76,10 @@ class QueryDmlTest {
             final Columns columns = Columns을_생성함(person);
             final Values values = Values을_생성함(person);
 
+            final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
             //when
-            String q = query.insert(tableName, columns, values);
+            String q = query.insert(entityMeta, values);
 
             //then
             assertDoesNotThrow(() -> jdbcTemplate.execute(q));
@@ -129,8 +116,6 @@ class QueryDmlTest {
 
             final TableName tableName = TableName을_생성함(person);
             final Columns columns = Columns을_생성함(person);
-            final JoinColumn joinColumn = JoinColumn을_생성함(person.getClass());
-
 
             insert(person);
 
@@ -163,25 +148,12 @@ class QueryDmlTest {
             final Columns columns = Columns을_생성함(person1);
             final JoinColumn joinColumn = JoinColumn을_생성함(person1.getClass());
 
-
             //when
             List<SelectPerson> personList = jdbcTemplate.query(getSelectAllQuery("findAll", tableName, columns)
                 , new ResultMapper<>(SelectPerson.class));
 
             //then
             assertThat(personList).size().isEqualTo(2);
-        }
-
-        @Test
-        @DisplayName("@Entity가 존재하지 않는 클래스의 select query 생성시 오류 출력")
-        void notEntity() {
-            //given
-            final Class<NotEntityPerson> aClass = NotEntityPerson.class;
-            final String methodName = "findAll";
-
-            //when & then
-            assertThrows(InvalidEntityException.class,
-                () -> jdbcTemplate.query(getSelectAllQuery(aClass, methodName), new ResultMapper<>(SelectPerson.class)));
         }
 
         @AfterEach
@@ -219,12 +191,14 @@ class QueryDmlTest {
             final TableName tableName = TableName을_생성함(clazz);
             final Columns columns = Columns을_생성함(clazz);
 
+            final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
             //when
-            String q = query.delete(tableName, columns, id);
+            String q = query.delete(entityMeta, id);
             jdbcTemplate.execute(q);
 
-            SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery(selectPersonClass, "findById", id)
-                    , new ResultMapper<>(SelectPerson.class));
+            SelectPerson result = jdbcTemplate.queryForObject(getSelectQuery(selectPersonClass, "findById", id)
+                , new ResultMapper<>(SelectPerson.class));
 
             //then
             assertThat(result).isNull();
@@ -265,11 +239,12 @@ class QueryDmlTest {
             Class<SelectPerson> clazz = SelectPerson.class;
             final TableName tableName = TableName을_생성함(clazz);
             final Columns columns = Columns을_생성함(clazz);
-            final JoinColumn joinColumn = JoinColumn을_생성함(clazz);
             final Values values = Values을_생성함(expected);
 
+            final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
             //when
-            String q = query.update(values, tableName, columns, id);
+            String q = query.update(entityMeta, values, id);
             jdbcTemplate.execute(q);
             SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery("findAll", tableName, columns),
                 new ResultMapper<>(clazz));
@@ -295,15 +270,19 @@ class QueryDmlTest {
     }
 
     private String getSelectAllQuery(String methodName, TableName tableName, Columns columns) {
-        return query.selectAll(methodName, tableName, columns);
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns);
+
+        return query.selectAll(entityMeta);
     }
 
-    private <T> String getSelectAllQuery(Class<T> tClass, String methodName, Object... args) {
+    private <T> String getSelectQuery(Class<T> tClass, String methodName, Object arg) {
         final TableName tableName = TableName을_생성함(tClass);
         final Columns columns = Columns을_생성함(tClass);
         final JoinColumn joinColumn = JoinColumn을_생성함(tClass);
 
-        return query.select(methodName, tableName, columns, joinColumn, args);
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns, joinColumn);
+
+        return query.select(entityMeta, arg);
     }
 
     private <T> void 테이블을_생성함(Class<T> tClass) {
@@ -318,7 +297,9 @@ class QueryDmlTest {
         final Columns columns = Columns을_생성함(t);
         final Values values = Values.of(t);
 
-        jdbcTemplate.execute(query.insert(tableName, columns, values));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
+        jdbcTemplate.execute(query.insert(entityMeta, values));
     }
 
     private <T> void dropTable(Class<T> tClass) {

@@ -2,13 +2,12 @@ package persistence.entity;
 
 import jakarta.persistence.Transient;
 import java.util.Arrays;
+import java.util.List;
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.Query;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-
-import java.util.List;
+import persistence.sql.dml.Query;
 
 public class EntityPersister<T> {
     private final Query query;
@@ -37,8 +36,9 @@ public class EntityPersister<T> {
     }
 
     public <I> boolean update(I input, Object arg) {
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
         try {
-            String q = query.update(getValues(input), tableName, columns, arg);
+            String q = query.update(entityMeta, getValues(input), arg);
 
             jdbcTemplate.execute(q);
             return true;
@@ -48,13 +48,15 @@ public class EntityPersister<T> {
     }
 
     public <I> void insert(I input) {
-        String q = query.insert(tableName, columns, getValues(input));
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+        String q = query.insert(entityMeta, getValues(input));
 
         jdbcTemplate.execute(q);
     }
 
     public void delete(Object arg) {
-        String q = query.delete(tableName, columns, arg);
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+        String q = query.delete(entityMeta, arg);
 
         jdbcTemplate.execute(q);
     }

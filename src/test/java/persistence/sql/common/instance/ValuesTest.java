@@ -1,11 +1,11 @@
 package persistence.sql.common.instance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.common.meta.Columns;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ValuesTest {
     @Test

@@ -3,9 +3,8 @@ package persistence.sql.common.meta;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import persistence.exception.InvalidGeneratedValueException;
-
 import java.lang.reflect.Field;
+import persistence.exception.InvalidGeneratedValueException;
 
 class Constraint {
     private GenerationType generationType;

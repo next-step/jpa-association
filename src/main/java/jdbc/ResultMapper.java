@@ -1,16 +1,19 @@
 package jdbc;
 
 import jakarta.persistence.Transient;
-import persistence.sql.common.meta.ColumnName;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
+import persistence.sql.common.meta.Column;
+import persistence.sql.common.meta.TableName;
 
 public class ResultMapper<T> implements RowMapper<T> {
+
     private final Class<T> tClass;
 
     public ResultMapper(Class<T> tClass) {
@@ -19,16 +22,20 @@ public class ResultMapper<T> implements RowMapper<T> {
 
     @Override
     public T mapRow(ResultSet resultSet) {
-        T clazz = getConstructor();
+        T clazz = getConstructor(tClass);
 
-        Arrays.stream(tClass.getDeclaredFields())
+        extracted(resultSet, tClass, clazz);
+
+        return clazz;
+    }
+
+    private void extracted(ResultSet resultSet, Class clazz, Object object) {
+        Arrays.stream(clazz.getDeclaredFields())
             .filter(field -> !field.isAnnotationPresent(Transient.class))
             .forEach(field -> {
                 field.setAccessible(true);
-                setFieldData(resultSet, field, clazz);
+                setFieldData(resultSet, field, object);
             });
-
-        return clazz;
     }
 
     /**
@@ -36,23 +43,25 @@ public class ResultMapper<T> implements RowMapper<T> {
      */
     private <R> R extracted(ResultSet resultSet, Field field, Class<R> rClass, String columnName) {
         try {
-            if (isTypeEquals(field, Long.class)) {
-                return rClass.cast(resultSet.getLong(columnName));
-            } else if (isTypeEquals(field, Boolean.class)) {
-                return rClass.cast(resultSet.getBoolean(columnName));
-            } else if (isTypeEquals(field, Integer.class)) {
-                return rClass.cast(resultSet.getInt(columnName));
-            } else if (isTypeEquals(field, String.class)) {
-                return rClass.cast(resultSet.getString(columnName));
-            } else if (isTypeEquals(field, Double.class)) {
-                return rClass.cast(resultSet.getDouble(columnName));
-            } else if (isTypeEquals(field, Float.class)) {
-                return rClass.cast(resultSet.getFloat(columnName));
-            } else if (isTypeEquals(field, Short.class)) {
-                return rClass.cast(resultSet.getShort(columnName));
+            if (isTypeEquals(field, List.class)) {
+                Class<?> aClazz = (Class) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+
+                List<Object> list = new ArrayList<>();
+
+                while (!resultSet.isAfterLast()) {
+
+                    Object o = aClazz.newInstance();
+
+                    extracted(resultSet, aClazz, o);
+
+                    resultSet.next();
+                    list.add(o);
+                }
+                return (R) list;
             }
-            return null;
-        } catch (SQLException e) {
+
+            return rClass.cast(resultSet.getObject(columnName, rClass));
+        } catch (SQLException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -61,18 +70,22 @@ public class ResultMapper<T> implements RowMapper<T> {
         return field.getType().equals(tClass);
     }
 
-    private T getConstructor() {
+    private T getConstructor(Class<T> tClass) {
         try {
             return tClass.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setFieldData(ResultSet resultSet, Field field, T clazz) {
+    private void setFieldData(ResultSet resultSet, Field field, Object object) {
         try {
-            field.set(clazz, extracted(resultSet, field, field.getType(), Objects.requireNonNull(
-                    ColumnName.of(field)).getName()));
+            TableName tableName = TableName.of(object.getClass());
+            Column column = Column.of(field);
+
+            field.set(object,
+                extracted(resultSet, field, field.getType(), tableName.getName() + "." + column.getName()));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }

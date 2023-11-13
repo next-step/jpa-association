@@ -1,7 +1,6 @@
 package persistence.entity;
 
 import domain.Snapshot;
-
 import java.util.Map;
 
 public interface PersistenceContext {

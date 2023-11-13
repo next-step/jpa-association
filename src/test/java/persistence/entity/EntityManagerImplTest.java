@@ -1,9 +1,17 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import domain.SelectPerson;
+import java.sql.SQLException;
+import java.util.List;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -15,15 +23,6 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
-
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
-import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
 class EntityManagerImplTest {
 

@@ -3,7 +3,6 @@ package persistence.sql.common.meta;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 

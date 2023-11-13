@@ -1,30 +1,25 @@
 package domain;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import database.DatabaseServer;
 import database.H2;
 import domain.helper.CreateSqlHelper;
+import java.sql.SQLException;
 import jdbc.JdbcTemplate;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.EntityManagerFactory;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.SoftAssertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 class OrderTest {
+
     private DatabaseServer server;
     private JdbcTemplate jdbcTemplate;
     private EntityManager entityManager;
 
-    private Order order = new Order(1L, "00001", null);
+    private Order order = new Order(9999L, "1", null);
 
     @BeforeEach
     void init() throws SQLException {
@@ -46,16 +41,17 @@ class OrderTest {
     @DisplayName("order를 조회하여 정상적으로 생성함")
     void ii() {
         //given
-        final Long orderId = 1L;
-        final String orderNumber = "00001";
+        final Long orderId = 9999L;
+        final String orderNumber = "1";
 
         //when
-        Order result = entityManager.find(Order.class, 1L);
+        Order result = entityManager.find(Order.class, 9999L);
 
         //then
         assertSoftly(softAssertions -> {
             softAssertions.assertThat(result.getId()).isEqualTo(orderId);
             softAssertions.assertThat(result.getOrderNumber()).isEqualTo(orderNumber);
+            softAssertions.assertThat(result.getOrderItems()).size().isEqualTo(3);
         });
     }
 

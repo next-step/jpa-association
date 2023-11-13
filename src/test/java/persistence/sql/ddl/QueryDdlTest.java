@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.dml.Query;
 
 class QueryDdlTest {
 
@@ -28,6 +27,7 @@ class QueryDdlTest {
     private static JdbcTemplate jdbcTemplate;
 
     private final DmlQuery dmlQuery = DmlQuery.getInstance();
+
     @BeforeAll
     static void start() throws SQLException {
         server = new H2();
