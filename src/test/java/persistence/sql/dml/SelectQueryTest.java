@@ -73,10 +73,10 @@ class SelectQueryTest {
 
         String expectedQuery = "SELECT .*\\.id, .*\\.order_number, .*\\.id, .*\\.product, .*\\.quantity FROM orders .* JOIN order_items .* ON .*\\.id = .*\\.order_id WHERE .*\\.id = 1";
 
-        final EntityMeta entityMeta = EntityMeta.selectMeta(methodName, tableName, columns, joinColumn, 1);
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns, joinColumn);
 
         //when
-        String q = query.select(entityMeta);
+        String q = query.select(entityMeta, 1);
 
         //then
         assertThat(q.matches(expectedQuery)).isTrue();
@@ -112,10 +112,10 @@ class SelectQueryTest {
 
         String wildcardPattern = "SELECT .*\\.select_person_id, .*\\.nick_name, .*\\.old, .*\\.email FROM selectPerson .* WHERE .*\\.select_person_id = 1";
 
-        final EntityMeta entityMeta = EntityMeta.selectMeta("findById", tableName, columns, joinColumn, 1L);
+        final EntityMeta entityMeta = new EntityMeta("findById", tableName, columns, joinColumn);
 
         //when
-        String q = query.select(entityMeta);
+        String q = query.select(entityMeta, 1L);
 
         //then
         assertThat(q.matches(wildcardPattern)).isTrue();

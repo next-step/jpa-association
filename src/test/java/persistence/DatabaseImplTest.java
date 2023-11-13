@@ -181,8 +181,8 @@ class DatabaseImplTest {
         final Columns columns = Columns을_생성함(tClass);
         final JoinColumn joinColumn = JoinColumn을_생성함(tClass);
 
-        final EntityMeta entityMeta = EntityMeta.selectMeta(methodName, tableName, columns, joinColumn, arg);
+        final EntityMeta entityMeta = new EntityMeta(methodName, tableName, columns, joinColumn);
 
-        return database.executeQuery(query.select(entityMeta));
+        return database.executeQuery(query.select(entityMeta, arg));
     }
 }

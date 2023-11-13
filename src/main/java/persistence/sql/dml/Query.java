@@ -25,8 +25,8 @@ public final class Query {
         return INSTANCE;
     }
 
-    public String select(EntityMeta entityMeta) {
-        return INSTANCE.selectQuery.get(entityMeta);
+    public String select(EntityMeta entityMeta, Object arg) {
+        return INSTANCE.selectQuery.get(entityMeta, arg);
     }
 
     public String selectAll(String methodName, TableName tableName, Columns columns) {

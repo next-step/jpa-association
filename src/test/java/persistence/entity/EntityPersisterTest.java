@@ -202,9 +202,9 @@ class EntityPersisterTest {
         final Columns columns = Columns을_생성함(clazz);
         final JoinColumn joinColumn = JoinColumn을_생성함(clazz);
 
-        final EntityMeta entityMeta = EntityMeta.selectMeta("findById", tableName, columns, joinColumn, id);
+        final EntityMeta entityMeta = new EntityMeta("findById", tableName, columns, joinColumn);
 
-        return query.select(entityMeta);
+        return query.select(entityMeta, id);
     }
 
     private <T> void 데이터를_저장함(T t) {

@@ -36,17 +36,17 @@ public class EntityLoader<T> {
     }
 
     public <I> T findById(I input) {
-        EntityMeta entityMeta = EntityMeta.selectMeta(new Object() {
-        }.getClass().getEnclosingMethod().getName(), tableName, columns, joinColumn, input);
+        EntityMeta entityMeta = new EntityMeta(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns, joinColumn);
 
-        String selectQuery = query.select(entityMeta);
+        String selectQuery = query.select(entityMeta, input);
 
         return jdbcTemplate.queryForObject(selectQuery, resultMapper);
     }
 
     public <I> int getHashCode(I input) {
-        EntityMeta entityMeta = EntityMeta.selectMeta("findById", tableName, columns, joinColumn, input);
+        EntityMeta entityMeta = EntityMeta.selectMeta("findById", tableName, columns, joinColumn);
 
-        return query.select(entityMeta).hashCode();
+        return query.select(entityMeta, input).hashCode();
     }
 }

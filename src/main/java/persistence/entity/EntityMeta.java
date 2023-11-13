@@ -10,23 +10,21 @@ public class EntityMeta {
     private TableName tableName;
     private Columns columns;
     private JoinColumn joinColumn;
-    private Object arg;
 
     public EntityMeta(TableName tableName, Columns columns) {
         this.tableName = tableName;
         this.columns = columns;
     }
 
-    public EntityMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object arg) {
+    public EntityMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn) {
         this.methodName = methodName;
         this.tableName = tableName;
         this.columns = columns;
         this.joinColumn = joinColumn;
-        this.arg = arg;
     }
 
-    public static EntityMeta selectMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn, Object arg) {
-        return new EntityMeta(methodName, tableName, columns, joinColumn, arg);
+    public static EntityMeta selectMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn) {
+        return new EntityMeta(methodName, tableName, columns, joinColumn);
     }
 
     public String getMethodName() {
@@ -43,9 +41,5 @@ public class EntityMeta {
 
     public JoinColumn getJoinColumn() {
         return joinColumn;
-    }
-
-    public Object getArg() {
-        return arg;
     }
 }
