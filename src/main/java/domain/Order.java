@@ -38,13 +38,11 @@ public class Order {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj == null) {
+		if(obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 
-		if (!(obj instanceof Order order)) {
-			return false;
-		}
+		Order order = (Order) obj;
 
 		return hashCode() == order.hashCode();
 	}

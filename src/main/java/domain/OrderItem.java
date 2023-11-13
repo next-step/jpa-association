@@ -31,13 +31,11 @@ public class OrderItem {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj == null) {
+		if(obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 
-		if (!(obj instanceof OrderItem orderItem)) {
-			return false;
-		}
+		OrderItem orderItem = (OrderItem) obj;
 
 		return hashCode() == orderItem.hashCode();
 	}

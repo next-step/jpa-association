@@ -14,13 +14,11 @@ public class EntityKey {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj == null) {
+		if(obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 
-		if (!(obj instanceof EntityKey entityKey)) {
-			return false;
-		}
+		EntityKey entityKey = (EntityKey) obj;
 
 		return hashCode() == entityKey.hashCode();
 	}
