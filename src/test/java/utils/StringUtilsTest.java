@@ -1,6 +1,8 @@
 package utils;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,14 +10,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
 class StringUtilsTest {
+
     @Nested
     @DisplayName("Object가 문자열이면 콜론으로 감싸 반환")
     class parseChar {
+
         @ParameterizedTest
         @ValueSource(strings = {"a", "가", "1"})
         @DisplayName("string 들어오면 '' 붙여서 반환")
@@ -85,6 +85,7 @@ class StringUtilsTest {
     @Nested
     @DisplayName("카멜케이스 문자열을 스네이크 문자열로 변환")
     class camelToSnake {
+
         @ParameterizedTest
         @CsvSource({"snake, snake", "helloWorld, hello_world", "happyBirthDay, happy_birth_day"})
         @DisplayName("성공적으로 스네이크 문자열로 변경")

@@ -1,11 +1,10 @@
 package persistence.sql.common.instance;
 
 import jakarta.persistence.Transient;
-import java.util.Objects;
-import utils.StringUtils;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Objects;
+import utils.StringUtils;
 
 public class Value {
     private final String fieldName;

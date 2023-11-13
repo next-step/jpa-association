@@ -1,9 +1,18 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
+import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
+import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
+import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
+
 import database.DatabaseServer;
 import database.H2;
 import domain.Person;
 import domain.SelectPerson;
+import java.sql.SQLException;
 import jdbc.JdbcTemplate;
 import jdbc.ResultMapper;
 import org.junit.jupiter.api.AfterAll;
@@ -19,16 +28,6 @@ import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.ddl.DmlQuery;
 import persistence.sql.dml.Query;
-
-import java.sql.SQLException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
-import static persistence.sql.common.meta.MetaUtils.JoinColumn을_생성함;
-import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
-import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
 class EntityPersisterTest {
 

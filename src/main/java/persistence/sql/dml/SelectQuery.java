@@ -1,12 +1,11 @@
 package persistence.sql.dml;
 
+import java.util.List;
 import persistence.entity.EntityMeta;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import utils.ConditionUtils;
-
-import java.util.List;
 
 class SelectQuery {
 

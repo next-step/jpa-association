@@ -2,9 +2,8 @@ package persistence.sql.common.meta;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import persistence.exception.InvalidEntityException;
-
 import java.time.LocalDateTime;
+import persistence.exception.InvalidEntityException;
 
 public class TableName {
 

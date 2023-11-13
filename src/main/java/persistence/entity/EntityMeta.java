@@ -3,9 +3,9 @@ package persistence.entity;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.dml.Query;
 
 public class EntityMeta {
+
     private String methodName;
     private TableName tableName;
     private Columns columns;
@@ -29,7 +29,8 @@ public class EntityMeta {
         this.columns = columns;
     }
 
-    public static EntityMeta selectMeta(String methodName, TableName tableName, Columns columns, JoinColumn joinColumn) {
+    public static EntityMeta selectMeta(String methodName, TableName tableName, Columns columns,
+        JoinColumn joinColumn) {
         return new EntityMeta(methodName, tableName, columns, joinColumn);
     }
 
@@ -47,5 +48,9 @@ public class EntityMeta {
 
     public JoinColumn getJoinColumn() {
         return joinColumn;
+    }
+
+    public boolean isJoin() {
+        return joinColumn != null;
     }
 }

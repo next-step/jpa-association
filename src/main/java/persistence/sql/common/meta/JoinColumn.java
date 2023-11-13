@@ -2,7 +2,6 @@ package persistence.sql.common.meta;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;

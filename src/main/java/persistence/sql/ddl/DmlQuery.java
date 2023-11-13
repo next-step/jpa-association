@@ -2,7 +2,6 @@ package persistence.sql.ddl;
 
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-import persistence.sql.dml.Query;
 
 public class DmlQuery {
     private static final DmlQuery INSTANCE = new DmlQuery();

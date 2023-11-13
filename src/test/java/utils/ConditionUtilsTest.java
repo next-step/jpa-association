@@ -1,21 +1,19 @@
 package utils;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ConditionUtilsTest {
 
     @Nested
     @DisplayName("카멜케이스 형식으로 작성된 문자열을 List 형식으로 반환하는 Utils method 테스트")
     class getWordsFromCamelCase {
+
         @Test
         @DisplayName("별도 조건이 필요없는 findByAll의 경우 빈 값을 반환")
         void success() {

@@ -1,24 +1,22 @@
 package persistence.sql.dml;
 
-import domain.Person;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import persistence.entity.EntityMeta;
-import persistence.exception.InvalidEntityException;
-import domain.NonExistentTablePerson;
-import domain.NotEntityPerson;
-import domain.SelectPerson;
-import persistence.sql.common.instance.Values;
-import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.TableName;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 import static persistence.sql.common.meta.MetaUtils.Values을_생성함;
 
+import domain.NonExistentTablePerson;
+import domain.Person;
+import domain.SelectPerson;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import persistence.entity.EntityMeta;
+import persistence.sql.common.instance.Values;
+import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.TableName;
+
 class UpdateQueryTest {
+
     private final static Query query = Query.getInstance();
 
     @Test

@@ -2,13 +2,12 @@ package persistence.entity;
 
 import jakarta.persistence.Transient;
 import java.util.Arrays;
+import java.util.List;
 import jdbc.JdbcTemplate;
-import persistence.sql.dml.Query;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
-
-import java.util.List;
+import persistence.sql.dml.Query;
 
 public class EntityPersister<T> {
     private final Query query;

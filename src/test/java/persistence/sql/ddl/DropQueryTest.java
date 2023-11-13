@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import domain.Person;
-import persistence.exception.InvalidEntityException;
 import domain.ExistTablePerson;
 import domain.NonExistentEntityPerson;
+import domain.Person;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import persistence.exception.InvalidEntityException;
 import persistence.sql.common.meta.TableName;
 
 class DropQueryTest {
