@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.TableName;
@@ -14,11 +15,11 @@ class UpdateQuery {
 
     UpdateQuery() { }
 
-    String get(Values values, TableName tableName, Columns columns, Object args) {
-        this.tableName = tableName;
-        this.columns = columns;
+    String get(EntityMeta entityMeta, Values values, Object arg) {
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
         this.values = values;
-        this.arg = args;
+        this.arg = arg;
 
         return combine();
     }

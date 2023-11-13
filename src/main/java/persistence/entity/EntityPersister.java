@@ -37,8 +37,9 @@ public class EntityPersister<T> {
     }
 
     public <I> boolean update(I input, Object arg) {
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
         try {
-            String q = query.update(getValues(input), tableName, columns, arg);
+            String q = query.update(entityMeta, getValues(input), arg);
 
             jdbcTemplate.execute(q);
             return true;

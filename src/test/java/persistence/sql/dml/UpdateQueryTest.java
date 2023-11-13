@@ -3,6 +3,7 @@ package persistence.sql.dml;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.EntityMeta;
 import persistence.exception.InvalidEntityException;
 import domain.NonExistentTablePerson;
 import domain.NotEntityPerson;
@@ -32,8 +33,10 @@ class UpdateQueryTest {
         final Columns columns = Columns을_생성함(clazz);
         final Values values = Values을_생성함(person);
 
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
         //when
-        String result = query.update(values, tableName, columns, 3L);
+        String result = query.update(entityMeta, values, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -51,8 +54,10 @@ class UpdateQueryTest {
         final Columns columns = Columns을_생성함(clazz);
         final Values values = Values을_생성함(person);
 
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
         //when
-        String result = query.update(values, tableName, columns, 3L);
+        String result = query.update(entityMeta, values, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
@@ -70,23 +75,12 @@ class UpdateQueryTest {
         final Columns columns = Columns을_생성함(clazz);
         final Values values = Values을_생성함(person);
 
+        final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
         //when
-        String result = query.update(values, tableName, columns, 3L);
+        String result = query.update(entityMeta, values, 3L);
 
         //then
         assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    @DisplayName("@Entity가 없을 경우 쿼리문 생성되지 않음")
-    void notEntity() {
-        //given
-        NotEntityPerson person = new NotEntityPerson(3L, "zz", 30);
-
-        Class<NotEntityPerson> clazz = NotEntityPerson.class;
-
-        //when & then
-        assertThrows(InvalidEntityException.class
-                , () -> query.update(Values을_생성함(person), TableName을_생성함(clazz), Columns을_생성함(clazz), 3L));
     }
 }

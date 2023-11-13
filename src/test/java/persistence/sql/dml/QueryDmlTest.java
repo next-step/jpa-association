@@ -119,8 +119,6 @@ class QueryDmlTest {
 
             final TableName tableName = TableName을_생성함(person);
             final Columns columns = Columns을_생성함(person);
-            final JoinColumn joinColumn = JoinColumn을_생성함(person.getClass());
-
 
             insert(person);
 
@@ -243,11 +241,12 @@ class QueryDmlTest {
             Class<SelectPerson> clazz = SelectPerson.class;
             final TableName tableName = TableName을_생성함(clazz);
             final Columns columns = Columns을_생성함(clazz);
-            final JoinColumn joinColumn = JoinColumn을_생성함(clazz);
             final Values values = Values을_생성함(expected);
 
+            final EntityMeta entityMeta = new EntityMeta(tableName, columns);
+
             //when
-            String q = query.update(values, tableName, columns, id);
+            String q = query.update(entityMeta, values, id);
             jdbcTemplate.execute(q);
             SelectPerson result = jdbcTemplate.queryForObject(getSelectAllQuery("findAll", tableName, columns),
                 new ResultMapper<>(clazz));

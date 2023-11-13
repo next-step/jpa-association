@@ -37,8 +37,8 @@ public final class Query {
         return INSTANCE.insertQuery.get(entityMeta, values);
     }
 
-    public String update(Values values, TableName tableName, Columns columns, Object args) {
-        return INSTANCE.updateQuery.get(values, tableName, columns, args);
+    public String update(EntityMeta entityMeta, Values values, Object args) {
+        return INSTANCE.updateQuery.get(entityMeta, values, args);
     }
 
     public String delete(TableName tableName, Columns columns, Object arg) {
