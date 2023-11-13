@@ -95,7 +95,7 @@ class EntityLoaderTest {
 
     @Test
     @DisplayName("지연로딩 엔티티 조회 - 지연로딩 대상 자식엔티티의 경우, 실제 사용될 때 로딩이 이루어진다")
-    void findLazyWithChildEntities() throws Exception {
+    void findLazyWithChildEntities() {
         EntityLoader entityLoader = EntityLoader.of(jdbcTemplate);
         Order order = entityLoader.selectOne(Order.class, 1L);
         List<OrderItem> orderItems = order.getOrderItems();
