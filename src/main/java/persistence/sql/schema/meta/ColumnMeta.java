@@ -83,8 +83,16 @@ public class ColumnMeta {
         return field.isAnnotationPresent(Transient.class);
     }
 
+    public static boolean isNotTransient(Field field) {
+        return !isTransient(field);
+    }
+
     public static boolean isCollection(Field field) {
         return Collection.class.isAssignableFrom(field.getType());
+    }
+
+    public static boolean isNotCollection(Field field) {
+        return !isCollection(field);
     }
 
     public boolean isPrimaryKey() {
@@ -105,6 +113,10 @@ public class ColumnMeta {
 
     public boolean isLazyLoading() {
         return this.relation.isLazyLoading();
+    }
+
+    public boolean isEagerLoading() {
+        return !isLazyLoading();
     }
 
     private static String getColumnName(Field field) {

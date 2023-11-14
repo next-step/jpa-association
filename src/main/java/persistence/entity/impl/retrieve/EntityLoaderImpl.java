@@ -32,7 +32,7 @@ public class EntityLoaderImpl implements EntityLoader {
 
         final T queryObject = jdbcTemplate.queryForObject(selectSql, new EntityRowMapper<>(clazz, columnType));
 
-        if (!classMappingMeta.hasRelation()) {
+        if (classMappingMeta.hasNoRelation()) {
             return queryObject;
         }
 

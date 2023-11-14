@@ -1,6 +1,5 @@
 package persistence.entity.impl.retrieve;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.List;
 import jdbc.JdbcTemplate;
@@ -16,9 +15,11 @@ import persistence.sql.schema.meta.EntityObjectMappingMeta;
 public class EntityCollectionLoader {
 
     private final JdbcTemplate jdbcTemplate;
+    private final CollectionObjectMapper collectionObjectMapper;
 
     public EntityCollectionLoader(Connection connection) {
         this.jdbcTemplate = new JdbcTemplate(connection);
+        this.collectionObjectMapper = new CollectionObjectMapper();
     }
 
     public <T> T loadCollection(Class<T> clazz, Object instance, ColumnType columnType) {
@@ -27,7 +28,7 @@ public class EntityCollectionLoader {
         final List<ColumnMeta> relationColumnMetaList = classMappingMeta.getRelationColumnMetaList();
 
         for (ColumnMeta columnMeta : relationColumnMetaList) {
-            if (!columnMeta.isLazyLoading()) {
+            if (columnMeta.isEagerLoading()) {
                 eagerLoad(instance, columnMeta, objectMappingMeta, columnType);
             }
 
@@ -37,25 +38,15 @@ public class EntityCollectionLoader {
         return clazz.cast(instance);
     }
 
-    private void eagerLoad(Object instance, ColumnMeta columnMeta, EntityObjectMappingMeta objectMappingMeta, ColumnType columnType) {
+    private void eagerLoad(Object parent, ColumnMeta columnMeta, EntityObjectMappingMeta objectMappingMeta, ColumnType columnType) {
         final String selectRelationSql = SelectStatementBuilder.builder()
             .selectFrom(columnMeta.getJoinColumnTableType(), columnType)
             .where(WherePredicate.of(columnMeta.getJoinColumnName(), objectMappingMeta.getIdValue(), new EqualOperator()))
             .build();
 
-        final List<?> loadedRelation = jdbcTemplate.query(selectRelationSql,
+        final List<?> loadedChildList = jdbcTemplate.query(selectRelationSql,
             new EntityRowMapper<>(columnMeta.getJoinColumnTableType(), columnType));
 
-        mappingFieldRelation(instance, columnMeta, loadedRelation);
-    }
-
-    private static void mappingFieldRelation(Object instance, ColumnMeta columnMeta, List<?> loadedRelation) {
-        try {
-            final Field field = instance.getClass().getDeclaredField(columnMeta.getFieldName());
-            field.setAccessible(true);
-            field.set(instance, loadedRelation);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        collectionObjectMapper.mappingFieldRelation(parent, columnMeta, loadedChildList);
     }
 }

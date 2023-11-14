@@ -24,7 +24,7 @@ public class FromClauseBuilder {
         return new FromClauseBuilder(fromClauseStringBuilder);
     }
 
-    public FromClauseBuilder leftJoin(String joinTable, OnPredicate predicate) {
+    public FromClauseBuilder innerJoin(String joinTable, OnPredicate predicate) {
         this.joinClauseBuilderList.add(JoinClauseBuilder.builder(joinTable, predicate));
 
         return this;
