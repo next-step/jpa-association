@@ -1,9 +1,10 @@
 package persistence.sql.dialect;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import persistence.sql.exception.NotSupportedTypeException;
+import persistence.sql.exception.ClassMappingException;
 
 /**
  * @http://www.h2database.com/html/datatypes.html
@@ -29,9 +30,13 @@ public class H2ColumnType implements ColumnType {
 
     @Override
     public String getFieldType(Field field) {
+        if (Collection.class.isAssignableFrom(field.getType())) {
+            return field.getType().getTypeName();
+        }
+
         final String fieldType = typeMap.get(field.getType());
         if (fieldType == null) {
-            throw new NotSupportedTypeException(String.format("%s type is not supported", field.getType()));
+            throw ClassMappingException.notSupportedType(field.getType());
         }
 
         return fieldType;

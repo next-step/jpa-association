@@ -1,10 +1,10 @@
 package persistence.sql.dml.statement;
 
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.WherePredicate;
 import persistence.sql.dml.clause.builder.WhereClauseBuilder;
-import persistence.sql.exception.PreconditionRequiredException;
-import persistence.sql.schema.EntityClassMappingMeta;
+import persistence.sql.dml.clause.predicate.WherePredicate;
+import persistence.sql.exception.ClassMappingException;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 public class DeleteStatementBuilder {
 
@@ -26,7 +26,7 @@ public class DeleteStatementBuilder {
         final EntityClassMappingMeta classMappingMeta = EntityClassMappingMeta.of(clazz, columnType);
 
         if (deleteStatementBuilder.length() > 0) {
-            throw new PreconditionRequiredException("delete() method must be called only once");
+            throw ClassMappingException.duplicateCallMethod("delete() 메서드");
         }
 
         deleteStatementBuilder.append(String.format(DELETE_FORMAT, classMappingMeta.tableClause()));
@@ -40,7 +40,7 @@ public class DeleteStatementBuilder {
 
     public DeleteStatementBuilder and(WherePredicate predicate) {
         if (this.whereClauseBuilder == null) {
-            throw new PreconditionRequiredException("where() method must be called");
+            throw ClassMappingException.preconditionRequired("where()");
         }
 
         this.whereClauseBuilder.and(predicate);
@@ -49,7 +49,7 @@ public class DeleteStatementBuilder {
 
     public DeleteStatementBuilder or(WherePredicate predicate) {
         if (this.whereClauseBuilder == null) {
-            throw new PreconditionRequiredException("where() method must be called");
+            throw ClassMappingException.preconditionRequired("where()");
         }
 
         this.whereClauseBuilder.or(predicate);
@@ -58,7 +58,7 @@ public class DeleteStatementBuilder {
 
     public String build() {
         if (deleteStatementBuilder.length() == 0) {
-            throw new PreconditionRequiredException("DeleteStatement must start with delete()");
+            throw ClassMappingException.preconditionRequired("delete()");
         }
 
         if (this.whereClauseBuilder == null) {

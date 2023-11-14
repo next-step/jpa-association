@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.dml.clause.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.clause.operator.NotEqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 
 @DisplayName("WHERE절 생성 테스트")
 class WhereClauseBuilderTest {

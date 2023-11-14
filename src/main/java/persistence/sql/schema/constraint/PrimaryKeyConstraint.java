@@ -6,13 +6,13 @@ import jakarta.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.exception.UnrecognizedGeneratedValueException;
+import persistence.sql.exception.ClassMappingException;
 
 public class PrimaryKeyConstraint implements Constraint {
 
     private static final String PRIMARY_KEY_FORMAT = "%s %s";
     private static final String PRIMARY_KEY = "PRIMARY KEY";
-    
+
     private final String constraint;
 
     public PrimaryKeyConstraint(Field field, ColumnType columnType) {
@@ -39,7 +39,7 @@ public class PrimaryKeyConstraint implements Constraint {
             return String.format(PRIMARY_KEY_FORMAT, columnType.generationIdentity(), PRIMARY_KEY);
         }
 
-        throw new UnrecognizedGeneratedValueException("Unexpected value: " + generatedValue.strategy());
+        throw ClassMappingException.unrecognizedGeneratedValue(generatedValue.strategy().name());
     }
 
     public static boolean isPrimaryKey(Field field) {

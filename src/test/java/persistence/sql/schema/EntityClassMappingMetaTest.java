@@ -8,7 +8,9 @@ import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
-import persistence.sql.exception.RequiredAnnotationException;
+import persistence.sql.exception.ClassMappingException;
+import persistence.sql.exception.impl.RequiredAnnotationException;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 @DisplayName("EntityMeta 테스트")
 class EntityClassMappingMetaTest {
@@ -20,7 +22,8 @@ class EntityClassMappingMetaTest {
             () -> EntityClassMappingMeta.of(EntityMappingMetaFixtureWithNoEntityAnnotation.class, new H2ColumnType())
         )
             .isInstanceOf(RequiredAnnotationException.class)
-            .hasMessage("@Entity annotation is required");
+            .hasMessage(
+                ClassMappingException.requiredAnnotation(EntityMappingMetaFixtureWithNoEntityAnnotation.class, "@Entity").getMessage());
     }
 
     @Test

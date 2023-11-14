@@ -3,7 +3,7 @@ package persistence.sql.dml;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import persistence.sql.exception.JdbcTemplateException;
+import persistence.sql.exception.impl.JdbcTemplateException;
 
 public class JdbcTemplate implements Database {
 

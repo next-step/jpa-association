@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
+import persistence.sql.schema.meta.ColumnMeta;
 
 
 @DisplayName("ColumnMeta 테스트")

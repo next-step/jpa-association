@@ -7,7 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import jdbc.RowMapper;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.EntityClassMappingMeta;
+import persistence.sql.exception.ClassMappingException;
+import persistence.sql.schema.meta.EntityClassMappingMeta;
 
 public class EntityRowMapper<T> implements RowMapper<T> {
 
@@ -46,7 +47,7 @@ public class EntityRowMapper<T> implements RowMapper<T> {
             field.setAccessible(true);
             field.set(object, resultSet.getObject(entityClassMappingMeta.getMappingColumnName(field)));
         } catch (IllegalAccessException | SQLException e) {
-            throw new RuntimeException(e);
+            throw ClassMappingException.mappingFail(field.getName());
         }
     }
 }

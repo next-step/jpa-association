@@ -1,7 +1,7 @@
 package persistence.sql.ddl.generator;
 
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.schema.TableMeta;
+import persistence.sql.schema.meta.TableMeta;
 
 public class DropDDLQueryGenerator {
 

@@ -19,6 +19,16 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.impl.EntityManagerImpl;
 import persistence.entity.impl.context.DefaultPersistenceContext;
+import persistence.entity.impl.event.EntityEventDispatcher;
+import persistence.entity.impl.event.EntityEventPublisher;
+import persistence.entity.impl.event.dispatcher.EntityEventDispatcherImpl;
+import persistence.entity.impl.event.listener.DeleteEntityEventListenerImpl;
+import persistence.entity.impl.event.listener.LoadEntityEventListenerImpl;
+import persistence.entity.impl.event.listener.MergeEntityEventListenerImpl;
+import persistence.entity.impl.event.listener.PersistEntityEventListenerImpl;
+import persistence.entity.impl.event.publisher.EntityEventPublisherImpl;
+import persistence.entity.impl.retrieve.EntityLoaderImpl;
+import persistence.entity.impl.store.EntityPersisterImpl;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
 import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.dialect.H2ColumnType;
@@ -44,7 +54,18 @@ class CustomJpaRepositoryIntegrationTest {
         Connection connection = server.getConnection();
 
         final H2ColumnType columnType = new H2ColumnType();
-        entityManager = new EntityManagerImpl(connection, columnType, new DefaultPersistenceContext(columnType));
+        final EntityPersisterImpl persister = new EntityPersisterImpl(connection);
+        final EntityLoaderImpl loader = new EntityLoaderImpl(connection);
+
+        EntityEventDispatcher entityEventDispatcher = new EntityEventDispatcherImpl(
+            new LoadEntityEventListenerImpl(loader, columnType),
+            new MergeEntityEventListenerImpl(persister, columnType),
+            new PersistEntityEventListenerImpl(persister, columnType),
+            new DeleteEntityEventListenerImpl(persister, columnType)
+        );
+        EntityEventPublisher entityEventPublisher = new EntityEventPublisherImpl(entityEventDispatcher);
+
+        entityManager = new EntityManagerImpl(connection, columnType, new DefaultPersistenceContext(columnType), entityEventPublisher);
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         CreateDDLQueryGenerator createDDLQueryGenerator = new CreateDDLQueryGenerator(columnType);
@@ -84,7 +105,7 @@ class CustomJpaRepositoryIntegrationTest {
         assertAll(
             () -> assertThat(entity.getName()).isEqualTo(savedEntity.getName()),
             () -> assertThat(entity.getEmail()).isEqualTo(savedEntity.getEmail()),
-            () -> assertThat(findEntity).hasValueSatisfying(e->
+            () -> assertThat(findEntity).hasValueSatisfying(e ->
                 assertThat(savedEntity == e).isTrue()
             )
         );

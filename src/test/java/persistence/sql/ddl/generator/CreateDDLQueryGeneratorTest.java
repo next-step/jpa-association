@@ -17,7 +17,8 @@ import persistence.sql.ddl.generator.fixture.PersonV3;
 import persistence.sql.ddl.generator.fixture.PersonV3WithTable;
 import persistence.sql.ddl.generator.fixture.PersonV3WithTransient;
 import persistence.sql.dialect.H2ColumnType;
-import persistence.sql.exception.RequiredAnnotationException;
+import persistence.sql.exception.ClassMappingException;
+import persistence.sql.exception.impl.RequiredAnnotationException;
 
 @DisplayName("CREATE DDL 생성 테스트")
 class CreateDDLQueryGeneratorTest {
@@ -41,7 +42,7 @@ class CreateDDLQueryGeneratorTest {
             assertThatThrownBy(
                 () -> createDDLQueryGenerator.create(PersonV1WithNoEntityAnnotation.class)
             ).isInstanceOf(RequiredAnnotationException.class)
-                .hasMessage("@Entity annotation is required");
+                .hasMessage(ClassMappingException.requiredAnnotation(PersonV1WithNoEntityAnnotation.class, "@Entity").getMessage());
         }
     }
 

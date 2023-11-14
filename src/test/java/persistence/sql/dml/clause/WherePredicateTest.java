@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import persistence.sql.dml.clause.operator.ComparisonOperator;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.clause.operator.NotEqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 
 @DisplayName("WHERE 절 조건 생성 테스트")
 class WherePredicateTest {

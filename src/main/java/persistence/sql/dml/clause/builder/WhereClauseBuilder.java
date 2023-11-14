@@ -3,11 +3,11 @@ package persistence.sql.dml.clause.builder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import persistence.sql.dml.clause.WherePredicate;
 import persistence.sql.dml.clause.operator.AndOperator;
 import persistence.sql.dml.clause.operator.LogicalOperator;
 import persistence.sql.dml.clause.operator.OrOperator;
-import persistence.sql.exception.PreconditionRequiredException;
+import persistence.sql.dml.clause.predicate.WherePredicate;
+import persistence.sql.exception.ClassMappingException;
 
 public class WhereClauseBuilder {
 
@@ -21,7 +21,7 @@ public class WhereClauseBuilder {
 
     private WhereClauseBuilder(WhereClause whereClause) {
         if (whereClause == null) {
-            throw new PreconditionRequiredException("WhereClause required");
+            throw ClassMappingException.preconditionRequired("Where절");
         }
         this.whereClauseList = new ArrayList<>(List.of(whereClause));
     }

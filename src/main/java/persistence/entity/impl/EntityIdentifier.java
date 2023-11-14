@@ -1,8 +1,8 @@
 package persistence.entity.impl;
 
 import java.util.Objects;
-import persistence.sql.schema.ColumnMeta;
-import persistence.sql.schema.ValueMeta;
+import persistence.sql.schema.meta.ColumnMeta;
+import persistence.sql.schema.meta.ValueMeta;
 
 public class EntityIdentifier {
 

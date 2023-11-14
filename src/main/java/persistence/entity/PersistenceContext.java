@@ -4,6 +4,7 @@ import java.util.Optional;
 import persistence.entity.impl.SnapShot;
 
 public interface PersistenceContext {
+
     Optional<Object> getEntity(Class<?> entityClazz, Object id);
 
     void addEntity(Object entity);

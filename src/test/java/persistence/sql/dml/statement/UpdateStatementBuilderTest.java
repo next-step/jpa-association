@@ -1,7 +1,6 @@
 package persistence.sql.dml.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

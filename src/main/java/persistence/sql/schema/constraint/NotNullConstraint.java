@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 public class NotNullConstraint implements Constraint {
 
     public static final String NOT_NULL = "NOT NULL";
-    
+
     private final String constraint;
 
 

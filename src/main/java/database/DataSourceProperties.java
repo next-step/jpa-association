@@ -1,6 +1,7 @@
 package database;
 
 public class DataSourceProperties {
+
     private final String url;
     private final String username;
     private final String password;
