@@ -4,8 +4,8 @@ import java.sql.Connection;
 import jdbc.JdbcTemplate;
 import persistence.entity.impl.EntityRowMapper;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.statement.SelectStatementBuilder;
 import persistence.sql.schema.meta.EntityClassMappingMeta;
 

@@ -9,6 +9,7 @@ import persistence.sql.schema.meta.EntityClassMappingMeta;
 import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class SnapShotCacheContext {
+
     private final Map<EntityIdentifier, Object> contextSnapshotCacheMap;
     private final ColumnType columnType;
 

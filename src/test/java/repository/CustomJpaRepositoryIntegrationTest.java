@@ -16,11 +16,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.EntityManager;
-import persistence.entity.impl.event.EntityEventDispatcher;
 import persistence.entity.impl.EntityManagerImpl;
 import persistence.entity.impl.context.DefaultPersistenceContext;
+import persistence.entity.impl.event.EntityEventDispatcher;
+import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.impl.event.dispatcher.EntityEventDispatcherImpl;
 import persistence.entity.impl.event.listener.DeleteEntityEventListenerImpl;
 import persistence.entity.impl.event.listener.LoadEntityEventListenerImpl;
@@ -105,7 +105,7 @@ class CustomJpaRepositoryIntegrationTest {
         assertAll(
             () -> assertThat(entity.getName()).isEqualTo(savedEntity.getName()),
             () -> assertThat(entity.getEmail()).isEqualTo(savedEntity.getEmail()),
-            () -> assertThat(findEntity).hasValueSatisfying(e->
+            () -> assertThat(findEntity).hasValueSatisfying(e ->
                 assertThat(savedEntity == e).isTrue()
             )
         );

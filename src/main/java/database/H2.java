@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class H2 implements DatabaseServer {
+
     private static final Logger logger = LoggerFactory.getLogger(H2.class);
     private static final DataSourceProperties DEFAULT_PROPERTIES =
         new DataSourceProperties("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "");

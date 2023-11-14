@@ -6,8 +6,8 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import persistence.entity.impl.EntityRowMapper;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.statement.SelectStatementBuilder;
 import persistence.sql.schema.meta.ColumnMeta;
 import persistence.sql.schema.meta.EntityClassMappingMeta;
@@ -43,7 +43,8 @@ public class EntityCollectionLoader {
             .where(WherePredicate.of(columnMeta.getJoinColumnName(), objectMappingMeta.getIdValue(), new EqualOperator()))
             .build();
 
-        final List<?> loadedRelation = jdbcTemplate.query(selectRelationSql,new EntityRowMapper<>(columnMeta.getJoinColumnTableType(), columnType));
+        final List<?> loadedRelation = jdbcTemplate.query(selectRelationSql,
+            new EntityRowMapper<>(columnMeta.getJoinColumnTableType(), columnType));
 
         mappingFieldRelation(instance, columnMeta, loadedRelation);
     }

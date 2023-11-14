@@ -1,8 +1,8 @@
 package persistence.entity.impl.event.listener;
 
+import persistence.entity.EventSource;
 import persistence.entity.impl.event.EntityEvent;
 import persistence.entity.impl.event.EntityEventListener;
-import persistence.entity.EventSource;
 import persistence.entity.impl.retrieve.EntityLoader;
 import persistence.sql.dialect.ColumnType;
 import persistence.sql.schema.meta.EntityObjectMappingMeta;

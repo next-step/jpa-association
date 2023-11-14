@@ -1,7 +1,7 @@
 package persistence.entity.impl.event.publisher;
 
-import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.impl.event.EntityEventDispatcher;
+import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.impl.event.type.DeleteEntityEvent;
 import persistence.entity.impl.event.type.LoadEntityEvent;
 import persistence.entity.impl.event.type.MergeEntityEvent;

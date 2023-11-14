@@ -6,8 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.generator.fixture.PersonV3;
 import persistence.sql.dialect.H2ColumnType;
-import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 
 @DisplayName("DELETE 문 생성 테스트")
 class DeleteStatementBuilderTest {

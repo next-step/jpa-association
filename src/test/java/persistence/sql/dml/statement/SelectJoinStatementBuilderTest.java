@@ -1,7 +1,6 @@
 package persistence.sql.dml.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,9 +16,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
+import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.clause.predicate.OnPredicate;
 import persistence.sql.dml.clause.predicate.WherePredicate;
-import persistence.sql.dml.clause.operator.EqualOperator;
 
 @DisplayName("SELECT 문 생성 테스트")
 class SelectJoinStatementBuilderTest {
@@ -90,6 +89,7 @@ class SelectJoinStatementBuilderTest {
     @Entity
     @Table(name = "order_items")
     private static class OrderItem {
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;

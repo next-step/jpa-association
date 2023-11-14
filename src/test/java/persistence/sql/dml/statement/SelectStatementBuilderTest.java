@@ -13,8 +13,8 @@ import jakarta.persistence.Transient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
-import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 
 @DisplayName("SELECT 문 생성 테스트")
 class SelectStatementBuilderTest {
@@ -114,7 +114,7 @@ class SelectStatementBuilderTest {
 
         @Column(nullable = false)
         private String email;
-        
+
         @Transient
         private Integer index;
 

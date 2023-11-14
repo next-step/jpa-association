@@ -5,10 +5,10 @@ import java.sql.SQLException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.EntityManager;
 import persistence.entity.EventSource;
 import persistence.entity.PersistenceContext;
+import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.impl.event.type.DeleteEntityEvent;
 import persistence.entity.impl.event.type.LoadEntityEvent;
 import persistence.entity.impl.event.type.MergeEntityEvent;
@@ -25,7 +25,8 @@ public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityEventPublisher entityEventPublisher;
 
-    public EntityManagerImpl(Connection connection, ColumnType columnType, PersistenceContext persistenceContext, EntityEventPublisher eventPublisher) {
+    public EntityManagerImpl(Connection connection, ColumnType columnType, PersistenceContext persistenceContext,
+        EntityEventPublisher eventPublisher) {
         this.connection = connection;
         this.columnType = columnType;
         this.entityEventPublisher = eventPublisher;
@@ -36,7 +37,7 @@ public class EntityManagerImpl implements EntityManager {
     public <T> T find(Class<T> clazz, Object id) {
         final Optional<Object> cachedEntity = persistenceContext.getEntity(clazz, id);
         if (cachedEntity.isEmpty()) {
-            final Object loadedEntity = entityEventPublisher.onLoad(LoadEntityEvent.of(clazz, id, (EventSource)persistenceContext));
+            final Object loadedEntity = entityEventPublisher.onLoad(LoadEntityEvent.of(clazz, id, (EventSource) persistenceContext));
             return clazz.cast(loadedEntity);
         }
 
@@ -50,13 +51,13 @@ public class EntityManagerImpl implements EntityManager {
         final Optional<Object> cachedEntity = persistenceContext.getEntity(entity.getClass(), objectMappingMeta.getIdValue());
 
         return cachedEntity.orElseGet(() ->
-            entityEventPublisher.onPersist(PersistEntityEvent.of(entity, (EventSource)persistenceContext))
+            entityEventPublisher.onPersist(PersistEntityEvent.of(entity, (EventSource) persistenceContext))
         );
     }
 
     @Override
     public void remove(Object entity) {
-        entityEventPublisher.onDelete(DeleteEntityEvent.of(entity, (EventSource)persistenceContext));
+        entityEventPublisher.onDelete(DeleteEntityEvent.of(entity, (EventSource) persistenceContext));
     }
 
     @Override
@@ -68,7 +69,7 @@ public class EntityManagerImpl implements EntityManager {
             return entity;
         }
 
-        final Object mergedEntity = entityEventPublisher.onMerge(MergeEntityEvent.of(entity, (EventSource)persistenceContext));
+        final Object mergedEntity = entityEventPublisher.onMerge(MergeEntityEvent.of(entity, (EventSource) persistenceContext));
 
         return clazz.cast(mergedEntity);
     }

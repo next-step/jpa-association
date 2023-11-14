@@ -1,6 +1,5 @@
 package persistence.entity.impl.listener;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,21 +15,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.EntityManager;
-import persistence.entity.impl.event.EntityEvent;
-import persistence.entity.impl.event.EntityEventDispatcher;
-import persistence.entity.impl.event.EntityEventListener;
 import persistence.entity.EventSource;
 import persistence.entity.impl.EntityManagerImpl;
 import persistence.entity.impl.context.DefaultPersistenceContext;
-import persistence.entity.impl.event.type.DeleteEntityEvent;
+import persistence.entity.impl.event.EntityEvent;
+import persistence.entity.impl.event.EntityEventDispatcher;
+import persistence.entity.impl.event.EntityEventListener;
+import persistence.entity.impl.event.EntityEventPublisher;
 import persistence.entity.impl.event.dispatcher.EntityEventDispatcherImpl;
 import persistence.entity.impl.event.listener.DeleteEntityEventListenerImpl;
 import persistence.entity.impl.event.listener.LoadEntityEventListenerImpl;
 import persistence.entity.impl.event.listener.MergeEntityEventListenerImpl;
 import persistence.entity.impl.event.listener.PersistEntityEventListenerImpl;
 import persistence.entity.impl.event.publisher.EntityEventPublisherImpl;
+import persistence.entity.impl.event.type.DeleteEntityEvent;
 import persistence.entity.impl.retrieve.EntityLoaderImpl;
 import persistence.entity.impl.store.EntityPersisterImpl;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
@@ -41,6 +40,7 @@ import persistence.sql.dml.JdbcTemplate;
 
 @DisplayName("DeleteEventListener 통합 테스트")
 class DeleteEntityEntityEventListenerImplTest {
+
     private DatabaseServer server;
 
     private Database jdbcTemplate;

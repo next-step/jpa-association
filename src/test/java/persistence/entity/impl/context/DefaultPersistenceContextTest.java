@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import persistence.entity.PersistenceContext;
-import persistence.entity.impl.context.DefaultPersistenceContext;
 import persistence.sql.dialect.H2ColumnType;
 
 @DisplayName("PersistenceContext 테스트")

@@ -26,6 +26,7 @@ import persistence.sql.dml.JdbcTemplate;
 
 @DisplayName("EntityLoader 테스트")
 class EntityLoaderImplTest {
+
     private DatabaseServer server;
 
     private Database jdbcTemplate;

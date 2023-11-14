@@ -2,8 +2,8 @@ package persistence.entity.impl;
 
 import java.sql.Connection;
 import persistence.entity.EntityManager;
-import persistence.entity.impl.event.EntityEventDispatcher;
 import persistence.entity.impl.context.DefaultPersistenceContext;
+import persistence.entity.impl.event.EntityEventDispatcher;
 import persistence.entity.impl.event.dispatcher.EntityEventDispatcherImpl;
 import persistence.entity.impl.event.listener.DeleteEntityEventListenerImpl;
 import persistence.entity.impl.event.listener.LoadEntityEventListenerImpl;

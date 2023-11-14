@@ -12,7 +12,7 @@ public class PrimaryKeyConstraint implements Constraint {
 
     private static final String PRIMARY_KEY_FORMAT = "%s %s";
     private static final String PRIMARY_KEY = "PRIMARY KEY";
-    
+
     private final String constraint;
 
     public PrimaryKeyConstraint(Field field, ColumnType columnType) {

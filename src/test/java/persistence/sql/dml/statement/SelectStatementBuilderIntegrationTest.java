@@ -20,8 +20,8 @@ import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.JdbcTemplate;
-import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.operator.EqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 
 @DisplayName("SELECT 문 생성 통합 테스트")
 class SelectStatementBuilderIntegrationTest {

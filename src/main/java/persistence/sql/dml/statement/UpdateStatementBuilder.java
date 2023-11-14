@@ -2,9 +2,9 @@ package persistence.sql.dml.statement;
 
 import java.util.stream.Collectors;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.dml.clause.builder.WhereClauseBuilder;
 import persistence.sql.dml.clause.operator.EqualOperator;
+import persistence.sql.dml.clause.predicate.WherePredicate;
 import persistence.sql.exception.PreconditionRequiredException;
 import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
@@ -33,7 +33,8 @@ public class UpdateStatementBuilder {
 
         entityObjectMappingMeta = EntityObjectMappingMeta.of(entity, columnType);
 
-        updateStatementBuilder.append(String.format(UPDATE_FORMAT, entityObjectMappingMeta.tableClause(), formatColumnWithUpdatedValue(entityObjectMappingMeta)));
+        updateStatementBuilder.append(
+            String.format(UPDATE_FORMAT, entityObjectMappingMeta.tableClause(), formatColumnWithUpdatedValue(entityObjectMappingMeta)));
         return this;
     }
 

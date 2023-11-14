@@ -145,6 +145,7 @@ class EntityManagerImplRelationIntegrationTest {
     @Entity
     @Table(name = "order_items")
     private static class OrderItem {
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
