@@ -29,7 +29,8 @@ public class EntityMeta {
         this.entityClass = entityClass;
 
         findOneToManyFiled(entityClass).ifPresent(field ->
-                this.oneToManyAssociation = OneToManyAssociation.of(field, pkColumn));
+                this.oneToManyAssociation = OneToManyAssociation
+                        .createOneToMayAssociationByField(field, pkColumn));
     }
 
     private EntityMeta(Class<?> entityClass, ForeignerColumn foreignerColumn) {

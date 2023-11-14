@@ -33,12 +33,12 @@ public class OneToManyAssociation {
 
     }
 
-    public static OneToManyAssociation of(Field oneField, EntityColumn pkColumn) {
+    public static OneToManyAssociation createOneToMayAssociationByField(Field oneField, EntityColumn pkColumn) {
         return new OneToManyAssociation(oneField, pkColumn);
     }
 
-    public static OneToManyAssociation of(Class<?> clazz, EntityMeta entityMeta) {
-        return new OneToManyAssociation(getMappingField(clazz), entityMeta.getPkColumn());
+    public static OneToManyAssociation createOneToMayAssociationByClass(Class<?> clazz, EntityMeta entityMeta) {
+        return createOneToMayAssociationByField(getMappingField(clazz), entityMeta.getPkColumn());
     }
 
     private static Field getMappingField(Class<?> clazz) {

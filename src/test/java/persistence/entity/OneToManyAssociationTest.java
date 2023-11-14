@@ -16,7 +16,8 @@ class OneToManyAssociationTest {
     @DisplayName("연관관계 엔티티를 생성한다")
     void createAssociate() throws Exception {
         //given
-        OneToManyAssociation oneToManyColumn = OneToManyAssociation.of(Order.class, EntityMeta.from(Order.class));
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation
+                .createOneToMayAssociationByClass(Order.class, EntityMeta.from(Order.class));
 
         //when
         final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
@@ -34,7 +35,7 @@ class OneToManyAssociationTest {
     @DisplayName("JoinColumn이 없는 연관관계 엔티티를 생성한다")
     void noJoinColumnCreateAssociate() throws Exception {
         //given
-        OneToManyAssociation oneToManyColumn = OneToManyAssociation.of(NoHasJoinColumnOrder.class, EntityMeta.from(NoHasJoinColumnOrder.class));
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation.createOneToMayAssociationByClass(NoHasJoinColumnOrder.class, EntityMeta.from(NoHasJoinColumnOrder.class));
 
         //when
         final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
@@ -51,7 +52,8 @@ class OneToManyAssociationTest {
     @DisplayName("oneToMany fetch type이 lazy인 생성한다")
     void oneToManyFetch() throws Exception {
         //given
-        OneToManyAssociation oneToManyColumn = OneToManyAssociation.of(LazyLoadOrder.class, EntityMeta.from(LazyLoadOrder.class));
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation
+                .createOneToMayAssociationByClass(LazyLoadOrder.class, EntityMeta.from(LazyLoadOrder.class));
 
         //when
         final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
@@ -70,7 +72,8 @@ class OneToManyAssociationTest {
     @DisplayName("연관관계 엔티티의 pk컬럼을 가져온다")
     void getManyPkColumn() {
         //given
-        OneToManyAssociation oneToManyColumn = OneToManyAssociation.of(Order.class, EntityMeta.from(Order.class));
+        OneToManyAssociation oneToManyColumn = OneToManyAssociation
+                .createOneToMayAssociationByClass(Order.class, EntityMeta.from(Order.class));
 
         //when
         final EntityMeta manyEntityMeta = oneToManyColumn.getManyEntityMeta();
