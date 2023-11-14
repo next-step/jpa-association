@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import persistence.sql.dialect.ColumnType;
-import persistence.sql.exception.RequiredAnnotationException;
+import persistence.sql.exception.ClassMappingException;
 import persistence.sql.schema.constraint.PrimaryKeyConstraint;
 
 public class EntityClassMappingMeta {
@@ -53,13 +53,17 @@ public class EntityClassMappingMeta {
 
     public List<Field> getMappingFieldList() {
         return columnMetaMap.keySet().stream()
-            .filter(field -> !ColumnMeta.isTransient(field) )
-            .filter(field -> !ColumnMeta.isCollection(field))
+            .filter(ColumnMeta::isNotTransient)
+            .filter(ColumnMeta::isNotCollection)
             .collect(Collectors.toList());
     }
 
     public boolean hasRelation() {
         return columnMetaMap.values().stream().anyMatch(ColumnMeta::hasRelation);
+    }
+
+    public boolean hasNoRelation() {
+        return !hasRelation();
     }
 
     public List<ColumnMeta> getRelationColumnMetaList() {
@@ -81,27 +85,22 @@ public class EntityClassMappingMeta {
             .filter(entry -> PrimaryKeyConstraint.isPrimaryKey(entry.getKey()))
             .map(Entry::getValue)
             .findAny()
-            .orElseThrow(() -> new RequiredAnnotationException("@Id annotation is required in entity"));
+            .orElseThrow(() -> ClassMappingException.requiredAnnotation(getTableMeta().getType(), "@Id"));
+    }
+
+    public String getIdFieldColumnName() {
+        return getIdColumnMeta().getColumnName();
     }
 
     public String getMappingColumnName(Field field) {
         return columnMetaMap.get(field).getColumnName();
     }
 
-    public String getIdFieldColumnName() {
-        return columnMetaMap.entrySet().stream()
-            .filter(entry -> PrimaryKeyConstraint.isPrimaryKey(entry.getKey()))
-            .map(Entry::getValue)
-            .findAny()
-            .orElseThrow(() -> new RequiredAnnotationException("@Id annotation is required in entity"))
-            .getColumnName();
-    }
-
     public Constructor<?> getDefaultConstructor() {
         return Arrays.stream(tableMeta.getType().getDeclaredConstructors())
             .filter(constructor -> constructor.getParameterCount() == 0)
             .findAny()
-            .orElseThrow(() -> new RuntimeException("Default constructor required"));
+            .orElseThrow(ClassMappingException::defaultConstructorRequired);
     }
 
     private static Map<Field, ColumnMeta> getColumnMetasFromEntity(Class<?> entityClazz, ColumnType columnType) {
@@ -118,7 +117,7 @@ public class EntityClassMappingMeta {
 
     private static void validateEntityAnnotationIsPresent(Class<?> entityClazz) {
         if (entityClazz.isAnnotationPresent(Entity.class) == Boolean.FALSE) {
-            throw new RequiredAnnotationException("@Entity annotation is required");
+            throw ClassMappingException.requiredAnnotation(entityClazz, "@Entity");
         }
     }
 
@@ -127,7 +126,7 @@ public class EntityClassMappingMeta {
             .anyMatch(PrimaryKeyConstraint::isPrimaryKey);
 
         if (!hasIdAnnotation) {
-            throw new RequiredAnnotationException("@Id annotation is required in entity");
+            throw ClassMappingException.requiredAnnotation(entityClazz, "@Id");
         }
     }
 }

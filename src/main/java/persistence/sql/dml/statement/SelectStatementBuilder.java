@@ -8,7 +8,8 @@ import persistence.sql.dml.clause.builder.FromClauseBuilder;
 import persistence.sql.dml.clause.builder.WhereClauseBuilder;
 import persistence.sql.dml.clause.predicate.OnPredicate;
 import persistence.sql.dml.clause.predicate.WherePredicate;
-import persistence.sql.exception.PreconditionRequiredException;
+import persistence.sql.exception.FieldException;
+import persistence.sql.exception.ClassMappingException;
 import persistence.sql.schema.meta.ColumnMeta;
 import persistence.sql.schema.meta.EntityClassMappingMeta;
 
@@ -33,7 +34,7 @@ public class SelectStatementBuilder {
 
     public SelectStatementBuilder selectFrom(Class<?> clazz, ColumnType columnType, String... targetFieldNames) {
         if (selectStatementBuilder.length() > 0) {
-            throw new PreconditionRequiredException("select() method must be called only once");
+            throw ClassMappingException.duplicateCallMethod("select()");
         }
 
         final EntityClassMappingMeta classMappingMeta = EntityClassMappingMeta.of(clazz, columnType);
@@ -51,7 +52,7 @@ public class SelectStatementBuilder {
 
     public SelectStatementBuilder leftJoin(Class<?> clazz, OnPredicate predicate, ColumnType columnType) {
         final EntityClassMappingMeta classMappingMeta = EntityClassMappingMeta.of(clazz, columnType);
-        this.fromClauseBuilder = fromClauseBuilder.leftJoin(classMappingMeta.tableClause(), predicate);
+        this.fromClauseBuilder = fromClauseBuilder.innerJoin(classMappingMeta.tableClause(), predicate);
         return this;
     }
 
@@ -62,7 +63,7 @@ public class SelectStatementBuilder {
 
     public SelectStatementBuilder and(WherePredicate predicate) {
         if (this.whereClauseBuilder == null) {
-            throw new PreconditionRequiredException("where() method must be called");
+            throw ClassMappingException.preconditionRequired("where()");
         }
 
         this.whereClauseBuilder.and(predicate);
@@ -71,7 +72,7 @@ public class SelectStatementBuilder {
 
     public SelectStatementBuilder or(WherePredicate predicate) {
         if (this.whereClauseBuilder == null) {
-            throw new PreconditionRequiredException("where() method must be called");
+            throw ClassMappingException.preconditionRequired("where()");
         }
 
         this.whereClauseBuilder.or(predicate);
@@ -81,7 +82,7 @@ public class SelectStatementBuilder {
     public String build() {
         final StringBuilder selectClause = selectStatementBuilder;
         if (selectClause.length() == 0) {
-            throw new PreconditionRequiredException("SelectStatement must start with select()");
+            throw ClassMappingException.preconditionRequired("select()");
         }
 
         final String fromClause = this.fromClauseBuilder.build();
@@ -105,7 +106,7 @@ public class SelectStatementBuilder {
             .collect(Collectors.toList());
 
         if (!undefinedTargetField.isEmpty()) {
-            throw new PreconditionRequiredException(String.format("%s 필드는 정의되지 않은 필드입니다.", undefinedTargetField));
+            throw FieldException.undefinedField(undefinedTargetField.toString());
         }
     }
 }

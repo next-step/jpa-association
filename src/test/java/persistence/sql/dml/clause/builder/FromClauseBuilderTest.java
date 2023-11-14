@@ -25,7 +25,7 @@ class FromClauseBuilderTest {
     void canBuildFromJoinClause() {
         final String fromJoinClause = FromClauseBuilder
             .builder("TEAM")
-            .leftJoin("MEMBERS", OnPredicate.of("TEAM.id", "MEMBERS.team_id", new EqualOperator()))
+            .innerJoin("MEMBERS", OnPredicate.of("TEAM.id", "MEMBERS.team_id", new EqualOperator()))
             .build();
 
         assertThat(fromJoinClause).isEqualTo("FROM TEAM JOIN MEMBERS ON TEAM.id = MEMBERS.team_id");

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.impl.EntityManagerFactoryImpl;
+import persistence.entity.impl.EntityManagerFactory;
 import persistence.sql.ddl.generator.CreateDDLQueryGenerator;
 import persistence.sql.ddl.generator.DropDDLQueryGenerator;
 import persistence.sql.dialect.H2ColumnType;
@@ -47,7 +47,7 @@ class EntityManagerImplRelationIntegrationTest {
         Connection connection = server.getConnection();
 
         final H2ColumnType columnType = new H2ColumnType();
-        final EntityManagerFactoryImpl emf = new EntityManagerFactoryImpl(connection, columnType);
+        final EntityManagerFactory emf = new EntityManagerFactory(connection, columnType);
         entityManager = emf.createEntityManager();
 
         jdbcTemplate = new JdbcTemplate(server.getConnection());

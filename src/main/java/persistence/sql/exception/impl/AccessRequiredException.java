@@ -1,4 +1,4 @@
-package persistence.sql.exception;
+package persistence.sql.exception.impl;
 
 public class AccessRequiredException extends RuntimeException {
 

@@ -3,26 +3,22 @@ package persistence.sql.dml.clause.builder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import persistence.sql.dml.clause.operator.AndOperator;
 import persistence.sql.dml.clause.operator.LogicalOperator;
-import persistence.sql.dml.clause.operator.OrOperator;
 import persistence.sql.dml.clause.predicate.OnPredicate;
-import persistence.sql.exception.PreconditionRequiredException;
+import persistence.sql.exception.ClassMappingException;
 
 public class JoinClauseBuilder {
 
     private static final String JOIN_FORMAT = "JOIN %s ON %s";
     private static final String JOIN_PREDICATE_FORMAT = "%s %s";
     private static final String EMPTY_STRING = "";
-    private static final LogicalOperator andOperator = new AndOperator();
-    private static final LogicalOperator orOperator = new OrOperator();
 
     private final String joinTable;
     private final List<JoinOnClause> joinOnClauseList;
 
     private JoinClauseBuilder(String joinTable, JoinOnClause joinOnClause) {
         if (joinTable == null) {
-            throw new PreconditionRequiredException("Join table 은 필수값입니다.");
+            throw ClassMappingException.preconditionRequired("Join 테이블명");
         }
 
         this.joinTable = joinTable;

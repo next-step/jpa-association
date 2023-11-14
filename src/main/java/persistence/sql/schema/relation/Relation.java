@@ -13,17 +13,23 @@ import persistence.sql.schema.meta.TableMeta;
 
 public class Relation {
 
-    private TableMeta joinTable;
-    private String joinColumnName;
-    private FetchType fetchType;
+    private final TableMeta joinTable;
+    private final String joinColumnName;
+    private final FetchType fetchType;
+    private final boolean hasRelation;
 
     private Relation(TableMeta joinTable, String joinColumnName, FetchType fetchType) {
         this.joinTable = joinTable;
         this.joinColumnName = joinColumnName;
         this.fetchType = fetchType;
+        this.hasRelation = true;
     }
 
     private Relation() {
+        this.joinTable = null;
+        this.joinColumnName = null;
+        this.fetchType = null;
+        this.hasRelation = false;
     }
 
     public static Relation of(Field field, ColumnType columnType) {
@@ -43,7 +49,7 @@ public class Relation {
     }
 
     public boolean hasRelation() {
-        return joinTable != null;
+        return hasRelation;
     }
 
     public boolean isLazyLoading() {

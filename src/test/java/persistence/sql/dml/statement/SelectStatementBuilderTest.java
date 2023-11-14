@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.clause.predicate.WherePredicate;
+import persistence.sql.exception.FieldException;
 
 @DisplayName("SELECT 문 생성 테스트")
 class SelectStatementBuilderTest {
@@ -48,7 +49,7 @@ class SelectStatementBuilderTest {
                 .selectFrom(SelectStatementEntity.class, new H2ColumnType(), "phone_number")
                 .build();
         }).isInstanceOf(RuntimeException.class)
-            .hasMessage(String.format("%s 필드는 정의되지 않은 필드입니다.", "[phone_number]"));
+            .hasMessage(FieldException.undefinedField("[phone_number]").getMessage());
     }
 
     @Test

@@ -5,7 +5,7 @@ import persistence.sql.dialect.ColumnType;
 import persistence.sql.dml.clause.builder.WhereClauseBuilder;
 import persistence.sql.dml.clause.operator.EqualOperator;
 import persistence.sql.dml.clause.predicate.WherePredicate;
-import persistence.sql.exception.PreconditionRequiredException;
+import persistence.sql.exception.ClassMappingException;
 import persistence.sql.schema.meta.EntityObjectMappingMeta;
 
 public class UpdateStatementBuilder {
@@ -28,7 +28,7 @@ public class UpdateStatementBuilder {
 
     public UpdateStatementBuilder update(Object entity, ColumnType columnType) {
         if (updateStatementBuilder.length() > 0) {
-            throw new PreconditionRequiredException("update() method must be called only once");
+            throw ClassMappingException.duplicateCallMethod("update()");
         }
 
         entityObjectMappingMeta = EntityObjectMappingMeta.of(entity, columnType);
@@ -54,7 +54,7 @@ public class UpdateStatementBuilder {
 
     public UpdateStatementBuilder and(WherePredicate predicate) {
         if (this.whereClauseBuilder == null) {
-            throw new PreconditionRequiredException("where() method must be called");
+            throw ClassMappingException.preconditionRequired("where()");
         }
 
         this.whereClauseBuilder.and(predicate);
@@ -63,7 +63,7 @@ public class UpdateStatementBuilder {
 
     public UpdateStatementBuilder or(WherePredicate predicate) {
         if (this.whereClauseBuilder == null) {
-            throw new PreconditionRequiredException("where() method must be called");
+            throw ClassMappingException.preconditionRequired("where()");
         }
 
         this.whereClauseBuilder.or(predicate);
@@ -72,7 +72,7 @@ public class UpdateStatementBuilder {
 
     public String build() {
         if (updateStatementBuilder.length() == 0) {
-            throw new PreconditionRequiredException("UpdateStatement must start with update()");
+            throw ClassMappingException.preconditionRequired("update()");
         }
 
         if (this.whereClauseBuilder == null) {

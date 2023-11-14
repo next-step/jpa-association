@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import persistence.entity.impl.EntityIdentifier;
 import persistence.sql.dialect.ColumnType;
 import persistence.sql.dialect.H2ColumnType;
-import persistence.sql.exception.AccessRequiredException;
-import persistence.sql.exception.ColumnNotFoundException;
+import persistence.sql.exception.FieldException;
+import persistence.sql.exception.ClassMappingException;
 
 public class EntityObjectMappingMeta {
 
@@ -63,7 +63,7 @@ public class EntityObjectMappingMeta {
         final ColumnMeta idColumnMeta = objectValueMap.keySet().stream()
             .filter(ColumnMeta::isPrimaryKey)
             .findAny()
-            .orElseThrow(() -> new ColumnNotFoundException("Id Column not found"));
+            .orElseThrow(() -> ClassMappingException.columnNotFound("Id"));
 
         return idColumnMeta.getColumnName();
     }
@@ -73,7 +73,7 @@ public class EntityObjectMappingMeta {
             .filter(entry -> entry.getKey().isPrimaryKey())
             .map(Entry::getValue)
             .findAny()
-            .orElseThrow(() -> new ColumnNotFoundException("Id Column not found"));
+            .orElseThrow(() -> ClassMappingException.columnNotFound("Id"));
 
         return idValueMeta.getValue();
     }
@@ -89,7 +89,7 @@ public class EntityObjectMappingMeta {
         try {
             return ValueMeta.of(field.get(object));
         } catch (IllegalAccessException e) {
-            throw new AccessRequiredException(e);
+            throw FieldException.accessRequire(field.getName());
         }
     }
 
@@ -100,7 +100,7 @@ public class EntityObjectMappingMeta {
             .filter(entry -> entry.getKey().isPrimaryKey())
             .map(entry -> EntityIdentifier.fromIdColumnMetaWithValueMeta(entry.getKey(), entry.getValue()))
             .findAny()
-            .orElseThrow(() -> new ColumnNotFoundException("Id Column not found"));
+            .orElseThrow(() -> ClassMappingException.columnNotFound("Id"));
     }
 
     public EntityIdentifier getEntityIdentifier() {
