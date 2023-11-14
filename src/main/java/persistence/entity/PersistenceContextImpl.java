@@ -29,11 +29,12 @@ public class PersistenceContextImpl implements PersistenceContext {
             return null;
         }
 
-        addEntity(hashCode, snapshot);
+        //TODO: 깊은복사?
+        addEntity(hashCode, new Snapshot(hashCode, persister.findById(input)));
 
         entityEntry.managed(hashCode);
 
-        return (T) snapshot.getObject();
+        return (T) entityContext.getEntity(hashCode).getObject();
     }
 
     @Override
@@ -51,7 +52,7 @@ public class PersistenceContextImpl implements PersistenceContext {
     public Object addEntity(Integer hashCode, Snapshot snapshot) {
         entityEntry.saving(hashCode);
 
-        return entityContext.save(hashCode, snapshot);
+        return entityContext.save(hashCode, new Snapshot(snapshot));
     }
 
     @Override
@@ -95,7 +96,7 @@ public class PersistenceContextImpl implements PersistenceContext {
             }
 
             if (status.isDeleted()) {
-                entityPersister.delete(object);
+                entityPersister.delete(snapshotMap.getEntity(hashcode).getId());
                 entityEntry.gone(hashcode);
                 return;
             }

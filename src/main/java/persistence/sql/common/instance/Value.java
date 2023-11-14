@@ -39,10 +39,6 @@ public class Value {
     }
 
     public String getValue() {
-        if (value == null) {
-            return null;
-        }
-
         return StringUtils.parseChar(value);
     }
 

@@ -18,27 +18,6 @@ public class EntityEntry {
         return entry.get(hashCode).isManaged();
     }
 
-    public boolean isSaving(Integer hashCode) {
-        if (!containsEntry(hashCode)) {
-            return false;
-        }
-        return entry.get(hashCode).isSaving();
-    }
-
-    public boolean isDeleted(Integer hashCode) {
-        if (!containsEntry(hashCode)) {
-            return false;
-        }
-        return entry.get(hashCode).isDeleted();
-    }
-
-    public boolean isGone(Integer hashCode) {
-        if (!containsEntry(hashCode)) {
-            return false;
-        }
-        return entry.get(hashCode).isGone();
-    }
-
     public Map<Integer, EntityStatus> getEntry() {
         return entry;
     }

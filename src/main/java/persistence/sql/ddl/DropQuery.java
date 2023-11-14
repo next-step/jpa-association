@@ -10,10 +10,6 @@ class DropQuery {
 
     DropQuery() { }
 
-    DropQuery create() {
-        return new DropQuery();
-    }
-
     String get(TableName tableName) {
         this.tableName = tableName;
 

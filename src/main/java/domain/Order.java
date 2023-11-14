@@ -29,9 +29,7 @@ public class Order {
         this.orderItems = orderItems;
     }
 
-    public Order() {
-
-    }
+    public Order() { }
 
     public Long getId() {
         return id;

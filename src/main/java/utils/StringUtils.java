@@ -9,6 +9,10 @@ public final class StringUtils {
      * 예) 'apple', '1'
      */
     public static String parseChar(Object value) {
+        if(value == null || isEmpty(value.toString())) {
+            return null;
+        }
+
         final String REGEX = "[-+]?\\d*\\.?\\d+";
         Pattern pattern = Pattern.compile(REGEX);
 
@@ -27,9 +31,18 @@ public final class StringUtils {
     }
 
     public static String camelToSnake(String input) {
-        if (input == null) {
+        if(isEmpty(input)) {
             return null;
         }
+
         return input.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase();
+    }
+
+    public static boolean isEmpty(String input) {
+        if (input == null || " ".equals(input) || input.length() == 0) {
+            return true;
+        }
+
+        return false;
     }
 }

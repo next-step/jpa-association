@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class StringUtilsTest {
@@ -15,6 +16,18 @@ class StringUtilsTest {
     @Nested
     @DisplayName("Object가 문자열이면 콜론으로 감싸 반환")
     class parseChar {
+
+        @ParameterizedTest
+        @ValueSource(strings = " ")
+        @NullAndEmptySource
+        @DisplayName("null 혹은 빈 값이 들어왔을 때 null 반환")
+        void paramIsNull(String input) {
+            //when
+            String result = StringUtils.parseChar(input);
+
+            //then
+            assertThat(result).isNull();
+        }
 
         @ParameterizedTest
         @ValueSource(strings = {"a", "가", "1"})
@@ -96,5 +109,17 @@ class StringUtilsTest {
             //then
             assertThat(result).isEqualTo(after);
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = " ")
+    @NullAndEmptySource
+    @DisplayName("null 혹은 빈 값이 들어왔을 때 null 반환")
+    void paramIsNull(String input) {
+        //when
+        String result = StringUtils.camelToSnake(input);
+
+        //then
+        assertThat(result).isNull();
     }
 }

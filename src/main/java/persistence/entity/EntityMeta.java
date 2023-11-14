@@ -49,8 +49,4 @@ public class EntityMeta {
     public JoinColumn getJoinColumn() {
         return joinColumn;
     }
-
-    public boolean isJoin() {
-        return joinColumn != null;
-    }
 }

@@ -28,14 +28,6 @@ class SelectQuery {
         return combine();
     }
 
-    String getAll(String methodName, TableName tableName, Columns columns) {
-        this.methodName = methodName;
-        this.tableName = tableName;
-        this.columns = columns;
-
-        return combine();
-    }
-
     String get(EntityMeta entityMeta, Object arg) {
         this.methodName = entityMeta.getMethodName();
         this.tableName = entityMeta.getTableName();

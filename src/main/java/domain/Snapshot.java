@@ -10,6 +10,11 @@ public class Snapshot {
         this.object = object;
     }
 
+    public Snapshot(Snapshot snapshot) {
+        this.id = snapshot.getId();
+        this.object = snapshot.getObject();
+    }
+
     public Object getId() {
         return id;
     }

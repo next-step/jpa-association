@@ -15,8 +15,8 @@ public class EntitySnapshot {
         return snapshot.get(hashCode);
     }
 
-    public Object getEntity(Integer hashCode) {
-        return getSnapshot(hashCode).getObject();
+    public Snapshot getEntity(Integer hashCode) {
+        return getSnapshot(hashCode);
     }
 
     public <I> Snapshot save(Integer hashCode, I input, Object data) {

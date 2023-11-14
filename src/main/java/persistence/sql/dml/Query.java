@@ -33,10 +33,6 @@ public final class Query {
         return INSTANCE.selectQuery.getAll(entityMeta);
     }
 
-    public String selectAll(String methodName, TableName tableName, Columns columns) {
-        return INSTANCE.selectQuery.getAll(methodName, tableName, columns);
-    }
-
     public String insert(EntityMeta entityMeta, Values values) {
         return INSTANCE.insertQuery.get(entityMeta, values);
     }
