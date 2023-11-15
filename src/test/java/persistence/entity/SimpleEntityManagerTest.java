@@ -31,9 +31,9 @@ class SimpleEntityManagerTest {
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
 
-        EntityMetadata personMetadata = new EntityMetadata(new Person());
-        EntityMetadata orderMetadata = new EntityMetadata(new Order());
-        EntityMetadata orderItemMetadata = new EntityMetadata(new OrderItem());
+        EntityMetadata personMetadata = new EntityMetadata(Person.class);
+        EntityMetadata orderMetadata = new EntityMetadata(Order.class);
+        EntityMetadata orderItemMetadata = new EntityMetadata(OrderItem.class);
 
         jdbcTemplate.execute(H2DdlQueryBuilder.build().dropQuery(personMetadata));
         jdbcTemplate.execute(H2DdlQueryBuilder.build().createQuery(personMetadata));
@@ -45,7 +45,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES('book', 2, 1)");
         jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES('pen', 1, 1)");
 
-        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate), new EntityLoader(jdbcTemplate), new SimplePersistenceContext());
+        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate, Person.class), new EntityLoader(jdbcTemplate), new SimplePersistenceContext());
         entityManager.persist(new Person("hhhhhwi", 1, "aab555586@gmail.com", 0));
     }
 

@@ -39,7 +39,7 @@ public class EntityMapper<T> implements RowMapper<T>{
                 .toArray(Field[]::new);
 
         for(Field field : fields) {
-            Column column = new Column(field, null);
+            Column column = new Column(field);
             Table table = new Table(entity.getClass());
 
             if(column.hasAssociation()) {
