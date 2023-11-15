@@ -16,7 +16,7 @@ public class Car {
 
   @PrintView
   public void printView() {
-    System.out.println("자동차 정보를 출력 합니다.");
+    System.out.println("Printing Info");
   }
 
   public String testGetName() {

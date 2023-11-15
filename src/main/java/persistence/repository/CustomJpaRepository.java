@@ -15,7 +15,7 @@ public class CustomJpaRepository <T, ID> {
     return entity;
   }
 
-  public Optional<T> findById(T entity, Long id){
-    return (Optional<T>) entityManager.find(entity.getClass(), id);
+  public T findById(T entity, Long id){
+    return (T) entityManager.find(entity.getClass(), id);
   }
 }

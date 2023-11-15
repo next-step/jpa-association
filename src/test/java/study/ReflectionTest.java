@@ -88,7 +88,7 @@ public class ReflectionTest {
 
     for (Method method : methods) {
       method.invoke(car);
-      assertThat(outputStream.toString()).startsWith("자동차 정보를 출력 합니다.");
+      assertThat(outputStream.toString()).startsWith("Printing Info");
     }
   }
 

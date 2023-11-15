@@ -19,7 +19,7 @@ public class CustomJpaRepositoryTest extends BuilderTest {
         entityEntry));
     PersonFixtureStep3 person = customJpaRepository.save(PersonInstances.세번째사람);
 
-    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId()).get();
+    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId());
 
     assertThat(personFound.getId()).isEqualTo(person.getId());
     assertThat(personFound.getName()).isEqualTo(person.getName());
@@ -36,7 +36,7 @@ public class CustomJpaRepositoryTest extends BuilderTest {
     person.setName("사이먼팍");
     customJpaRepository.save(person);
 
-    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId()).get();
+    PersonFixtureStep3 personFound = customJpaRepository.findById(person, person.getId());
     assertThat(personFound.getId()).isEqualTo(person.getId());
     assertThat(personFound.getName()).isEqualTo(person.getName());
   }

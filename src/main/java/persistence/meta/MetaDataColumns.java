@@ -50,22 +50,6 @@ public class MetaDataColumns {
         .map(MetaDataColumn::getDBColumnName)
         .collect(Collectors.toList());
   }
-
-  public List<String> getFieldValuesWithoutId(Object entity) {
-    return columns.stream()
-        .filter(MetaDataColumn::isNotPrimaryKey)
-        .map(column -> String.valueOf(column.getFieldValue(entity)))
-        .collect(Collectors.toList());
-  }
-
-  public Map<String, String> getFieldToDBColumnMap() {
-    return columns.stream()
-        .collect(Collectors.toMap(
-            MetaDataColumn::getDBColumnName,
-            MetaDataColumn::getFieldName
-        ));
-  }
-
   public List<String> getFields() {
     return columns.stream()
         .filter(MetaDataColumn::isNotPrimaryKey)

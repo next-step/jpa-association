@@ -94,7 +94,7 @@ public class PersonFixtureStep3 {
     }
     PersonFixtureStep3 that = (PersonFixtureStep3) o;
     return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(age,
-        that.age) && Objects.equals(email, that.email) && Objects.equals(index, that.index);
+        that.age) && Objects.equals(email, that.email);
   }
 
   @Override

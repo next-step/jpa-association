@@ -42,6 +42,6 @@ public class UpdateQueryBuilderTest extends BuilderTest {
                 rs.getInt("old"),
                 rs.getString("email")
             ));
-    assertThat(people).contains(afterUpdatedPerson);
+    assertThat(people.get(0)).isEqualTo(afterUpdatedPerson);
   }
 }

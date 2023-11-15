@@ -57,12 +57,12 @@ public class JdbcPersistenceContextTest extends BuilderTest {
   public void removeSnapshotEntity() {
     persistenceContext = new JdbcPersistenceContext();
 
-    persistenceContext.putDatabaseSnapshot(PersonInstances.첫번째사람.getId(), PersonInstances.첫번째사람);
+    persistenceContext.putDatabaseSnapshot(PersonInstances.세번째사람.getId(), PersonInstances.세번째사람);
 
-    PersonInstances.첫번째사람.setName("Sichang Park");
-    PersonInstances.첫번째사람.setAge(22);
+    PersonInstances.세번째사람.setName("Sichang Park");
+    PersonInstances.세번째사람.setAge(22);
 
-    boolean changed = persistenceContext.isSameWithSnapshot(PersonInstances.첫번째사람.getId(), PersonInstances.첫번째사람);
+    boolean changed = persistenceContext.isSameWithSnapshot(PersonInstances.세번째사람.getId(), PersonInstances.세번째사람);
 
     assertThat(changed).isEqualTo(false);
   }

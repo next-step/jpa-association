@@ -24,4 +24,5 @@ public class SelectQueryBuilder {
     return String.format(SELECT_WHERE_IN_SQL_QUERY, columnClause, tableName, whereClause);
   }
 
+
 }
