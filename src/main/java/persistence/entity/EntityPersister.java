@@ -12,23 +12,26 @@ public class EntityPersister {
 
 	private final EntityMetadata entityMetadata;
 
-	public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> clazz) {
+	private final DmlQueryBuilder dmlQueryBuilder;
+
+	public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> clazz, DmlQueryBuilder dmlQueryBuilder) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.entityMetadata = new EntityMetadata(clazz);
+		this.dmlQueryBuilder = dmlQueryBuilder;
 	}
 
 	public Object insert(Object entity) {
-		String query = DmlQueryBuilder.build().insertQuery(entityMetadata, Values.from(entity));
+		String query = dmlQueryBuilder.insertQuery(entityMetadata, Values.from(entity));
 		return jdbcTemplate.executeUpdate(query);
 	}
 
 	public void delete(Object entity) {
-		String query = DmlQueryBuilder.build().deleteQuery(entityMetadata, getIdValue(entity));
+		String query = dmlQueryBuilder.deleteQuery(entityMetadata, getIdValue(entity));
         jdbcTemplate.execute(query);
 	}
 
 	public void update(Field[] fields, Object entity) {
-		String query = DmlQueryBuilder.build().updateQuery(entityMetadata, Values.of(fields, entity), getIdValue(entity));
+		String query = dmlQueryBuilder.updateQuery(entityMetadata, Values.of(fields, entity), getIdValue(entity));
 		jdbcTemplate.execute(query);
 	}
 

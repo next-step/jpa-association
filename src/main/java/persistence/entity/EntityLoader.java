@@ -10,13 +10,16 @@ public class EntityLoader {
 
 	private final EntityMetadata entityMetadata;
 
-	public EntityLoader(JdbcTemplate jdbcTemplate, Class<?> clazz) {
+	private final DmlQueryBuilder dmlQueryBuilder;
+
+	public EntityLoader(JdbcTemplate jdbcTemplate, Class<?> clazz, DmlQueryBuilder dmlQueryBuilder) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.entityMetadata = new EntityMetadata(clazz);
+		this.dmlQueryBuilder = dmlQueryBuilder;
 	}
 
 	public <T> T find(Class<T> clazz, Long id) {
-		String query = DmlQueryBuilder.build().selectQuery(entityMetadata, id);
+		String query = dmlQueryBuilder.findById(entityMetadata, id);
 		return jdbcTemplate.queryForObject(query, new EntityMapper<>(clazz));
 	}
 }
