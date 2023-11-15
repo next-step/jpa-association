@@ -19,12 +19,8 @@ public class H2DdlQueryBuilder extends DdlQueryBuilder{
 	private static final String NOT_NULL_CONSTRAINT = " NOT NULL";
 
 
-	private H2DdlQueryBuilder() {
+	public H2DdlQueryBuilder() {
 		super(DbType.H2);
-	}
-
-	public static H2DdlQueryBuilder build() {
-		return new H2DdlQueryBuilder();
 	}
 
 	public String createQuery(EntityMetadata entityMetadata) {

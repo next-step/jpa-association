@@ -16,7 +16,7 @@ class DmlQueryBuilderTest {
 	
 	private final EntityMetadata orderMetadata = new EntityMetadata(Order.class);
 
-	private final DmlQueryBuilder queryBuilder = DmlQueryBuilder.build();
+	private final DmlQueryBuilder queryBuilder = new DmlQueryBuilder();
 
 	@DisplayName("Person 객체로 PK 조건의 DELETE 쿼리 생성 테스트")
 	@Test
@@ -32,7 +32,7 @@ class DmlQueryBuilderTest {
 	void test_insertQuery() {
 		assertEquals(
 				queryBuilder.insertQuery(personMetadata, Values.of(person.getClass().getDeclaredFields(), person)),
-				"INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');"
+				"INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi', 1, 'aab555586@gmail.com');"
 		);
 	}
 
@@ -40,8 +40,8 @@ class DmlQueryBuilderTest {
 	@Test
 	void test_selectQuery() {
 		assertEquals(
-				queryBuilder.selectQuery(personMetadata, 1),
-				"SELECT * FROM users WHERE users.id = 1;"
+				queryBuilder.findById(personMetadata, 1),
+				"SELECT users.id, users.nick_name, users.old, users.email FROM users WHERE users.id = 1;"
 		);
 	}
 
@@ -49,8 +49,8 @@ class DmlQueryBuilderTest {
 	@Test
 	void test_selectQueryWithJoinQuery() {
 		assertEquals(
-				queryBuilder.selectQuery(orderMetadata, 1),
-				"SELECT * FROM orders JOIN order_items ON order_items.order_id = orders.id WHERE orders.id = 1;"
+				queryBuilder.findById(orderMetadata, 1),
+				"SELECT orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity FROM orders JOIN order_items ON order_items.order_id = orders.id WHERE orders.id = 1;"
 		);
 	}
 

@@ -30,8 +30,10 @@ class CustomJpaRepositoryTest {
 
 		EntityMetadata entityMetadata = new EntityMetadata(Person.class);
 
-		jdbcTemplate.execute(H2DdlQueryBuilder.build().dropQuery(entityMetadata));
-		jdbcTemplate.execute(H2DdlQueryBuilder.build().createQuery(entityMetadata));
+		H2DdlQueryBuilder ddlQueryBuilder = new H2DdlQueryBuilder();
+
+		jdbcTemplate.execute(ddlQueryBuilder.dropQuery(entityMetadata));
+		jdbcTemplate.execute(ddlQueryBuilder.createQuery(entityMetadata));
 
 		persistenceContext = new SimplePersistenceContext();
 		entityManager = new SimpleEntityManager(jdbcTemplate, Person.class, persistenceContext);
