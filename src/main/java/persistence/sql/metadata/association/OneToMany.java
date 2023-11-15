@@ -24,13 +24,18 @@ public class OneToMany implements Association{
 	}
 
 	@Override
-	public String buildJoinClause() {
-		return table.getName() + " ON " + table.getName() + "." + joinColumnName;
+	public Class<?> getType() {
+		return type;
 	}
 
 	@Override
-	public Class<?> getType() {
-		return type;
+	public String getJoinColumnName() {
+		return joinColumnName;
+	}
+
+	@Override
+	public String getTableName() {
+		return table.getName();
 	}
 
 	private String findJoinColumnName(Field field) {

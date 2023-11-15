@@ -1,63 +1,42 @@
 package persistence.sql.metadata;
 
 import jakarta.persistence.Entity;
-import persistence.dialect.Dialect;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EntityMetadata {
     private final Table table;
 
-    private final Columns columns;
+    private final List<Column> columns;
 
     private final Column id;
 
-    public EntityMetadata(Object entity) {
-        if (!entity.getClass().isAnnotationPresent(Entity.class)) {
+    public EntityMetadata(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("Entity 클래스가 아닙니다.");
         }
-        this.table = new Table(entity.getClass());
-        this.columns = Columns.convertEntityToColumnList(entity);
-        this.id = columns.getId();
+        this.table = new Table(clazz);
+        this.columns = Arrays.stream(clazz.getDeclaredFields())
+                .map(Column::new)
+                .collect(Collectors.toList());
+        this.id = columns.stream()
+                .filter(Column::isPrimaryKey)
+                .findAny()
+                .orElseThrow(NoSuchFieldError::new);
     }
 
-    public EntityMetadata(Table table, Columns columns) {
-        this.table = table;
-        this.columns = columns;
-        this.id = columns.getId();
-    }
-
-    public String getTableName() {
-        return table.getName();
-    }
-
-    public Object getId() {
-        return id.getValue();
+    public List<Column> getColumns() {
+        return columns;
     }
 
     public String getIdName() {
         return id.getName();
     }
 
-    public boolean isNewEntity() {
-        return id.getValue() == null;
+    public String getTableName() {
+        return table.getName();
     }
 
-    public String getColumnsToCreate(Dialect dialect) {
-        return columns.buildColumnsWithConstraint(dialect);
-    }
-
-    public String buildColumnsClause() {
-        return columns.buildColumnsClause();
-    }
-
-    public String buildValueClause() {
-        return columns.buildValueClause();
-    }
-
-    public String buildWhereWithPKClause() {
-        return getTableName() + "." + columns.buildWhereWithPKClause();
-    }
-
-    public String[] buildJoinClauses() {
-        return columns.buildJoinClauses();
-    }
 }

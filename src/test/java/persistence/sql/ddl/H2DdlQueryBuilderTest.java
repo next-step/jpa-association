@@ -9,7 +9,7 @@ import persistence.sql.metadata.EntityMetadata;
 import static org.junit.jupiter.api.Assertions.*;
 
 class H2DdlQueryBuilderTest {
-	private final EntityMetadata entityMetadata = new EntityMetadata(new Person());
+	private final EntityMetadata entityMetadata = new EntityMetadata(Person.class);
 
 	@DisplayName("DB Type에 맞는 전략을 출력한다.")
 	@Test

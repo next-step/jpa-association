@@ -4,19 +4,15 @@ import domain.Order;
 import domain.Person;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.sql.metadata.Column;
-import persistence.sql.metadata.Columns;
 import persistence.sql.metadata.EntityMetadata;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import persistence.sql.metadata.Values;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class DmlQueryBuilderTest {
 	private final Person person = new Person(1L, "hhhhhwi", 1, "aab555586@gmail.com", 0);
 
-	private final EntityMetadata entityMetadata = new EntityMetadata(person);
+	private final EntityMetadata entityMetadata = new EntityMetadata(Person.class);
 
 	private final DmlQueryBuilder queryBuilder = DmlQueryBuilder.build();
 
@@ -24,7 +20,7 @@ class DmlQueryBuilderTest {
 	@Test
 	void test_deleteQuery() {
 		assertEquals(
-				queryBuilder.deleteQuery(entityMetadata),
+				queryBuilder.deleteQuery(entityMetadata, 1L),
 				"DELETE FROM users WHERE users.id = 1;"
 		);
 	}
@@ -33,7 +29,7 @@ class DmlQueryBuilderTest {
 	@Test
 	void test_insertQuery() {
 		assertEquals(
-				queryBuilder.insertQuery(entityMetadata),
+				queryBuilder.insertQuery(entityMetadata, Values.of(person.getClass().getDeclaredFields(), person)),
 				"INSERT INTO users (nick_name, old, email) VALUES ('hhhhhwi',1,'aab555586@gmail.com');"
 		);
 	}
@@ -42,7 +38,7 @@ class DmlQueryBuilderTest {
 	@Test
 	void test_selectQuery() {
 		assertEquals(
-				queryBuilder.selectQuery(Person.class, "1"),
+				queryBuilder.selectQuery(Person.class, 1),
 				"SELECT * FROM users WHERE users.id = 1;"
 		);
 	}
@@ -51,7 +47,7 @@ class DmlQueryBuilderTest {
 	@Test
 	void test_selectQueryWithJoinQuery() {
 		assertEquals(
-				queryBuilder.selectQuery(Order.class, "1"),
+				queryBuilder.selectQuery(Order.class, 1),
 				"SELECT * FROM orders JOIN order_items ON order_items.order_id = orders.id WHERE orders.id = 1;"
 		);
 	}
@@ -61,15 +57,7 @@ class DmlQueryBuilderTest {
 	void test_updateQuery() {
 		Person updatePerson = new Person("update", 2, "update@email.com", 0);
 
-		assertEquals(queryBuilder.updateQuery(
-				new Columns(Arrays.stream(updatePerson.getClass().getDeclaredFields()).map(x -> {
-					try {
-						x.setAccessible(true);
-						return new Column(x, String.valueOf(x.get(updatePerson)));
-					} catch (IllegalAccessException e) {
-						throw new RuntimeException(e);
-					}
-				}).collect(Collectors.toList())), entityMetadata),
+		assertEquals(queryBuilder.updateQuery(entityMetadata, Values.from(updatePerson), 1),
 				"UPDATE users SET nick_name = 'update', old = 2, email = 'update@email.com' WHERE users.id = 1;");
 	}
 }
