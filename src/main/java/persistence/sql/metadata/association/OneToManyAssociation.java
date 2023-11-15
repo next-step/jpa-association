@@ -7,7 +7,7 @@ import persistence.sql.metadata.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
-public class OneToMany implements Association{
+public class OneToManyAssociation implements Association{
 	private final FetchType fetchType;
 
 	private final String joinColumnName;
@@ -16,7 +16,7 @@ public class OneToMany implements Association{
 
 	private final Table table;
 
-	public OneToMany(Field field) {
+	public OneToManyAssociation(Field field) {
 		this.fetchType = field.getDeclaredAnnotation(jakarta.persistence.OneToMany.class).fetch();
 		this.joinColumnName = findJoinColumnName(field);
 		this.type = findType(field);

@@ -3,7 +3,8 @@ package persistence.sql.metadata;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import persistence.sql.metadata.association.Association;
-import persistence.sql.metadata.association.AssociationType;
+import persistence.sql.metadata.association.ManyToOneAssociation;
+import persistence.sql.metadata.association.OneToManyAssociation;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -72,11 +73,11 @@ public class Column {
 
     private Association findAssociation(Field field) {
         if(field.isAnnotationPresent(OneToMany.class)) {
-            return AssociationType.OneToMany.createdAssociation(field);
+            return new OneToManyAssociation(field);
         }
 
         if(field.isAnnotationPresent(ManyToOne.class)) {
-            return AssociationType.ManyToOne.createdAssociation(field);
+            return new ManyToOneAssociation(field);
         }
 
         return null;
