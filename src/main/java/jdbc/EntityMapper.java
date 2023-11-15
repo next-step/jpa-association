@@ -39,29 +39,32 @@ public class EntityMapper<T> implements RowMapper<T>{
                 .toArray(Field[]::new);
 
         for(Field field : fields) {
-            Column column = new Column(field);
-            Table table = new Table(entity.getClass());
-
-            if(column.hasAssociation()) {
-                if(field.getType().equals(List.class)) {
-                    List<Object> list = new ArrayList<>();
-
-                    while(!resultSet.isAfterLast()) {
-                        Object joinEntity = column.getAssociation().getType().getDeclaredConstructor().newInstance();
-
-                        list.add(setFields(joinEntity.getClass().getDeclaredFields(), joinEntity, resultSet));
-                        resultSet.next();
-                    }
-
-                    field.setAccessible(true);
-                    field.set(entity, list);
-                }
-            } else {
-                field.setAccessible(true);
-                field.set(entity, resultSet.getObject(table.getName() + "." + column.getName()));
-            }
+            field.setAccessible(true);
+            field.set(entity, getFieldValue(field, entity, resultSet));
         }
 
         return entity;
+    }
+
+    private Object getFieldValue(Field field, Object entity, ResultSet resultSet) throws Exception{
+        Column column = new Column(field);
+        Table table = new Table(entity.getClass());
+
+        if(column.hasAssociation()) {
+            return getListFieldValue(column.getAssociation().getType(), resultSet);
+        }
+
+        return resultSet.getObject(table.getName() + "." + column.getName());
+    }
+
+    private List<Object> getListFieldValue(Class<?> clazz, ResultSet resultSet) throws Exception{
+        List<Object> list = new ArrayList<>();
+
+        while(!resultSet.isAfterLast()) {
+            list.add(setFields(clazz.getDeclaredFields(), clazz.getDeclaredConstructor().newInstance(), resultSet));
+            resultSet.next();
+        }
+
+        return list;
     }
 }
