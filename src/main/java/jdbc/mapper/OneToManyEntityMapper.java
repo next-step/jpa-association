@@ -1,4 +1,4 @@
-package jdbc;
+package jdbc.mapper;
 
 import jakarta.persistence.Transient;
 import persistence.sql.metadata.Column;
@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EntityMapper<T> implements RowMapper<T>{
+public class OneToManyEntityMapper<T> implements RowMapper<T>{
     private final Class<T> clazz;
 
-    public EntityMapper(Class<T> clazz) {
+    public OneToManyEntityMapper(Class<T> clazz) {
         this.clazz = clazz;
     }
 

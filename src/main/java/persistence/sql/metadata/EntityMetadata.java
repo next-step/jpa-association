@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class EntityMetadata {
@@ -47,5 +48,9 @@ public class EntityMetadata {
 
     public Column getAssociatedColumn() {
         return associatedColumn;
+    }
+
+    public boolean hasAssociation() {
+        return Objects.nonNull(associatedColumn);
     }
 }

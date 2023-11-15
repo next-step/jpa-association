@@ -3,7 +3,6 @@ package persistence.sql.dml;
 import persistence.sql.metadata.Column;
 import persistence.sql.metadata.EntityMetadata;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -30,7 +29,7 @@ public class SelectQueryBuilder {
 				.map(x -> convertColumnToString(entityMetadata.getTableName(), x.getName()))
 				.collect(Collectors.joining(", "));
 
-		if(Objects.nonNull(entityMetadata.getAssociatedColumn())) {
+		if(entityMetadata.hasAssociation()) {
 			result += ", " + buildColumnsClause(new EntityMetadata(entityMetadata.getAssociatedColumn().getAssociation().getType()));
 		}
 

@@ -1,7 +1,7 @@
 package persistence.entity;
 
-import jdbc.EntityMapper;
 import jdbc.JdbcTemplate;
+import jdbc.mapper.RowMapperFactory;
 import persistence.sql.dml.DmlQueryBuilder;
 import persistence.sql.metadata.EntityMetadata;
 
@@ -20,6 +20,6 @@ public class EntityLoader {
 
 	public <T> T find(Class<T> clazz, Long id) {
 		String query = dmlQueryBuilder.findById(entityMetadata, id);
-		return jdbcTemplate.queryForObject(query, new EntityMapper<>(clazz));
+		return jdbcTemplate.queryForObject(query, new RowMapperFactory<T>().create(entityMetadata, clazz));
 	}
 }
