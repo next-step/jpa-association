@@ -45,7 +45,7 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES('book', 2, 1)");
         jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES('pen', 1, 1)");
 
-        entityManager = new SimpleEntityManager(new EntityPersister(jdbcTemplate, Person.class), new EntityLoader(jdbcTemplate), new SimplePersistenceContext());
+        entityManager = new SimpleEntityManager(jdbcTemplate, Person.class, new SimplePersistenceContext());
         entityManager.persist(new Person("hhhhhwi", 1, "aab555586@gmail.com", 0));
     }
 

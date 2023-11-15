@@ -57,9 +57,7 @@ public class DmlQueryBuilder {
 		);
 	}
 
-	public String selectQuery(Class<?> clazz, Object idValue) {
-		EntityMetadata entityMetadata = new EntityMetadata(clazz);
-
+	public String selectQuery(EntityMetadata entityMetadata, Object idValue) {
 		return format(SELECT_COMMAND, "*", entityMetadata.getTableName() + joinClause(entityMetadata) + wherePKClause(entityMetadata, idValue));
 	}
 

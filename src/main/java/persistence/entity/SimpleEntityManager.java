@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.Id;
+import jdbc.JdbcTemplate;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -13,9 +14,9 @@ public class SimpleEntityManager implements EntityManager{
 
     private final PersistenceContext persistenceContext;
 
-    public SimpleEntityManager(EntityPersister entityPersister, EntityLoader entityLoader, PersistenceContext persistenceContext) {
-        this.entityPersister = entityPersister;
-        this.entityLoader = entityLoader;
+    public SimpleEntityManager(JdbcTemplate jdbcTemplate, Class<?> clazz, PersistenceContext persistenceContext) {
+        this.entityPersister = new EntityPersister(jdbcTemplate, clazz);
+        this.entityLoader = new EntityLoader(jdbcTemplate, clazz);
         this.persistenceContext = persistenceContext;
     }
 
