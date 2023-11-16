@@ -1,4 +1,4 @@
-package jdbc;
+package jdbc.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

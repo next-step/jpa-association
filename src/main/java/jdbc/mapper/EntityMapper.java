@@ -1,4 +1,4 @@
-package jdbc;
+package jdbc.mapper;
 
 import jakarta.persistence.Transient;
 import persistence.sql.metadata.Column;
@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-public class EntityMapper<T> implements RowMapper<T>{
+public class EntityMapper<T> implements RowMapper<T> {
     private final Class<T> clazz;
 
     public EntityMapper(Class<T> clazz) {
@@ -29,7 +29,7 @@ public class EntityMapper<T> implements RowMapper<T>{
                     .toArray(Field[]::new);
 
             for(Field field : fields) {
-                Column column = new Column(field, null);
+                Column column = new Column(field);
 
                 field.setAccessible(true);
                 field.set(entity, resultSet.getObject(column.getName()));

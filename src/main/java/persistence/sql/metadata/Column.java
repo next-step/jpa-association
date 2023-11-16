@@ -1,9 +1,13 @@
 package persistence.sql.metadata;
 
-import jakarta.persistence.Transient;
-import persistence.dialect.Dialect;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import persistence.sql.metadata.association.Association;
+import persistence.sql.metadata.association.ManyToOneAssociation;
+import persistence.sql.metadata.association.OneToManyAssociation;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class Column {
     private final String name;
@@ -12,60 +16,45 @@ public class Column {
 
     private final Constraint constraint;
 
-    private final boolean isTransient;
+    private final Association association;
 
-    private final String convertedValue;
-
-    private final Object value;
-
-    public Column(Field field, Object value) {
+    public Column(Field field) {
         this.name = findName(field);
         this.type = field.getType();
         this.constraint = new Constraint(field);
-        this.isTransient = field.isAnnotationPresent(Transient.class);
-        this.convertedValue = convertValueToString(value);
-        this.value = value;
+        this.association = findAssociation(field);
     }
 
     public String getName() {
         return name;
     }
 
-    public boolean isNotTransient() {
-        return !isTransient;
+    public Class<?> getType() {
+        return type;
     }
 
-    public String getConvertedValue() {
-        return convertedValue;
+    public Association getAssociation() {
+        return association;
     }
 
-    public Object getValue() {
-        return value;
-    }
-
-    public String buildColumnsWithConstraint(Dialect dialect) {
-        return new StringBuilder()
-                .append(name + " " + findType(dialect))
-                .append(constraint.buildNullable())
-                .append(dialect.getGeneratedStrategy(constraint.getGeneratedType()))
-                .append(constraint.buildPrimaryKey())
-                .toString();
+    public boolean checkPossibleToBeCreate() {
+        return !constraint.isTransient() && !hasAssociation();
     }
 
     public boolean checkPossibleToBeValue() {
-        if("null".equals(value) && isNotNullable()) {
-            return false;
-        }
-
-        return !isTransient && !constraint.isPrimaryKey();
+        return !constraint.isTransient() && !constraint.isPrimaryKey() && !hasAssociation();
     }
 
     public boolean isPrimaryKey() {
         return constraint.isPrimaryKey();
     }
 
-    public boolean isNotNullable() {
-        return !constraint.isNullable();
+    public boolean isNullable() {
+        return constraint.isNullable();
+    }
+
+    public String getGeneratedType() {
+        return constraint.getGeneratedType();
     }
 
     private String findName(Field field) {
@@ -82,15 +71,19 @@ public class Column {
         return column.name();
     }
 
-    private String findType(Dialect dialect) {
-        return dialect.getColumnType(type);
-    }
-
-    private String convertValueToString(Object value) {
-        if(type.equals(String.class) && value != null) {
-            value = "'" + value + "'";
+    private Association findAssociation(Field field) {
+        if(field.isAnnotationPresent(OneToMany.class)) {
+            return new OneToManyAssociation(field);
         }
 
-        return String.valueOf(value);
+        if(field.isAnnotationPresent(ManyToOne.class)) {
+            return new ManyToOneAssociation(field);
+        }
+
+        return null;
+    }
+
+    public boolean hasAssociation() {
+        return Objects.nonNull(association);
     }
 }

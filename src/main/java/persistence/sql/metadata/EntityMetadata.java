@@ -1,55 +1,56 @@
 package persistence.sql.metadata;
 
 import jakarta.persistence.Entity;
-import persistence.dialect.Dialect;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class EntityMetadata {
     private final Table table;
 
-    private final Columns columns;
+    private final List<Column> columns;
 
-    private final Column id;
+    private final Column idColumn;
 
-    public EntityMetadata(Object entity) {
-        if (!entity.getClass().isAnnotationPresent(Entity.class)) {
+    private final Column associatedColumn;
+
+    public EntityMetadata(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("Entity 클래스가 아닙니다.");
         }
-        this.table = new Table(entity.getClass());
-        this.columns = Columns.convertEntityToColumnList(entity);
-        this.id = columns.getId();
+        this.table = new Table(clazz);
+        this.columns = Arrays.stream(clazz.getDeclaredFields())
+                .map(Column::new)
+                .collect(Collectors.toList());
+        this.idColumn = columns.stream()
+                .filter(Column::isPrimaryKey)
+                .findAny()
+                .orElseThrow(NoSuchFieldError::new);
+        this.associatedColumn = columns.stream()
+                .filter(Column::hasAssociation)
+                .findAny()
+                .orElse(null);
     }
 
-    public EntityMetadata(Table table, Columns columns) {
-        this.table = table;
-        this.columns = columns;
-        this.id = columns.getId();
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    public String getIdName() {
+        return idColumn.getName();
     }
 
     public String getTableName() {
         return table.getName();
     }
 
-    public Object getId() {
-        return id.getValue();
+    public Column getAssociatedColumn() {
+        return associatedColumn;
     }
 
-    public boolean isNewEntity() {
-        return id.getValue() == null;
-    }
-
-    public String getColumnsToCreate(Dialect dialect) {
-        return columns.buildColumnsWithConstraint(dialect);
-    }
-
-    public String buildColumnsClause() {
-        return columns.buildColumnsClause();
-    }
-
-    public String buildValueClause() {
-        return columns.buildValueClause();
-    }
-
-    public String buildWhereWithPKClause() {
-        return columns.buildWhereWithPKClause();
+    public boolean hasAssociation() {
+        return Objects.nonNull(associatedColumn);
     }
 }

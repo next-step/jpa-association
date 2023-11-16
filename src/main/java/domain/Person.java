@@ -77,13 +77,11 @@ public class Person {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == null) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        if (!(obj instanceof Person person)) {
-            return false;
-        }
+        Person person = (Person) obj;
 
         return hashCode() == person.hashCode();
     }

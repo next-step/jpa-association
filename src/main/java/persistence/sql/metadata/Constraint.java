@@ -1,25 +1,23 @@
 package persistence.sql.metadata;
 
+import jakarta.persistence.*;
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;
 
 public class Constraint {
-    private static final String PRIMARY_CONSTRAINT = " PRIMARY KEY";
-    private static final String NOT_NULL_CONSTRAINT = " NOT NULL";
-
     private final boolean isPrimaryKey;
 
     private final boolean isNullable;
+
+    private final boolean isTransient;
 
     private final String generatedType;
 
     public Constraint(Field field) {
         this.isPrimaryKey = findIsPrimaryKey(field);
         this.isNullable = findIsNullable(field);
+        this.isTransient = field.isAnnotationPresent(Transient.class);
         this.generatedType = findGeneratedType(field);
     }
 
@@ -29,6 +27,10 @@ public class Constraint {
 
     public boolean isNullable() {
         return isNullable;
+    }
+
+    public boolean isTransient() {
+        return isTransient;
     }
 
     public String getGeneratedType() {
@@ -57,21 +59,5 @@ public class Constraint {
         GenerationType strategy = field.getAnnotation(GeneratedValue.class).strategy();
 
         return strategy.name();
-    }
-
-    public String buildPrimaryKey() {
-        if(isPrimaryKey) {
-            return PRIMARY_CONSTRAINT;
-        }
-
-        return "";
-    }
-
-    public String buildNullable() {
-        if(!isNullable) {
-            return NOT_NULL_CONSTRAINT;
-        }
-
-        return "";
     }
 }

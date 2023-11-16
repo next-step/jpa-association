@@ -1,6 +1,8 @@
 package persistence.entity;
 
-import persistence.sql.metadata.EntityMetadata;
+import persistence.sql.metadata.Values;
+
+import java.util.Objects;
 
 public class CustomJpaRepository <T> {
 	private final EntityManager entityManager;
@@ -10,7 +12,7 @@ public class CustomJpaRepository <T> {
 	}
 
 	public T save(T t) {
-		if(new EntityMetadata(t).isNewEntity()) {
+		if(Objects.isNull(Values.from(t).getValue("id"))) {
 			entityManager.persist(t);
 			return t;
 		}
