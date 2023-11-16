@@ -39,12 +39,52 @@ public class ProxyTest {
 		);
 	}
 
+	@DisplayName("프록시 콜백 필터를 통해 알맞는 문자열을 반환한다.")
+	@Test
+	void test_sayHello_With_CallbackFilter() {
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(HelloTarget.class);
+		enhancer.setCallbacks(new Callback[] {
+				new UpperCaseInterceptor(),
+				new LowerCaseInterceptor()
+		});
+		enhancer.setCallbackFilter(new HelloTargetCallbackFilter());
+
+		HelloTarget helloTarget = (HelloTarget) enhancer.create();
+
+		Assertions.assertAll(
+				() -> assertEquals(helloTarget.sayHello("hhhhhwi"), "hello hhhhhwi"),
+				() -> assertEquals(helloTarget.sayHi("hhhhhwi"), "hi hhhhhwi"),
+				() -> assertEquals(helloTarget.sayThankYou("hhhhhwi"), "THANK YOU HHHHHWI")
+		);
+	}
+
 	static class UpperCaseInterceptor implements MethodInterceptor {
 		@Override
 		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 			String returnValue = (String) proxy.invokeSuper(obj, args);
 
 			return returnValue.toUpperCase();
+		}
+	}
+
+	static class LowerCaseInterceptor implements MethodInterceptor {
+		@Override
+		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+			String returnValue = (String) proxy.invokeSuper(obj, args);
+
+			return returnValue.toLowerCase();
+		}
+	}
+
+	static class HelloTargetCallbackFilter implements CallbackFilter {
+		@Override
+		public int accept(Method method) {
+			if(method.getName().contains("ThankYou")) {
+				return 0;
+			}
+
+			return 1;
 		}
 	}
 }
