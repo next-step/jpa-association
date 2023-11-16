@@ -48,13 +48,26 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
 
   @Override
   public Long insert(Object entity) {
+
+    if(metaEntity.isDbGeneratedKey()){
+      String values = metaEntity.getValueClause(entity);
+      String columns = metaEntity.getColumnClause();
+
+      String query = dmlQueryBuilder.createInsertQuery(metaEntity.getTableName(), columns, values);
+
+      Long id =  jdbcTemplate.executeWithGeneratedKey(query);
+      metaEntity.getPrimaryKeyColumn().setFieldValue(entity, id);
+      return id;
+    }
+
     String values = metaEntity.getValueClause(entity);
-    String columns = metaEntity.getColumnClause();
+    String columns = metaEntity.getColumnClauseWithId();
 
-    String query = dmlQueryBuilder.createInsertQuery(metaEntity.getTableName(), columns, values);
+    Long id = metaEntity.getPrimaryKeyColumnValue(entity);
 
-    Long id =  jdbcTemplate.executeWithGeneratedKey(query);
-    metaEntity.getPrimaryKeyColumn().setFieldValue(entity, id);
+    String query = dmlQueryBuilder.createInsertQuery(metaEntity.getTableName(), columns, String.join(",",String.valueOf(id), values));
+
+    jdbcTemplate.execute(query);
 
     return id;
   }

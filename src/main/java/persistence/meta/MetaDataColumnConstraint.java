@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 public class MetaDataColumnConstraint {
+
   private final ConstraintType constraintType;
   private final Annotation annotation;
 
@@ -12,20 +13,24 @@ public class MetaDataColumnConstraint {
     this.annotation = annotation;
   }
 
-  public static MetaDataColumnConstraint of(Annotation annotation){
+  public static MetaDataColumnConstraint of(Annotation annotation) {
     ConstraintType constraintType = Arrays.stream(ConstraintType.values())
-            .filter(constraintGroupType -> constraintGroupType.hasConstraint(annotation))
-            .findFirst()
-            .orElseGet(() -> ConstraintType.EMPTY);
+        .filter(constraintGroupType -> constraintGroupType.hasConstraint(annotation))
+        .findFirst()
+        .orElseGet(() -> ConstraintType.EMPTY);
 
     return new MetaDataColumnConstraint(constraintType, annotation);
   }
 
-  public String getConstraint(){
+  public String getConstraint() {
     return this.constraintType.getConstraintMappingToConstraint(this.annotation);
   }
 
-  public boolean isPrimaryKey(){
+  public boolean isGeneratedKey() {
+    return this.constraintType.equals(ConstraintType.GENERATED_VALUE);
+  }
+
+  public boolean isPrimaryKey() {
     return this.constraintType.equals(ConstraintType.ID);
   }
 }
