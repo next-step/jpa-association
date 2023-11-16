@@ -31,6 +31,7 @@ public class BuilderTest {
   public static Connection connection;
   public static PersistenceContext persistenceContext;
   public static EntityEntry entityEntry;
+  public static String DELIMITER = ",";
 
   @BeforeAll
   static void setup() throws SQLException {
