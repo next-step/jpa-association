@@ -3,14 +3,35 @@ package persistence.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.builder.BuilderTest;
 import persistence.sql.fixture.PersonFixtureStep3;
-import persistence.sql.fixture.PersonInstances;
 
 public class JdbcEntityPersisterTest extends BuilderTest {
 
+  public static final long ID = 70L;
+  public static final long ID1 = 71L;
+  public static final long ID2 = 72L;
+  PersonFixtureStep3 첫번째사람 = new PersonFixtureStep3(ID, "제임스", 21, "sdafij@gmail.com");
+  PersonFixtureStep3 두번째사람 = new PersonFixtureStep3(ID1, "사이먼", 23, "sdafij@gmail.com");
+  PersonFixtureStep3 세번째사람 = new PersonFixtureStep3(ID2, "사이먼", 23, "sdafij@gmail.com");
+  @BeforeEach
+  void insert() {
+    persistenceContext = new JdbcPersistenceContext();
+
+    String queryFirst = insertQueryBuilder.createInsertQuery(meta.getTableName(),
+        meta.getColumnClauseWithId(), String.join(DELIMITER, String.valueOf(ID), meta.getValueClause(첫번째사람)));
+    String querySecond = insertQueryBuilder.createInsertQuery(meta.getTableName(),
+        meta.getColumnClauseWithId(), String.join(DELIMITER, String.valueOf(ID1), meta.getValueClause(두번째사람)));
+    String queryThird = insertQueryBuilder.createInsertQuery(meta.getTableName(),
+        meta.getColumnClauseWithId(), String.join(DELIMITER, String.valueOf(ID2), meta.getValueClause(세번째사람)));
+
+    jdbcTemplate.execute(queryFirst);
+    jdbcTemplate.execute(querySecond);
+    jdbcTemplate.execute(queryThird);
+  }
   @Test
   @DisplayName("Persister를 이용해서 insert 합니다.")
   public void persisterInsertEntity() {
@@ -28,16 +49,13 @@ public class JdbcEntityPersisterTest extends BuilderTest {
   @Test
   @DisplayName("Persister를 이용해서 update 합니다.")
   public void persisterUpdateEntity() {
-    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection, persistenceContext,
-        entityEntry);
+    JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection, persistenceContext, entityEntry);
     JdbcEntityPersister<PersonFixtureStep3> persister = new JdbcEntityPersister<>(PersonFixtureStep3.class, connection);
-    PersonFixtureStep3 업데이트된세번째사람 = new PersonFixtureStep3(3L, "헨드릭스", 24, "sdafij@gmail.com");
+    PersonFixtureStep3 업데이트된세번째사람 = new PersonFixtureStep3(ID2, "헨드릭스", 24, "sdafij@gmail.com");
 
-
-    persister.insert(PersonInstances.세번째사람);
     boolean execute = persister.update(업데이트된세번째사람);
 
-    PersonFixtureStep3 person = jdbcEntityManager.find(PersonFixtureStep3.class, 3L);
+    PersonFixtureStep3 person = jdbcEntityManager.find(PersonFixtureStep3.class, ID2);
 
     assertThat(execute).isEqualTo(false);
     assertThat(person).isEqualTo(업데이트된세번째사람);
@@ -49,11 +67,10 @@ public class JdbcEntityPersisterTest extends BuilderTest {
     JdbcEntityManager jdbcEntityManager = new JdbcEntityManager(connection, persistenceContext,
         entityEntry);
     JdbcEntityPersister<PersonFixtureStep3> persister = new JdbcEntityPersister<>(PersonFixtureStep3.class, connection);
-    persister.insert(PersonInstances.두번째사람);
 
-    persister.delete(PersonInstances.두번째사람);
+    persister.delete(두번째사람);
 
-    assertThat(jdbcEntityManager.find(PersonFixtureStep3.class, 3L)).isEqualTo(null);
+    assertThat(jdbcEntityManager.find(PersonFixtureStep3.class, ID1)).isEqualTo(null);
   }
 
   @Test

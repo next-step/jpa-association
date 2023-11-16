@@ -3,6 +3,7 @@ package persistence.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.ddl.builder.BuilderTest;
@@ -10,6 +11,24 @@ import persistence.sql.fixture.PersonFixtureStep3;
 import persistence.sql.fixture.PersonInstances;
 
 public class JdbcPersistenceContextTest extends BuilderTest {
+
+  public static final long ID = 80L;
+  public static final long ID1 = 81L;
+  public static final long ID2 = 82L;
+  PersonFixtureStep3 첫번째사람 = new PersonFixtureStep3(ID, "제임스", 21, "sdafij@gmail.com");
+  PersonFixtureStep3 두번째사람 = new PersonFixtureStep3(ID1, "사이먼", 23, "sdafij@gmail.com");
+  PersonFixtureStep3 세번째사람 = new PersonFixtureStep3(ID2, "사이먼", 23, "sdafij@gmail.com");
+  @BeforeEach
+  void insert() {
+    persistenceContext = new JdbcPersistenceContext();
+
+    String queryFirst = insertQueryBuilder.createInsertQuery(meta.getTableName(),
+        meta.getColumnClauseWithId(), String.join(DELIMITER, String.valueOf(ID), meta.getValueClause(첫번째사람)));
+    String querySecond = insertQueryBuilder.createInsertQuery(meta.getTableName(),
+        meta.getColumnClauseWithId(), String.join(DELIMITER, String.valueOf(ID1), meta.getValueClause(두번째사람)));
+    jdbcTemplate.execute(queryFirst);
+    jdbcTemplate.execute(querySecond);
+  }
 
   public static PersistenceContext persistenceContext;
 
