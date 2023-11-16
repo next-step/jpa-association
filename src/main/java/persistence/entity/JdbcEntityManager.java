@@ -49,9 +49,10 @@ public class JdbcEntityManager implements EntityManager {
     entityEntry.putEntityEntryStatus(entity, EntityStatus.SAVING);
     Long assignedId = persister.getEntityId(entity).orElse(-1L);
 
-    if (persister.entityExists(entity) &&
-        !persistenceContext.isSameWithSnapshot(assignedId, entity)) {
-
+    if (persister.entityExists(entity)){
+      if(persistenceContext.isSameWithSnapshot(assignedId, entity)) {
+        return;
+      }
       persister.update(entity);
       putPersistenceContext(assignedId, entity);
       return;
