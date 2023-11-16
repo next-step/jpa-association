@@ -46,7 +46,7 @@ public class BuilderTest {
     insertQueryBuilder = new InsertQueryBuilder();
     createQueryBuilder = new CreateQueryBuilder();
     selectQueryBuilder = new SelectQueryBuilder();
-    String query = createQueryBuilder.createCreateQuery(meta.getTableName(), meta.getColumns());
+    String query = createQueryBuilder.createIfNotExistsCreateQuery(meta.getTableName(), meta.getColumns());
     jdbcTemplate.execute(query);
   }
 
