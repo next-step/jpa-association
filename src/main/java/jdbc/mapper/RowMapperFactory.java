@@ -11,6 +11,6 @@ public class RowMapperFactory<T> {
 			return new OneToManyEntityMapper<>(clazz);
 		}
 
-		return new EntityMapper<>(clazz);
+		return new SingleEntityMapper<>(clazz);
 	}
 }
