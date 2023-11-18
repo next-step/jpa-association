@@ -24,7 +24,7 @@ public class MetaDataColumns {
 
   public static MetaDataColumns of(Class<?> clazz, Dialect dialect) {
     List<MetaDataColumn> metaColumns = Arrays.stream(clazz.getDeclaredFields())
-        .filter(field -> isNotTransient(List.of(field.getAnnotations())) && isNotRelation(List.of(field.getAnnotations())))
+        .filter(field -> isNotTransient(List.of(field.getAnnotations())))
         .map(field -> MetaDataColumn.of(field, dialect.convertToColumn(field)))
         .collect(Collectors.toList());
 
@@ -90,7 +90,7 @@ public class MetaDataColumns {
   }
 
   public List<MetaDataColumn> getMetaDataColumns() {
-    return columns;
+    return columns.stream().filter(column -> !column.hasRelation()).collect(Collectors.toList());
   }
 
   public MetaDataColumn getColumnByFieldName(String fieldName) {
