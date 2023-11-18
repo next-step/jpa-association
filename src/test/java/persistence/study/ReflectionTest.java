@@ -17,6 +17,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import persistence.study.reflection.Car;
+import persistence.study.reflection.PrintView;
 
 @DisplayName("Reflection 테스트")
 class ReflectionTest {
@@ -26,7 +28,7 @@ class ReflectionTest {
     @Test
     @DisplayName("클래스 정보를 확인할 수 있다.")
     void showClass() {
-        final String carClassInfo = "persistence.study.Car";
+        final String carClassInfo = "persistence.study.reflection.Car";
         assertThat(carClass.getName()).isEqualTo(carClassInfo);
     }
 
