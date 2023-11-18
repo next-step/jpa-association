@@ -19,20 +19,22 @@ public class DeleteQueryBuilderTest extends BuilderTest {
 
   PersonFixtureStep3 첫번째사람 = new PersonFixtureStep3(ID, "제임스", 21, "sdafij@gmail.com");
   PersonFixtureStep3 두번째사람 = new PersonFixtureStep3(ID1, "사이먼", 23, "sdafij@gmail.com");
+
   @BeforeEach
   void insert() {
     persistenceContext = new JdbcPersistenceContext();
 
-
-
     String queryFirst = insertQueryBuilder.createInsertQuery(meta.getTableName(),
-        meta.getColumnClauseWithId(), String.join(DELIMITER,String.valueOf(ID), meta.getValueClause(첫번째사람)));
+        meta.getColumnClauseWithId(),
+        String.join(DELIMITER, String.valueOf(ID), meta.getValueClause(첫번째사람)));
     String querySecond = insertQueryBuilder.createInsertQuery(meta.getTableName(),
-        meta.getColumnClauseWithId(), String.join(DELIMITER,String.valueOf(ID1), meta.getValueClause(두번째사람)));
+        meta.getColumnClauseWithId(),
+        String.join(DELIMITER, String.valueOf(ID1), meta.getValueClause(두번째사람)));
 
     jdbcTemplate.execute(queryFirst);
     jdbcTemplate.execute(querySecond);
   }
+
   @Test
   @DisplayName("Delete SQL 구문을 생성합니다.")
   public void deleteDMLfromEntity() {
@@ -51,17 +53,19 @@ public class DeleteQueryBuilderTest extends BuilderTest {
     SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
     Long targetId = 10L;
 
-    String queryDelete = deleteQueryBuilder.createDeleteQuery(meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetId);
+    String queryDelete = deleteQueryBuilder.createDeleteQuery(meta.getTableName(),
+        meta.getPrimaryKeyColumn().getDBColumnName(), targetId);
     jdbcTemplate.execute(queryDelete);
 
-    String querySelect = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClause(), meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetId);
+    String querySelect = selectQueryBuilder.createSelectByFieldQuery(meta.getColumnClause(),
+        meta.getTableName(), meta.getPrimaryKeyColumn().getDBColumnName(), targetId);
     List<Object> people = jdbcTemplate.query(querySelect, (rs) ->
-            new PersonFixtureStep3(
-                    rs.getLong("id"),
-                    rs.getString("nick_name"),
-                    rs.getInt("old"),
-                    rs.getString("email")
-            ));
+        new PersonFixtureStep3(
+            rs.getLong("id"),
+            rs.getString("nick_name"),
+            rs.getInt("old"),
+            rs.getString("email")
+        ));
 
     assertThat(people).isEmpty();
   }
