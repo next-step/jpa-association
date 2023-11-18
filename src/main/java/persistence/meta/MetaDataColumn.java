@@ -35,7 +35,7 @@ public class MetaDataColumn {
             .sorted(Comparator.comparing(MetaDataColumnConstraint::getConstraint).reversed())
             .collect(Collectors.toList());
     boolean isRelation = Arrays.stream(field.getAnnotations())
-        .anyMatch(annot -> annot.equals(OneToMany.class) || annot.equals(JoinColumn.class));
+        .anyMatch(annot -> annot.annotationType().equals(OneToMany.class) || annot.annotationType().equals(JoinColumn.class));
 
     Relation relation = isRelation ? MetaDataColumnRelation.of(field) : new MetaDataColumnEmptyRelation();
 
