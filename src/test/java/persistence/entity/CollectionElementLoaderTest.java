@@ -81,6 +81,17 @@ class CollectionElementLoaderTest {
     assertThat(order.orderItems.get(1).product).isEqualTo("두번째 음식");
   }
 
+
+  @Test
+  @DisplayName("Fetch Type이 EAGER인 엔티티를 LOAD할 때, element 엔티티들도 Load 됩니다.")
+  void entityLoadByIdsCollection(){
+    CollectionElementLoader<Order> Loader = (CollectionElementLoader<Order>) CollectionElementLoader.of(Order.class, connection);
+    List<Order> orders = Loader.loadByIds(List.of(1L,2L));
+
+    assertThat(orders).hasSize(1);
+    assertThat(orders.get(0).orderItems.get(0).product).isEqualTo("첫번째 음식");
+    assertThat(orders.get(0).orderItems.get(1).product).isEqualTo("두번째 음식");
+  }
   @Entity
   @Table(name = "orders")
   public static class Order {

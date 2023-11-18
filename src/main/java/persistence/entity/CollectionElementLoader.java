@@ -4,6 +4,7 @@ import jakarta.persistence.FetchType;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import jdbc.CollectionRowMapper;
 import jdbc.JdbcRowMapper;
 import jdbc.JdbcTemplate;
@@ -80,8 +81,10 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
     MetaDataColumn keyColumn = metaEntity.getPrimaryKeyColumn();
     String targetColumn = keyColumn.getDBColumnName();
 
-    String query = selectQueryBuilder.createSelectByFieldQuery(metaEntity.getColumnClauseWithId(),
-        metaEntity.getTableName(), targetColumn, ids);
+    List<String> idValues = ids.stream().map(Object::toString).collect(Collectors.toList());
+
+    String query = selectQueryBuilder.createSelectByFieldsQuery(metaEntity.getColumnClauseWithId(),
+        metaEntity.getTableName(), targetColumn, idValues);
 
     List<T> entities = jdbcTemplate.query(query, rowMapper);
 
@@ -95,7 +98,7 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
         .select(metaEntity.getTableName(),elementEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
         .join(List.of(elementEntity.getTableName()))
         .on(List.of(relation.getDbName()))
-        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(), List.of(String.valueOf(ids)))
+        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(), idValues)
         .build().createJoinQuery();
 
     List<T> entitiesWithCollection = jdbcTemplate.query(joinQuery, elementRowMapper);
