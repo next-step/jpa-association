@@ -24,7 +24,7 @@ public class CollectionRowMapper<T, V> implements RowMapper<T> {
 
     for (MetaDataColumn metaDataColumn : metaDataColumns.getMetaDataColumns()) {
       String dbName = metaDataColumn.getDBColumnName();
-      String columnName = String.join(DELIMITER, dbName,
+      String columnName = String.join(DELIMITER, metaEntity.getTableName(),
           metaDataColumn.getDBColumnName());
       metaDataColumn.setFieldValue(entityInstance, resultSet.getObject(columnName));
     }
@@ -39,7 +39,7 @@ public class CollectionRowMapper<T, V> implements RowMapper<T> {
 
       for (MetaDataColumn metaDataColumn : elementDataColumns.getMetaDataColumns()) {
         String dbName = metaDataColumn.getDBColumnName();
-        String columnName = String.join(DELIMITER, dbName,
+        String columnName = String.join(DELIMITER, elementEntity.getTableName(),
             metaDataColumn.getDBColumnName());
         metaDataColumn.setFieldValue(elementInstance, resultSet.getObject(columnName));
       }

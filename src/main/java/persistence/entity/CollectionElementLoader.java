@@ -64,7 +64,7 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
     }
 
     String joinQuery = new JoinQueryBuilder()
-        .select(metaEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
+        .select(metaEntity.getTableName(),elementEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
         .join(List.of(elementEntity.getTableName()))
         .on(List.of(relation.getDbName()))
         .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(), List.of(String.valueOf(id)))
@@ -92,7 +92,7 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
     }
 
     String joinQuery = new JoinQueryBuilder()
-        .select(metaEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
+        .select(metaEntity.getTableName(),elementEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
         .join(List.of(elementEntity.getTableName()))
         .on(List.of(relation.getDbName()))
         .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(), List.of(String.valueOf(ids)))
