@@ -14,9 +14,9 @@ public class EntityPersister {
 
 	private final DmlQueryBuilder dmlQueryBuilder;
 
-	public EntityPersister(JdbcTemplate jdbcTemplate, Class<?> clazz, DmlQueryBuilder dmlQueryBuilder) {
+	public EntityPersister(JdbcTemplate jdbcTemplate, EntityMetadata entityMetadata, DmlQueryBuilder dmlQueryBuilder) {
 		this.jdbcTemplate = jdbcTemplate;
-		this.entityMetadata = new EntityMetadata(clazz);
+		this.entityMetadata = entityMetadata;
 		this.dmlQueryBuilder = dmlQueryBuilder;
 	}
 

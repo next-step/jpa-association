@@ -8,10 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-public class EntityMapper<T> implements RowMapper<T> {
+public class SingleEntityMapper<T> implements RowMapper<T> {
     private final Class<T> clazz;
 
-    public EntityMapper(Class<T> clazz) {
+    public SingleEntityMapper(Class<T> clazz) {
         this.clazz = clazz;
     }
 
