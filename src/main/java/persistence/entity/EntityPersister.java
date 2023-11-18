@@ -6,6 +6,7 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
+import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
 import persistence.sql.dml.Query;
 
@@ -33,6 +34,10 @@ public class EntityPersister<T> {
 
     public <I> T findById(I input) {
         return entityLoader.findById(input);
+    }
+
+    public <I> List<T> findByJoin(I input, JoinColumn joinColumn) {
+        return entityLoader.findByJoinId(input, joinColumn);
     }
 
     public <I> boolean update(I input, Object arg) {

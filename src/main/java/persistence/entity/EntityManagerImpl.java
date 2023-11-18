@@ -2,6 +2,7 @@ package persistence.entity;
 
 import java.util.List;
 import java.util.Map;
+import persistence.sql.common.meta.JoinColumn;
 
 public class EntityManagerImpl implements EntityManager {
     private final Map<String, EntityPersister<?>> persisterMap;
@@ -23,6 +24,13 @@ public class EntityManagerImpl implements EntityManager {
         int hashCode = persister.getHashCode(input);
 
         return (R) persistenceContext.getEntity(hashCode, persister, input);
+    }
+
+    @Override
+    public <S, R> List<S> findJoin(Class<S> subClass, R input, JoinColumn joinColumn) {
+        final EntityPersister<?> persister = getPersister(subClass);
+
+        return (List<S>) persister.findByJoin(input, joinColumn);
     }
 
     @Override

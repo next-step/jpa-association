@@ -2,6 +2,7 @@ package persistence.entity;
 
 import java.util.List;
 import jdbc.JdbcTemplate;
+import jdbc.LazyResultMapper;
 import jdbc.ResultMapper;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -10,6 +11,7 @@ import persistence.sql.dml.Query;
 
 public class EntityLoader<T> {
 
+    private final Class<T> clazz;
     private final Query query;
     private final JdbcTemplate jdbcTemplate;
     private final ResultMapper<T> resultMapper;
@@ -19,6 +21,8 @@ public class EntityLoader<T> {
 
     EntityLoader(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
         this.query = query;
+
+        this.clazz = tClass;
 
         this.jdbcTemplate = jdbcTemplate;
         this.resultMapper = new ResultMapper<>(tClass);
@@ -43,7 +47,20 @@ public class EntityLoader<T> {
 
         String selectQuery = query.select(entityMeta, input);
 
-        return jdbcTemplate.queryForObject(selectQuery, resultMapper);
+        if(joinColumn != null && joinColumn.isEager()) {
+            return jdbcTemplate.queryForObject(selectQuery, resultMapper);
+        }
+
+        return jdbcTemplate.queryForObject(selectQuery, new LazyResultMapper<>(clazz));
+    }
+
+    public <I> List<T> findByJoinId(I input, JoinColumn joinColumn) {
+        EntityMeta entityMeta = new EntityMeta(new Object() {
+        }.getClass().getEnclosingMethod().getName(), tableName, columns, joinColumn);
+
+        String selectQuery = query.selectJoin(entityMeta, input);
+
+        return jdbcTemplate.query(selectQuery, resultMapper);
     }
 
     public <I> int getHashCode(I input) {
