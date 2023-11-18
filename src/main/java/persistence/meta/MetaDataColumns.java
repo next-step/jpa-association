@@ -33,9 +33,9 @@ public class MetaDataColumns {
         .findFirst().orElseThrow(() -> new RuntimeException("ID 필드가 없습니다."));
 
     Relation relation = metaColumns.stream()
-        .filter(column -> column.hasRelation())
-        .map(column -> column.getColumnRelation())
-        .findAny().orElseGet(() -> new MetaDataColumnEmptyRelation());
+        .filter(MetaDataColumn::hasRelation)
+        .map(MetaDataColumn::getColumnRelation)
+        .findAny().orElseGet(MetaDataColumnEmptyRelation::new);
 
     return new MetaDataColumns(metaColumns, primaryKeyColumn, relation);
   }
