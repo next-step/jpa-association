@@ -15,11 +15,13 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
   private final JdbcTemplate jdbcTemplate;
   private final MetaEntity<T> metaEntity;
   private final EntityLoader<T> entityLoader;
+  private final RelationLoader relationLoader;
   private final DmlQueryBuilder dmlQueryBuilder = new DmlQueryBuilder();
 
   public JdbcEntityPersister(Class<T> clazz, Connection connection) {
     this.jdbcTemplate = new JdbcTemplate(connection);
     this.metaEntity = MetaEntity.of(clazz);
+    this.relationLoader = metaEntity.hasRelation() ? new EmptyCollectionLoader() : CollectionElementLoader.of(clazz, connection);
     this.entityLoader = new JdbcEntityLoader<T>(clazz, connection);
   }
 
@@ -101,10 +103,16 @@ public class JdbcEntityPersister<T> implements EntityPersister<T> {
   }
 
   public Optional<T> load(Long id) {
+    if(metaEntity.hasRelation()){
+      return relationLoader.load(id);
+    }
     return entityLoader.load(id);
   }
 
   public List<T> loadAll(List<Long> ids) {
+    if(metaEntity.hasRelation()){
+      return relationLoader.loadByIds(ids);
+    }
     return entityLoader.loadByIds(ids);
   }
 }
