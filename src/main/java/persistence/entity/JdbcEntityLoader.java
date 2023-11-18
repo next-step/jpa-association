@@ -31,12 +31,7 @@ public class JdbcEntityLoader<T> implements EntityLoader<T> {
     String query = selectQueryBuilder.createSelectByFieldQuery(metaEntity.getColumnClauseWithId(),
         metaEntity.getTableName(), targetColumn, id);
 
-    try {
-      return Optional.ofNullable(jdbcTemplate.queryForObject(query, jdbcRowMapper));
-    } catch (RuntimeException e) {
-      return Optional.empty();
-    }
-
+    return Optional.ofNullable(jdbcTemplate.queryForObject(query, jdbcRowMapper));
   }
 
   @Override
