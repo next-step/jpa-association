@@ -112,10 +112,15 @@ public class MetaEntity<T> {
     return metaDataColumns.getFields();
   }
 
-
-  private List<String> getEntityColumnsWithId() {
+  public List<String> getEntityColumnsWithId() {
     return metaDataColumns.getColumnsWithId();
   }
 
+  public boolean hasRelation(){
+    return metaDataColumns.hasRelation();
+  }
 
+  public boolean isDbGeneratedKey() {
+    return primaryKeyColumn.isGenerated();
+  }
 }

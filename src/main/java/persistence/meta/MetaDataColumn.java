@@ -1,6 +1,8 @@
 package persistence.meta;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -15,13 +17,16 @@ public class MetaDataColumn {
   private final String fieldName;
   private final Field field;
   private final List<MetaDataColumnConstraint> constraints;
+  private final Relation columnRelation;
 
-  private MetaDataColumn(String name, String type, String fieldName, Field field, List<MetaDataColumnConstraint> constraints) {
+  private MetaDataColumn(String name, String type, String fieldName, Field field, List<MetaDataColumnConstraint> constraints,
+      Relation columnRelation) {
     this.name = name;
     this.type = type;
     this.fieldName = fieldName;
     this.field = field;
     this.constraints = constraints;
+    this.columnRelation = columnRelation;
   }
 
   public static MetaDataColumn of(Field field, String columnType) {
@@ -29,8 +34,13 @@ public class MetaDataColumn {
             .map(MetaDataColumnConstraint::of)
             .sorted(Comparator.comparing(MetaDataColumnConstraint::getConstraint).reversed())
             .collect(Collectors.toList());
+    boolean isRelation = Arrays.stream(field.getAnnotations())
+        .anyMatch(annot -> annot.annotationType().equals(OneToMany.class) || annot.annotationType().equals(JoinColumn.class));
 
-    return new MetaDataColumn(getDBColumnName(field), columnType, field.getName(), field, constraints);
+    Relation relation = isRelation ? MetaDataColumnRelation.of(field) : new MetaDataColumnEmptyRelation();
+
+    return new MetaDataColumn(getDBColumnName(field), columnType, field.getName(), field, constraints, relation);
+
   }
 
   public String getDBColumnsClause() {
@@ -89,5 +99,15 @@ public class MetaDataColumn {
       throw new RuntimeException(e);
     }
     field.setAccessible(false);
+  }
+
+  public boolean hasRelation(){
+    return columnRelation.isRelation();
+  }
+  public Relation getColumnRelation(){
+    return columnRelation;
+  }
+  public boolean isGenerated(){
+    return constraints.stream().anyMatch(constraint -> constraint.isGeneratedKey());
   }
 }

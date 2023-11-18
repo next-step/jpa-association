@@ -23,6 +23,7 @@ public class JdbcRowMapperTest {
             "1L, 사이몬, 21, safasd@asmsdf.com\n";
 
     ResultSet rs = new Csv().read(new StringReader(csv), new String[] {"id","name", "age","email"});
+    rs.next();
 
     JdbcRowMapper<PersonFixtureMapper> jdbcRowMapper = new JdbcRowMapper(MetaEntity.of(PersonFixtureMapper.class));
     PersonFixtureMapper person = jdbcRowMapper.mapRow(rs);

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTemplate {
+
+    public static final int COLUMN_INDEX = 1;
     private final Connection connection;
 
     public JdbcTemplate(final Connection connection) {
@@ -21,20 +23,26 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
     public Long executeWithGeneratedKey(final String sql) {
-        try (final PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (final PreparedStatement statement = connection.prepareStatement(sql,
+            Statement.RETURN_GENERATED_KEYS)) {
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
 
-            return resultSet.getLong(1);
+            return resultSet.getLong(COLUMN_INDEX);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
     public <T> T queryForObject(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return rowMapper.mapRow(resultSet);
+            if (resultSet.next()) {
+                return rowMapper.mapRow(resultSet);
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException("해당 객체는 존재 하지 않습니다.", e);
         }

@@ -31,6 +31,7 @@ public class BuilderTest {
   public static Connection connection;
   public static PersistenceContext persistenceContext;
   public static EntityEntry entityEntry;
+  public static String DELIMITER = ",";
 
   @BeforeAll
   static void setup() throws SQLException {
@@ -45,7 +46,7 @@ public class BuilderTest {
     insertQueryBuilder = new InsertQueryBuilder();
     createQueryBuilder = new CreateQueryBuilder();
     selectQueryBuilder = new SelectQueryBuilder();
-    String query = createQueryBuilder.createCreateQuery(meta.getTableName(), meta.getColumns());
+    String query = createQueryBuilder.createIfNotExistsCreateQuery(meta.getTableName(), meta.getColumns());
     jdbcTemplate.execute(query);
   }
 

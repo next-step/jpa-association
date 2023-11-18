@@ -3,10 +3,9 @@ package persistence.entity;
 import java.util.List;
 import java.util.Optional;
 
-public interface EntityLoader<T> {
-  <T> Optional<T> load(Long id);
+public interface RelationLoader<T> {
 
-  List<T> findAll();
+  <T> Optional<T> load(Long id);
 
   List<T> loadByIds(List<Long> ids);
 }

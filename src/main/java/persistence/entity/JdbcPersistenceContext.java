@@ -11,7 +11,6 @@ public class JdbcPersistenceContext implements PersistenceContext {
 
   private final Map<EntityKey, Object> entityCache = new ConcurrentHashMap<>();
   private final Map<EntityKey, Object> entitySnapshot = new ConcurrentHashMap<>();
-  private final EntityEntry entityEntry = new JdbcEntityEntry();
   @Override
   public Optional<Object> getEntity(Long id, Class<?> clazz) {
     return Optional.ofNullable(entityCache.get(new EntityKey(clazz, id)));

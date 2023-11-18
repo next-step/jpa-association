@@ -14,7 +14,6 @@ public class JdbcRowMapper<T> implements RowMapper<T> {
   }
   @Override
   public T mapRow(ResultSet resultSet) throws SQLException {
-    resultSet.next();
 
     T entityInstance = metaEntity.createInstance();
     MetaDataColumns metaDataColumns = metaEntity.getMetaDataColumns();
