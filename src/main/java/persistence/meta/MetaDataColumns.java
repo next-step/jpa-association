@@ -35,7 +35,7 @@ public class MetaDataColumns {
     Relation relation = metaColumns.stream()
         .filter(column -> column.hasRelation())
         .map(column -> column.getColumnRelation())
-        .findAny().orElse(new MetaDataColumnEmptyRelation());
+        .findAny().orElseGet(() -> new MetaDataColumnEmptyRelation());
 
     return new MetaDataColumns(metaColumns, primaryKeyColumn, relation);
   }
