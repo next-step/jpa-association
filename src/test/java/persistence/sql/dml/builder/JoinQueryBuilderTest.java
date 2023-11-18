@@ -18,13 +18,13 @@ public class JoinQueryBuilderTest {
     MetaEntity<OrderItem> metaOrderItem = MetaEntity.of(OrderItem.class);
 
     String joinQuery = new JoinQueryBuilder()
-        .select(metaOrder.getTableName(), metaOrder.getEntityColumnsWithId(), metaOrderItem.getEntityColumnsWithId())
+        .select(metaOrder.getTableName(),metaOrderItem.getTableName(), metaOrder.getEntityColumnsWithId(), metaOrderItem.getEntityColumnsWithId())
         .join(List.of(metaOrderItem.getTableName()))
         .on(List.of("order_id"))
         .where(metaOrder.getPrimaryKeyColumn().getDBColumnName(), List.of("1", "2"))
         .build().createJoinQuery();
 
     assertThat(joinQuery).isEqualTo(
-        "SELECT ORDERS.id,ORDERS.ordernumber,ORDERS.id,ORDERS.product,ORDERS.quantity FROM ORDERS JOIN ORDER_ITEMS ON ORDERS.id = ORDER_ITEMS.order_id WHERE ORDERS.id IN [1,2];");
+        "SELECT ORDERS.id,ORDERS.ordernumber,ORDER_ITEMS.id,ORDER_ITEMS.product,ORDER_ITEMS.quantity FROM ORDERS JOIN ORDER_ITEMS ON ORDERS.id = ORDER_ITEMS.order_id WHERE ORDERS.id IN (1,2);");
   }
 }

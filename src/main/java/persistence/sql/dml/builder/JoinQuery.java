@@ -9,7 +9,7 @@ public class JoinQuery {
   private static final String SELECT_CLAUSE = "SELECT %s";
   private static final String FROM_CLAUSE = "FROM %s";
   private static final String JOIN_CLAUSE = "JOIN %s ON %s = %s";
-  private static final String WHERE_CLAUSE = "WHERE %s IN [%s]";
+  private static final String WHERE_CLAUSE = "WHERE %s IN (%s)";
   private static final String DELIMITER = ",";
   private static final String SPACE = " ";
   private final String tableName;
