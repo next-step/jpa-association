@@ -1,6 +1,8 @@
 package persistence.meta;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,11 +34,13 @@ public class MetaDataColumn {
             .map(MetaDataColumnConstraint::of)
             .sorted(Comparator.comparing(MetaDataColumnConstraint::getConstraint).reversed())
             .collect(Collectors.toList());
-//    MetaDataColumnRelation columnRelation = Arrays.stream(field.getAnnotations())
-//        .map(MetaDataColumnRelation::of)
-//        .findAny().orElse(new MetaDataColumnEmptyRelation());
-    return new MetaDataColumn(getDBColumnName(field), columnType, field.getName(), field, constraints,
-        new MetaDataColumnEmptyRelation());
+    boolean isRelation = Arrays.stream(field.getAnnotations())
+        .anyMatch(annot -> annot.equals(OneToMany.class) || annot.equals(JoinColumn.class));
+
+    Relation relation = isRelation ? MetaDataColumnRelation.of(field) : new MetaDataColumnEmptyRelation();
+
+    return new MetaDataColumn(getDBColumnName(field), columnType, field.getName(), field, constraints, relation);
+
   }
 
   public String getDBColumnsClause() {
@@ -97,6 +101,12 @@ public class MetaDataColumn {
     field.setAccessible(false);
   }
 
+  public boolean hasRelation(){
+    return columnRelation.isRelation();
+  }
+  public Relation getColumnRelation(){
+    return columnRelation;
+  }
   public boolean isGenerated(){
     return constraints.stream().anyMatch(constraint -> constraint.isGeneratedKey());
   }
