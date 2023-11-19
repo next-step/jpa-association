@@ -9,15 +9,13 @@ import persistence.meta.MetaDataColumns;
 import persistence.meta.MetaEntity;
 import persistence.meta.Relation;
 
-public class CollectionRowMapper<T, V> implements RowMapper<T> {
+public class CollectionRowMapper<T> implements RowMapper<T> {
 
   public static String DELIMITER = ".";
   private final MetaEntity<T> metaEntity;
-  private final MetaEntity<V> elementEntity;
 
-  public CollectionRowMapper(MetaEntity<T> metaEntity, MetaEntity<V> elementEntity) {
+  public CollectionRowMapper(MetaEntity<T> metaEntity) {
     this.metaEntity = metaEntity;
-    this.elementEntity = elementEntity;
   }
 
   @Override
@@ -34,10 +32,13 @@ public class CollectionRowMapper<T, V> implements RowMapper<T> {
     Relation relation = metaDataColumns.getRelation();
     MetaDataColumn relationColumn = metaEntity.getMetaDataColumns()
         .getColumnByFieldName(relation.getFieldName());
-    List<V> elements = new ArrayList<>();
+
+    MetaEntity<?> elementEntity = metaEntity.getRelation().getMetaEntity();
+
+    List<Object> elements = new ArrayList<>();
 
     do {
-      V elementInstance = elementEntity.createInstance();
+      Object elementInstance = elementEntity.createInstance();
       MetaDataColumns elementDataColumns = elementEntity.getMetaDataColumns();
 
       for (MetaDataColumn metaDataColumn : elementDataColumns.getMetaDataColumns()) {
@@ -53,4 +54,5 @@ public class CollectionRowMapper<T, V> implements RowMapper<T> {
 
     return entityInstance;
   }
+
 }

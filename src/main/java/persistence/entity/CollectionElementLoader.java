@@ -34,7 +34,7 @@ public class CollectionElementLoader<T> implements RelationLoader<T> {
     this.metaEntity = metaEntity;
     this.elementEntity = elementEntity;
     this.rowMapper = new JdbcRowMapper<>(metaEntity);
-    this.elementRowMapper = new CollectionRowMapper<>(metaEntity, elementEntity);
+    this.elementRowMapper = new CollectionRowMapper<>(metaEntity);
     this.relation = relation;
   }
 

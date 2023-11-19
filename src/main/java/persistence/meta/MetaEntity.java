@@ -128,4 +128,8 @@ public class MetaEntity<T> {
   public boolean isDbGeneratedKey() {
     return primaryKeyColumn.isGenerated();
   }
+
+  public Relation getRelation() {
+    return metaDataColumns.getRelation();
+  }
 }
