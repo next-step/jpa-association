@@ -1,4 +1,4 @@
-package persistence.entity.loader;
+package persistence.entity.persister;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -10,38 +10,37 @@ import persistence.sql.QueryGenerator;
 import persistence.testFixtures.assosiate.Order;
 import util.DataBaseTestSetUp;
 
-public class OneToManyEntityMapperTest extends DataBaseTestSetUp {
+class OneToManyEntityPersiterTest extends DataBaseTestSetUp {
 
     @Test
-    @DisplayName("oneToMany 엔터티와 ResultSet을 맵핑한다.")
-    void resultSetToOneToManyEntity() {
+    @DisplayName("OneToMany 관계의 엔티티를 조회한다.")
+    void oneToMany() {
         //given
-        OneToManyEntityMapper entityMapper = new OneToManyEntityMapper(EntityMeta.from(Order.class));
+        EntityMeta entityMeta = EntityMeta.from(Order.class);
+        QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
+        OneToManyEntityPersister persister = OneToManyEntityPersister.create(jdbcTemplate, queryGenerator, entityMeta);
 
         //when
-        final Order order = jdbcTemplate.queryForObject(
-                QueryGenerator.of(Order.class, dialect).select().findByIdOneToManyQuery(1L),
-                (rs) -> entityMapper.findMapper(Order.class, rs));
+        final Order order = persister.find(Order.class, 1L);
 
         //then
         assertSoftly((it) -> {
             it.assertThat(order.getId()).isEqualTo(1L);
-            it.assertThat(order.getOrderNumber()).isEqualTo("order-number-1");
             it.assertThat(order.getOrderItems()).hasSize(2);
+            it.assertThat(order.getOrderNumber()).isEqualTo("order-number-1");
         });
     }
 
     @Test
-    @DisplayName("다건 엔티티를 맵핑한다.")
-    void resultSetToOneToManyEntityMany() {
+    @DisplayName("OneToMany 관계의 전체를 엔티티를 조회한다.")
+    void oneToManyFindAll() {
         //given
-        final OneToManyEntityMapper entityMapper = new OneToManyEntityMapper(EntityMeta.from(Order.class));
+        EntityMeta entityMeta = EntityMeta.from(Order.class);
         QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
-
+        OneToManyEntityPersister persister = OneToManyEntityPersister.create(jdbcTemplate, queryGenerator, entityMeta);
 
         //when
-        final List<Order> orders = jdbcTemplate.queryForAll(queryGenerator.select().findAllOneToManyQuery(),
-                (rs) -> entityMapper.findAllMapper(Order.class, rs));
+        final List<Order> orders = persister.findAll(Order.class);
 
         //then
         assertSoftly((it) -> {
@@ -53,3 +52,4 @@ public class OneToManyEntityMapperTest extends DataBaseTestSetUp {
         });
     }
 }
+

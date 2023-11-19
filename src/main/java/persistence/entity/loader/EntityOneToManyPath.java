@@ -13,7 +13,7 @@ public class EntityOneToManyPath {
 
     public EntityOneToManyPath(EntityMeta entityMeta, Object rootEntity) {
         path.put(START_PATH_LEVEL, List.of(rootEntity));
-        pathSearch(entityMeta, START_PATH_LEVEL );
+        pathSearch(entityMeta, START_PATH_LEVEL);
     }
 
     private void pathSearch(EntityMeta entityMeta, int level) {

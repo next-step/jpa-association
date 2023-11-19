@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import persistence.entity.persister.EntityPersister;
 import persistence.meta.EntityMeta;
 
 public class SimplePersistenceContext implements PersistenceContext {
@@ -78,7 +79,7 @@ public class SimplePersistenceContext implements PersistenceContext {
         }
     }
 
-    public <T> T loading(EntityLoader entityLoader, Class<T> clazz, Object id) {
+    public <T> T loading(EntityPersister entityPersister, Class<T> clazz, Object id) {
         EntityKey entityKey = EntityKey.of(clazz, id);
         EntityEntry entityEntry = entityEntryContext.getEntityEntry(entityKey);
 
@@ -86,7 +87,7 @@ public class SimplePersistenceContext implements PersistenceContext {
             return (T) getEntity(entityKey);
         }
 
-        final T loadingEntity = entityEntry.loading(entityLoader, clazz, id);
+        final T loadingEntity = entityEntry.loading(entityPersister, clazz, id);
 
         if (loadingEntity != null) {
             addEntity(entityKey, loadingEntity);
@@ -96,8 +97,8 @@ public class SimplePersistenceContext implements PersistenceContext {
         return loadingEntity;
     }
 
-    public <T> List<T> findAll(EntityLoader entityLoader, Class<T> tClass) {
-        final List<T> findList = entityLoader.findAll(tClass);
+    public <T> List<T> findAll(EntityPersister entityPersister, Class<T> tClass) {
+        final List<T> findList = entityPersister.findAll(tClass);
 
         findList.forEach((it) -> {
                 EntityEntry entityEntry = entityEntryContext.getEntityEntry(EntityKey.of(it));

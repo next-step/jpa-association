@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
+import persistence.entity.EntityKey;
 import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
@@ -41,8 +42,8 @@ class EntityPersisterTest {
     void entityAutoIncrementSave() {
         Person person = new Person("이름", 3, "dsa@gmil.com");
 
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
-                QueryGenerator.of(Person.class, dialect));
+        SimpleEntityPersister entityPersister = SimpleEntityPersister.create(jdbcTemplate,
+                QueryGenerator.of(Person.class, dialect), EntityMeta.from(Person.class));
 
         final Person result = entityPersister.insert(person);
 
@@ -58,9 +59,9 @@ class EntityPersisterTest {
         //given
         NoAutoIncrementPerson person = new NoAutoIncrementPerson(3L, "이름", 3, "dsa@gmil.com");
 
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate,
-                EntityMeta.from(NoAutoIncrementPerson.class),
-                QueryGenerator.of(Person.class, dialect));
+        SimpleEntityPersister entityPersister = SimpleEntityPersister.create(jdbcTemplate
+                , QueryGenerator.of(Person.class, dialect)
+                , EntityMeta.from(NoAutoIncrementPerson.class));
 
         //when
         final NoAutoIncrementPerson result = entityPersister.insert(person);
@@ -77,33 +78,23 @@ class EntityPersisterTest {
     void entityUpdate() {
         //given
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
-                QueryGenerator.of(Person.class, dialect));
+        SimpleEntityPersister entityPersister = SimpleEntityPersister.create(jdbcTemplate
+                , QueryGenerator.of(Person.class, dialect)
+                , EntityMeta.from(Person.class));
 
         //when & then
         assertThat(entityPersister.update(person)).isTrue();
     }
 
-    @Test
-    @DisplayName("엔티티가 삭제 된다.")
-    void entityDelete() {
-        //given
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
-                QueryGenerator.of(Person.class, dialect));
-        Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
-
-        //then
-        Assertions.assertDoesNotThrow(() -> {
-            entityPersister.delete(person);
-        });
-    }
 
     @Test
     @DisplayName("엔티티가 삭제 된다.")
     void entityDeleteByKey() {
         //given
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class),
-                QueryGenerator.of(Person.class, dialect));
+        SimpleEntityPersister entityPersister = SimpleEntityPersister.create(jdbcTemplate
+                , QueryGenerator.of(Person.class, dialect)
+                , EntityMeta.from(Person.class)
+        );
         Person person = new Person(1L, "이름", 3, "dsa@gmil.com");
 
         //then
@@ -111,15 +102,6 @@ class EntityPersisterTest {
             entityPersister.deleteByKey(EntityKey.of(person));
         });
     }
-
-
-    @Test
-    @DisplayName("저장이 된다")
-    void saving() {
-
-    }
-
-
 
 
     @AfterEach

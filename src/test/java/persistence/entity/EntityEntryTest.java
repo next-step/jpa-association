@@ -15,7 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
-import persistence.entity.loader.EntityLoaderFactory;
+import persistence.entity.persister.EntityPersister;
+import persistence.entity.persister.EntityPersisterFactory;
+import persistence.entity.persister.SimpleEntityPersister;
 import persistence.exception.ObjectNotFoundException;
 import persistence.fake.FakeDialect;
 import persistence.meta.EntityMeta;
@@ -28,6 +30,8 @@ class EntityEntryTest {
     private DatabaseServer server;
     private Dialect dialect;
 
+    private EntityPersisterFactory entityPersisterFactory;
+
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -36,6 +40,7 @@ class EntityEntryTest {
         dialect = new FakeDialect();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
+        entityPersisterFactory = new EntityPersisterFactory(jdbcTemplate);
     }
 
 
@@ -46,7 +51,7 @@ class EntityEntryTest {
         Person person = new Person(1L, "이름", 30, "email@odna");
         final EntityMeta entityMeta = EntityMeta.from(person.getClass());
         final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
-        final EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        final SimpleEntityPersister entityPersister = SimpleEntityPersister.create(jdbcTemplate, queryGenerator, entityMeta);
 
         //when
         EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
@@ -78,9 +83,7 @@ class EntityEntryTest {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
         EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
-        final EntityMeta entityMeta = EntityMeta.from(person.getClass());
-        final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
-        final EntityPersister entityPersister = new EntityPersister(jdbcTemplate, entityMeta, queryGenerator);
+        final EntityPersister entityPersister = entityPersisterFactory.create(person.getClass(), dialect);
 
         //when
         entityEntry.readOnly();
@@ -126,17 +129,14 @@ class EntityEntryTest {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
         EntityEntry entityEntry = EntityEntry.loadingOf(EntityKey.of(person));
-        final EntityMeta entityMeta = EntityMeta.from(person.getClass());
-        final QueryGenerator queryGenerator = QueryGenerator.of((entityMeta), new FakeDialect());
-        final EntityLoaderFactory entityLoaderFactory = new EntityLoaderFactory(jdbcTemplate);
-        EntityLoader entityLoader = entityLoaderFactory.create(entityMeta, queryGenerator);
+        final EntityPersister entityPersister = entityPersisterFactory.create(person.getClass(), dialect);
 
         //when
         entityEntry.gone();
 
         //then
         assertThatExceptionOfType(ObjectNotFoundException.class)
-                .isThrownBy(() -> entityEntry.loading(entityLoader, Person.class, 1L));
+                .isThrownBy(() -> entityEntry.loading(entityPersister, Person.class, 1L));
     }
 
     @Test
