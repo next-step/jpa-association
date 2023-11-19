@@ -74,3 +74,51 @@ select 이후에 eager이면 join fetch 진행 아니면 lazy
 - 테스트 멱등성을 위해 테스트마다 다른 pk 삽입
 - create table시에 있다면 생성하지 않는 방향으로 table 생성
 - 너무 작은 변경에도 쉽게 허물어지는데 mapping 로직 확인 필요하다.
+
+
+-----------------------------------------------------------------------------------------------------------------
+1,2 단계 리뷰사항
+
+1. CollectionRowMapper에서 elementEntity와 MetaEntity 추출 시에 T, V 를 사용할 필요없이 뽑아내도된다.
+2. JoinQueryBuilder에서 select 시에 table.field 로 깔끔하게 매개변수 받아서 넘길수있다.
+3. 사용 하지 않는 변수 제거
+4. nullObject returns null보다는 throw exception
+5. 이런... orElse, orElseGet 확인해서 제거하기
+   - else는 무조건 부르고 get은
+6. stream 사용내에 메서드 레퍼런스로 수정
+7. 내 스스로의 리뷰사항 -> 메서드 분리로 코드내에 굉장히 긴 METHOD들을 정리
+   - 맵핑로직, 쿼리빌더 로직 전반적 개선이 필요해보이긴하다.
+   - 새로 추가된 객체들 유닛 테스트 안되고있음
+
+3단계 구현사항
+1. Lazy로 변경
+2. 프록시 생성되는지 검증
+3. query 로드시에 나가는지 검증
+4. Entity 객체 검증하기
+
+
+-------------------------------------------------
+1. 리뷰 적용 우선
+
+2. order lazy 변경
+3. loader 에서 프록시 생성해서 넣어주기
+4. 테스트만 작성해주면 완성
+
+orderItems 에 ORDER 자체가 들어오는 구조다.
+ElementRowMapper는 OrderItems만 들고오면 되지 Order을 들고 올 필요가없다.
+
+elementRowMapper list 반환하고 -> Loader에서 묶어주자.
+
+
+
+1. 포맷터 적용 + 코드 리팩토링을 후순위
+2. 냄새가 나는 부분들을 추후에 잡아서 개선하자
+
+
+
+
+질문들
+----------
+1. 검증사항들은 어떻게 보강시킬수있을까요?
+   - lazy load 상태값 이전과 후 비교하거나 mockito로 해당 method invoke 됐는지 확인해야할까요?
+   - 테스트 하는데 조언이 필요합니다!!!
