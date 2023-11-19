@@ -18,10 +18,11 @@ public class JoinQueryBuilderTest {
     MetaEntity<OrderItem> metaOrderItem = MetaEntity.of(OrderItem.class);
 
     String joinQuery = new JoinQueryBuilder()
-        .select(metaOrder.getTableName(),metaOrderItem.getTableName(), metaOrder.getEntityColumnsWithId(), metaOrderItem.getEntityColumnsWithId())
+        .select(metaOrder.getEntityTableColumnsWithId(), metaOrderItem.getEntityTableColumnsWithId())
+        .from(metaOrder.getTableName())
         .join(List.of(metaOrderItem.getTableName()))
         .on(List.of("order_id"))
-        .where(metaOrder.getPrimaryKeyColumn().getDBColumnName(), List.of("1", "2"))
+        .where(metaOrder.getPrimaryKeyColumn().getDBColumnName(metaOrder.getTableName()), List.of("1", "2"))
         .build().createJoinQuery();
 
     assertThat(joinQuery).isEqualTo(

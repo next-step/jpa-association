@@ -12,6 +12,7 @@ import persistence.dialect.Dialect;
 public class MetaDataColumns {
 
   public static final String DELIMITER = ",";
+  public static final String PERIOD = ".";
   private final List<MetaDataColumn> columns = new ArrayList<>();
   private final MetaDataColumn primaryColumn;
   private final Relation relation;
@@ -71,13 +72,18 @@ public class MetaDataColumns {
         .collect(Collectors.toList());
   }
 
+  public List<String> getColumnsWithId(String metaTableName) {
+    return columns.stream()
+        .filter(column -> !column.hasRelation())
+        .map(column -> String.join(PERIOD, metaTableName, column.getDBColumnName()))
+        .collect(Collectors.toList());
+  }
   public List<String> getColumnsWithId() {
     return columns.stream()
         .filter(column -> !column.hasRelation())
-        .map(MetaDataColumn::getDBColumnName)
+        .map(column -> String.join(PERIOD, column.getDBColumnName()))
         .collect(Collectors.toList());
   }
-
   public boolean hasRelation(){
     return relation.isRelation();
   }

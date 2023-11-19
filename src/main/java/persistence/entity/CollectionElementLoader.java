@@ -9,6 +9,8 @@ import jdbc.CollectionRowMapper;
 import jdbc.JdbcRowMapper;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
 import persistence.meta.MetaDataColumn;
 import persistence.meta.MetaDataColumns;
 import persistence.meta.MetaEntity;
@@ -16,7 +18,8 @@ import persistence.meta.Relation;
 import persistence.sql.dml.builder.JoinQueryBuilder;
 import persistence.sql.dml.builder.SelectQueryBuilder;
 
-public class CollectionElementLoader<T> implements RelationLoader<T>{
+public class CollectionElementLoader<T> implements RelationLoader<T> {
+
   private final JdbcTemplate jdbcTemplate;
   private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder();
   private final MetaEntity<T> metaEntity;
@@ -35,14 +38,13 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
     this.relation = relation;
   }
 
-  public static CollectionElementLoader<?> of(Class<?> clazz, Connection connection){
+  public static CollectionElementLoader<?> of(Class<?> clazz, Connection connection) {
 
     MetaEntity<?> entity = MetaEntity.of(clazz);
     MetaDataColumns columns = entity.getMetaDataColumns();
     Relation relation = columns.getRelation();
 
     MetaEntity<?> elementEntity = relation.getMetaEntity();
-
 
     return new CollectionElementLoader<>(connection, entity, elementEntity, relation);
   }
@@ -58,18 +60,25 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
 
     T entity = jdbcTemplate.queryForObject(query, rowMapper);
 
-    if(relation.getFetchType() == FetchType.LAZY){
-      MetaDataColumn relationColumn = metaEntity.getMetaDataColumns().getColumnByFieldName(relation.getFieldName());
-//      relationColumn.setFieldValue(entity, elements); proxy 예정
-      return Optional.ofNullable(entity);
-    }
-
     String joinQuery = new JoinQueryBuilder()
-        .select(metaEntity.getTableName(),elementEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
+        .select(metaEntity.getEntityTableColumnsWithId(), elementEntity.getEntityTableColumnsWithId())
+        .from(metaEntity.getTableName())
         .join(List.of(elementEntity.getTableName()))
         .on(List.of(relation.getDbName()))
-        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(), List.of(String.valueOf(id)))
+        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(metaEntity.getTableName()), List.of(String.valueOf(id)))
         .build().createJoinQuery();
+
+    if (relation.getFetchType() == FetchType.LAZY) {
+      MetaDataColumn relationColumn = metaEntity.getMetaDataColumns()
+          .getColumnByFieldName(relation.getFieldName());
+
+      Enhancer enhancer = new Enhancer();
+      enhancer.setSuperclass(List.class); // 여기 relation 에서 타입 가져와야할듯.
+      enhancer.setCallback(new MethodLazyLoader(joinQuery, elementRowMapper));
+//      List<Object> objects = (List<>) enhancer.create(); // 이부분에 타입만 잘정의하면 lazy loader 잘들어갈듯
+//      relationColumn.setFieldValue(entity, objects);
+      return Optional.ofNullable(entity);
+    }
 
     return Optional.ofNullable(jdbcTemplate.queryForObject(joinQuery, elementRowMapper));
 
@@ -88,23 +97,43 @@ public class CollectionElementLoader<T> implements RelationLoader<T>{
 
     List<T> entities = jdbcTemplate.query(query, rowMapper);
 
-    if(relation.getFetchType() == FetchType.LAZY){
-      MetaDataColumn relationColumn = metaEntity.getMetaDataColumns().getColumnByFieldName(relation.getFieldName());
+    String joinQuery = new JoinQueryBuilder()
+        .select(metaEntity.getEntityTableColumnsWithId(), elementEntity.getEntityTableColumnsWithId())
+        .from(metaEntity.getTableName())
+        .join(List.of(elementEntity.getTableName()))
+        .on(List.of(relation.getDbName()))
+        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(metaEntity.getTableName()), idValues)
+        .build().createJoinQuery();
+
+    if (relation.getFetchType() == FetchType.LAZY) {
+
+      MetaDataColumn relationColumn = metaEntity.getMetaDataColumns()
+          .getColumnByFieldName(relation.getFieldName());
+
 //      relationColumn.setFieldValue(entity, elements); proxy 예정
       return entities;
     }
-
-    String joinQuery = new JoinQueryBuilder()
-        .select(metaEntity.getTableName(),elementEntity.getTableName(), metaEntity.getEntityColumnsWithId(), elementEntity.getEntityColumnsWithId())
-        .join(List.of(elementEntity.getTableName()))
-        .on(List.of(relation.getDbName()))
-        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(), idValues)
-        .build().createJoinQuery();
 
     List<T> entitiesWithCollection = jdbcTemplate.query(joinQuery, elementRowMapper);
 
     return entitiesWithCollection;
   }
 
+  public class MethodLazyLoader implements LazyLoader {
+
+    private final String joinQuery;
+    private final RowMapper<?> rowMapper;
+
+    public MethodLazyLoader(String joinQuery, RowMapper<?> rowMapper) {
+      this.joinQuery = joinQuery;
+      this.rowMapper = rowMapper;
+    }
+
+    @Override
+    public Object loadObject() throws Exception {
+      return jdbcTemplate.query(joinQuery, elementRowMapper);
+    }
+
+  }
 
 }

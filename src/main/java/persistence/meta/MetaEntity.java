@@ -115,7 +115,12 @@ public class MetaEntity<T> {
   public List<String> getEntityColumnsWithId() {
     return metaDataColumns.getColumnsWithId();
   }
-
+  public List<String> getEntityTableColumnsWithId() {
+    return metaDataColumns.getColumnsWithId(metaDataTable.getName());
+  }
+  public Class<T> getClazz() {
+    return clazz;
+  }
   public boolean hasRelation(){
     return metaDataColumns.hasRelation();
   }
