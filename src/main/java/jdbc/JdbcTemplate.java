@@ -59,4 +59,15 @@ public class JdbcTemplate {
             throw new RuntimeException(e);
         }
     }
+
+    public <T> List<T> queryForObject(final String sql, final CollectionRowMapper<T> rowMapper) {
+        try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            if (resultSet.next()) {
+                return rowMapper.mapRow(resultSet);
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("해당 객체는 존재 하지 않습니다.", e);
+        }
+    }
 }

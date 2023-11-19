@@ -82,7 +82,9 @@ public class MetaDataColumn {
   public String getDBColumnName() {
     return name;
   }
-
+  public String getDBColumnName(String tableName) {
+    return String.join(".", tableName, name);
+  }
   public boolean isNotPrimaryKey() {
     return constraints.stream().noneMatch(MetaDataColumnConstraint::isPrimaryKey);
   }

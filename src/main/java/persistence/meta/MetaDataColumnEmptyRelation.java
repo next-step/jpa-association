@@ -14,26 +14,26 @@ public class MetaDataColumnEmptyRelation implements Relation {
 
   @Override
   public String getDbName() {
-    return null;
+    throw new RuntimeException("relation이 존재하지 않는 Column 입니다.");
   }
 
   @Override
   public FetchType getFetchType() {
-    return null;
+    throw new RuntimeException("relation이 존재하지 않는 Column 입니다.");
   }
 
   @Override
   public MetaEntity<?> getMetaEntity() {
-    return null;
+    throw new RuntimeException("relation이 존재하지 않는 Column 입니다.");
   }
 
   @Override
   public Class<?> getRelation() {
-    return null;
+    throw new RuntimeException("relation이 존재하지 않는 Column 입니다.");
   }
 
   @Override
   public String getFieldName() {
-    return null;
+    throw new RuntimeException("relation이 존재하지 않는 Column 입니다.");
   }
 }

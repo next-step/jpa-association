@@ -20,7 +20,7 @@ public class Order {
 
   private String orderNumber;
 
-  @OneToMany(fetch = FetchType.EAGER)
+  @OneToMany(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   private List<OrderItem> orderItems;
 }

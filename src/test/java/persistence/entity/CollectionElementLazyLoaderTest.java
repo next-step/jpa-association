@@ -19,9 +19,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.meta.MetaEntity;
 
-class CollectionElementLoaderTest {
+
+public class CollectionElementLazyLoaderTest {
 
   public static DatabaseServer server;
   public static JdbcTemplate jdbcTemplate;
@@ -70,31 +70,43 @@ class CollectionElementLoaderTest {
 
   }
 
+
   @Test
   @DisplayName("Fetch Type이 EAGER인 엔티티를 LOAD할 때, element 엔티티들도 Load 됩니다.")
-  void entityLoadCollection() {
-    CollectionElementLoader<Order> Loader = (CollectionElementLoader<Order>) CollectionElementLoader.of(
-        Order.class, connection);
-    Order order = Loader.load(1L).get();
+  void entityLoadByIdsCollection() {
+    CollectionElementLoader<CollectionElementLazyLoaderTest.Order> Loader = (CollectionElementLoader<CollectionElementLazyLoaderTest.Order>) CollectionElementLoader.of(
+        CollectionElementLazyLoaderTest.Order.class, connection);
+    List<CollectionElementLazyLoaderTest.Order> orders = Loader.loadByIds(List.of(1L, 2L));
 
-    assertThat(order.orderItems).hasSize(2);
-    assertThat(order.orderItems.get(0).product).isEqualTo("첫번째 음식");
-    assertThat(order.orderItems.get(1).product).isEqualTo("두번째 음식");
+    assertThat(orders).hasSize(1);
+    assertThat(orders.get(0).orderItems.get(0).product).isEqualTo("첫번째 음식");
+    assertThat(orders.get(0).orderItems.get(1).product).isEqualTo("두번째 음식");
   }
 
+  @Test
+  @DisplayName("Fetch Type이 Lazy인 엔티티를 LOAD할 때, element 엔티티들은 proxy가 됩니다.")
+  void entityLoadByIdsLazyCollection() {
+    CollectionElementLoader<CollectionElementLazyLoaderTest.Order> Loader = (CollectionElementLoader<CollectionElementLazyLoaderTest.Order>) CollectionElementLoader.of(
+        CollectionElementLazyLoaderTest.Order.class, connection);
+    List<CollectionElementLazyLoaderTest.Order> orders = Loader.loadByIds(List.of(1L, 2L));
+
+    assertThat(orders).hasSize(1);
+    assertThat(orders.get(0).orderItems.get(0).product).isEqualTo("첫번째 음식");
+    assertThat(orders.get(0).orderItems.get(1).product).isEqualTo("두번째 음식");
+  }
 
   @Entity
   @Table(name = "orders")
   public static class Order {
 
     @Id
-    private Long id;
+    public Long id;
 
-    private Long number;
+    public Long number;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems;
+    public List<CollectionElementLazyLoaderTest.OrderItem> orderItems;
   }
 
   @Entity
@@ -102,13 +114,10 @@ class CollectionElementLoaderTest {
   public static class OrderItem {
 
     @Id
-    private Long id;
+    public Long id;
 
-    private String product;
+    public String product;
 
-    private Long number;
+    public Long number;
   }
-
 }
-
-

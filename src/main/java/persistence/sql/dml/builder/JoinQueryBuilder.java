@@ -20,22 +20,21 @@ public class JoinQueryBuilder {
   private String whereColumn;
   private List<String> whereValues;
 
-  public JoinQueryBuilder select(String tableName, String tablesToJoin, List<String> selectColumnsTable, List<String> selectColumnsTableToJoin){
+  public JoinQueryBuilder select(List<String> selectColumnsTable, List<String> selectColumnsTableToJoin){
 
-    String selectColumns = selectColumnsTable.stream()
-        .map(columnName -> String.join(PERIOD, tableName, columnName))
-        .collect(Collectors.joining(DELIMITER));
 
-    String selectColumnsJoin = selectColumnsTableToJoin.stream()
-        .map(columnName -> String.join(PERIOD, tablesToJoin, columnName))
-        .collect(Collectors.joining(DELIMITER));
+    String selectColumns = String.join(DELIMITER, selectColumnsTable);
 
-    this.tableName = tableName;
+    String selectColumnsJoin = String.join(DELIMITER, selectColumnsTableToJoin);
+
     selectClause = String.join(DELIMITER, selectColumns, selectColumnsJoin);
 
     return this;
   }
-
+  public JoinQueryBuilder from(String table){
+    tableName = table;
+    return this;
+  }
   public JoinQueryBuilder join(List<String> tablesToJoin){
     this.tablesToJoin = tablesToJoin;
 
@@ -58,7 +57,7 @@ public class JoinQueryBuilder {
   }
 
   public JoinQueryBuilder where(String targetName, List<String> targets){
-    this.whereColumn = String.join(PERIOD, List.of(tableName, targetName));
+    this.whereColumn = String.join(PERIOD, List.of(targetName));
     this.whereValues = targets;
 
     return this;
