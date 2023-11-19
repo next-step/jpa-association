@@ -1,44 +1,50 @@
 package persistence.entity.loader;
 
-import java.util.List;
-import jdbc.JdbcTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import persistence.entity.EntityLoader;
-import persistence.sql.QueryGenerator;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
+import persistence.entity.OneToManyAssociation;
+import persistence.entity.persister.OneToManyEntityPersister;
+import persistence.meta.EntityMeta;
 
-public class OneToManyLazyLoader implements EntityLoader {
-    private final Logger log = LoggerFactory.getLogger(OneToManyLazyLoader.class);
-    private final JdbcTemplate jdbcTemplate;
-    private final QueryGenerator queryGenerator;
-    private final OneToManyLazyMapper entityMapper;
+public class OneToManyLazyLoader extends AbstractEntityLoader {
+    private final EntityMeta entityMeta;
+    private final OneToManyEntityPersister persister;
 
-    public OneToManyLazyLoader(JdbcTemplate jdbcTemplate, QueryGenerator queryGenerator,
-                               OneToManyLazyMapper oneToManyLazyMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.queryGenerator = queryGenerator;
-        this.entityMapper = oneToManyLazyMapper;
+    public static OneToManyLazyLoader create(EntityMeta entityMeta, OneToManyEntityPersister persister) {
+        return new OneToManyLazyLoader(entityMeta, persister);
     }
 
-    public <T> T find(Class<T> tClass, Object id) {
-        final String query = queryGenerator
-                .select()
-                .findByIdQuery(id);
-
-        log.debug(query);
-
-        return jdbcTemplate.queryForObject(query,
-                (resultSet) -> entityMapper.findLazyMapper(tClass, resultSet));
+    private OneToManyLazyLoader(EntityMeta entityMeta, OneToManyEntityPersister persister) {
+        this.entityMeta = entityMeta;
+        this.persister = persister;
     }
 
-    public <T> List<T> findAll(Class<T> tClass) {
-        final String query = queryGenerator.select().findAllQuery();
+    @Override
+    public <T> T load(Class<T> tClass, ResultSet resultSet) {
+        final T instance = resultSetToEntity(tClass, resultSet);
 
-        log.debug(query);
+        final OneToManyAssociation oneToManyAssociation = entityMeta.getOneToManyAssociation();
+        final Field proxyField = oneToManyAssociation.getMappingField();
 
-        return jdbcTemplate.query(query,
-                (resultSet) -> entityMapper.findLazyMapper(tClass, resultSet));
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(proxyField.getType());
+
+        enhancer.setCallback((LazyLoader) () -> persister.findMany(instance, oneToManyAssociation));
+
+        return instanceProxyFieldMapping(instance, proxyField, enhancer);
     }
 
+    private <T> T instanceProxyFieldMapping(T instance, Field oneField, Enhancer e) {
+        try {
+            final Field declaredField = instance.getClass().getDeclaredField(oneField.getName());
+            declaredField.setAccessible(true);
+            declaredField.set(instance, e.create());
+            return instance;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
 }

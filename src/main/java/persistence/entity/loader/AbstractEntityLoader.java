@@ -9,20 +9,10 @@ import persistence.meta.ColumnType;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 
-public abstract class EntityMapper {
+public abstract class AbstractEntityLoader implements EntityLoader {
     protected static final int ROOT_LEVEL_NUMBER = 0;
 
-    protected final EntityMeta entityMeta;
-
-    public EntityMapper(EntityMeta entityMeta) {
-        this.entityMeta = entityMeta;
-    }
-
-    public <T> T findMapper(Class<T> tClass, ResultSet resultSet) {
-        return resultSetToEntity(tClass, resultSet);
-    }
-
-    protected <T> T resultSetToEntity(Class<T> tClass, ResultSet resultSet) {
+    public <T> T resultSetToEntity(Class<T> tClass, ResultSet resultSet) {
         return resultSetSingleToEntity(tClass, resultSet, ROOT_LEVEL_NUMBER);
     }
 

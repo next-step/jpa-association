@@ -24,4 +24,16 @@ public class LazyLoadOrder {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     public List<OrderItem> orderItems;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
 }

@@ -10,40 +10,38 @@ import persistence.sql.QueryGenerator;
 import persistence.testFixtures.assosiate.Order;
 import util.DataBaseTestSetUp;
 
-class OneToManyEntityLoaderTest extends DataBaseTestSetUp {
+public class OneToManyEntityLoaderTest extends DataBaseTestSetUp {
 
     @Test
-    @DisplayName("OneToMany 관계의 엔티티를 조회한다.")
-    void oneToMany() {
+    @DisplayName("oneToMany 엔터티를 로드한다.")
+    void load() {
         //given
-        EntityMeta entityMeta = EntityMeta.from(Order.class);
-        OneToManyEntityMapper entityMapper = new OneToManyEntityMapper(entityMeta);
-        QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
-        OneToManyEntityLoader entityLoader = new OneToManyEntityLoader(jdbcTemplate, queryGenerator, entityMapper);
+        OneToManyEntityLoader loader = OneToManyEntityLoader.create(EntityMeta.from(Order.class));
 
         //when
-        final Order order = entityLoader.find(Order.class, 1L);
+        final Order order = jdbcTemplate.queryForObject(
+                QueryGenerator.of(Order.class, dialect).select().findByIdOneToManyQuery(1L),
+                (rs) -> loader.load(Order.class, rs));
 
         //then
         assertSoftly((it) -> {
             it.assertThat(order.getId()).isEqualTo(1L);
-            it.assertThat(order.getOrderItems()).hasSize(2);
             it.assertThat(order.getOrderNumber()).isEqualTo("order-number-1");
+            it.assertThat(order.getOrderItems()).hasSize(2);
         });
-
     }
 
     @Test
-    @DisplayName("OneToMany 관계의 전체를 엔티티를 조회한다.")
-    void oneToManyFindALL() {
+    @DisplayName("다건 oneToMany 엔터티를 로드한다.")
+    void resultSetToOneToManyEntityMany() {
         //given
-        EntityMeta entityMeta = EntityMeta.from(Order.class);
-        OneToManyEntityMapper entityMapper = new OneToManyEntityMapper(entityMeta);
+        OneToManyEntityLoader loader = OneToManyEntityLoader.create(EntityMeta.from(Order.class));
         QueryGenerator queryGenerator = QueryGenerator.of(Order.class, dialect);
-        OneToManyEntityLoader entityLoader = new OneToManyEntityLoader(jdbcTemplate, queryGenerator, entityMapper);
+
 
         //when
-        final List<Order> orders = entityLoader.findAll(Order.class);
+        final List<Order> orders = jdbcTemplate.queryForAll(queryGenerator.select().findAllOneToManyQuery(),
+                (rs) -> loader.loadAll(Order.class, rs));
 
         //then
         assertSoftly((it) -> {
@@ -53,7 +51,5 @@ class OneToManyEntityLoaderTest extends DataBaseTestSetUp {
             it.assertThat(orders.get(0).getOrderItems()).hasSize(2);
             it.assertThat(orders.get(1).getOrderItems()).hasSize(2);
         });
-
     }
 }
-

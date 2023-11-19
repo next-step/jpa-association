@@ -5,7 +5,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.EntityLoader;
+import persistence.entity.persister.OneToManyEntityPersister;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.assosiate.LazyLoadOrder;
@@ -19,12 +19,18 @@ class OneToManyLazyLoaderTest extends DataBaseTestSetUp {
     void findLazy() {
         //given
         EntityMeta entityMeta = EntityMeta.from(LazyLoadOrder.class);
-
         QueryGenerator queryGenerator = QueryGenerator.of(LazyLoadOrder.class, dialect);
-        EntityLoader entityLoader = new EntityLoaderFactory(jdbcTemplate).create(entityMeta, queryGenerator);
+        OneToManyEntityPersister persister = OneToManyEntityPersister.create(jdbcTemplate, queryGenerator,
+                entityMeta);
+
+        OneToManyLazyLoader loader = OneToManyLazyLoader.create(EntityMeta.from(Order.class), persister);
+        final String query = queryGenerator.select()
+                .findByIdQuery(1L);
 
         //when
-        final Order order = entityLoader.find(Order.class, 1L);
+        final LazyLoadOrder order = jdbcTemplate.queryForObject(query,
+                (resultSet) -> loader.load(LazyLoadOrder.class, resultSet));
+
 
         //then
         assertSoftly((it) -> {
@@ -34,17 +40,25 @@ class OneToManyLazyLoaderTest extends DataBaseTestSetUp {
         });
     }
 
+
+
     @Test
     @DisplayName("One To Many 다건을 조회한다.")
     void resultSetToOneToManyEntity() {
         //given
         EntityMeta entityMeta = EntityMeta.from(LazyLoadOrder.class);
-
         QueryGenerator queryGenerator = QueryGenerator.of(LazyLoadOrder.class, dialect);
-        EntityLoader entityLoader = new EntityLoaderFactory(jdbcTemplate).create(entityMeta, queryGenerator);
+        OneToManyEntityPersister persister = OneToManyEntityPersister.create(jdbcTemplate, queryGenerator,
+                entityMeta);
+
+        OneToManyLazyLoader loader = OneToManyLazyLoader.create(EntityMeta.from(Order.class), persister);
+        final String query = queryGenerator.select().findAllQuery();
+
 
         //when
-        final List<Order> orders = entityLoader.findAll(Order.class);
+        final List<LazyLoadOrder> orders = jdbcTemplate.query(query,
+                (resultSet) -> loader.load(LazyLoadOrder.class, resultSet));
+
 
         //then
         assertSoftly((it) -> {
