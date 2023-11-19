@@ -39,10 +39,8 @@ public class CollectionElementLoader<T> implements RelationLoader<T> {
   }
 
   public static CollectionElementLoader<?> of(Class<?> clazz, Connection connection) {
-
     MetaEntity<?> entity = MetaEntity.of(clazz);
-    MetaDataColumns columns = entity.getMetaDataColumns();
-    Relation relation = columns.getRelation();
+    Relation relation = entity.getRelation();
 
     MetaEntity<?> elementEntity = relation.getMetaEntity();
 
@@ -51,22 +49,13 @@ public class CollectionElementLoader<T> implements RelationLoader<T> {
 
   @Override
   public Optional<T> load(Long id) {
-
-    MetaDataColumn keyColumn = metaEntity.getPrimaryKeyColumn();
-    String targetColumn = keyColumn.getDBColumnName();
+    String targetColumn = getPrimaryKeyDbColumn();
 
     String query = selectQueryBuilder.createSelectByFieldQuery(metaEntity.getColumnClauseWithId(),
         metaEntity.getTableName(), targetColumn, id);
+    String joinQuery = getJoinQuery(List.of(String.valueOf(id)));
 
     T entity = jdbcTemplate.queryForObject(query, rowMapper);
-
-    String joinQuery = new JoinQueryBuilder()
-        .select(metaEntity.getEntityTableColumnsWithId(), elementEntity.getEntityTableColumnsWithId())
-        .from(metaEntity.getTableName())
-        .join(List.of(elementEntity.getTableName()))
-        .on(List.of(relation.getDbName()))
-        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(metaEntity.getTableName()), List.of(String.valueOf(id)))
-        .build().createJoinQuery();
 
     if (relation.getFetchType() == FetchType.LAZY) {
       MetaDataColumn relationColumn = metaEntity.getMetaDataColumns()
@@ -84,26 +73,17 @@ public class CollectionElementLoader<T> implements RelationLoader<T> {
 
   }
 
+
   @Override
   public List<T> loadByIds(List<Long> ids) {
-
-    MetaDataColumn keyColumn = metaEntity.getPrimaryKeyColumn();
-    String targetColumn = keyColumn.getDBColumnName();
+    String targetColumn = getPrimaryKeyDbColumn();
 
     List<String> idValues = ids.stream().map(Object::toString).collect(Collectors.toList());
-
     String query = selectQueryBuilder.createSelectByFieldsQuery(metaEntity.getColumnClauseWithId(),
         metaEntity.getTableName(), targetColumn, idValues);
+    String joinQuery = getJoinQuery(idValues);
 
     List<T> entities = jdbcTemplate.query(query, rowMapper);
-
-    String joinQuery = new JoinQueryBuilder()
-        .select(metaEntity.getEntityTableColumnsWithId(), elementEntity.getEntityTableColumnsWithId())
-        .from(metaEntity.getTableName())
-        .join(List.of(elementEntity.getTableName()))
-        .on(List.of(relation.getDbName()))
-        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(metaEntity.getTableName()), idValues)
-        .build().createJoinQuery();
 
     if (relation.getFetchType() == FetchType.LAZY) {
 
@@ -117,6 +97,24 @@ public class CollectionElementLoader<T> implements RelationLoader<T> {
     List<T> entitiesWithCollection = jdbcTemplate.query(joinQuery, elementRowMapper);
 
     return entitiesWithCollection;
+  }
+
+  private String getPrimaryKeyDbColumn() {
+    MetaDataColumn keyColumn = metaEntity.getPrimaryKeyColumn();
+    String targetColumn = keyColumn.getDBColumnName();
+    return targetColumn;
+  }
+
+  private String getJoinQuery(List<String> id) {
+    String joinQuery = new JoinQueryBuilder()
+        .select(metaEntity.getEntityTableColumnsWithId(),
+            elementEntity.getEntityTableColumnsWithId())
+        .from(metaEntity.getTableName())
+        .join(List.of(elementEntity.getTableName()))
+        .on(List.of(relation.getDbName()))
+        .where(metaEntity.getPrimaryKeyColumn().getDBColumnName(metaEntity.getTableName()), id)
+        .build().createJoinQuery();
+    return joinQuery;
   }
 
   public class MethodLazyLoader implements LazyLoader {
