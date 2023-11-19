@@ -1,5 +1,6 @@
 package persistence.study.proxy;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -24,7 +25,9 @@ public class HelloTargetLazyLoaderTest {
 
         final HelloTarget helloTarget = new HelloTarget(lazyLoadedAddress);
 
+        assertThat(helloTarget.isLoaded()).isFalse();
         assertThat(helloTarget.getAddress().size()).isEqualTo(2);
+        assertThat(helloTarget.isLoaded()).isTrue();
     }
 
     /**
