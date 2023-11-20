@@ -1,24 +1,31 @@
-package persistence.entity;
+package persistence.entity.persister;
 
 import java.lang.reflect.Field;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.EntityKey;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 
+public abstract class AbstractEntityPersister implements EntityPersister {
+    private static final Logger log = LoggerFactory.getLogger(AbstractEntityPersister.class);
 
-public class EntityPersister {
-    private static final Logger log = LoggerFactory.getLogger(EntityPersister.class);
-    private final JdbcTemplate jdbcTemplate;
-    private final EntityMeta entityMeta;
-    private final QueryGenerator queryGenerator;
+    protected final JdbcTemplate jdbcTemplate;
+    protected final QueryGenerator queryGenerator;
+    protected final EntityMeta entityMeta;
 
-    public EntityPersister(JdbcTemplate jdbcTemplate, EntityMeta entityMeta, QueryGenerator queryGenerator) {
+    public AbstractEntityPersister(JdbcTemplate jdbcTemplate
+            , QueryGenerator queryGenerator
+            , EntityMeta entityMeta
+
+    ) {
+
         this.jdbcTemplate = jdbcTemplate;
-        this.entityMeta = entityMeta;
         this.queryGenerator = queryGenerator;
+        this.entityMeta = entityMeta;
+
     }
 
     public <T> T insert(T entity) {
@@ -30,27 +37,8 @@ public class EntityPersister {
             final long id = jdbcTemplate.insertForGenerateKey(query);
             changeValue(entityMeta.getPkColumn(), entity, id);
         }
+
         return entityMeta.createCopyEntity(entity);
-    }
-
-    public boolean update(Object entity) {
-        final String query = queryGenerator.update().build(entity);
-
-        log.info(query);
-        jdbcTemplate.execute(query);
-        return true;
-    }
-
-    public void delete(Object entity) {
-        final EntityMeta entityMeta = EntityMeta.from(entity.getClass());
-
-        final String query = queryGenerator
-                .delete()
-                .build(entityMeta.getPkValue(entity));
-
-        log.info(query);
-
-        jdbcTemplate.execute(query);
     }
 
     private void changeValue(EntityColumn column, Object entity, Object value) {
@@ -63,6 +51,14 @@ public class EntityPersister {
         }
     }
 
+    public boolean update(Object entity) {
+        final String query = queryGenerator.update().build(entity);
+
+        log.info(query);
+        jdbcTemplate.execute(query);
+        return true;
+    }
+
     public void deleteByKey(EntityKey entityKey) {
         final String query = queryGenerator
                 .delete()
@@ -72,6 +68,4 @@ public class EntityPersister {
 
         jdbcTemplate.execute(query);
     }
-
-
 }

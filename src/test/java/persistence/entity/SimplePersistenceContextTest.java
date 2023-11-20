@@ -13,8 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.dialect.Dialect;
+import persistence.entity.persister.EntityPersister;
+import persistence.entity.persister.EntityPersisterFactory;
 import persistence.fake.FakeDialect;
-import persistence.meta.EntityMeta;
 import persistence.sql.QueryGenerator;
 import persistence.testFixtures.Person;
 
@@ -23,6 +24,7 @@ class SimplePersistenceContextTest {
     private JdbcTemplate jdbcTemplate;
     private DatabaseServer server;
     private Dialect dialect;
+    private EntityPersisterFactory entityPersisterFactory;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -31,13 +33,14 @@ class SimplePersistenceContextTest {
         dialect = new FakeDialect();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).create());
+        entityPersisterFactory = new EntityPersisterFactory(jdbcTemplate);
     }
 
     @Test
     @DisplayName("영속성 컨텍스트에 의해 저장 및 조회가 된다.")
     void getEntity() {
         //given
-        Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
+        Person person = new Person(1L, "이름", 19, "asd@gmail.com");
         PersistenceContext context = new SimplePersistenceContext();
         final EntityKey entityKey = EntityKey.of(person);
 
@@ -55,7 +58,7 @@ class SimplePersistenceContextTest {
     @DisplayName("영속성 컨텍스트에서 삭제가 된다.")
     void removeEntity() {
         //given
-        Person person = new Person(1L ,"이름", 19, "asd@gmail.com");
+        Person person = new Person(1L, "이름", 19, "asd@gmail.com");
         PersistenceContext context = new SimplePersistenceContext();
         final EntityKey entityKey = EntityKey.of(person);
 
@@ -74,7 +77,6 @@ class SimplePersistenceContextTest {
         Person person = new Person(1L, "이름", 19, "sad@gmail.com");
         PersistenceContext context = new SimplePersistenceContext();
         final EntityKey entityKey = EntityKey.of(person);
-
 
         //when
         context.addEntity(entityKey, person);
@@ -101,7 +103,6 @@ class SimplePersistenceContextTest {
         final EntityKey entityKey = EntityKey.of(person);
         final EntityKey entityKey2 = EntityKey.of(person2);
 
-
         //when
         context.addEntity(entityKey, person);
         context.addEntity(entityKey2, person2);
@@ -121,11 +122,10 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
         SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class), QueryGenerator.of(Person.class, dialect));
+        EntityPersister entityPersister = entityPersisterFactory.create(Person.class, dialect);
 
         //when
         simplePersistenceContext.saving(entityPersister, person);
-
 
         //then
         assertThat(simplePersistenceContext.getEntity(EntityKey.of(person))).isEqualTo(person);
@@ -137,7 +137,7 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
         SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class), QueryGenerator.of(Person.class, dialect));
+        EntityPersister entityPersister = entityPersisterFactory.create(Person.class, dialect);
 
         //when
         simplePersistenceContext.saving(entityPersister, person);
@@ -153,15 +153,10 @@ class SimplePersistenceContextTest {
         //given
         Person person = new Person(1L, "이름", 30, "email@odna");
         SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
-        EntityLoader entityLoader =
-                new EntityLoader(jdbcTemplate,QueryGenerator.of(Person.class, dialect),  new EntityMapper(EntityMeta.from(person.getClass()))
-                );
-
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class), QueryGenerator.of(Person.class, dialect));
-
+        EntityPersister entityPersister = entityPersisterFactory.create(Person.class, dialect);
         //when
         simplePersistenceContext.saving(entityPersister, person);
-        final Person loading = simplePersistenceContext.loading(entityLoader, Person.class, 1L);
+        final Person loading = simplePersistenceContext.loading(entityPersister, Person.class, 1L);
 
         //then
         assertThat(loading).isEqualTo(person);
@@ -174,20 +169,17 @@ class SimplePersistenceContextTest {
         Person person = new Person(1L, "이름", 30, "email@odna");
         Person person2 = new Person(2L, "이름", 30, "email@odna");
         SimplePersistenceContext simplePersistenceContext = new SimplePersistenceContext();
-        EntityLoader entityLoader =
-                new EntityLoader(jdbcTemplate,QueryGenerator.of(Person.class, dialect),  new EntityMapper(EntityMeta.from(person.getClass()))
-                );
-
-        EntityPersister entityPersister = new EntityPersister(jdbcTemplate, EntityMeta.from(Person.class), QueryGenerator.of(Person.class, dialect));
+        EntityPersister entityPersister = entityPersisterFactory.create(Person.class, dialect);
 
         //when
         simplePersistenceContext.saving(entityPersister, person);
         simplePersistenceContext.saving(entityPersister, person2);
-        final List<Person> loading = simplePersistenceContext.findAll(entityLoader, Person.class);
+        final List<Person> loading = simplePersistenceContext.findAll(entityPersister, Person.class);
 
         //then
         assertThat(loading).contains(person, person2);
     }
+
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(QueryGenerator.of(Person.class, dialect).drop());

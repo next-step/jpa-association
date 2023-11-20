@@ -12,13 +12,7 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
     }
 
     public String findAllQuery() {
-        if (entityMeta.hasOneToManyAssociation()) {
-            return selectQuery(getColumnsString(entityMeta))
-                    + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()))
-                    + new OneToManyJoinQueryBuilder(entityMeta).build();
-        }
-
-        return selectQuery(getColumnsString(entityMeta))
+        return selectQuery(selectColumn(entityMeta).collect(Collectors.joining(", ")))
                 + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()));
     }
 
@@ -27,9 +21,44 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
             throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
         }
 
-        return findAllQuery()
+        return selectQuery(selectColumn(entityMeta).collect(Collectors.joining(", ")))
+                + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()))
                 + whereId(tableNameSignature(entityMeta.getTableName()), getPkColumn(), id);
     }
+
+
+    public String findByForeignerId(Object id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
+        }
+        final EntityMeta manyEntityMeta = entityMeta
+                .getOneToManyAssociation()
+                .getManyEntityMeta();
+
+
+        return selectQuery(getColumnsString(manyEntityMeta))
+                + getFromTableQuery(manyEntityMeta.getTableName(), tableNameSignature(manyEntityMeta.getTableName()))
+                + whereId(tableNameSignature(manyEntityMeta.getTableName()), manyEntityMeta.getForeignerColumn(), id);
+    }
+
+    public String findAllOneToManyQuery() {
+        return selectQuery(getColumnsString(entityMeta))
+                + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()))
+                + new OneToManyJoinQueryBuilder(entityMeta).build();
+
+    }
+
+    public String findByIdOneToManyQuery(Object id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id가 비어 있으면 안 됩니다.");
+        }
+
+        return selectQuery(getColumnsString(entityMeta))
+                + getFromTableQuery(entityMeta.getTableName(), tableNameSignature(entityMeta.getTableName()))
+                + new OneToManyJoinQueryBuilder(entityMeta).build()
+                + whereId(tableNameSignature(entityMeta.getTableName()), getPkColumn(), id);
+    }
+
 
     private String selectQuery(String fileNames) {
         return dialect.select(fileNames);
@@ -39,6 +68,10 @@ public class SelectQueryBuilder extends DMLQueryBuilder {
         return getColumnsStream(entityMeta, 0)
                 .collect(Collectors.joining(", "));
 
+    }
+
+    private Stream<String> selectColumn(EntityMeta entityMeta) {
+        return convertColumnsSegnetureStream(entityMeta, 0);
     }
 
     private Stream<String> convertColumnsSegnetureStream(EntityMeta entityMeta, int depth) {

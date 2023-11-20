@@ -2,23 +2,20 @@ package persistence.entity;
 
 
 import java.util.List;
+import persistence.entity.persister.EntityPersister;
 
 
 public class SimpleEntityManager implements EntityManager {
-    private final EntityLoaderContext entityLoaderContext;
     private final EntityPersisteContext entityPersisterContenxt;
     private final SimplePersistenceContext persistenceContext;
 
-    private SimpleEntityManager(EntityPersisteContext entityPersisterContenxt,
-                                EntityLoaderContext entityLoaderContext) {
+    private SimpleEntityManager(EntityPersisteContext entityPersisterContenxt) {
         this.persistenceContext = new SimplePersistenceContext();
         this.entityPersisterContenxt = entityPersisterContenxt;
-        this.entityLoaderContext = entityLoaderContext;
     }
 
-    public static SimpleEntityManager of(EntityPersisteContext entityPersisterContenxt,
-                                         EntityLoaderContext entityLoaderContext) {
-        return new SimpleEntityManager(entityPersisterContenxt, entityLoaderContext);
+    public static SimpleEntityManager create(EntityPersisteContext entityPersisterContenxt) {
+        return new SimpleEntityManager(entityPersisterContenxt);
     }
 
     @Override
@@ -35,18 +32,17 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T, ID> T find(Class<T> clazz, ID id) {
-        EntityLoader entityLoader = entityLoaderContext.getEntityLoader(clazz);
+        EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(clazz);
 
-        return persistenceContext.loading(entityLoader, clazz, id);
+        return persistenceContext.loading(entityPersister, clazz, id);
     }
 
     @Override
     public <T> List<T> findAll(Class<T> tClass) {
-        EntityLoader entityLoader = entityLoaderContext.getEntityLoader(tClass);
+        EntityPersister entityPersister = entityPersisterContenxt.getEntityPersister(tClass);
 
-        return persistenceContext.findAll(entityLoader, tClass);
+        return persistenceContext.findAll(entityPersister, tClass);
     }
-
 
     @Override
     public void flush() {

@@ -2,7 +2,7 @@ package persistence.sql.dml;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import persistence.association.OneToManyAssociation;
+import persistence.entity.OneToManyAssociation;
 import persistence.meta.EntityColumn;
 import persistence.meta.EntityMeta;
 import persistence.sql.QueryBuilder;
@@ -25,7 +25,7 @@ public class OneToManyJoinQueryBuilder extends QueryBuilder {
             return "";
         }
         final OneToManyAssociation oneToManyAssociate = entityMeta.getOneToManyAssociation();
-        final EntityColumn joinPkColumn = oneToManyAssociate.getPkManyColumn();
+        final EntityColumn joinPkColumn = oneToManyAssociate.getManyPkColumn();
 
         final String drivenTableSignature = tableNameSignature(entityMeta.getTableName(), depth);
         final String joinTableSignature = tableNameSignature(oneToManyAssociate.getManyEntityMeta().getTableName(), depth + 1);

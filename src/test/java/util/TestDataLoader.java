@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import jdbc.JdbcTemplate;
 
-public class InitTestDataLoader {
+public class TestDataLoader {
     private final JdbcTemplate jdbcTemplate;
 
-    public InitTestDataLoader(JdbcTemplate jdbcTemplate) {
+    public TestDataLoader(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
