@@ -46,9 +46,13 @@ public class EntityLoader<T> {
 
         String selectQuery = query.select(entityMeta, input);
 
-        if(joinColumn != null && joinColumn.isEager()) {
-            return jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(clazz));
-        }
+        return jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(clazz));
+    }
+
+    public <I> T findByIdLazy(I input) {
+        EntityMeta entityMeta = new EntityMeta("findById", tableName, columns, joinColumn);
+
+        String selectQuery = query.select(entityMeta, input);
 
         return jdbcTemplate.queryForObject(selectQuery, new LazyResultMapper<>(clazz));
     }

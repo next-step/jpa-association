@@ -4,6 +4,7 @@ import jakarta.persistence.Transient;
 import java.util.Arrays;
 import java.util.List;
 import jdbc.JdbcTemplate;
+import jdbc.ResultMapper;
 import persistence.sql.common.instance.Values;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -17,6 +18,7 @@ public class EntityPersister<T> {
     private final JdbcTemplate jdbcTemplate;
     private final TableName tableName;
     private final Columns columns;
+    private final JoinColumn joinColumn;
 
     public EntityPersister(JdbcTemplate jdbcTemplate, Class<T> tClass, Query query) {
         this.jdbcTemplate = jdbcTemplate;
@@ -24,6 +26,7 @@ public class EntityPersister<T> {
         this.tableName = TableName.of(tClass);
         this.columns = Columns.of(tClass.getDeclaredFields());
         this.query = query;
+        this.joinColumn = JoinColumn.of(tClass.getDeclaredFields());
 
         this.entityLoader = new EntityLoader<>(jdbcTemplate, tClass, query);
     }
@@ -33,7 +36,11 @@ public class EntityPersister<T> {
     }
 
     public <I> T findById(I input) {
-        return entityLoader.findById(input);
+        if(joinColumn != null && joinColumn.isEager()) {
+            return entityLoader.findById(input);
+        }
+
+        return entityLoader.findByIdLazy(input);
     }
 
     public <I> List<T> findByJoin(I input, JoinColumn joinColumn) {

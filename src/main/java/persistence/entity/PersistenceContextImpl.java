@@ -101,7 +101,7 @@ public class PersistenceContextImpl implements PersistenceContext {
                 return;
             }
 
-            entityPersister.update(object, map.get(entityContext.getEntity(hashcode)).getId());
+            entityPersister.update(object, map.get(hashcode).getId());
             entityEntry.managed(hashcode);
         });
 
