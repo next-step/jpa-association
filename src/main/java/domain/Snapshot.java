@@ -11,8 +11,8 @@ public class Snapshot {
     }
 
     public Snapshot(Snapshot snapshot) {
-        this.id = snapshot.getId();
-        this.object = snapshot.getObject();
+        this.id = snapshot.id;
+        this.object = snapshot.object;
     }
 
     public Object getId() {
