@@ -2,8 +2,6 @@ package persistence.sql.dml;
 
 import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
-import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.TableName;
 
 public final class Query {
 

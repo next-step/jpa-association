@@ -4,6 +4,7 @@ import java.util.List;
 import jdbc.JdbcTemplate;
 import jdbc.LazyResultMapper;
 import jdbc.ResultMapper;
+import jdbc.RowMapper;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
 import persistence.sql.common.meta.TableName;
@@ -14,7 +15,6 @@ public class EntityLoader<T> {
     private final Class<T> clazz;
     private final Query query;
     private final JdbcTemplate jdbcTemplate;
-    private final ResultMapper<T> resultMapper;
     private final TableName tableName;
     private final Columns columns;
     private final JoinColumn joinColumn;
@@ -25,7 +25,6 @@ public class EntityLoader<T> {
         this.clazz = tClass;
 
         this.jdbcTemplate = jdbcTemplate;
-        this.resultMapper = new ResultMapper<>(tClass);
 
         this.tableName = TableName.of(tClass);
         this.columns = Columns.of(tClass.getDeclaredFields());
@@ -38,7 +37,7 @@ public class EntityLoader<T> {
 
         String q = query.selectAll(entityMeta);
 
-        return jdbcTemplate.query(q, resultMapper);
+        return jdbcTemplate.query(q, new ResultMapper<>(clazz));
     }
 
     public <I> T findById(I input) {
@@ -48,7 +47,7 @@ public class EntityLoader<T> {
         String selectQuery = query.select(entityMeta, input);
 
         if(joinColumn != null && joinColumn.isEager()) {
-            return jdbcTemplate.queryForObject(selectQuery, resultMapper);
+            return jdbcTemplate.queryForObject(selectQuery, new ResultMapper<>(clazz));
         }
 
         return jdbcTemplate.queryForObject(selectQuery, new LazyResultMapper<>(clazz));
@@ -60,7 +59,7 @@ public class EntityLoader<T> {
 
         String selectQuery = query.selectJoin(entityMeta, input);
 
-        return jdbcTemplate.query(selectQuery, resultMapper);
+        return jdbcTemplate.query(selectQuery, new ResultMapper<>(clazz));
     }
 
     public <I> int getHashCode(I input) {

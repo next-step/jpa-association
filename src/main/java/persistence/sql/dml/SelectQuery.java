@@ -33,17 +33,6 @@ class SelectQuery {
         return combine();
     }
 
-    String get(Class<?> clazz, EntityMeta entityMeta, Object arg) {
-        this.clazz = clazz;
-        this.methodName = entityMeta.getMethodName();
-        this.tableName = entityMeta.getTableName();
-        this.columns = entityMeta.getColumns();
-        this.joinColumn = entityMeta.getJoinColumn();
-        this.arg = arg;
-
-        return combine();
-    }
-
     String get(EntityMeta entityMeta, Object arg) {
         this.methodName = entityMeta.getMethodName();
         this.tableName = entityMeta.getTableName();
