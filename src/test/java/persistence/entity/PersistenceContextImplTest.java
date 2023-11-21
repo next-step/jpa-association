@@ -1,6 +1,8 @@
 package persistence.entity;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.*;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static persistence.sql.common.meta.MetaUtils.Columns을_생성함;
 import static persistence.sql.common.meta.MetaUtils.TableName을_생성함;
@@ -12,6 +14,8 @@ import domain.SelectPerson;
 import java.sql.SQLException;
 import java.util.Map;
 import jdbc.JdbcTemplate;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -203,6 +207,70 @@ class PersistenceContextImplTest {
 
             //then
             assertThat(persistenceContext.getEntity(hashCode, persister, id)).isNull();
+        }
+
+        @Test
+        @DisplayName("성공적으로 flush로 엔티티 삭제")
+        void successFlush() throws SQLException {
+            //given
+            final Long id = 3333L;
+            final String name = "name";
+            final Integer age = 30;
+            final String email = "email";
+            final int index = 3;
+
+            final Integer hashCode = id.hashCode();
+
+            SelectPerson person = new SelectPerson(id, name, age, email, index);
+            영속성_컨텍스트에서_데이터를_저장한다(hashCode, id, person);
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
+
+            persistenceContext.getEntity(hashCode, persister, id);
+            persistenceContext.removeEntity(hashCode);
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
+
+            //when
+            SelectPerson result = persistenceContext.getEntity(hashCode, persister, id);
+
+            //then
+            assertThat(result).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("영속성 컨텍스트에서 데이터를 업데이트합니다.")
+    class update {
+        @Test
+        @DisplayName("성공적으로 flush로 엔티티 수정 완료")
+        void success() throws SQLException {
+            //given
+            final Long id = 3333L;
+            final String name = "name";
+            final Integer age = 30;
+            final String email = "email";
+            final int index = 3;
+
+            final Integer hashCode = id.hashCode();
+
+            SelectPerson person = new SelectPerson(id, name, age, email, index);
+            영속성_컨텍스트에서_데이터를_저장한다(hashCode, id, person);
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
+
+            SelectPerson changePerson = persistenceContext.getEntity(hashCode, persister, id);
+            changePerson.changeName("zz");
+            persistenceContext.flush(Map.of("domain.SelectPerson", persister));
+
+            //when
+            SelectPerson result = persistenceContext.getEntity(hashCode, persister, id);
+
+            //then
+            assertSoftly(softAssertions -> {
+                softAssertions.assertThat(result.getId()).isEqualTo(id);
+                softAssertions.assertThat(result.getName()).isNotEqualTo(name);
+                softAssertions.assertThat(result.getAge()).isEqualTo(age);
+                softAssertions.assertThat(result.getEmail()).isEqualTo(email);
+                softAssertions.assertThat(result.getIndex()).isNull();
+            });
         }
     }
 

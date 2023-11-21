@@ -11,25 +11,27 @@ import jakarta.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name = "orders")
-public class Order {
+@Table(name = "orders_lazy")
+public class OrderLazy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String orderNumber;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems;
+    private List<OrderLazyItem> orderItems;
 
-    public Order(Long id, String orderNumber, List<OrderItem> orderItems) {
+    public OrderLazy(Long id, String orderNumber, List<OrderLazyItem> orderItems) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.orderItems = orderItems;
     }
 
-    public Order() { }
+    public OrderLazy() {
+
+    }
 
     public Long getId() {
         return id;
@@ -39,7 +41,16 @@ public class Order {
         return orderNumber;
     }
 
-    public List<OrderItem> getOrderItems() {
+    public List<OrderLazyItem> getOrderItems() {
         return orderItems;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderLazy{" +
+            "id=" + id +
+            ", orderNumber='" + orderNumber + '\'' +
+            ", orderItems=" + orderItems +
+            '}';
     }
 }

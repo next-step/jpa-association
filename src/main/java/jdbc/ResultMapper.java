@@ -49,7 +49,6 @@ public class ResultMapper<T> implements RowMapper<T> {
                 List<Object> list = new ArrayList<>();
 
                 while (!resultSet.isAfterLast()) {
-
                     Object o = aClazz.newInstance();
 
                     extracted(resultSet, aClazz, o);

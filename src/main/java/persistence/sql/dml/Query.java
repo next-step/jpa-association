@@ -2,8 +2,6 @@ package persistence.sql.dml;
 
 import persistence.entity.EntityMeta;
 import persistence.sql.common.instance.Values;
-import persistence.sql.common.meta.Columns;
-import persistence.sql.common.meta.TableName;
 
 public final class Query {
 
@@ -29,12 +27,12 @@ public final class Query {
         return INSTANCE.selectQuery.get(entityMeta, arg);
     }
 
-    public String selectAll(EntityMeta entityMeta) {
-        return INSTANCE.selectQuery.getAll(entityMeta);
+    public String selectJoin(EntityMeta entityMeta, Object arg) {
+        return INSTANCE.selectQuery.getJoin(entityMeta, arg);
     }
 
-    public String selectAll(String methodName, TableName tableName, Columns columns) {
-        return INSTANCE.selectQuery.getAll(methodName, tableName, columns);
+    public String selectAll(EntityMeta entityMeta) {
+        return INSTANCE.selectQuery.getAll(entityMeta);
     }
 
     public String insert(EntityMeta entityMeta, Values values) {

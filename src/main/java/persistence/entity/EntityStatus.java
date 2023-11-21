@@ -8,10 +8,6 @@ public enum EntityStatus {
     LOADING,
     SAVING;
 
-    public boolean isGone() {
-        return this.equals(GONE);
-    }
-
     public boolean isManaged() {
         return this.equals(MANAGED);
     }

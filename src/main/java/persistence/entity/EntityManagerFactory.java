@@ -19,13 +19,21 @@ import persistence.sql.dml.Query;
 
 public class EntityManagerFactory {
 
+    private static EntityManager INSTANCE;
+
     private static final String ROOT_PACKAGE_NAME = "domain";
+
+    public EntityManagerFactory(JdbcTemplate jdbcTemplate, List<Class<?>> classList) {
+        INSTANCE = new EntityManagerImpl(persisterInit(jdbcTemplate, classList));
+    }
 
     public static EntityManager of(Connection connection) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         List<Class<?>> classList = EntityManagerFactory.getClasses();
 
-        return new EntityManagerImpl(persisterInit(jdbcTemplate, classList));
+        new EntityManagerFactory(jdbcTemplate, classList);
+
+        return INSTANCE;
     }
 
     private static Map<String, EntityPersister<?>> persisterInit(JdbcTemplate jdbcTemplate, List<Class<?>> list) {
@@ -91,5 +99,9 @@ public class EntityManagerFactory {
         if (clazz.isAnnotationPresent(Entity.class)) {
             classes.add(clazz);
         }
+    }
+
+    public static EntityManager get() {
+        return INSTANCE;
     }
 }

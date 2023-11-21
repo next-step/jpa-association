@@ -7,8 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "order_items")
-public class OrderItem {
+@Table(name = "order_lazy_items")
+public class OrderLazyItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,13 +17,13 @@ public class OrderItem {
 
     private Integer quantity;
 
-    public OrderItem(Long id, String product, Integer quantity) {
+    public OrderLazyItem(Long id, String product, Integer quantity) {
         this.id = id;
         this.product = product;
         this.quantity = quantity;
     }
 
-    public OrderItem() { }
+    public OrderLazyItem() { }
 
     public Long getId() {
         return id;
@@ -35,5 +35,14 @@ public class OrderItem {
 
     public Integer getQuantity() {
         return quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderLazyItem{" +
+            "id=" + id +
+            ", product='" + product + '\'' +
+            ", quantity=" + quantity +
+            '}';
     }
 }

@@ -1,6 +1,9 @@
 package persistence.sql.dml;
 
 import java.util.List;
+
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
 import persistence.entity.EntityMeta;
 import persistence.sql.common.meta.Columns;
 import persistence.sql.common.meta.JoinColumn;
@@ -11,6 +14,8 @@ class SelectQuery {
 
     private static final String DEFAULT_SELECT_COLUMN_QUERY = "SELECT %s FROM %s";
     private static final String DEFAULT_JOIN_QUERY = "JOIN %s ON %s = %s";
+
+    private Class<?> clazz;
 
     private String methodName;
     private TableName tableName;
@@ -28,14 +33,6 @@ class SelectQuery {
         return combine();
     }
 
-    String getAll(String methodName, TableName tableName, Columns columns) {
-        this.methodName = methodName;
-        this.tableName = tableName;
-        this.columns = columns;
-
-        return combine();
-    }
-
     String get(EntityMeta entityMeta, Object arg) {
         this.methodName = entityMeta.getMethodName();
         this.tableName = entityMeta.getTableName();
@@ -44,6 +41,16 @@ class SelectQuery {
         this.arg = arg;
 
         return combine();
+    }
+
+    String getJoin(EntityMeta entityMeta, Object arg) {
+        this.methodName = entityMeta.getMethodName();
+        this.tableName = entityMeta.getTableName();
+        this.columns = entityMeta.getColumns();
+        this.joinColumn = entityMeta.getJoinColumn();
+        this.arg = arg;
+
+        return String.join(" ", String.format(DEFAULT_SELECT_COLUMN_QUERY, joinColumn.getColumns().getColumnsWithComma(), joinColumn.getTableName()), parseJoinColumn());
     }
 
     public String combine() {
@@ -68,13 +75,17 @@ class SelectQuery {
         return String.format(DEFAULT_JOIN_QUERY, joinColumn.getTableName() + " " + joinColumn.getTableAlias(), tableName.getAlias() + "." + columns.getIdName(), joinColumn.getTableAlias() + "." + joinColumn.getJoinColumn());
     }
 
+    private String parseJoinColumn() {
+        return ConditionBuilder.getCondition(joinColumn.getJoinColumn(), arg, null);
+    }
+
     private String parseSelectFiled() {
         if(joinColumn == null) {
             return columns.getColumnsWithComma(tableName.getAlias());
         }
 
         if(!joinColumn.isEager()) {
-            //TODO: LAZY 작성 필요
+            return String.join(", ", columns.getColumnsWithComma(tableName.getAlias()));
         }
         
         return String.join(", ", columns.getColumnsWithComma(tableName.getAlias()), joinColumn.getColumns().getColumnsWithComma(joinColumn.getTableAlias()));
@@ -94,7 +105,7 @@ class SelectQuery {
     }
 
     private boolean isJoin() {
-        return joinColumn != null;
+        return joinColumn != null && joinColumn.isEager();
     }
 
     private String setConditionField(String word) {

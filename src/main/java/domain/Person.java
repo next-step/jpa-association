@@ -38,8 +38,4 @@ public class Person {
     public Person() {
 
     }
-
-    public void changeName(String name) {
-        this.name = name;
-    }
 }
