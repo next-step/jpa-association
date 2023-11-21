@@ -7,6 +7,8 @@ public class HelloTarget {
 
     private List<Address> address = new ArrayList<>();
 
+    private boolean isLoaded = false;
+
     public HelloTarget() {
     }
 
@@ -26,7 +28,12 @@ public class HelloTarget {
         return "Thank You " + name;
     }
 
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
     public List<Address> getAddress() {
+        isLoaded = true;
         return address;
     }
 }

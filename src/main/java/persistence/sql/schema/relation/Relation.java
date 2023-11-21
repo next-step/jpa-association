@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import persistence.sql.dialect.ColumnType;
+import persistence.sql.exception.impl.PreconditionRequiredException;
 import persistence.sql.schema.meta.EntityClassMappingMeta;
 import persistence.sql.schema.meta.TableMeta;
 
@@ -45,6 +46,10 @@ public class Relation {
     }
 
     public Class<?> getJoinTableType() {
+        if (this.joinTable == null) {
+            throw new PreconditionRequiredException("Join Table");
+        }
+
         return this.joinTable.getType();
     }
 

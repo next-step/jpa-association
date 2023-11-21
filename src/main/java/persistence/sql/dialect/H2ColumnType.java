@@ -16,11 +16,13 @@ public class H2ColumnType implements ColumnType {
     private static final HashMap.Entry<Class<?>, String> longType = Map.entry(Long.class, "bigint");
     private static final HashMap.Entry<Class<?>, String> stringType = Map.entry(String.class, "varchar");
     private static final HashMap.Entry<Class<?>, String> integerType = Map.entry(Integer.class, "integer");
+    private static final HashMap.Entry<Class<?>, String> booleanType = Map.entry(Boolean.class, "boolean");
 
     public H2ColumnType() {
         typeMap.put(longType.getKey(), longType.getValue());
         typeMap.put(stringType.getKey(), stringType.getValue());
         typeMap.put(integerType.getKey(), integerType.getValue());
+        typeMap.put(booleanType.getKey(), booleanType.getValue());
     }
 
     @Override

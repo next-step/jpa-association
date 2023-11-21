@@ -30,8 +30,8 @@ import persistence.sql.dialect.H2ColumnType;
 import persistence.sql.dml.Database;
 import persistence.sql.dml.JdbcTemplate;
 
-@DisplayName("EntityCollectionLoader 테스트")
-class EntityCollectionLoaderTest {
+@DisplayName("EntityCollectionLoader Eager 테스트")
+class EntityCollectionLoaderEagerTest {
 
     private DatabaseServer server;
 
@@ -102,7 +102,7 @@ class EntityCollectionLoaderTest {
 
         @OneToMany(fetch = FetchType.EAGER)
         @JoinColumn(name = "parent_id")
-        List<ChildEntity> childEntityList = new ArrayList<>();
+        private final List<ChildEntity> childEntityList = new ArrayList<>();
 
         protected EntityLoaderEntity() {
         }
