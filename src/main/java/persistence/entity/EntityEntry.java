@@ -1,13 +1,13 @@
 package persistence.entity;
 
 public class EntityEntry {
-    private EntityStatus status;
+    private EntityEntryStatus status;
 
-    public EntityEntry(EntityStatus status) {
+    public EntityEntry(EntityEntryStatus status) {
         this.status = status;
     }
 
-    public void updateStatus(EntityStatus status) {
+    public void updateStatus(EntityEntryStatus status) {
         this.status = status;
     }
 }

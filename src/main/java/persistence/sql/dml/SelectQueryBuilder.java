@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 public class SelectQueryBuilder {
     private static final String SELECT_QUERY_TEMPLATE = "SELECT %s FROM %s";
+    private static final String JOIN_QUERY_TEMPLATE = " JOIN %s ON %s";
     private static final String WHERE_CLAUSE_TEMPLATE = " WHERE %s = %s";
     private static final String COLUMN_DELIMITER = ", ";
 

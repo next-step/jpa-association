@@ -2,7 +2,7 @@ package persistence.persistencecontext;
 
 import persistence.entity.EntityEntry;
 import persistence.entity.EntityMeta;
-import persistence.entity.EntityStatus;
+import persistence.entity.EntityEntryStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +24,7 @@ public class MyPersistenceContext implements PersistenceContext {
     @Override
     public void addEntity(Object entity) {
         EntityMeta entityMeta = EntityMeta.from(entity);
-        entries.put(entity, new EntityEntry(EntityStatus.MANAGED));
+        entries.put(entity, new EntityEntry(EntityEntryStatus.MANAGED));
         entities.put(entityMeta.getEntityKey(entity), entity);
     }
 
@@ -32,9 +32,9 @@ public class MyPersistenceContext implements PersistenceContext {
     public void removeEntity(Object entity) {
         EntityMeta entityMeta = EntityMeta.from(entity);
         EntityEntry entityEntry = entries.get(entity);
-        entityEntry.updateStatus(EntityStatus.DELETED);
+        entityEntry.updateStatus(EntityEntryStatus.DELETED);
         entities.remove(entityMeta.getEntityKey(entity));
-        entityEntry.updateStatus(EntityStatus.GONE);
+        entityEntry.updateStatus(EntityEntryStatus.GONE);
     }
 
     @Override
@@ -52,8 +52,8 @@ public class MyPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void addEntityEntry(Object entity, EntityStatus entityStatus) {
-        entries.put(entity, new EntityEntry(entityStatus));
+    public void addEntityEntry(Object entity, EntityEntryStatus entityEntryStatus) {
+        entries.put(entity, new EntityEntry(entityEntryStatus));
     }
 
     @Override
