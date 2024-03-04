@@ -1,6 +1,6 @@
-package persistence.sql.domain.dialect;
+package database.dialect;
 
-import persistence.sql.domain.DataType;
+import persistence.sql.meta.DataType;
 
 import java.util.HashMap;
 import java.util.Map;

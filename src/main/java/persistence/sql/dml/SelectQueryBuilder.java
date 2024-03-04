@@ -1,9 +1,9 @@
 package persistence.sql.dml;
 
-import persistence.sql.domain.Column;
-import persistence.sql.domain.DataType;
-import persistence.sql.domain.IdColumn;
-import persistence.sql.domain.Table;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.DataType;
+import persistence.sql.meta.IdColumn;
+import persistence.sql.meta.Table;
 
 import java.util.List;
 import java.util.stream.Collectors;

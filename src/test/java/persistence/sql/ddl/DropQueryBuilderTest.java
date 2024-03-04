@@ -3,8 +3,8 @@ package persistence.sql.ddl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import persistence.sql.Person;
-import persistence.sql.domain.dialect.H2Dialect;
+import domain.Person;
+import database.dialect.H2Dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

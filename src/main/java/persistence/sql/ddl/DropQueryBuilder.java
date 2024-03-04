@@ -1,7 +1,7 @@
 package persistence.sql.ddl;
 
-import persistence.sql.domain.Table;
-import persistence.sql.domain.dialect.Dialect;
+import persistence.sql.meta.Table;
+import database.dialect.Dialect;
 
 public class DropQueryBuilder {
     private final Dialect dialect;

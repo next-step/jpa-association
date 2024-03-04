@@ -7,10 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManager;
 import persistence.entity.MyEntityManager;
-import persistence.sql.Person;
+import domain.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.domain.dialect.H2Dialect;
+import database.dialect.H2Dialect;
 import persistence.support.DatabaseSetup;
 
 import static org.assertj.core.api.Assertions.assertThat;

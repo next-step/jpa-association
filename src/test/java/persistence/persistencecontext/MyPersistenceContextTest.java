@@ -1,8 +1,7 @@
 package persistence.persistencecontext;
 
 import org.junit.jupiter.api.Test;
-import persistence.entity.EntityMeta;
-import persistence.sql.Person;
+import domain.Person;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

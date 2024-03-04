@@ -1,6 +1,6 @@
 package utils;
 
-import persistence.sql.domain.Column;
+import persistence.sql.meta.Column;
 
 import java.lang.reflect.Field;
 

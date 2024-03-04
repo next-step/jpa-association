@@ -1,4 +1,4 @@
-package persistence.sql;
+package domain;
 
 import jakarta.persistence.*;
 

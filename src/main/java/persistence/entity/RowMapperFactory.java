@@ -1,8 +1,8 @@
 package persistence.entity;
 
 import jdbc.RowMapper;
-import persistence.sql.domain.Column;
-import persistence.sql.domain.Table;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.Table;
 
 import java.lang.reflect.Field;
 import java.util.List;

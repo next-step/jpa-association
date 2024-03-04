@@ -4,9 +4,9 @@ import persistence.sql.ddl.strategy.AdditionalColumQueryStrategy;
 import persistence.sql.ddl.strategy.AutoIncrementColumnStrategy;
 import persistence.sql.ddl.strategy.NullableFalseColumnStrategy;
 import persistence.sql.ddl.strategy.PrimaryKeyColumnStrategy;
-import persistence.sql.domain.Column;
-import persistence.sql.domain.Table;
-import persistence.sql.domain.dialect.Dialect;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.Table;
+import database.dialect.Dialect;
 
 import java.lang.reflect.Field;
 import java.util.List;

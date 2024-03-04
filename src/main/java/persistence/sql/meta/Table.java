@@ -1,4 +1,4 @@
-package persistence.sql.domain;
+package persistence.sql.meta;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
