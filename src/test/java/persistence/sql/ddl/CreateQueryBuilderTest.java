@@ -2,7 +2,7 @@ package persistence.sql.ddl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.column.Columns;
 import persistence.sql.column.IdColumn;
 import persistence.sql.column.TableColumn;

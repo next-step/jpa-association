@@ -2,7 +2,7 @@ package persistence.sql.ddl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.column.TableColumn;
 
 import static org.assertj.core.api.Assertions.assertThat;

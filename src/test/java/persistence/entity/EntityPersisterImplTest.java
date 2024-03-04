@@ -7,7 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.column.Columns;
 import persistence.sql.column.IdColumn;
 import persistence.sql.column.TableColumn;

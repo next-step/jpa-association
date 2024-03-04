@@ -3,7 +3,7 @@ package persistence.sql.dml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.dialect.Database;
 import persistence.sql.dialect.Dialect;
 
