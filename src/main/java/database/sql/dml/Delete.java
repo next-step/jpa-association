@@ -7,25 +7,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class SelectQueryBuilder {
+public class Delete {
     private final String tableName;
     private final List<String> allColumnNames;
-    private final String joinedAllColumnNames;
+    private final String primaryKeyColumnName;
 
-    public SelectQueryBuilder(EntityMetadata entityMetadata) {
+    public Delete(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
+        this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
         this.allColumnNames = entityMetadata.getAllColumnNames();
-        this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
     }
 
-    public SelectQueryBuilder(Class<?> clazz) {
+    public Delete(Class<?> clazz) {
         this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
         StringJoiner query = new StringJoiner(" ")
-                .add("SELECT")
-                .add(joinedAllColumnNames)
+                .add("DELETE")
                 .add("FROM").add(tableName);
         String whereClause = whereClause(conditionMap);
         if (!whereClause.isEmpty()) {
@@ -34,8 +33,8 @@ public class SelectQueryBuilder {
         return query.toString();
     }
 
-    public String buildQuery() {
-        return buildQuery(Map.of());
+    public String buildQuery(long id) {
+        return buildQuery(Map.of(primaryKeyColumnName, id));
     }
 
     private String whereClause(Map<String, Object> conditionMap) {

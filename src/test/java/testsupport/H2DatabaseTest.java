@@ -3,8 +3,8 @@ package testsupport;
 import database.H2;
 import database.dialect.Dialect;
 import database.dialect.MySQLDialect;
-import database.sql.Person;
-import database.sql.ddl.CreateQueryBuilder;
+import database.sql.ddl.Create;
+import entity.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +38,7 @@ abstract public class H2DatabaseTest {
     private void createTable() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(connection);
         jdbcTemplate.execute("DROP TABLE users IF EXISTS");
-        jdbcTemplate.execute(new CreateQueryBuilder(Person.class, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(Person.class, dialect).buildQuery());
     }
 
     @AfterAll

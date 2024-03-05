@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CreateQueryBuilderTest {
+class CreateTest {
     private final Dialect dialect = MySQLDialect.INSTANCE;
 
     @ParameterizedTest
@@ -17,8 +17,8 @@ class CreateQueryBuilderTest {
             "database.sql.ddl.OldPerson3:CREATE TABLE users (id BIGINT AUTO_INCREMENT PRIMARY KEY, nick_name VARCHAR(255) NULL, old INT NULL, email VARCHAR(255) NOT NULL)"
     }, delimiter = ':')
     void buildCreateQuery(Class<?> clazz, String expected) {
-        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(clazz, dialect);
-        String actual = createQueryBuilder.buildQuery();
+        Create create = new Create(clazz, dialect);
+        String actual = create.buildQuery();
 
         assertThat(actual).isEqualTo(expected);
     }

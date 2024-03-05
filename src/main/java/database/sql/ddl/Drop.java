@@ -2,14 +2,14 @@ package database.sql.ddl;
 
 import database.mapping.EntityMetadata;
 
-public class DropQueryBuilder {
+public class Drop {
     private final String tableName;
 
-    public DropQueryBuilder(EntityMetadata entityMetadata) {
+    public Drop(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
     }
 
-    public DropQueryBuilder(Class<?> clazz) {
+    public Drop(Class<?> clazz) {
         this(EntityMetadata.fromClass(clazz));
     }
 

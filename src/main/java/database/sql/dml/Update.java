@@ -9,16 +9,16 @@ import java.util.StringJoiner;
 
 import static database.sql.Util.quote;
 
-public class UpdateQueryBuilder {
+public class Update {
     private final String tableName;
     private final List<EntityColumn> generalColumns;
 
-    public UpdateQueryBuilder(EntityMetadata entityMetadata) {
+    public Update(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.generalColumns = entityMetadata.getGeneralColumns();
     }
 
-    public UpdateQueryBuilder(Class<?> clazz) {
+    public Update(Class<?> clazz) {
         this(EntityMetadata.fromClass(clazz));
     }
 

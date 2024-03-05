@@ -2,8 +2,8 @@ package persistence.entity.database;
 
 import database.mapping.EntityClass;
 import database.mapping.EntityMetadata;
-import database.sql.dml.SelectByPrimaryKeyQueryBuilder;
-import database.sql.dml.SelectQueryBuilder;
+import database.sql.dml.Select;
+import database.sql.dml.SelectByPrimaryKey;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 
@@ -24,7 +24,7 @@ public class EntityLoader {
         EntityMetadata metadata = entityClass.getMetadata();
         RowMapper<Object> rowMapper = entityClass.getRowMapper();
 
-        String query = new SelectQueryBuilder(metadata).buildQuery(Map.of("id", ids));
+        String query = new Select(metadata).buildQuery(Map.of("id", ids));
         return jdbcTemplate.query(query, rowMapper);
     }
 
@@ -33,7 +33,7 @@ public class EntityLoader {
         EntityMetadata metadata = entityClass.getMetadata();
         RowMapper<Object> rowMapper = entityClass.getRowMapper();
 
-        String query = new SelectByPrimaryKeyQueryBuilder(metadata).buildQuery(id);
+        String query = new SelectByPrimaryKey(metadata).buildQuery(id);
         return jdbcTemplate.query(query, rowMapper).stream().findFirst();
     }
 }

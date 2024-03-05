@@ -3,7 +3,7 @@ package database.mapping;
 import database.dialect.Dialect;
 import database.dialect.MySQLDialect;
 import database.mapping.column.EntityColumn;
-import database.sql.Person;
+import entity.Person;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

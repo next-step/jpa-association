@@ -1,6 +1,6 @@
 package persistence.entity.database;
 
-import database.sql.Person;
+import entity.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManagerImpl;

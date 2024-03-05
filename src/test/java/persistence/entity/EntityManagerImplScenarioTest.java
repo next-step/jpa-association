@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import database.sql.Person;
+import entity.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
