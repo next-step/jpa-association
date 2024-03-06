@@ -18,3 +18,7 @@ WHERE
   orders.id = :orderId
 ```
 - [x] Join Query를 만들 수 있다.
+
+## 요구사항 2 - Join Query 를 만들어 Entity 화 해보기
+
+- [x] Join query로 Entity를 매핑할 수 있다.

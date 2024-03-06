@@ -1,15 +1,17 @@
 package persistence.entity;
 
+import database.dialect.H2Dialect;
+import domain.Order;
+import domain.Person;
 import jdbc.JdbcTemplate;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import domain.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
-import database.dialect.H2Dialect;
 import persistence.support.DatabaseSetup;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +52,26 @@ class MyEntityManagerTest {
 
         // then
         assertThat(person).isNotNull();
+    }
+
+    @Test
+    @DisplayName("find 메서드는 주어진 클래스와 연관관계에 있는 엔티티까지 반환한다.")
+    void find_containsOneToMany() {
+        //given
+        String orderCreateQuery = "CREATE TABLE orders (id BIGINT AUTO_INCREMENT PRIMARY KEY, orderNumber VARCHAR(255));";
+        String orderItemCreateQuery = "CREATE TABLE order_items (id BIGINT AUTO_INCREMENT PRIMARY KEY, product VARCHAR(255), quantity INT, order_id BIGINT);";
+        jdbcTemplate.execute(orderCreateQuery);
+        jdbcTemplate.execute(orderItemCreateQuery);
+        jdbcTemplate.execute("INSERT INTO order_items (id, order_id, product, quantity) VALUES (1, 1,'상품A', 1);");
+        jdbcTemplate.execute("INSERT INTO order_items (id, order_id, product, quantity) VALUES (2, 1,'상품B', 2);");
+        jdbcTemplate.execute("INSERT INTO orders (id, orderNumber) VALUES (1, '주문번호1');");
+        MyEntityManager entityManager = new MyEntityManager(jdbcTemplate);
+
+        //when
+        Order order = entityManager.find(Order.class, 1L);
+
+        //then
+        Assertions.assertThat(order.getOrderItems()).hasSize(2);
     }
 
     @Test

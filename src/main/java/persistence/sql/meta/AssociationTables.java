@@ -17,11 +17,4 @@ public class AssociationTables {
     public List<AssociationTable> getTables() {
         return tables;
     }
-
-    public List<Column> getAllColumns() {
-        return tables.stream()
-                .map(AssociationTable::getColumns)
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-    }
 }

@@ -65,7 +65,7 @@ public class Table {
 
     private static List<AssociationTable> createJoinTables(List<Field> oneToManyFields) {
         return oneToManyFields.stream()
-                .map(field -> new OneToManyTable(Table.from(getGenericTypeOfCollection(field)), getJoinColumnName(field), getFetchType(field)))
+                .map(field -> new OneToManyTable(Table.from(getGenericTypeOfCollection(field)), getJoinColumnName(field), getFetchType(field), field))
                 .collect(Collectors.toList());
     }
 
