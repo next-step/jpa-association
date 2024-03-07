@@ -4,6 +4,7 @@ import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import jdbc.RowMapperFactory;
 import persistence.sql.dml.SelectQueryBuilder;
+import persistence.sql.meta.Table;
 
 public class MyEntityLoader implements EntityLoader {
 
@@ -17,7 +18,13 @@ public class MyEntityLoader implements EntityLoader {
 
     @Override
     public <T> T find(Class<T> clazz, Object Id) {
-        String query = selectQueryBuilder.build(clazz, Id);
+        Table table = Table.from(clazz);
+        if (!table.containsAssociation()) {
+            String query = selectQueryBuilder.build(table, Id);
+            RowMapper<T> rowMapper = RowMapperFactory.create(clazz);
+            return jdbcTemplate.queryForObject(query, rowMapper);
+        }
+        String query = selectQueryBuilder.buildWithJoin(table, Id);
         RowMapper<T> rowMapper = RowMapperFactory.create(clazz);
         return jdbcTemplate.queryForObject(query, rowMapper);
     }

@@ -1,6 +1,10 @@
 package persistence.sql.dml;
 
-import persistence.sql.meta.*;
+import persistence.sql.meta.AssociationTable;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.DataType;
+import persistence.sql.meta.IdColumn;
+import persistence.sql.meta.Table;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,24 +23,32 @@ public class SelectQueryBuilder {
         return InstanceHolder.INSTANCE;
     }
 
-    public String build(Class<?> target, Object id) {
-        Table table = Table.from(target);
+    public String build(Table table, Object id) {
         String baseQuery = createBaseQuery(table);
-        String joinQuery = "";
-        if (table.containsAssociation()) {
-            joinQuery = createJoinQuery(table);
-        }
         String whereClause = createWhereQuery(table, id);
 
+        return baseQuery + whereClause;
+    }
+
+    public String buildWithJoin(Table table, Object id) {
+        String baseQuery = createBaseQueryForJoin(table);
+        String joinQuery = createJoinQuery(table);
+        String whereClause = createWhereQuery(table, id);
         return baseQuery + joinQuery + whereClause;
     }
 
     private String createBaseQuery(Table table) {
         String columns = getColumnsNames(table.getName(), table.getColumns());
-        if (table.containsAssociation()) {
-            columns += getAssociationColumns(table);
-        }
         return String.format(SELECT_QUERY_TEMPLATE, columns, table.getName());
+    }
+
+    private String createBaseQueryForJoin(Table table) {
+        String columns = getColumnsNameWithAssociation(table);
+        return String.format(SELECT_QUERY_TEMPLATE, columns, table.getName());
+    }
+
+    private String getColumnsNameWithAssociation(Table table) {
+        return getColumnsNames(table.getName(), table.getColumns()) + getAssociationColumns(table);
     }
 
     private String getAssociationColumns(Table table) {
