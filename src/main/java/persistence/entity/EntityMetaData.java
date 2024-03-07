@@ -9,9 +9,9 @@ public class EntityMetaData {
     private final Class<?> clazz;
     private final Columns columns;
 
-    public EntityMetaData(Object entity, Dialect dialect) {
+    public EntityMetaData(Object entity) {
         this.clazz = entity.getClass();
-        this.columns = new Columns(entity, dialect);
+        this.columns = new Columns(entity);
     }
 
     public EntityMetaData(Class<?> clazz, Columns columns) {

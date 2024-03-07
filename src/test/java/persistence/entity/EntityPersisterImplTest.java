@@ -46,9 +46,9 @@ class EntityPersisterImplTest {
     }
 
     private void createTable(Class<Person> personEntity, Dialect dialect) {
-        Columns columns = new Columns(personEntity.getDeclaredFields(), dialect);
-        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
-        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn);
+        Columns columns = new Columns(personEntity.getDeclaredFields());
+        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields());
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn, dialect);
         String createQuery = createQueryBuilder.build();
         jdbcTemplate.execute(createQuery);
     }
@@ -69,7 +69,7 @@ class EntityPersisterImplTest {
 
         //when
         savedPerson.setName("김길동");
-        entityPersister.update(savedPerson, new IdColumn(savedPerson, dialect).getValue());
+        entityPersister.update(savedPerson, new IdColumn(savedPerson).getValue());
 
         //then
         Person foundPerson = entityManager.find(Person.class, savedPerson.getId());
@@ -104,7 +104,7 @@ class EntityPersisterImplTest {
         //given
         Person person = new Person(1L, "홍길동", 20, "jon@test.com", 20);
         entityPersister.insert(person);
-        IdColumn idColumn = new IdColumn(person, dialect);
+        IdColumn idColumn = new IdColumn(person);
         //when
         entityPersister.delete(person, idColumn.getValue());
 

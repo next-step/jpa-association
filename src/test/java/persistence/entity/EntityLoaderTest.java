@@ -36,10 +36,10 @@ class EntityLoaderTest {
         Class<Person> personEntity = Person.class;
         table = new TableColumn(personEntity);
         dialect = new MysqlDialect();
-        Columns columns = new Columns(personEntity.getDeclaredFields(), dialect);
-        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
+        Columns columns = new Columns(personEntity.getDeclaredFields());
+        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields());
 
-        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn);
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn, dialect);
 
         String createQuery = createQueryBuilder.build();
         jdbcTemplate.execute(createQuery);

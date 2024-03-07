@@ -20,9 +20,9 @@ class CreateQueryBuilderTest {
         Class<Person> personEntity = Person.class;
         TableColumn table = new TableColumn(personEntity);
         Dialect dialect = Database.MYSQL.createDialect();
-        Columns columns = new Columns(personEntity.getDeclaredFields(), dialect);
-        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
-        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn);
+        Columns columns = new Columns(personEntity.getDeclaredFields());
+        IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields());
+        CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn, dialect);
 
         //when
         String ddl = createQueryBuilder.build();

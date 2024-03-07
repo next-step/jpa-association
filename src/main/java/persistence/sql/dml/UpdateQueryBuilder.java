@@ -26,8 +26,8 @@ public class UpdateQueryBuilder implements DmlQueryBuilder {
     public UpdateQueryBuilder build(Object entity) {
         Class<?> clazz = entity.getClass();
         TableColumn tableColumn = new TableColumn(clazz);
-        this.columns = new Columns(entity, dialect);
-        this.idColumn = new IdColumn(entity, dialect);
+        this.columns = new Columns(entity);
+        this.idColumn = new IdColumn(entity);
         this.query = String.format(UPDATE_QUERY_FORMAT, tableColumn.getName(), getColumnFormat(columns));
         return this;
     }

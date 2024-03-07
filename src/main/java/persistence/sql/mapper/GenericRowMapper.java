@@ -38,12 +38,12 @@ public class GenericRowMapper<T> implements RowMapper<T> {
     }
 
     private void mapIdColumn(ResultSet resultSet, T instance) {
-        IdColumn idColumn = new IdColumn(clazz.getDeclaredFields(), dialect);
+        IdColumn idColumn = new IdColumn(clazz.getDeclaredFields());
         setColumnValue(resultSet, instance, idColumn);
     }
 
     private void mapGeneralColumns(ResultSet resultSet, T instance) {
-        Columns columns = new Columns(clazz.getDeclaredFields(), dialect);
+        Columns columns = new Columns(clazz.getDeclaredFields());
         columns.getValues()
                 .forEach(column -> setColumnValue(resultSet, instance, column));
     }

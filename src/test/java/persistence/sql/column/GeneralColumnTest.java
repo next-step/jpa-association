@@ -20,11 +20,11 @@ class GeneralColumnTest {
     void getDefinition(String fieldName, String result) throws NoSuchFieldException {
         //given
         Field field = Person.class.getDeclaredField(fieldName);
-        GeneralColumn generalColumn = new GeneralColumn(field, new MysqlDialect());
+        GeneralColumn generalColumn = new GeneralColumn(field);
 
         //when
         //then
-        assertThat(generalColumn.getDefinition()).isEqualTo(result);
+        assertThat(generalColumn.getDefinition(new MysqlDialect())).isEqualTo(result);
     }
 
     private static Stream<Arguments> getDefinition() {
@@ -43,7 +43,7 @@ class GeneralColumnTest {
         Field field = Person.class.getDeclaredField(fieldName);
 
         //when
-        GeneralColumn generalColumn = new GeneralColumn(field, new MysqlDialect());
+        GeneralColumn generalColumn = new GeneralColumn(field);
 
         //then
         assertThat(generalColumn.getName()).isEqualTo(result);
@@ -65,7 +65,7 @@ class GeneralColumnTest {
         Field field = Person.class.getDeclaredField(fieldName);
 
         //when
-        GeneralColumn generalColumn = new GeneralColumn(field, new MysqlDialect());
+        GeneralColumn generalColumn = new GeneralColumn(field);
 
         //then
         assertThat(generalColumn.getFieldName()).isEqualTo(result);

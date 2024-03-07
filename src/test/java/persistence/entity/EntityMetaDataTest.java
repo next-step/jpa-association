@@ -15,8 +15,8 @@ class EntityMetaDataTest {
         Person person = new Person("KIM", "kim@test.com", 30);
         Person person1 = new Person("LEE", "kim@test.com", 20);
 
-        EntityMetaData entityMetaData = new EntityMetaData(person, new MysqlDialect());
-        EntityMetaData entityMetaData2 = new EntityMetaData(person1, new MysqlDialect());
+        EntityMetaData entityMetaData = new EntityMetaData(person);
+        EntityMetaData entityMetaData2 = new EntityMetaData(person1);
 
         assertThat(entityMetaData.isDirty(entityMetaData2)).isTrue();
     }
@@ -26,8 +26,8 @@ class EntityMetaDataTest {
     void isDirtyWhenSameData(){
         Person person = new Person("KIM", "kim@test.com", 30);
 
-        EntityMetaData entityMetaData = new EntityMetaData(person, new MysqlDialect());
-        EntityMetaData entityMetaData2 = new EntityMetaData(person, new MysqlDialect());
+        EntityMetaData entityMetaData = new EntityMetaData(person);
+        EntityMetaData entityMetaData2 = new EntityMetaData(person);
 
         assertThat(entityMetaData.isDirty(entityMetaData2)).isFalse();
     }

@@ -23,7 +23,7 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
     }
 
     private boolean isNew(T entity) {
-        IdColumn idColumn = new IdColumn(entity, entityManager.getDialect());
+        IdColumn idColumn = new IdColumn(entity);
         return idColumn.isNull();
     }
 }

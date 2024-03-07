@@ -17,13 +17,13 @@ public class Columns {
 
     private final List<GeneralColumn> values;
 
-    public Columns(Object object, Dialect dialect) {
+    public Columns(Object object) {
         Field[] fields = object.getClass().getDeclaredFields();
-        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(object, field, dialect));
+        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(object, field));
     }
 
-    public Columns(Field[] fields, Dialect dialect) {
-        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(field, dialect));
+    public Columns(Field[] fields) {
+        this.values = createGeneralColumns(fields, GeneralColumn::new);
     }
 
     private List<GeneralColumn> createGeneralColumns(Field[] fields, Function<Field, GeneralColumn> columnCreator) {
@@ -34,10 +34,10 @@ public class Columns {
                 .collect(Collectors.toList());
     }
 
-    public String getColumnsDefinition() {
+    public String getColumnsDefinition(Dialect dialect) {
         return this.values
                 .stream()
-                .map(Column::getDefinition)
+                .map(column -> column.getDefinition(dialect))
                 .collect(Collectors.joining(COMMA));
     }
 

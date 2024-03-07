@@ -44,7 +44,7 @@ class HibernatePersistContextTest {
         //given
         Person person = new Person("John", "John@test.com", 30);
         long id = 1L;
-        EntityMetaData entityMetaData = new EntityMetaData(person, new MysqlDialect());
+        EntityMetaData entityMetaData = new EntityMetaData(person);
         context.addEntity(entityMetaData, id);
 
         //when
