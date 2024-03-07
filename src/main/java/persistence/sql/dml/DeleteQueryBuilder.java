@@ -9,13 +9,10 @@ public class DeleteQueryBuilder implements DmlQueryBuilder {
     private static final String DELETE_QUERY_FORMAT = "delete from %s";
     private static final String WHERE_CLAUSE_FORMAT = " where %s = %d";
 
-    private final Dialect dialect;
     private IdColumn idColumn;
     private String query;
 
-    public DeleteQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
-    }
+    public DeleteQueryBuilder() {}
 
     public DeleteQueryBuilder build(Object entity) {
         Class<?> clazz = entity.getClass();

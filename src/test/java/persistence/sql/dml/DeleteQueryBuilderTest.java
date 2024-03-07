@@ -14,8 +14,7 @@ class DeleteQueryBuilderTest {
     @DisplayName("Person 객체를 delete 쿼리로 변환한다.")
     void testDeleteDml() {
         //given
-        Dialect dialect = new MysqlDialect();
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(dialect);
+        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         Person person = new Person("username", 50, "test@test.com", 1);
 
         //when

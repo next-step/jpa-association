@@ -15,7 +15,7 @@ public class EntityLoaderImpl implements EntityLoader {
     public EntityLoaderImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
         this.dialect = dialect;
-        this.selectQueryBuilder = new SelectQueryBuilder(dialect);
+        this.selectQueryBuilder = new SelectQueryBuilder();
     }
 
     @Override

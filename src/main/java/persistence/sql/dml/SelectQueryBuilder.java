@@ -15,10 +15,8 @@ public class SelectQueryBuilder implements DmlQueryBuilder {
     private TableColumn tableColumn;
     private Columns columns;
     private IdColumn idColumn;
-    private final Dialect dialect;
 
-    public SelectQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
+    public SelectQueryBuilder() {
     }
 
     public SelectQueryBuilder build(Class<?> entity) {

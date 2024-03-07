@@ -14,13 +14,12 @@ public class UpdateQueryBuilder implements DmlQueryBuilder {
     private static final String WHERE_CLAUSE_FORMAT = "where %s = %d";
     private static final String COMMA = ", ";
 
-    private final Dialect dialect;
     private Columns columns;
     private IdColumn idColumn;
     private String query;
 
-    public UpdateQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
+    public UpdateQueryBuilder() {
+
     }
 
     public UpdateQueryBuilder build(Object entity) {

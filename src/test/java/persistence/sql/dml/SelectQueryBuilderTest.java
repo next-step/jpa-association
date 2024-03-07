@@ -14,11 +14,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SelectQueryBuilderTest {
 
     private Person person;
-    private Dialect dialect;
 
     @BeforeEach
     void setUp() {
-        dialect = Database.MYSQL.createDialect();
         person = new Person("username", 50, "test@test.com", 1);
     }
 
@@ -27,7 +25,7 @@ class SelectQueryBuilderTest {
     void buildFindQuery() {
 
         //given
-        SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
+        SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
 
         //when
         String selectOneQuery = queryBuilder.build(Person.class).toStatementWithId(1L);
@@ -41,7 +39,7 @@ class SelectQueryBuilderTest {
     @Test
     void testSelectAllDml() {
         //given
-        SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
+        SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
 
         //when
         String selectAll = queryBuilder.build(Person.class).toStatement();
@@ -55,7 +53,7 @@ class SelectQueryBuilderTest {
     @Test
     void testJoinQuery() {
         //given
-        SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
+        SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
         String joinQuery = queryBuilder.build(Order.class).toJoinStatement();
 
         //when
@@ -67,7 +65,7 @@ class SelectQueryBuilderTest {
     @Test
     void testJoinWithIdQuery() {
         //given
-        SelectQueryBuilder queryBuilder = new SelectQueryBuilder(dialect);
+        SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
         String joinQuery = queryBuilder.build(Order.class).toJoinStatementWithId(1);
 
         //when
