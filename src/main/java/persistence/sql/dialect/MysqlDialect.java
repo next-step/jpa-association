@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 public class MysqlDialect implements Dialect {
 
     @Override
-    public ColumnType getColumn(Class<?> javaType) {
+    public ColumnType getColumnType(Class<?> javaType) {
         return MysqlColumnType.convertToSqlColumnType(javaType);
     }
 
