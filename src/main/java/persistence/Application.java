@@ -2,14 +2,14 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
+import database.dialect.H2Dialect;
+import domain.Person;
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.MyEntityManager;
-import persistence.sql.Person;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.domain.dialect.H2Dialect;
 import repository.CustomJpaRepository;
 
 public class Application {

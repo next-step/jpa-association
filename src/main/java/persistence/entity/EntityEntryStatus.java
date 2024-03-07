@@ -1,6 +1,6 @@
 package persistence.entity;
 
-public enum EntityStatus {
+public enum EntityEntryStatus {
     MANAGED,
     READ_ONLY,
     DELETED,

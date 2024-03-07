@@ -1,8 +1,8 @@
 package persistence.sql.dml;
 
-import persistence.sql.domain.Column;
-import persistence.sql.domain.IdColumn;
-import persistence.sql.domain.Table;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.IdColumn;
+import persistence.sql.meta.Table;
 
 import java.lang.reflect.Field;
 

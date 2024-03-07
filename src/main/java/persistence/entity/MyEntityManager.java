@@ -31,7 +31,7 @@ public class MyEntityManager implements EntityManager {
 
     @Override
     public <T> T persist(T entity) {
-        persistenceContext.addEntityEntry(entity, EntityStatus.SAVING);
+        persistenceContext.addEntityEntry(entity, EntityEntryStatus.SAVING);
         Object generatedId = entityPersister.insert(entity);
         EntityMeta entityMeta = EntityMeta.from(entity);
         entityMeta.injectId(entity, generatedId);
@@ -59,7 +59,7 @@ public class MyEntityManager implements EntityManager {
         List<Object> entities = persistenceContext.getDirtyEntities();
         for (Object entity : entities) {
             entityPersister.update(entity);
-            persistenceContext.addEntityEntry(entity, EntityStatus.GONE);
+            persistenceContext.addEntityEntry(entity, EntityEntryStatus.GONE);
         }
     }
 

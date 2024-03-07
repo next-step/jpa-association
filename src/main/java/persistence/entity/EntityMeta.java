@@ -1,8 +1,8 @@
 package persistence.entity;
 
 import persistence.persistencecontext.EntityKey;
-import persistence.sql.domain.IdColumn;
-import persistence.sql.domain.Table;
+import persistence.sql.meta.IdColumn;
+import persistence.sql.meta.Table;
 import utils.ValueExtractor;
 import utils.ValueInjector;
 

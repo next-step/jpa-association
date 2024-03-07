@@ -1,6 +1,6 @@
-package persistence.sql.domain.dialect;
+package database.dialect;
 
-import persistence.sql.domain.DataType;
+import persistence.sql.meta.DataType;
 
 public interface Dialect {
     String convertClassForDialect(DataType dataType);

@@ -2,6 +2,7 @@ package persistence.entity;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
+import jdbc.RowMapperFactory;
 import persistence.sql.dml.SelectQueryBuilder;
 
 public class MyEntityLoader implements EntityLoader {

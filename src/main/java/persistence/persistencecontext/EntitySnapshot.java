@@ -1,7 +1,7 @@
 package persistence.persistencecontext;
 
-import persistence.sql.domain.Column;
-import persistence.sql.domain.Table;
+import persistence.sql.meta.Column;
+import persistence.sql.meta.Table;
 import utils.ValueExtractor;
 
 import java.util.LinkedHashMap;
