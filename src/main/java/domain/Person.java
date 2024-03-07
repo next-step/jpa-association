@@ -37,7 +37,6 @@ public class Person {
     }
 
     public Person() {
-
     }
 
     public static Person of(Long id, String name, Integer age, String email) {

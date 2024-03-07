@@ -28,10 +28,6 @@ public class Columns {
             .count();
     }
 
-    public List<Column> getColumns() {
-        return columns;
-    }
-
     public Column getIdColumn() {
         return columns.stream()
             .filter(Column::isIdAnnotation)
@@ -45,13 +41,37 @@ public class Columns {
 
     public List<Column> getInsertColumns() {
         return columns.stream()
-            .filter(column -> !column.isGeneratedValueAnnotation())
+            .filter(column -> !column.isGeneratedValueAnnotation() && !column.isRelationColumn())
             .collect(Collectors.toList());
     }
 
     public List<Column> getUpdateColumns() {
         return columns.stream()
             .filter(column -> !column.isIdAnnotation())
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getSelectColumns() {
+        return columns.stream()
+            .filter(column -> !column.isEagerRelationColumn())
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getEagerRelationColumns() {
+        return columns.stream()
+            .filter(Column::isEagerRelationColumn)
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getRelationColumns(){
+        return columns.stream()
+            .filter(Column::isRelationColumn)
+            .collect(Collectors.toList());
+    }
+
+    public List<Object> getRelationValues(Object entity) {
+        return getRelationColumns().stream()
+            .map(column -> column.getFieldValue(entity))
             .collect(Collectors.toList());
     }
 }

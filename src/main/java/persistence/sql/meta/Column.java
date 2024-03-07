@@ -1,8 +1,18 @@
 package persistence.sql.meta;
 
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.h2.util.StringUtils;
@@ -14,7 +24,7 @@ public class Column {
 
     private final Field field;
 
-    private Column(Field field) {
+    protected Column(Field field) {
         this.field = field;
     }
 
@@ -23,15 +33,24 @@ public class Column {
     }
 
     public String getColumnName() {
+        JoinColumn joinColumn = field.getDeclaredAnnotation(JoinColumn.class);
+        if (joinColumn != null) {
+            return joinColumn.name();
+        }
         jakarta.persistence.Column column = field.getDeclaredAnnotation(jakarta.persistence.Column.class);
         if (column == null || StringUtils.isNullOrEmpty(column.name())) {
             return convertCamelToSnakeString(field.getName());
         }
+
         return column.name();
     }
 
     public Class<?> getType() {
         return field.getType();
+    }
+
+    public Type getGenericType() {
+        return field.getGenericType();
     }
 
     public boolean isIdAnnotation() {
@@ -42,6 +61,29 @@ public class Column {
         jakarta.persistence.GeneratedValue generatedValue = field.getDeclaredAnnotation(jakarta.persistence.GeneratedValue.class);
 
         return generatedValue != null && generatedValue.strategy() == GenerationType.IDENTITY;
+    }
+
+    public boolean isEagerRelationColumn() {
+        if (field.isAnnotationPresent(OneToOne.class)) {
+            return FetchType.EAGER.equals(field.getAnnotation(OneToOne.class).fetch());
+        }
+        if (field.isAnnotationPresent(OneToMany.class)) {
+            return FetchType.EAGER.equals(field.getAnnotation(OneToMany.class).fetch());
+        }
+        if (field.isAnnotationPresent(ManyToOne.class)) {
+            return FetchType.EAGER.equals(field.getAnnotation(ManyToOne.class).fetch());
+        }
+        if (field.isAnnotationPresent(ManyToMany.class)) {
+            return FetchType.EAGER.equals(field.getAnnotation(ManyToMany.class).fetch());
+        }
+        return false;
+    }
+
+    public boolean isRelationColumn() {
+        return field.isAnnotationPresent(OneToOne.class)
+            || field.isAnnotationPresent(OneToMany.class)
+            || field.isAnnotationPresent(ManyToOne.class)
+            || field.isAnnotationPresent(ManyToMany.class);
     }
 
     public boolean isNullable() {
@@ -61,10 +103,27 @@ public class Column {
     public void setFieldValue(Object object, Object value) {
         try {
             field.setAccessible(true);
+            if (field.getType() == List.class) {
+                ((List) getFieldValue(object)).add(value);
+                return;
+            }
             field.set(object, value);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isOneToMany() {
+        return field.isAnnotationPresent(OneToMany.class) && field.isAnnotationPresent(JoinColumn.class);
+    }
+
+    public Table getRelationTable()  {
+        ParameterizedType type = (ParameterizedType) field.getGenericType();
+        return Arrays.stream(type.getActualTypeArguments())
+            .map(t -> (Class<?>) t)
+            .map(Table::getInstance)
+            .findFirst()
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     private Object valueOf(Object object) {

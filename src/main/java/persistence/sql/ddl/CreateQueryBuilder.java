@@ -25,6 +25,14 @@ public class CreateQueryBuilder {
             .map(fieldBuilder::generate)
             .collect(Collectors.joining(COMMA.getValue()));
 
-        return String.format(CREATE_TABLE_DEFINITION, table.getTableName(), columnDefinitions);
+        String relationDefinitions = Table.getRelationColumns(table).stream()
+            .map(entry -> fieldBuilder.generateRelation(entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(COMMA.getValue()));
+
+        if (relationDefinitions.isEmpty()) {
+            return String.format(CREATE_TABLE_DEFINITION, table.getTableName(), columnDefinitions);
+        }
+
+        return String.format(CREATE_TABLE_DEFINITION, table.getTableName(), columnDefinitions + COMMA.getValue() + relationDefinitions);
     }
 }

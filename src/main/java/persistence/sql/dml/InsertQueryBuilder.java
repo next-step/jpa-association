@@ -1,6 +1,8 @@
 package persistence.sql.dml;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import static persistence.sql.constant.SqlConstant.COMMA;
 import persistence.sql.meta.Column;
@@ -12,7 +14,6 @@ public class InsertQueryBuilder {
 
     private InsertQueryBuilder() {
     }
-
     private static class Holder {
         static final InsertQueryBuilder INSTANCE = new InsertQueryBuilder();
     }
@@ -21,14 +22,38 @@ public class InsertQueryBuilder {
         return Holder.INSTANCE;
     }
 
-    public String generateQuery(Table table, Object object) {
+    public String generateQuery(Table table, Object entity) {
         return String.format(INSERT_DEFINITION, table.getTableName(),
-            columnsClause(table.getInsertColumns()), valueClause(table.getInsertColumns(), object));
+            columnsClause(table.getInsertColumns()), valueClause(table.getInsertColumns(), entity));
     }
+
+    public String generateQuery(Table table, Object entity, Object parent) {
+
+        StringBuilder columnsBuilder = new StringBuilder(columnsClause(table.getInsertColumns()));
+        StringBuilder valuesBuilder = new StringBuilder(valueClause(table.getInsertColumns(), entity));
+
+        String relationColumns = relationColumnsClause(Table.getRelationColumns(table), parent);
+        String relationValues = relationValueClause(parent);
+
+        if (!relationColumns.isEmpty()) {
+            columnsBuilder.append(COMMA.getValue()).append(relationColumns);
+            valuesBuilder.append(COMMA.getValue()).append(relationValues);
+        }
+
+        return String.format(INSERT_DEFINITION, table.getTableName(), columnsBuilder, valuesBuilder);
+    }
+
 
     private String columnsClause(List<Column> columns) {
         return columns.stream()
             .map(Column::getColumnName)
+            .collect(Collectors.joining(COMMA.getValue()));
+    }
+
+    private String relationColumnsClause(Set<Map.Entry<Table, Column>> relationColumns, Object parent) {
+        return relationColumns.stream()
+            .filter(entry -> entry.getKey().equals(Table.getInstance(parent.getClass())))
+            .map(entry -> entry.getValue().getColumnName())
             .collect(Collectors.joining(COMMA.getValue()));
     }
 
@@ -37,5 +62,9 @@ public class InsertQueryBuilder {
             .map(column -> column.getFieldValue(object))
             .map(String::valueOf)
             .collect(Collectors.joining(COMMA.getValue()));
+    }
+
+    private String relationValueClause(Object parent) {
+        return Table.getInstance(parent.getClass()).getIdValue(parent).toString();
     }
 }

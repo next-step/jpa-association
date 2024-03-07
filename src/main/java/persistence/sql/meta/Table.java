@@ -1,10 +1,11 @@
 package persistence.sql.meta;
 
 import jakarta.persistence.Entity;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.h2.util.StringUtils;
 
@@ -13,6 +14,7 @@ public class Table {
     private final Class<?> clazz;
     private final Columns columns;
     private static final Map<Class<?>, Table> cashTable = new ConcurrentHashMap<>();
+    private static final Map<Table, Set<Map.Entry<Table, Column>>> relationTable = new ConcurrentHashMap<>();
 
     private Table(Class<?> clazz, Columns columns) {
         this.clazz = clazz;
@@ -26,12 +28,18 @@ public class Table {
 
         Columns columns = Columns.from(clazz.getDeclaredFields());
         validate(clazz, columns);
+        Table table = cashTable.computeIfAbsent(clazz, t -> new Table(clazz, columns));
+        setRelationTable(table, columns);
 
-        return cashTable.computeIfAbsent(clazz, t -> new Table(clazz, columns));
+        return table;
+    }
+
+    public static Set<Map.Entry<Table, Column>> getRelationColumns(Table table) {
+        return relationTable.getOrDefault(table, Set.of());
     }
 
     public List<Column> getColumns() {
-        return columns.getColumns();
+        return columns.getSelectColumns();
     }
 
     public String getTableName() {
@@ -42,6 +50,14 @@ public class Table {
         return table.name();
     }
 
+    public Object getClassInstance() {
+        try {
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("클래스 인스턴스 생성에 실패했습니다.");
+        }
+    }
+
     public List<Column> getInsertColumns() {
         return columns.getInsertColumns();
     }
@@ -50,8 +66,20 @@ public class Table {
         return columns.getUpdateColumns();
     }
 
+    public List<Column> getSelectColumns() {
+        return columns.getSelectColumns();
+    }
+
+    public List<Column> getEagerRelationColumns() {
+        return columns.getEagerRelationColumns();
+    }
+
     public Column getIdColumn() {
         return columns.getIdColumn();
+    }
+
+    public String getIdColumnName() {
+        return columns.getIdColumn().getColumnName();
     }
 
     public Object getIdValue(Object entity) {
@@ -60,6 +88,18 @@ public class Table {
 
     public void setIdValue(Object entity, Object id) {
         columns.getIdColumn().setFieldValue(entity, id);
+    }
+
+    private static void setRelationTable(Table root, Columns columns) {
+        columns.getRelationColumns().stream()
+            .filter(Column::isOneToMany)
+            .forEach(column -> {
+                Table table =  column.getRelationTable();
+                if (!relationTable.containsKey(table)) {
+                    relationTable.put(table, new HashSet<>());
+                }
+                relationTable.get(table).add(Map.entry(root, column));
+            });
     }
 
     private static void validate(Class<?> clazz, Columns columns) {
@@ -85,5 +125,9 @@ public class Table {
     @Override
     public int hashCode() {
         return Objects.hash(clazz);
+    }
+
+    public List<Object> getRelationValues(Object entity) {
+        return columns.getRelationValues(entity);
     }
 }

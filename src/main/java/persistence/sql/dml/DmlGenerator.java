@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import java.util.Map;
+import static persistence.sql.constant.SqlConstant.DOT;
 import static persistence.sql.constant.SqlConstant.EQUALS;
 import static persistence.sql.constant.SqlConstant.SPACE;
 import persistence.sql.meta.Column;
@@ -36,6 +37,11 @@ public class DmlGenerator {
         return insertQueryBuilder.generateQuery(table, object);
     }
 
+    public String generateInsertQuery(Object relatedEntity, Object parent) {
+        Table table = getTable(relatedEntity.getClass());
+        return insertQueryBuilder.generateQuery(table, relatedEntity, parent);
+    }
+
     public String generateSelectQuery(Class<?> clazz) {
         Table table = getTable(clazz);
         return selectQueryBuilder.generateQuery(table);
@@ -44,22 +50,22 @@ public class DmlGenerator {
     public String generateSelectQuery(Class<?> clazz, Object id) {
         Table table = getTable(clazz);
         return selectQueryBuilder.generateQuery(table) +
-            whereClause(Map.of(table.getIdColumn(), id));
+            whereClause(table.getTableName(), Map.of(table.getIdColumn(), id));
     }
 
     public String generateUpdateQuery(Object object) {
         Table table = getTable(object.getClass());
         return updateQueryBuilder.generateQuery(table, object) +
-            whereClause(Map.of(table.getIdColumn(), table.getIdValue(object)));
+            whereClause(table.getTableName(), Map.of(table.getIdColumn(), table.getIdValue(object)));
     }
 
     public String generateDeleteQuery(Object object) {
         Table table = Table.getInstance(object.getClass());
         return deleteQueryBuilder.generateQuery(table) +
-            whereClause(Map.of(table.getIdColumn(), table.getIdValue(object)));
+            whereClause(table.getTableName(), Map.of(table.getIdColumn(), table.getIdValue(object)));
     }
 
-    private String whereClause(Map<Column, Object> conditions) {
+    private String whereClause(String tableName, Map<Column, Object> conditions) {
         if (conditions == null || conditions.isEmpty()) {
             return "";
         }
@@ -67,6 +73,8 @@ public class DmlGenerator {
         StringBuilder whereClause = new StringBuilder(SPACE.getValue() + WHERE_CLAUSE + SPACE.getValue());
 
         conditions.forEach((key, value) -> {
+                whereClause.append(tableName);
+                whereClause.append(DOT.getValue());
                 whereClause.append(key.getColumnName());
                 whereClause.append(SPACE.getValue());
                 whereClause.append(EQUALS.getValue());

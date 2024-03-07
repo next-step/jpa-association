@@ -3,6 +3,7 @@ package persistence.sql.constant;
 public enum SqlConstant {
 
     COMMA(","),
+    DOT("."),
     SPACE(" "),
     EMPTY(""),
     EQUALS("=");
