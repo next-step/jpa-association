@@ -8,6 +8,7 @@ import domain.Person;
 import java.sql.SQLException;
 import java.util.stream.IntStream;
 import jdbc.JdbcTemplate;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -127,9 +128,10 @@ class SimpleEntityManagerTest {
 
             // then
             assertAll(
-                () -> assertEquals(foundOrder.getId(), 1L),
+                () -> assertEquals(foundOrder, order),
+                () -> assertEquals(foundOrder.getId(), order.getId()),
                 () -> assertEquals(foundOrder.getOrderNumber(), order.getOrderNumber()),
-                () -> assertEquals(foundOrder.getOrderItems().size(), 3),
+                () -> assertThat(foundOrder.getOrderItems()).hasSize(3),
                 () -> IntStream.range(0, foundOrder.getOrderItems().size())
                 .forEach(i -> assertEquals(foundOrder.getOrderItems().get(i), order.getOrderItems().get(i)))
             );

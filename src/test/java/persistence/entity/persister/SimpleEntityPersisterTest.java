@@ -95,7 +95,7 @@ class SimpleEntityPersisterTest {
                 resultSet -> new EntityRowMapper<>(Order.class).mapRow(resultSet));
 
             assertAll(
-                () -> assertThat(foundOrder).isNotNull(),
+                () -> assertThat(foundOrder).isEqualTo(order),
                 () -> assertThat(foundOrder.getId()).isEqualTo(order.getId()),
                 () -> assertThat(foundOrder.getOrderNumber()).isEqualTo(order.getOrderNumber()),
                 () -> assertThat(foundOrder.getOrderItems()).hasSize(3),
