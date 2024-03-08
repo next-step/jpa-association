@@ -6,11 +6,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import static persistence.sql.constant.SqlConstant.DOT;
+import static persistence.sql.constant.SqlConstant.EMPTY;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
 
 public class EntityRowMapper<T> implements RowMapper {
 
+    private static final String ZERO = "0";
     private final Class<T> clazz;
 
     public EntityRowMapper(Class<T> clazz) {
@@ -44,25 +46,29 @@ public class EntityRowMapper<T> implements RowMapper {
             tableName + DOT.getValue() + column.getColumnName(), column.getType())));
     }
 
-    private boolean isEagerRelationEmpty(ResultSet resultSet, String tableName, Column idColumn) {
-
-         Object id = ResultSetColumnReader.map(resultSet, tableName + DOT.getValue() + idColumn.getColumnName(), idColumn.getType());
-         return Objects.isNull(id) || id.toString().equals("0");
-    }
-
-    private void setRelationFieldValues(final ResultSet resultSet,
-                                        final List<Column> eagerRelationColumns,
-                                        final T instance) {
-        eagerRelationColumns
-            .stream().filter(column -> {
-                Table relationTable = column.getRelationTable();
-                return !isEagerRelationEmpty(resultSet, relationTable.getTableName(), relationTable.getIdColumn());
-            })
+    private void setRelationFieldValues(ResultSet resultSet,
+                                        List<Column> eagerRelationColumns,
+                                        T instance) {
+        eagerRelationColumns.stream()
+            .filter(column -> !isEagerRelationEmpty(resultSet, column.getRelationTable()))
             .forEach(column -> {
                 Table relationTable = column.getRelationTable();
                 Object relatedInstance = relationTable.getClassInstance();
                 setFieldValues(relatedInstance, relationTable.getTableName(), relationTable.getColumns(), resultSet);
                 column.setFieldValue(instance, relatedInstance);
             });
+    }
+
+    private boolean isEagerRelationEmpty(ResultSet resultSet, Table relationTable) {
+
+        String tableName = relationTable.getTableName();
+        Column idColumn = relationTable.getIdColumn();
+
+        String key = String.join(EMPTY.getValue(), tableName,DOT.getValue(),
+            idColumn.getColumnName());
+
+        Object id = ResultSetColumnReader.map(resultSet, key, idColumn.getType());
+
+        return Objects.isNull(id) || id.toString().equals(ZERO);
     }
 }
