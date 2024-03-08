@@ -18,18 +18,13 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
 
+    public Order() {
+    }
+
     public Order(Long id, String orderNumber, List<OrderItem> orderItems) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.orderItems = orderItems;
-    }
-
-    public Order() {
-
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getOrderNumber() {
@@ -40,12 +35,4 @@ public class Order {
         return orderItems;
     }
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", orderNumber='" + orderNumber + '\'' +
-                ", orderItems=" + orderItems +
-                '}';
-    }
 }

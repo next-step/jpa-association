@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class JoinTableColumn implements TableEntity {
 
+    private static final int MINIMUM_SIZE = 0;
+
     private final TableName name;
 
     private final AssociationEntity associationEntity;
@@ -64,7 +66,7 @@ public class JoinTableColumn implements TableEntity {
     }
 
     private static boolean hasType(Type[] typeArguments) {
-        return typeArguments != null && typeArguments.length > 0;
+        return typeArguments != null && typeArguments.length > MINIMUM_SIZE;
     }
 
     private static <T> List<Field> getAssociationField(Class<T> clazz) {
@@ -94,14 +96,4 @@ public class JoinTableColumn implements TableEntity {
         return clazz;
     }
 
-    @Override
-    public String toString() {
-        return "JoinTableColumn{" +
-                "name=" + name +
-                ", associationEntity=" + associationEntity +
-                ", idColumn=" + idColumn +
-                ", columns=" + columns +
-                ", clazz=" + clazz +
-                '}';
-    }
 }

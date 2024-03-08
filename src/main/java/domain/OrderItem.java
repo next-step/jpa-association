@@ -14,16 +14,6 @@ public class OrderItem {
 
     private Integer quantity;
 
-    public OrderItem(Long id, String product, Integer quantity) {
-        this.id = id;
-        this.product = product;
-        this.quantity = quantity;
-    }
-
-    public OrderItem() {
-
-    }
-
     public Long getId() {
         return id;
     }
@@ -36,12 +26,4 @@ public class OrderItem {
         return product;
     }
 
-    @Override
-    public String toString() {
-        return "OrderItem{" +
-                "id=" + id +
-                ", product='" + product + '\'' +
-                ", quantity=" + quantity +
-                '}';
-    }
 }
