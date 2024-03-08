@@ -94,6 +94,23 @@ public class Table {
         columns.getIdColumn().setFieldValue(entity, id);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Table table = (Table) o;
+        return Objects.equals(clazz, table.clazz);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz);
+    }
+
+    public List<Object> getRelationValues(Object entity) {
+        return columns.getRelationValues(entity);
+    }
+
     private static void setRelationTable(Table root, Columns columns) {
         columns.getRelationColumns().stream()
             .filter(Column::isOneToMany)
@@ -114,22 +131,5 @@ public class Table {
         if (columns.getIdCount() != 1) {
             throw new IllegalArgumentException("Id 필드는 필수로 1개를 가져야 합니다.");
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Table table = (Table) o;
-        return Objects.equals(clazz, table.clazz);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(clazz);
-    }
-
-    public List<Object> getRelationValues(Object entity) {
-        return columns.getRelationValues(entity);
     }
 }
