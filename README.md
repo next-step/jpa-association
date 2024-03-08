@@ -9,4 +9,4 @@
     join orderItem on orders.id = order_items.order_id
     where orders.id = ?;
     ```
-- [ ] 요구사항 2 - Join Query 를 만들어 Entity 화 해보기
+- [x] 요구사항 2 - Join Query 를 만들어 Entity 화 해보기

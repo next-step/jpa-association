@@ -1,21 +1,20 @@
 package persistence.sql.column;
 
 import jakarta.persistence.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import persistence.entity.AssociationEntity;
 import persistence.entity.JoinEntityColumn;
 import persistence.entity.OneToManyAssociationEntity;
 import persistence.sql.type.TableName;
+import utils.CamelToSnakeCaseConverter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class JoinTableColumn implements TableEntity {
-    private static Logger log = LoggerFactory.getLogger(JoinTableColumn.class);
 
     private final TableName name;
 
@@ -23,11 +22,13 @@ public class JoinTableColumn implements TableEntity {
 
     private final IdColumn idColumn;
     private final Columns columns;
+    private final Class<?> clazz;
 
-    public static <T> JoinTableColumn fromOneToMany(Class<T> rootClass) {
-        Optional<Field> associationField = getAssociationField(rootClass);
-        return associationField.map(JoinTableColumn::new)
-                .orElse(null);
+    public static <T> List<JoinTableColumn> fromOneToMany(Class<T> rootClass) {
+        List<Field> associationField = getAssociationField(rootClass);
+        return associationField.stream()
+                .map(JoinTableColumn::new)
+                .collect(Collectors.toList());
     }
 
     private JoinTableColumn(Field oneToManyField) {
@@ -35,7 +36,6 @@ public class JoinTableColumn implements TableEntity {
 
         OneToManyAssociationEntity associationEntity = new OneToManyAssociationEntity(
                 new JoinEntityColumn(oneToManyField),
-                oneToMany.mappedBy(),
                 oneToMany.fetch()
         );
 
@@ -45,6 +45,8 @@ public class JoinTableColumn implements TableEntity {
         this.name = new TableName(associatedClass);
         this.associationEntity = associationEntity;
         this.columns = new Columns(associatedClass.getDeclaredFields());
+        this.clazz = associatedClass;
+
     }
 
     private static Class<?> getAssociatedClass(Field oneToManyField) {
@@ -55,7 +57,7 @@ public class JoinTableColumn implements TableEntity {
             try {
                 return Class.forName(typeArgument.getTypeName());
             } catch (ClassNotFoundException e) {
-                log.info("Class not found: " + typeArgument.getTypeName(), e);
+                throw new RuntimeException("Class not found: " + typeArgument.getTypeName());
             }
         }
         return null;
@@ -65,31 +67,15 @@ public class JoinTableColumn implements TableEntity {
         return typeArguments != null && typeArguments.length > 0;
     }
 
-    private static <T> Optional<Field> getAssociationField(Class<T> clazz) {
+    private static <T> List<Field> getAssociationField(Class<T> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .filter(it -> it.isAnnotationPresent(OneToMany.class))
-                .findFirst();
+                .collect(Collectors.toList());
     }
 
     @Override
     public String getName() {
-        return changeSnakeCase(name.getValue());
-    }
-
-    private String changeSnakeCase(String name) {
-        StringBuilder tableName = new StringBuilder();
-        for (int index = 0; index < name.length(); index++) {
-            char ch = name.charAt(index);
-            addUnderScore(index, ch, tableName);
-            tableName.append(Character.toLowerCase(ch));
-        }
-        return tableName.toString();
-    }
-
-    private void addUnderScore(int index, char ch, StringBuilder tableName) {
-        if (index > 0 && Character.isUpperCase(ch)) {
-            tableName.append("_");
-        }
+        return CamelToSnakeCaseConverter.convert(name.getValue());
     }
 
     public AssociationEntity getAssociationEntity() {
@@ -102,5 +88,20 @@ public class JoinTableColumn implements TableEntity {
 
     public IdColumn getIdColumn() {
         return idColumn;
+    }
+
+    public Class<?> getClazz() {
+        return clazz;
+    }
+
+    @Override
+    public String toString() {
+        return "JoinTableColumn{" +
+                "name=" + name +
+                ", associationEntity=" + associationEntity +
+                ", idColumn=" + idColumn +
+                ", columns=" + columns +
+                ", clazz=" + clazz +
+                '}';
     }
 }

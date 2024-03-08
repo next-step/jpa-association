@@ -2,6 +2,8 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +17,12 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.MysqlDialect;
+import persistence.sql.dml.SelectQueryBuilder;
 
 import java.sql.SQLException;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -70,4 +75,33 @@ class EntityLoaderTest {
                 () -> assertEquals(person.getEmail(), foundPerson.getEmail())
         );
     }
+
+    @DisplayName("연관된 엔티티를 조회해서 엔티티화 시킨다.")
+    @Test
+    void entity() {
+        //given
+        jdbcTemplate.execute("create table orders (id bigint auto_increment, order_number varchar(255), primary key (id))");
+        jdbcTemplate.execute("create table order_items (id bigint auto_increment, product varchar(255), quantity int, order_id bigint, FOREIGN KEY (order_id) REFERENCES orders(id), primary key (id))");
+
+        jdbcTemplate.execute("insert into orders (id, order_number) values (1, 'order1')");
+        jdbcTemplate.execute("insert into order_items (id, product, quantity, order_id) values (1, 'product1', 1, 1)");
+        jdbcTemplate.execute("insert into order_items (id, product, quantity, order_id) values (2, 'product2', 2, 1)");
+
+        //when
+        EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate, dialect);
+        Order order = entityLoader.find(Order.class, 1L);
+
+        //then
+        assertAll(
+                () -> assertThat(order.getOrderNumber()).isEqualTo("order1"),
+                () -> assertThat(order.getOrderItems()).hasSize(2),
+                () -> assertThat(order.getOrderItems().get(0).getId()).isEqualTo(1L),
+                () -> assertThat(order.getOrderItems().get(0).getProduct()).isEqualTo("product1"),
+                () -> assertThat(order.getOrderItems().get(0).getQuantity()).isEqualTo(1),
+                () -> assertThat(order.getOrderItems().get(1).getId()).isEqualTo(2L),
+                () -> assertThat(order.getOrderItems().get(1).getProduct()).isEqualTo("product2"),
+                () -> assertThat(order.getOrderItems().get(1).getQuantity()).isEqualTo(2)
+        );
+    }
+
 }

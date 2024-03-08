@@ -82,4 +82,9 @@ public class GeneralColumn implements Column {
         }
         return false;
     }
+
+    @Override
+    public Field getField() {
+        return field;
+    }
 }

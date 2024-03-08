@@ -1,7 +1,6 @@
 package persistence.sql.column;
 
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import persistence.sql.dialect.Dialect;
 
@@ -16,11 +15,6 @@ public class IdColumn implements Column {
 
     private final GeneralColumn generalColumn;
     private final Field field;
-
-    private IdColumn(GeneralColumn generalColumn, Field field) {
-        this.generalColumn = generalColumn;
-        this.field = field;
-    }
 
     public IdColumn(Field[] fields) {
         this(getIdField(fields), GeneralColumn::new);
@@ -83,5 +77,10 @@ public class IdColumn implements Column {
     @Override
     public String getFieldName() {
         return generalColumn.getFieldName();
+    }
+
+    @Override
+    public Field getField() {
+        return field;
     }
 }

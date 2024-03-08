@@ -8,11 +8,9 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
 
     private final EntityManager entityManager;
 
-
     public CustomJpaRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
-
 
     @Override
     public T save(T entity) {

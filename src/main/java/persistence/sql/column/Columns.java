@@ -1,6 +1,7 @@
 package persistence.sql.column;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import persistence.sql.dialect.Dialect;
 
@@ -30,6 +31,7 @@ public class Columns {
         return Arrays.stream(fields)
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(Id.class))
+                .filter(field -> !field.isAnnotationPresent(OneToMany.class))
                 .map(columnCreator)
                 .collect(Collectors.toList());
     }
@@ -44,6 +46,7 @@ public class Columns {
     public String getColumnNames() {
         return this.values
                 .stream()
+                .filter(column -> !column.isAssociationEntity())
                 .map(Column::getName)
                 .collect(Collectors.joining(COMMA));
     }

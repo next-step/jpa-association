@@ -5,23 +5,27 @@ import utils.CamelToSnakeCaseConverter;
 
 public class OneToManyAssociationEntity implements AssociationEntity {
     private final JoinEntityColumn joinColumn;
-    private final String mappedBy;
     private final FetchType fetchType;
 
 
-    public OneToManyAssociationEntity(JoinEntityColumn joinColumn, String mappedBy, FetchType fetchType) {
+    public OneToManyAssociationEntity(JoinEntityColumn joinColumn, FetchType fetchType) {
         this.joinColumn = joinColumn;
-        this.mappedBy = mappedBy;
         this.fetchType = fetchType;
     }
 
     @Override
     public String getJoinColumnName() {
-        return CamelToSnakeCaseConverter.convert(joinColumn.getName());
+        return CamelToSnakeCaseConverter.convert(joinColumn.getColumnName());
     }
 
     @Override
-    public FetchType getFetchType() {
-        return fetchType;
+    public String getJoinFieldName() {
+        return joinColumn.getFieldName();
     }
+
+    @Override
+    public boolean isLazy() {
+        return FetchType.LAZY.equals(fetchType);
+    }
+
 }

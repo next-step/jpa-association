@@ -5,6 +5,8 @@ import persistence.sql.dialect.Dialect;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.mapper.GenericRowMapper;
 
+import java.util.List;
+
 public class EntityLoaderImpl implements EntityLoader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -22,6 +24,6 @@ public class EntityLoaderImpl implements EntityLoader {
     public <T> T find(Class<T> clazz, Long id) {
         SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
         String query = queryBuilder.toStatementWithId(id);
-        return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz, dialect));
+        return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
     }
 }

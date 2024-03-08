@@ -6,10 +6,12 @@ import java.lang.reflect.Field;
 
 public class JoinEntityColumn {
 
-    private final String name;
+    private final String columnName;
+    private final String fieldName;
 
     public JoinEntityColumn(Field field) {
-        this.name = getJoinField(field);
+        this.columnName = getJoinField(field);
+        this.fieldName = field.getName();
     }
 
     private String getJoinField(Field joinField) {
@@ -20,7 +22,11 @@ public class JoinEntityColumn {
         return joinField.getName();
     }
 
-    public String getName() {
-        return name;
+    public String getColumnName() {
+        return columnName;
+    }
+
+    public String getFieldName() {
+        return fieldName;
     }
 }
