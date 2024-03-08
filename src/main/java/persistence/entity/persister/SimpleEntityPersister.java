@@ -32,19 +32,24 @@ public class SimpleEntityPersister implements EntityPersister {
         Object id = jdbcTemplate.executeInsert(dmlGenerator.generateInsertQuery(entity));
         Table table = Table.getInstance(entity.getClass());
         table.setIdValue(entity, id);
-
-        List<Object> relatedEntities = table.getRelationValues(entity);
-        relatedEntities.stream()
-            .flatMap(relatedEntity -> ((Collection<Object>) relatedEntity).stream())
-            .forEach(relatedEntity -> {
-                Object subId = jdbcTemplate.executeInsert(dmlGenerator.generateInsertQuery(relatedEntity, entity));
-                Table subTable = Table.getInstance(relatedEntity.getClass());
-                subTable.setIdValue(relatedEntity, subId);
-            });
+        insertRelation(table, entity);
     }
 
     @Override
     public void delete(Object entity) {
         jdbcTemplate.executeUpdate(dmlGenerator.generateDeleteQuery(entity));
+    }
+
+    private void insertRelation(Table root, Object entity) {
+
+        List<Object> relatedEntities = root.getRelationValues(entity);
+        relatedEntities.stream()
+            .map(relatedEntity -> ((Collection<Object>) relatedEntity))
+            .flatMap(Collection::stream)
+            .forEach(relatedEntity -> {
+                Object subId = jdbcTemplate.executeInsert(dmlGenerator.generateInsertQuery(relatedEntity, entity));
+                Table table = Table.getInstance(relatedEntity.getClass());
+                table.setIdValue(relatedEntity, subId);
+            });
     }
 }
