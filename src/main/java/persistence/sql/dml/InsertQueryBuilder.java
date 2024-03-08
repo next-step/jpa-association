@@ -36,8 +36,11 @@ public class InsertQueryBuilder {
         String relationValues = relationValueClause(parent);
 
         if (!relationColumns.isEmpty()) {
-            columnsBuilder.append(COMMA.getValue()).append(relationColumns);
-            valuesBuilder.append(COMMA.getValue()).append(relationValues);
+            columnsBuilder.append(COMMA.getValue())
+                .append(relationColumns);
+
+            valuesBuilder.append(COMMA.getValue())
+                .append(relationValues);
         }
 
         return String.format(INSERT_DEFINITION, table.getTableName(), columnsBuilder, valuesBuilder);
@@ -57,14 +60,16 @@ public class InsertQueryBuilder {
             .collect(Collectors.joining(COMMA.getValue()));
     }
 
-    private String valueClause(List<Column> columns, Object object) {
+    private String valueClause(List<Column> columns, Object entity) {
         return columns.stream()
-            .map(column -> column.getFieldValue(object))
+            .map(column -> column.getFieldValue(entity))
             .map(String::valueOf)
             .collect(Collectors.joining(COMMA.getValue()));
     }
 
     private String relationValueClause(Object parent) {
-        return Table.getInstance(parent.getClass()).getIdValue(parent).toString();
+        return Table.getInstance(parent.getClass())
+            .getIdValue(parent)
+            .toString();
     }
 }

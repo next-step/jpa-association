@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.stream.Collectors;
 import static persistence.sql.constant.SqlConstant.COMMA;
+import static persistence.sql.constant.SqlConstant.DOT;
 import static persistence.sql.constant.SqlConstant.SPACE;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
@@ -32,7 +33,7 @@ public class SelectQueryBuilder {
 
     private String buildSelectClause(Table table) {
         String rootColumns = buildColumnsClause(table.getTableName(), table.getSelectColumns());
-        if (table.getEagerRelationColumns().isEmpty()) {
+        if (table.isEagerRelationEmpty()) {
             return SELECT_DEFINITION + SPACE.getValue() + rootColumns;
         }
         String relationColumns = COMMA.getValue() + buildRelationColumnsClause(table.getEagerRelationColumns());
@@ -40,7 +41,7 @@ public class SelectQueryBuilder {
     }
 
     private String buildFromClause(Table table) {
-        if (table.getEagerRelationColumns().isEmpty()) {
+        if (table.isEagerRelationEmpty()) {
             return FROM_DEFINITION + SPACE.getValue() + table.getTableName();
         }
         String relationTable = SPACE.getValue() + buildRelationTableClause(table, table.getEagerRelationColumns());
@@ -54,12 +55,11 @@ public class SelectQueryBuilder {
     }
 
     private String formatColumnWithName(String tableName, Column column) {
-        return tableName + "." + column.getColumnName();
+        return tableName + DOT.getValue() + column.getColumnName();
     }
 
     private String buildRelationColumnsClause(List<Column> columns) {
         return columns.stream()
-            .filter(column -> column.getGenericType() instanceof ParameterizedType)
             .map(Column::getRelationTable)
             .map(table -> buildColumnsClause(table.getTableName(), table.getSelectColumns()))
             .collect(Collectors.joining(COMMA.getValue()));
@@ -67,7 +67,6 @@ public class SelectQueryBuilder {
 
     private String buildRelationTableClause(Table root, List<Column> columns) {
         return columns.stream()
-            .filter(column -> column.getGenericType() instanceof ParameterizedType)
             .map(column -> buildJoinDefinition(root, column))
             .collect(Collectors.joining()).trim();
     }

@@ -74,6 +74,10 @@ public class Table {
         return columns.getEagerRelationColumns();
     }
 
+    public boolean isEagerRelationEmpty() {
+        return columns.getRelationColumns().isEmpty();
+    }
+
     public Column getIdColumn() {
         return columns.getIdColumn();
     }
@@ -107,9 +111,7 @@ public class Table {
             throw new IllegalArgumentException("엔티티 객체가 아닙니다.");
         }
 
-        long idFieldCount = columns.getIdCount();
-
-        if (idFieldCount != 1) {
+        if (columns.getIdCount() != 1) {
             throw new IllegalArgumentException("Id 필드는 필수로 1개를 가져야 합니다.");
         }
     }
