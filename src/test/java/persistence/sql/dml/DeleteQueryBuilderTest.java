@@ -2,7 +2,7 @@ package persistence.sql.dml;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.MysqlDialect;
 
@@ -14,8 +14,7 @@ class DeleteQueryBuilderTest {
     @DisplayName("Person 객체를 delete 쿼리로 변환한다.")
     void testDeleteDml() {
         //given
-        Dialect dialect = new MysqlDialect();
-        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(dialect);
+        DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder();
         Person person = new Person("username", 50, "test@test.com", 1);
 
         //when

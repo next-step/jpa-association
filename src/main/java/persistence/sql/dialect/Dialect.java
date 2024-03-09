@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 
 public interface Dialect {
 
-    ColumnType getColumn(Class<?> type);
+    ColumnType getColumnType(Class<?> type);
 
     IdGeneratedStrategy getIdGeneratedStrategy(GenerationType strategy);
 

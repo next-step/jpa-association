@@ -2,7 +2,7 @@ package persistence.sql.column;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.dialect.MysqlDialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,9 +14,9 @@ class ColumnsTest {
     @Test
     void getColumnsDefinition() {
         // given
-        Columns columns = new Columns(Person.class.getDeclaredFields(), new MysqlDialect());
+        Columns columns = new Columns(Person.class.getDeclaredFields());
         // when
-        String result = columns.getColumnsDefinition();
+        String result = columns.getColumnsDefinition(new MysqlDialect());
 
         // then
         assertThat(result).isEqualTo("nick_name varchar(255), old integer, email varchar(255) not null");
@@ -26,7 +26,7 @@ class ColumnsTest {
     @Test
     void getColumnNames() {
         // given
-        Columns columns = new Columns(Person.class.getDeclaredFields(), new MysqlDialect());
+        Columns columns = new Columns(Person.class.getDeclaredFields());
         // when
         String result = columns.getColumnNames();
 
@@ -40,8 +40,8 @@ class ColumnsTest {
         // given
         Person person1 = new Person("KIM", "kim@test.com", 30);
         Person person2 = new Person("LEE", "kim@test.com", 20);
-        Columns columns = new Columns(person1, new MysqlDialect());
-        Columns columns2 = new Columns(person2, new MysqlDialect());
+        Columns columns = new Columns(person1);
+        Columns columns2 = new Columns(person2);
 
         //when
         boolean result = columns.isDirty(columns2);
@@ -55,8 +55,8 @@ class ColumnsTest {
     void isDirtyWhenSameData() {
         // given
         Person person = new Person("KIM", "kim@test.com", 30);
-        Columns columns = new Columns(person, new MysqlDialect());
-        Columns columns2 = new Columns(person, new MysqlDialect());
+        Columns columns = new Columns(person);
+        Columns columns2 = new Columns(person);
 
         //when
         boolean result = columns.isDirty(columns2);

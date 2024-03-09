@@ -18,9 +18,9 @@ public class EntityPersisterImpl implements EntityPersister {
 
     public EntityPersisterImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
-        this.updateQueryBuilder = new UpdateQueryBuilder(dialect);
+        this.updateQueryBuilder = new UpdateQueryBuilder();
         this.insertQueryBuilder = new InsertQueryBuilder(dialect);
-        this.deleteQueryBuilder = new DeleteQueryBuilder(dialect);
+        this.deleteQueryBuilder = new DeleteQueryBuilder();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package persistence;
+package domain;
 
 import jakarta.persistence.*;
 

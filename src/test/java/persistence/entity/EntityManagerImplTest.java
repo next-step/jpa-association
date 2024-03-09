@@ -7,7 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.Person;
+import domain.Person;
 import persistence.sql.column.Columns;
 import persistence.sql.column.IdColumn;
 import persistence.sql.column.TableColumn;
@@ -54,10 +54,10 @@ class EntityManagerImplTest {
 	}
 
 	private void createTable(Class<Person> personEntity) {
-		Columns columns = new Columns(personEntity.getDeclaredFields(), dialect);
-		IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields(), dialect);
+		Columns columns = new Columns(personEntity.getDeclaredFields());
+		IdColumn idColumn = new IdColumn(personEntity.getDeclaredFields());
 
-		CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn);
+		CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(table, columns, idColumn, dialect);
 
 		String createQuery = createQueryBuilder.build();
 		jdbcTemplate.execute(createQuery);

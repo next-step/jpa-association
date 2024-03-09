@@ -14,18 +14,15 @@ public class IdColumn implements Column {
     private static final String PRIMARY_KEY = "primary key";
 
     private final GeneralColumn generalColumn;
-    private final IdGeneratedStrategy idGeneratedStrategy;
+    private final Field field;
 
-    public IdColumn(Field[] fields, Dialect dialect) {
-        this(getIdField(fields),
-                field -> new GeneralColumn(field, dialect),
-                dialect);
+    public IdColumn(Field[] fields) {
+        this(getIdField(fields), GeneralColumn::new);
     }
 
-    public IdColumn(Object object, Dialect dialect) {
+    public IdColumn(Object object) {
         this(getIdField(object.getClass().getDeclaredFields()),
-                field -> new GeneralColumn(object, field, dialect),
-                dialect);
+                field -> new GeneralColumn(object, field));
     }
 
     private static Field getIdField(Field[] object) {
@@ -35,16 +32,12 @@ public class IdColumn implements Column {
                 .orElseThrow(() -> new IllegalArgumentException("[INFO] No @Id annotation"));
     }
 
-    private IdColumn(Field idField, Function<Field, GeneralColumn> generalColumnCreator, Dialect dialect) {
+    private IdColumn(Field idField, Function<Field, GeneralColumn> generalColumnCreator) {
         validateGeneratedValue(idField);
+        this.field = idField;
         this.generalColumn = generalColumnCreator.apply(idField);
-        this.idGeneratedStrategy = getIdGeneratedStrategy(dialect, idField);
     }
 
-    private IdGeneratedStrategy getIdGeneratedStrategy(Dialect dialect, Field idField) {
-        GeneratedValue annotation = idField.getAnnotation(GeneratedValue.class);
-        return dialect.getIdGeneratedStrategy(annotation.strategy());
-    }
 
     private void validateGeneratedValue(Field field) {
         if (!field.isAnnotationPresent(GeneratedValue.class)) {
@@ -56,17 +49,24 @@ public class IdColumn implements Column {
         return getValue() == null;
     }
 
-    public IdGeneratedStrategy getIdGeneratedStrategy() {
-        return idGeneratedStrategy;
+    public IdGeneratedStrategy getIdGeneratedStrategy(Dialect dialect) {
+        GeneratedValue annotation = field.getAnnotation(GeneratedValue.class);
+        return dialect.getIdGeneratedStrategy(annotation.strategy());
     }
 
+    public String getIdGeneratedDefinition(Dialect dialect) {
+        return getIdGeneratedStrategy(dialect).getValue();
+    }
     public <T> T getValue(){
         return (T) generalColumn.getValue();
     }
 
     @Override
-    public String getDefinition() {
-        return String.format(PK_FORMAT, generalColumn.getDefinition(), idGeneratedStrategy.getValue(), PRIMARY_KEY);
+    public String getDefinition(Dialect dialect) {
+        return String.format(PK_FORMAT,
+                generalColumn.getDefinition(dialect),
+                getIdGeneratedDefinition(dialect),
+                PRIMARY_KEY);
     }
 
     @Override
@@ -77,5 +77,10 @@ public class IdColumn implements Column {
     @Override
     public String getFieldName() {
         return generalColumn.getFieldName();
+    }
+
+    @Override
+    public Field getField() {
+        return field;
     }
 }

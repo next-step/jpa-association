@@ -1,6 +1,7 @@
 package persistence.sql.column;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import persistence.sql.dialect.Dialect;
 
@@ -17,33 +18,35 @@ public class Columns {
 
     private final List<GeneralColumn> values;
 
-    public Columns(Object object, Dialect dialect) {
+    public Columns(Object object) {
         Field[] fields = object.getClass().getDeclaredFields();
-        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(object, field, dialect));
+        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(object, field));
     }
 
-    public Columns(Field[] fields, Dialect dialect) {
-        this.values = createGeneralColumns(fields, (field) -> new GeneralColumn(field, dialect));
+    public Columns(Field[] fields) {
+        this.values = createGeneralColumns(fields, GeneralColumn::new);
     }
 
     private List<GeneralColumn> createGeneralColumns(Field[] fields, Function<Field, GeneralColumn> columnCreator) {
         return Arrays.stream(fields)
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(Id.class))
+                .filter(field -> !field.isAnnotationPresent(OneToMany.class))
                 .map(columnCreator)
                 .collect(Collectors.toList());
     }
 
-    public String getColumnsDefinition() {
+    public String getColumnsDefinition(Dialect dialect) {
         return this.values
                 .stream()
-                .map(Column::getDefinition)
+                .map(column -> column.getDefinition(dialect))
                 .collect(Collectors.joining(COMMA));
     }
 
     public String getColumnNames() {
         return this.values
                 .stream()
+                .filter(column -> !column.isAssociationEntity())
                 .map(Column::getName)
                 .collect(Collectors.joining(COMMA));
     }

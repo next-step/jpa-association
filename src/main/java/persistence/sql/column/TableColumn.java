@@ -1,20 +1,22 @@
 package persistence.sql.column;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import persistence.sql.type.NameType;
+import persistence.sql.type.TableName;
+import utils.CamelToSnakeCaseConverter;
 
-public class TableColumn {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-    private final NameType name;
+public class TableColumn implements TableEntity {
+
+    private final TableName name;
+    private final List<JoinTableColumn> joinTableColumn;
 
     public TableColumn(Class<?> clazz) {
         validateEntityAnnotation(clazz);
-        String tableColumnName = clazz.getSimpleName();
-        if (clazz.isAnnotationPresent(Table.class)) {
-            tableColumnName = clazz.getAnnotation(Table.class).name();
-        }
-        this.name = new NameType(clazz.getSimpleName(), tableColumnName);
+        this.joinTableColumn = new ArrayList<>(JoinTableColumn.fromOneToMany(clazz));
+        this.name = new TableName(clazz);
     }
 
     private void validateEntityAnnotation(Class<?> clazz) {
@@ -23,23 +25,13 @@ public class TableColumn {
         }
     }
 
+    @Override
     public String getName() {
-        return changeSnakeCase(name.getValue());
+        return CamelToSnakeCaseConverter.convert(name.getValue());
     }
 
-    private String changeSnakeCase(String name) {
-        StringBuilder tableName = new StringBuilder();
-        for (int index = 0; index < name.length(); index++) {
-            char ch = name.charAt(index);
-            addUnderScore(index, ch, tableName);
-            tableName.append(Character.toLowerCase(ch));
-        }
-        return tableName.toString();
+    public List<JoinTableColumn> getJoinTableColumn() {
+        return joinTableColumn;
     }
 
-    private void addUnderScore(int index, char ch, StringBuilder tableName) {
-        if (index > 0 && Character.isUpperCase(ch)) {
-            tableName.append("_");
-        }
-    }
 }

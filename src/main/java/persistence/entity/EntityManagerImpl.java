@@ -30,7 +30,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
-        EntityMetaData entityMetaData = new EntityMetaData(clazz, new Columns(clazz.getDeclaredFields(), dialect));
+        EntityMetaData entityMetaData = new EntityMetaData(clazz, new Columns(clazz.getDeclaredFields()));
         Object entity = persistContext.getEntity(clazz, id)
                 .orElseGet(() -> {
                     T findEntity = entityLoader.find(clazz, id);
@@ -43,8 +43,8 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T persist(Object entity) {
-        IdColumn idColumn = new IdColumn(entity, dialect);
-        GenerationType generationType = idColumn.getIdGeneratedStrategy().getGenerationType();
+        IdColumn idColumn = new IdColumn(entity);
+        GenerationType generationType = idColumn.getIdGeneratedStrategy(dialect).getGenerationType();
         if (dialect.getIdGeneratedStrategy(generationType).isAutoIncrement()) {
             long id = entityPersister.insertByGeneratedKey(entity);
             savePersistence(entity, id);
@@ -79,15 +79,15 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void remove(Object entity) {
-        IdColumn idColumn = new IdColumn(entity, dialect);
+        IdColumn idColumn = new IdColumn(entity);
         persistContext.removeEntity(entity.getClass(), idColumn.getValue());
         persistContext.addDeleteActionQueue(new DeleteEvent<>(idColumn.getValue(), entity));
     }
 
     @Override
     public <T> T merge(T entity) {
-        IdColumn idColumn = new IdColumn(entity, dialect);
-        EntityMetaData entityMetaData = new EntityMetaData(entity, dialect);
+        IdColumn idColumn = new IdColumn(entity);
+        EntityMetaData entityMetaData = new EntityMetaData(entity);
         EntityMetaData previousEntity = persistContext.getSnapshot(entity, idColumn.getValue());
          if (entityMetaData.isDirty(previousEntity)) {
             persistContext.addUpdateActionQueue(new UpdateEvent<>(idColumn.getValue(), entity));
@@ -98,7 +98,7 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     private void savePersistence(Object entity, Object id) {
-        persistContext.getDatabaseSnapshot(new EntityMetaData(entity, dialect), id);
+        persistContext.getDatabaseSnapshot(new EntityMetaData(entity), id);
         persistContext.addEntity(entity, id);
     }
 

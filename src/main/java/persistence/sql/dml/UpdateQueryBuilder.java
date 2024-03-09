@@ -14,20 +14,19 @@ public class UpdateQueryBuilder implements DmlQueryBuilder {
     private static final String WHERE_CLAUSE_FORMAT = "where %s = %d";
     private static final String COMMA = ", ";
 
-    private final Dialect dialect;
     private Columns columns;
     private IdColumn idColumn;
     private String query;
 
-    public UpdateQueryBuilder(Dialect dialect) {
-        this.dialect = dialect;
+    public UpdateQueryBuilder() {
+
     }
 
     public UpdateQueryBuilder build(Object entity) {
         Class<?> clazz = entity.getClass();
         TableColumn tableColumn = new TableColumn(clazz);
-        this.columns = new Columns(entity, dialect);
-        this.idColumn = new IdColumn(entity, dialect);
+        this.columns = new Columns(entity);
+        this.idColumn = new IdColumn(entity);
         this.query = String.format(UPDATE_QUERY_FORMAT, tableColumn.getName(), getColumnFormat(columns));
         return this;
     }
