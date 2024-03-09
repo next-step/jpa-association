@@ -1,8 +1,7 @@
 package persistence.sql.column;
 
 import persistence.sql.dialect.Dialect;
-import persistence.sql.type.TableName;
-import persistence.sql.type.NullableType;
+import persistence.sql.column.type.NullableType;
 import utils.CamelToSnakeCaseConverter;
 
 import java.lang.reflect.Field;

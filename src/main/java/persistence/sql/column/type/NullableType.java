@@ -1,8 +1,8 @@
-package persistence.sql.type;
+package persistence.sql.column.type;
 
 public class NullableType {
 
-    private boolean isNullable;
+    private final boolean isNullable;
 
     public NullableType() {
         this(true);

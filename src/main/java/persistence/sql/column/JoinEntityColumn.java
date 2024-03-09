@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.sql.column;
 
 import jakarta.persistence.JoinColumn;
 
@@ -6,12 +6,10 @@ import java.lang.reflect.Field;
 
 public class JoinEntityColumn {
 
-    private final String columnName;
-    private final String fieldName;
+    private final ColumnNameProperty columnNameProperty;
 
     public JoinEntityColumn(Field field) {
-        this.columnName = getJoinField(field);
-        this.fieldName = field.getName();
+        this.columnNameProperty = new ColumnNameProperty(getJoinField(field), field.getName());
     }
 
     private String getJoinField(Field joinField) {
@@ -23,10 +21,10 @@ public class JoinEntityColumn {
     }
 
     public String getColumnName() {
-        return columnName;
+        return columnNameProperty.getColumnName();
     }
 
     public String getFieldName() {
-        return fieldName;
+        return columnNameProperty.getFieldName();
     }
 }

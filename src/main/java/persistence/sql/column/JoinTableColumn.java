@@ -2,9 +2,7 @@ package persistence.sql.column;
 
 import jakarta.persistence.*;
 import persistence.entity.AssociationEntity;
-import persistence.entity.JoinEntityColumn;
 import persistence.entity.OneToManyAssociationEntity;
-import persistence.sql.type.TableName;
 import utils.CamelToSnakeCaseConverter;
 
 import java.lang.reflect.Field;
