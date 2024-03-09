@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import jakarta.persistence.FetchType;
+import persistence.sql.column.JoinEntityColumn;
 import utils.CamelToSnakeCaseConverter;
 
 public class OneToManyAssociationEntity implements AssociationEntity {

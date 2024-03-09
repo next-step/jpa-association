@@ -1,11 +1,9 @@
 package persistence.sql.column;
 
 import jakarta.persistence.Entity;
-import persistence.sql.type.TableName;
 import utils.CamelToSnakeCaseConverter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TableColumn implements TableEntity {

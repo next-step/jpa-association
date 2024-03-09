@@ -1,5 +1,7 @@
 package persistence.study;
 
+import java.util.Objects;
+
 public class Car {
 
     private String name;
