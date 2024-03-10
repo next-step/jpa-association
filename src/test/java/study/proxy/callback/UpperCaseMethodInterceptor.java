@@ -1,4 +1,4 @@
-package study.proxy;
+package study.proxy.callback;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
