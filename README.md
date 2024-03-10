@@ -34,5 +34,13 @@
       - 메서드 호출을 특정 객체로 위임. Dispatcher의 확장 버전으로, 메서드 호출 시 원본 객체의 참조를 유지
     - FixedValue
       - 모든 메서드 호출에 대해 동일한 값을 반환.
+
+### step 3 - OneToMany (FetchType.LAZY)
+
+- [ ] 요구사항1 - 리팩터링 (FetchType.LAZY)
+  - 테이블에 임의의 데이터를 넣고 가져오기
+  - Proxy 를 활용해 Lazy loading 을 구현
+  - Query 확인
+  - Entity 객체 만들어 보기
     
     
