@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 abstract public class H2DatabaseTest {
-    protected static final Dialect dialect = MySQLDialect.INSTANCE;
+    protected static final Dialect dialect = MySQLDialect.getInstance();
 
     protected static H2 server;
     protected Connection connection;

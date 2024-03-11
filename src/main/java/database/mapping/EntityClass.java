@@ -26,8 +26,7 @@ public class EntityClass {
         EntityMetadata entityMetadata = EntityMetadata.fromClass(clazz);
         return new EntityClass(
                 clazz,
-                entityMetadata,
-                RowMapperFactory.create(declaredConstructor, entityMetadata, MySQLDialect.INSTANCE)
+                RowMapperFactory.create(declaredConstructor, clazz, MySQLDialect.getInstance())
         );
     }
 

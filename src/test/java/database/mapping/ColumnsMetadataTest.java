@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ColumnsMetadataTest {
-    private final Dialect dialect = MySQLDialect.INSTANCE;
+    private final Dialect dialect = MySQLDialect.getInstance();
 
     private final ColumnsMetadata columnsMetadata = ColumnsMetadata.fromClass(Person.class);
 

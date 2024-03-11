@@ -8,7 +8,16 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateTest {
-    private final Dialect dialect = MySQLDialect.INSTANCE;
+    private final Dialect dialect = MySQLDialect.getInstance();
+
+    @BeforeAll
+    static void setUp() {
+        EntityMetadataFactoryLoader.loader()
+                .add(OldPerson1.class)
+                .add(OldPerson2.class)
+                .add(OldPerson3.class)
+                .load();
+    }
 
     @ParameterizedTest
     @CsvSource(value = {
