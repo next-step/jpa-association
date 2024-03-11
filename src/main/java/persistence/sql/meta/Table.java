@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.h2.util.StringUtils;
 
 public class Table {
@@ -25,9 +26,9 @@ public class Table {
         if (cashTable.containsKey(clazz)) {
             return cashTable.get(clazz);
         }
+        validate(clazz);
 
         Columns columns = Columns.from(clazz.getDeclaredFields());
-        validate(clazz, columns);
         Table table = cashTable.computeIfAbsent(clazz, t -> new Table(clazz, columns));
         setRelationTable(table, columns);
 
@@ -78,6 +79,12 @@ public class Table {
         return columns.getRelationColumns().isEmpty();
     }
 
+    public List<Table> getEagerRelationTables() {
+        return columns.getEagerRelationColumns()
+            .stream().map(Column::getRelationTable)
+            .collect(Collectors.toList());
+    }
+
     public Column getIdColumn() {
         return columns.getIdColumn();
     }
@@ -115,7 +122,7 @@ public class Table {
         columns.getRelationColumns().stream()
             .filter(Column::isOneToMany)
             .forEach(column -> {
-                Table table =  column.getRelationTable();
+                Table table = column.getRelationTable();
                 if (!relationTable.containsKey(table)) {
                     relationTable.put(table, new HashSet<>());
                 }
@@ -123,13 +130,9 @@ public class Table {
             });
     }
 
-    private static void validate(Class<?> clazz, Columns columns) {
+    private static void validate(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("엔티티 객체가 아닙니다.");
-        }
-
-        if (columns.getIdCount() != 1) {
-            throw new IllegalArgumentException("Id 필드는 필수로 1개를 가져야 합니다.");
         }
     }
 }

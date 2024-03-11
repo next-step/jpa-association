@@ -17,4 +17,8 @@ public enum SqlConstant {
     public String getValue() {
         return value;
     }
+
+    public StringBuilder concat(String left, String right) {
+        return new StringBuilder(left).append(value).append(right);
+    }
 }

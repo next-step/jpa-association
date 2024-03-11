@@ -131,11 +131,8 @@ class SimpleEntityManagerTest {
                 () -> assertEquals(foundOrder, order),
                 () -> assertEquals(foundOrder.getId(), order.getId()),
                 () -> assertEquals(foundOrder.getOrderNumber(), order.getOrderNumber()),
-                () -> assertThat(foundOrder.getOrderItems()).hasSize(3),
-                () -> IntStream.range(0, foundOrder.getOrderItems().size())
-                .forEach(i -> assertEquals(foundOrder.getOrderItems().get(i), order.getOrderItems().get(i)))
+                () -> assertEquals(foundOrder.getOrderItems(), order.getOrderItems())
             );
-            // then
         }
     }
 

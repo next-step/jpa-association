@@ -28,9 +28,10 @@ class SelectQueryBuilderTest {
             assertEquals("SELECT users.id,users.nick_name,users.old,users.email FROM users", query);
         }
 
-        @DisplayName("Order Entity의 select 쿼리가 만들어지는지 확인한다.")
+        @DisplayName("Order Entity의 select 쿼리 및 join 쿼리가 만들어지는지 확인한다.")
         @Test
         void testGenerateQuery2() {
+
             // given
             SelectQueryBuilder selectQueryBuilder = SelectQueryBuilder.getInstance();
 

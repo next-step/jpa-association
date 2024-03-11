@@ -118,12 +118,14 @@ public class Column {
     }
 
     public Table getRelationTable()  {
-        ParameterizedType type = (ParameterizedType) field.getGenericType();
-        return Arrays.stream(type.getActualTypeArguments())
-            .map(t -> (Class<?>) t)
-            .map(Table::getInstance)
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        Type genericType = field.getGenericType();
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+            Class<?> relationClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+            return Table.getInstance(relationClass);
+        }
+
+        return Table.getInstance(field.getType());
     }
 
     private Object valueOf(Object object) {

@@ -1,6 +1,5 @@
 package persistence.sql.dml;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.stream.Collectors;
 import static persistence.sql.constant.SqlConstant.COMMA;
@@ -11,12 +10,12 @@ import persistence.sql.meta.Table;
 
 public class SelectQueryBuilder {
 
-    private static final String SELECT_FORMAT = "%s %s";
     private static final String SELECT_DEFINITION = "SELECT";
     private static final String FROM_DEFINITION = "FROM";
-    private static final String LEFT_JOIN_DEFINITION = "LEFT JOIN %s ON %s.%s = %s.%s";
+    private JoinQueryBuilder joinQueryBuilder;
 
     private SelectQueryBuilder() {
+        joinQueryBuilder = JoinQueryBuilder.getInstance();
     }
 
     private static class Holder {
@@ -28,34 +27,33 @@ public class SelectQueryBuilder {
     }
 
     public String generateQuery(Table table) {
-        return String.format(SELECT_FORMAT, buildSelectClause(table), buildFromClause(table));
+        return SPACE.concat(buildSelectClause(table), buildFromClause(table)).toString();
     }
 
     private String buildSelectClause(Table table) {
-        String rootColumns = buildColumnsClause(table.getTableName(), table.getSelectColumns());
+        StringBuilder selectClause = SPACE.concat(SELECT_DEFINITION,
+            buildColumnsClause(table.getTableName(), table.getSelectColumns()));
+
         if (table.isEagerRelationEmpty()) {
-            return SELECT_DEFINITION + SPACE.getValue() + rootColumns;
+            return selectClause.toString();
         }
-        String relationColumns = COMMA.getValue() + buildRelationColumnsClause(table.getEagerRelationColumns());
-        return SELECT_DEFINITION + SPACE.getValue() + rootColumns + relationColumns;
+        return selectClause.append(COMMA.getValue())
+            .append(buildRelationColumnsClause(table.getEagerRelationColumns()))
+            .toString();
     }
 
     private String buildFromClause(Table table) {
+        StringBuilder fromClause = SPACE.concat(FROM_DEFINITION, table.getTableName());
         if (table.isEagerRelationEmpty()) {
-            return FROM_DEFINITION + SPACE.getValue() + table.getTableName();
+            return fromClause.toString();
         }
-        String relationTable = SPACE.getValue() + buildRelationTableClause(table, table.getEagerRelationColumns());
-        return FROM_DEFINITION + SPACE.getValue() + table.getTableName() + relationTable;
+        return SPACE.concat(fromClause.toString(), buildRelationTableClause(table)).toString();
     }
 
     private String buildColumnsClause(String tableName, List<Column> columns) {
         return columns.stream()
-            .map(column -> formatColumnWithName(tableName, column))
+            .map(column -> DOT.concat(tableName, column.getColumnName()))
             .collect(Collectors.joining(COMMA.getValue()));
-    }
-
-    private String formatColumnWithName(String tableName, Column column) {
-        return tableName + DOT.getValue() + column.getColumnName();
     }
 
     private String buildRelationColumnsClause(List<Column> columns) {
@@ -65,15 +63,9 @@ public class SelectQueryBuilder {
             .collect(Collectors.joining(COMMA.getValue()));
     }
 
-    private String buildRelationTableClause(Table root, List<Column> columns) {
-        return columns.stream()
-            .map(column -> buildJoinDefinition(root, column))
-            .collect(Collectors.joining()).trim();
-    }
-
-    private String buildJoinDefinition(Table root, Column column) {
-        Table relationTable = column.getRelationTable();
-        return String.format(LEFT_JOIN_DEFINITION, relationTable.getTableName(), root.getTableName(), root.getIdColumnName(),
-            relationTable.getTableName(), column.getColumnName());
+    private String buildRelationTableClause(Table root) {
+        return root.getEagerRelationTables().stream()
+            .map(relationTable -> joinQueryBuilder.generateLeftJoinQuery(root, relationTable))
+            .collect(Collectors.joining());
     }
 }

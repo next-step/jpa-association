@@ -6,13 +6,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import static persistence.sql.constant.SqlConstant.DOT;
-import static persistence.sql.constant.SqlConstant.EMPTY;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
 
 public class EntityRowMapper<T> implements RowMapper {
 
-    private static final String ZERO = "0";
     private final Class<T> clazz;
 
     public EntityRowMapper(Class<T> clazz) {
@@ -31,7 +29,7 @@ public class EntityRowMapper<T> implements RowMapper {
                 return instance;
             }
             do {
-                setRelationFieldValues(resultSet, eagerRelationColumns, instance);
+                setEagerRelationFieldValues(resultSet, eagerRelationColumns, instance);
             } while (resultSet.next());
 
             return instance;
@@ -46,7 +44,7 @@ public class EntityRowMapper<T> implements RowMapper {
             tableName + DOT.getValue() + column.getColumnName(), column.getType())));
     }
 
-    private void setRelationFieldValues(ResultSet resultSet,
+    private void setEagerRelationFieldValues(ResultSet resultSet,
                                         List<Column> eagerRelationColumns,
                                         T instance) {
         eagerRelationColumns.stream()
@@ -64,11 +62,18 @@ public class EntityRowMapper<T> implements RowMapper {
         String tableName = relationTable.getTableName();
         Column idColumn = relationTable.getIdColumn();
 
-        String key = String.join(EMPTY.getValue(), tableName,DOT.getValue(),
-            idColumn.getColumnName());
+        String key = DOT.concat(tableName, idColumn.getColumnName()).toString();
 
         Object id = ResultSetColumnReader.map(resultSet, key, idColumn.getType());
 
-        return Objects.isNull(id) || id.toString().equals(ZERO);
+        if (Objects.isNull(id)) {
+            return true;
+        }
+
+        if (id instanceof Number) {
+            return ((Number) id).intValue() == 0;
+        }
+
+        return false;
     }
 }
