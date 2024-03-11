@@ -1,7 +1,6 @@
 package persistence.entity.database;
 
 import database.mapping.EntityClass;
-import database.mapping.EntityMetadata;
 import database.sql.dml.Select;
 import database.sql.dml.SelectByPrimaryKey;
 import jdbc.JdbcTemplate;
@@ -21,19 +20,17 @@ public class EntityLoader {
 
     public List<Object> load(Class<?> clazz, Collection<Long> ids) {
         EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
         RowMapper<Object> rowMapper = entityClass.getRowMapper();
 
-        String query = new Select(metadata).buildQuery(Map.of("id", ids));
+        String query = new Select(clazz).buildQuery(Map.of("id", ids));
         return jdbcTemplate.query(query, rowMapper);
     }
 
     public Optional<Object> load(Class<?> clazz, Long id) {
         EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
         RowMapper<Object> rowMapper = entityClass.getRowMapper();
 
-        String query = new SelectByPrimaryKey(metadata).buildQuery(id);
+        String query = new SelectByPrimaryKey(clazz).buildQuery(id);
         return jdbcTemplate.query(query, rowMapper).stream().findFirst();
     }
 }

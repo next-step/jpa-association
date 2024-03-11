@@ -1,6 +1,7 @@
 package database.sql.dml;
 
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -18,13 +19,16 @@ public class Insert {
     private boolean includeIdField;
     private Map<String, Object> values;
 
-    public Insert(EntityMetadata metadata) {
-        this.includeIdField = false;
-        this.id = null;
+    public Insert(Class<?> clazz) {
+        this(EntityMetadataFactory.get(clazz));
+    }
 
+    private Insert(EntityMetadata metadata) {
         tableName = metadata.getTableName();
         primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
         columnNames = metadata.getGeneralColumnNames();
+        id = null;
+        includeIdField = false;
     }
 
     public Insert id(Long id) {

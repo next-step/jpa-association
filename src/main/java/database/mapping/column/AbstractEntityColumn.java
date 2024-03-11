@@ -35,11 +35,6 @@ public abstract class AbstractEntityColumn implements EntityColumn {
     }
 
     @Override
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    @Override
     public Object getValue(Object entity) {
         field.setAccessible(true);
         try {

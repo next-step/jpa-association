@@ -8,8 +8,6 @@ public interface EntityColumn {
 
     Field getField();
 
-    String getFieldName();
-
     Object getValue(Object entity);
 
     String getColumnName();

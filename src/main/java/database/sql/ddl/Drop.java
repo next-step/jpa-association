@@ -1,6 +1,7 @@
 package database.sql.ddl;
 
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 
 public class Drop {
     private final String tableName;
@@ -10,7 +11,7 @@ public class Drop {
     }
 
     public Drop(Class<?> clazz) {
-        this(EntityMetadata.fromClass(clazz));
+        this(EntityMetadataFactory.get(clazz));
     }
 
     public String buildQuery() {

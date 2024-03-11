@@ -1,7 +1,7 @@
 package persistence.entity.context;
 
-import database.mapping.EntityClass;
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 
 import java.util.Objects;
 
@@ -23,7 +23,7 @@ public class EntityKey {
 
     public static EntityKey of(Object entity) {
         Class<?> clazz = entity.getClass();
-        EntityMetadata entityMetadata = EntityClass.of(clazz).getMetadata();
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         Long id = entityMetadata.getPrimaryKeyValue(entity);
 
         return EntityKey.of(clazz, id);

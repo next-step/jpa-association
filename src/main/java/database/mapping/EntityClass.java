@@ -8,11 +8,9 @@ import java.lang.reflect.Constructor;
 public class EntityClass {
     private final Class<?> clazz;
     private final RowMapper<Object> rowMapper;
-    private final EntityMetadata entityMetadata;
 
-    private EntityClass(Class<?> clazz, EntityMetadata entityMetadata, RowMapper<Object> rowMapper) {
+    private EntityClass(Class<?> clazz, RowMapper<Object> rowMapper) {
         this.clazz = clazz;
-        this.entityMetadata = entityMetadata;
         this.rowMapper = rowMapper;
     }
 
@@ -23,7 +21,6 @@ public class EntityClass {
         } catch (NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
-        EntityMetadata entityMetadata = EntityMetadata.fromClass(clazz);
         return new EntityClass(
                 clazz,
                 RowMapperFactory.create(declaredConstructor, clazz, MySQLDialect.getInstance())
@@ -36,10 +33,6 @@ public class EntityClass {
 
     public String getName() {
         return clazz.getName();
-    }
-
-    public EntityMetadata getMetadata() {
-        return entityMetadata;
     }
 
     public RowMapper<Object> getRowMapper() {

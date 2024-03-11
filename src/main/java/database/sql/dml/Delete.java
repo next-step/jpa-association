@@ -1,7 +1,7 @@
 package database.sql.dml;
 
 import database.mapping.EntityMetadata;
-import database.sql.dml.where.WhereClause;
+import database.mapping.EntityMetadataFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -12,14 +12,14 @@ public class Delete {
     private final List<String> allColumnNames;
     private final String primaryKeyColumnName;
 
-    public Delete(EntityMetadata entityMetadata) {
+    public Delete(Class<?> clazz) {
+        this(EntityMetadataFactory.get(clazz));
+    }
+
+    private Delete(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
         this.allColumnNames = entityMetadata.getAllColumnNames();
-    }
-
-    public Delete(Class<?> clazz) {
-        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {

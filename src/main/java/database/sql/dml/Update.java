@@ -1,6 +1,7 @@
 package database.sql.dml;
 
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import database.mapping.column.EntityColumn;
 
 import java.util.List;
@@ -13,13 +14,13 @@ public class Update {
     private final String tableName;
     private final List<EntityColumn> generalColumns;
 
-    public Update(EntityMetadata entityMetadata) {
-        this.tableName = entityMetadata.getTableName();
-        this.generalColumns = entityMetadata.getGeneralColumns();
+    public Update(Class<?> clazz) {
+        this(EntityMetadataFactory.get(clazz));
     }
 
-    public Update(Class<?> clazz) {
-        this(EntityMetadata.fromClass(clazz));
+    private Update(EntityMetadata entityMetadata) {
+        this.tableName = entityMetadata.getTableName();
+        this.generalColumns = entityMetadata.getGeneralColumns();
     }
 
     public String buildQuery(long id, Map<String, Object> changes) {

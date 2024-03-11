@@ -2,6 +2,7 @@ package database.sql.ddl;
 
 import database.dialect.Dialect;
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 
 public class Create {
     private final String tableName;
@@ -13,7 +14,7 @@ public class Create {
     }
 
     public Create(Class<?> clazz, Dialect dialect) {
-        this(EntityMetadata.fromClass(clazz), dialect);
+        this(EntityMetadataFactory.get(clazz), dialect);
     }
 
     public String buildQuery() {

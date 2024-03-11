@@ -8,7 +8,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntityMetadataTest {
-    private final EntityMetadata entityMetadata = EntityMetadata.fromClass(Person4.class);
+    private final EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
 
     @Test
     void getTableName() {

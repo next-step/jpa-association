@@ -18,7 +18,7 @@ public class ColumnValueMap {
     }
 
     private static Map<String, Object> extractValues(Object entity) {
-        EntityMetadata entityMetadata = EntityMetadata.fromClass(entity.getClass());
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(entity.getClass());
         List<EntityColumn> generalColumns = entityMetadata.getGeneralColumns();
 
         // column.getValue(entity) 이 null일 경우가 있어서, Collectors.toMap 대신 for 를 사용합니다.

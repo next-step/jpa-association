@@ -15,7 +15,7 @@ public class EntityMetadata {
         this.columnsMetadata = columnsMetadata;
     }
 
-    public static EntityMetadata fromClass(Class<?> clazz) {
+    static EntityMetadata fromClass(Class<?> clazz) {
         return new EntityMetadata(
                 new TableMetadata(clazz),
                 ColumnsMetadata.fromClass(clazz)

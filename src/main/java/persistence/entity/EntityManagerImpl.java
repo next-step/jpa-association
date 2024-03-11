@@ -1,7 +1,7 @@
 package persistence.entity;
 
-import database.mapping.EntityClass;
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import jdbc.JdbcTemplate;
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
@@ -96,9 +96,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private static Long getRowId(Object entity) {
         Class<?> clazz = entity.getClass();
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata entityMetadata = entityClass.getMetadata();
-
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         return entityMetadata.getPrimaryKeyValue(entity);
     }
 }

@@ -14,8 +14,7 @@ public class RowMapperFactory {
     private RowMapperFactory() {
     }
 
-    public static RowMapper<Object> create(Constructor<?> declaredConstructor, EntityMetadata metadata,
-                                           Dialect dialect) {
+    public static RowMapper<Object> create(Constructor<?> declaredConstructor, Class<?> clazz, Dialect dialect) {
         return resultSet -> {
             ResultSetMetaData rsMetaData = resultSet.getMetaData();
             try {
@@ -25,7 +24,7 @@ public class RowMapperFactory {
                     String columnName = rsMetaData.getColumnName(i);
                     int columnType = rsMetaData.getColumnType(i);
                     try {
-                        setFieldValue(resultSet, columnName, columnType, object, metadata, dialect);
+                        setFieldValue(resultSet, columnName, columnType, object, clazz, dialect);
                     } catch (IllegalAccessException e) {
                         throw new RuntimeException(e);
                     }
@@ -42,8 +41,9 @@ public class RowMapperFactory {
                                       String columnName,
                                       int columnType,
                                       Object entity,
-                                      EntityMetadata entityMetadata,
+                                      Class<?> clazz,
                                       Dialect dialect) throws SQLException, IllegalAccessException {
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         Object value = dialect.getFieldValueFromResultSet(resultSet, columnName, columnType);
         Field field = entityMetadata.getFieldByColumnName(columnName);
         field.setAccessible(true);
