@@ -25,7 +25,7 @@ public class UpdateQueryBuilderTest {
                 String query = updateQueryBuilder.generateQuery(Table.getInstance(person.getClass()), person);
 
                 // then
-                assertEquals("UPDATE users SET nick_name='user1',old=1,email='abc@test.com'", query);
+                assertEquals("UPDATE users SET users.nick_name='user1',users.old=1,users.email='abc@test.com'", query);
             }
     }
 }

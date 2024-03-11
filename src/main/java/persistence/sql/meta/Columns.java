@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public class Columns {
 
     private static final String ID_NOT_FOUND_MESSAGE =  "Id 필드가 존재하지 않습니다.";
+    private static final String REQUIRED_ID_MESSAGE =  "Id 필드는 필수로 1개를 가져야 합니다.";
     private final List<Column> columns;
 
     public Columns(List<Column> columns) {
@@ -16,20 +17,23 @@ public class Columns {
     }
 
     public static Columns from(Field[] fields) {
-        return new Columns(Arrays.stream(fields)
+        List<Column> columnList = Arrays.stream(fields)
             .filter(field -> !field.isAnnotationPresent(Transient.class))
             .map(Column::from)
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList());
+        validate(columnList);
+
+        return new Columns(columnList);
     }
 
-    public long getIdCount() {
-        return columns.stream()
+    private static void validate(List<Column> columns) {
+        long idCount = columns.stream()
             .filter(Column::isIdAnnotation)
             .count();
-    }
 
-    public List<Column> getColumns() {
-        return columns;
+        if (idCount != 1) {
+            throw new IllegalArgumentException(REQUIRED_ID_MESSAGE);
+        }
     }
 
     public Column getIdColumn() {
@@ -45,13 +49,37 @@ public class Columns {
 
     public List<Column> getInsertColumns() {
         return columns.stream()
-            .filter(column -> !column.isGeneratedValueAnnotation())
+            .filter(column -> !column.isGeneratedValueAnnotation() && !column.isRelationColumn())
             .collect(Collectors.toList());
     }
 
     public List<Column> getUpdateColumns() {
         return columns.stream()
             .filter(column -> !column.isIdAnnotation())
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getSelectColumns() {
+        return columns.stream()
+            .filter(column -> !column.isEagerRelationColumn())
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getEagerRelationColumns() {
+        return columns.stream()
+            .filter(Column::isEagerRelationColumn)
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getRelationColumns(){
+        return columns.stream()
+            .filter(Column::isRelationColumn)
+            .collect(Collectors.toList());
+    }
+
+    public List<Object> getRelationValues(Object entity) {
+        return getRelationColumns().stream()
+            .map(column -> column.getFieldValue(entity))
             .collect(Collectors.toList());
     }
 }

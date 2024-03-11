@@ -2,18 +2,23 @@ package persistence.entity.persister;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import java.sql.SQLException;
+import java.util.stream.IntStream;
 import jdbc.EntityRowMapper;
 import jdbc.JdbcTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.fixture.OrderFixture;
 import persistence.fixture.PersonFixture;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
@@ -39,11 +44,15 @@ class SimpleEntityPersisterTest {
         dmlGenerator = DmlGenerator.getInstance();
         entityPersister = SimpleEntityPersister.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
+        jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Order.class));
+        jdbcTemplate.execute(ddlGenerator.generateCreateQuery(OrderItem.class));
     }
 
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(ddlGenerator.generateDropQuery(Person.class));
+        jdbcTemplate.execute(ddlGenerator.generateDropQuery(Order.class));
+        jdbcTemplate.execute(ddlGenerator.generateDropQuery(OrderItem.class));
         server.stop();
     }
 
@@ -66,6 +75,32 @@ class SimpleEntityPersisterTest {
                 () -> assertThat(person.getName()).isEqualTo(foundPerson.getName()),
                 () -> assertThat(person.getAge()).isEqualTo(foundPerson.getAge()),
                 () -> assertThat(person.getEmail()).isEqualTo(foundPerson.getEmail())
+            );
+        }
+
+        @DisplayName("Order Entity를 저장한다.")
+        @Test
+        void insertTest_whenOrder() {
+            //given
+            Order order = OrderFixture.createOrder();
+            order.addOrderItem(OrderFixture.createOrderItem());
+            order.addOrderItem(OrderFixture.createOrderItem());
+            order.addOrderItem(OrderFixture.createOrderItem());
+
+            //when
+            entityPersister.insert(order);
+
+            //then
+            Order foundOrder = jdbcTemplate.queryForObject(dmlGenerator.generateSelectQuery(Order.class, 1L),
+                resultSet -> new EntityRowMapper<>(Order.class).mapRow(resultSet));
+
+            assertAll(
+                () -> assertThat(foundOrder).isEqualTo(order),
+                () -> assertThat(foundOrder.getId()).isEqualTo(order.getId()),
+                () -> assertThat(foundOrder.getOrderNumber()).isEqualTo(order.getOrderNumber()),
+                () -> assertThat(foundOrder.getOrderItems()).hasSize(3),
+                () -> IntStream.range(0, foundOrder.getOrderItems().size())
+                    .forEach(i -> assertEquals(foundOrder.getOrderItems().get(i).getId(), order.getOrderItems().get(i).getId()))
             );
         }
     }

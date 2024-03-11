@@ -20,11 +20,32 @@ public class CreateQueryBuilder {
     }
 
     public String generateQuery(Table table) {
+        String columnDefinitions = generateColumnDefinitions(table);
+        String relationDefinitions = generateRelationDefinitions(table);
+        return generateTableDefinition(table, columnDefinitions, relationDefinitions);
+    }
 
-        String columnDefinitions = table.getColumns().stream()
+    private String generateColumnDefinitions(Table table) {
+        return table.getColumns()
+            .stream()
             .map(fieldBuilder::generate)
             .collect(Collectors.joining(COMMA.getValue()));
+    }
 
-        return String.format(CREATE_TABLE_DEFINITION, table.getTableName(), columnDefinitions);
+    private String generateRelationDefinitions(Table table) {
+        return Table.getRelationColumns(table)
+            .stream()
+            .map(entry -> fieldBuilder.generateRelation(entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(COMMA.getValue()));
+    }
+
+    private String generateTableDefinition(Table table, String columnDefinitions, String relationDefinitions) {
+        StringBuilder allDefinitions = new StringBuilder(columnDefinitions);
+        if (!relationDefinitions.isEmpty()) {
+            allDefinitions.append(COMMA.getValue());
+            allDefinitions.append(relationDefinitions);
+        }
+
+        return String.format(CREATE_TABLE_DEFINITION, table.getTableName(), allDefinitions);
     }
 }

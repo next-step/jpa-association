@@ -2,9 +2,13 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import java.sql.SQLException;
+import java.util.stream.IntStream;
 import jdbc.JdbcTemplate;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -13,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import persistence.fixture.OrderFixture;
 import persistence.fixture.PersonFixture;
 import persistence.sql.ddl.DdlGenerator;
 import persistence.sql.dialect.h2.H2Dialect;
@@ -35,11 +40,15 @@ class SimpleEntityManagerTest {
         ddlGenerator = DdlGenerator.getInstance(H2Dialect.getInstance());
         entityManager = SimpleEntityManager.from(jdbcTemplate);
         jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Person.class));
+        jdbcTemplate.execute(ddlGenerator.generateCreateQuery(Order.class));
+        jdbcTemplate.execute(ddlGenerator.generateCreateQuery(OrderItem.class));
     }
 
     @AfterEach
     void tearDown() {
         jdbcTemplate.execute(ddlGenerator.generateDropQuery(Person.class));
+        jdbcTemplate.execute(ddlGenerator.generateDropQuery(Order.class));
+        jdbcTemplate.execute(ddlGenerator.generateDropQuery(OrderItem.class));
         server.stop();
     }
 
@@ -101,6 +110,29 @@ class SimpleEntityManagerTest {
 
             // then
             assertEquals(foundPerson1, foundPerson2);
+        }
+
+        @DisplayName("Order entity를 검색 할 수 있다.")
+        @Test
+        void findTest_whenOrder() {
+            // given
+            Order order = OrderFixture.createOrder();
+            order.addOrderItem(OrderFixture.createOrderItem());
+            order.addOrderItem(OrderFixture.createOrderItem());
+            order.addOrderItem(OrderFixture.createOrderItem());
+
+            entityManager.persist(order);
+
+            // when
+            Order foundOrder = entityManager.find(Order.class, 1L);
+
+            // then
+            assertAll(
+                () -> assertEquals(foundOrder, order),
+                () -> assertEquals(foundOrder.getId(), order.getId()),
+                () -> assertEquals(foundOrder.getOrderNumber(), order.getOrderNumber()),
+                () -> assertEquals(foundOrder.getOrderItems(), order.getOrderItems())
+            );
         }
     }
 
