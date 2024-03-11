@@ -1,7 +1,6 @@
 package database.sql.dml;
 
 import database.mapping.ColumnValueMap;
-import database.mapping.EntityMetadata;
 
 import java.util.Map;
 
@@ -27,14 +26,19 @@ public class QueryBuilder {
     }
 
     /* INSERT */
+    public String buildCustomSelectQuery(Class<?> clazz) {
+        CustomSelect customSelect = new CustomSelect(clazz);
+        return customSelect.buildQuery();
+    }
+
     public String buildInsertQuery(Class<?> clazz, Map<String, Object> valueMap) {
-        return new Insert(EntityMetadata.fromClass(clazz))
+        return new Insert(clazz)
                 .values(valueMap)
                 .toQueryString();
     }
 
     public String buildInsertQuery(Object entity) {
-        return new Insert(EntityMetadata.fromClass(entity.getClass()))
+        return new Insert(entity.getClass())
                 .values(columnValues(entity))
                 .toQueryString();
     }

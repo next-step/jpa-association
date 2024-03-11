@@ -65,4 +65,8 @@ public class EntityMetadata {
     public boolean requiresIdWhenInserting() {
         return columnsMetadata.isRequiredId();
     }
+
+    public List<Association> getAssociations() {
+        return columnsMetadata.getAssociations();
+    }
 }
