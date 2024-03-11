@@ -3,8 +3,6 @@ package database.mapping;
 import database.dialect.MySQLDialect;
 import jdbc.RowMapper;
 
-import java.lang.reflect.Constructor;
-
 public class EntityClass {
     private final Class<?> clazz;
     private final RowMapper<Object> rowMapper;
@@ -15,16 +13,8 @@ public class EntityClass {
     }
 
     public static EntityClass of(Class<?> clazz) {
-        Constructor<?> declaredConstructor;
-        try {
-            declaredConstructor = clazz.getDeclaredConstructor();
-        } catch (NoSuchMethodException | SecurityException e) {
-            throw new RuntimeException(e);
-        }
-        return new EntityClass(
-                clazz,
-                RowMapperFactory.create(declaredConstructor, clazz, MySQLDialect.getInstance())
-        );
+        RowMapper<Object> rowMapper = RowMapperFactory.create(clazz, MySQLDialect.getInstance());
+        return new EntityClass(clazz, rowMapper);
     }
 
     public Class<?> getClazz() {

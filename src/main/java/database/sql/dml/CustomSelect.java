@@ -10,8 +10,8 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class CustomSelect {
-    private static final String SELF_ALIAS = "t";
-    private static final String TABLE_ALIAS_PREFIX = "a";
+    private static final String TABLE_ALIAS = "t";
+    private static final String ASSOCIATED_TABLE_ALIAS_PREFIX = "a";
 
     private final String tableName;
     private final List<String> allColumnNames;
@@ -32,23 +32,22 @@ public class CustomSelect {
     }
 
     public String buildQuery() {
-        StringJoiner joiner = new StringJoiner(" ");
-        return joiner.add("SELECT")
-                .add(columns())
+        return new StringJoiner(" ")
+                .add("SELECT")
+                .add(selectColumns())
                 .add("FROM")
                 .add(tableName)
-                .add(SELF_ALIAS)
+                .add(TABLE_ALIAS)
                 .add(joins())
                 .toString();
     }
 
-    private String columns() {
+    private String selectColumns() {
         StringJoiner joiner = new StringJoiner(", ");
 
         joiner.add(primaryTableColumns());
-
-        for (int i = 0; i < associations.size(); i++) {
-            joiner.add(associatedTableColumns(i));
+        for (int index = 0; index < associations.size(); index++) {
+            joiner.add(associatedTableColumns(index));
         }
 
         return joiner.toString();
@@ -56,54 +55,60 @@ public class CustomSelect {
 
     private String primaryTableColumns() {
         return allColumnNames.stream()
-                .map(columnName -> withAlias(SELF_ALIAS, columnName))
+                .map(columnName -> columnWithAlias(columnName, TABLE_ALIAS))
                 .collect(Collectors.joining(", "));
     }
 
-    private static String withAlias(String alias, String columnName) {
+    private static String columnWithAlias(String columnName, String alias) {
         return alias + "." + columnName;
     }
 
-    private String associatedTableColumns(int i) {
+    private String associatedTableColumns(int index) {
+        String alias = associatedTableAliasOf(index);
+        Association association = associations.get(index);
+
         StringJoiner joiner = new StringJoiner(", ");
 
-        String alias = tableAliasOf(i);
-        Association association = associations.get(i);
-
-        joiner.add(withAlias(alias, association.getForeignKeyColumnName()));
-
+        joiner.add(columnWithAlias(association.getForeignKeyColumnName(), alias));
         for (String column : association.getColumnNames()) {
-            joiner.add(withAlias(alias, column));
+            joiner.add(columnWithAlias(column, alias));
         }
+
         return joiner.toString();
     }
 
     private String joins() {
         StringJoiner joiner = new StringJoiner(" ");
-        for (int i = 0; i < associations.size(); i++) {
-            eachJoin(i, joiner);
+        for (int index = 0; index < associations.size(); index++) {
+            joiner.add(eachJoin(index));
         }
         return joiner.toString();
     }
 
-    private void eachJoin(int i, StringJoiner joiner) {
-        Association association = associations.get(i);
+    private String eachJoin(int index) {
+        Association association = associations.get(index);
         String foreignKeyColumnName = association.getForeignKeyColumnName();
-        String alias = tableAliasOf(i);
 
-        joiner.add("LEFT JOIN")
-                .add(association.getTableName()).add(alias)
+        String associatedTableAlias = associatedTableAliasOf(index);
+        return new StringJoiner(" ")
+                .add("LEFT JOIN")
+                .add(associatedTableNameWithAlias(index, association))
                 .add("ON")
-                .add(withAlias(SELF_ALIAS, "id"))
+                .add(columnWithAlias("id", TABLE_ALIAS))
                 .add("=")
-                .add(withAlias(alias, foreignKeyColumnName));
+                .add(columnWithAlias(foreignKeyColumnName, associatedTableAlias))
+                .toString();
     }
 
-    private static String tableAliasOf(int i) {
-        return TABLE_ALIAS_PREFIX + i;
+    private static String associatedTableNameWithAlias(int index, Association association) {
+        return association.getTableName() + " " + associatedTableAliasOf(index);
+    }
+
+    private static String associatedTableAliasOf(int index) {
+        return ASSOCIATED_TABLE_ALIAS_PREFIX + index;
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return WhereClause.from(conditionMap, allColumnNames, SELF_ALIAS).toQuery();
+        return WhereClause.from(conditionMap, allColumnNames, TABLE_ALIAS).toQuery();
     }
 }

@@ -14,7 +14,9 @@ public class RowMapperFactory {
     private RowMapperFactory() {
     }
 
-    public static RowMapper<Object> create(Constructor<?> declaredConstructor, Class<?> clazz, Dialect dialect) {
+    public static RowMapper<Object> create(Class<?> clazz, Dialect dialect) {
+        Constructor<?> declaredConstructor = getConstructor(clazz);
+
         return resultSet -> {
             ResultSetMetaData rsMetaData = resultSet.getMetaData();
             try {
@@ -23,11 +25,7 @@ public class RowMapperFactory {
                 for (int i = 1; i < rsMetaData.getColumnCount() + 1; i++) {
                     String columnName = rsMetaData.getColumnName(i);
                     int columnType = rsMetaData.getColumnType(i);
-                    try {
-                        setFieldValue(resultSet, columnName, columnType, object, clazz, dialect);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
+                    setFieldValue(resultSet, columnName, columnType, object, clazz, dialect);
                 }
                 return object;
             } catch (InstantiationException | IllegalAccessException |
@@ -37,16 +35,29 @@ public class RowMapperFactory {
         };
     }
 
+    private static Constructor<?> getConstructor(Class<?> clazz) {
+        try {
+            return clazz.getDeclaredConstructor();
+        } catch (NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void setFieldValue(ResultSet resultSet,
                                       String columnName,
                                       int columnType,
                                       Object entity,
                                       Class<?> clazz,
-                                      Dialect dialect) throws SQLException, IllegalAccessException {
+                                      Dialect dialect) throws SQLException {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         Object value = dialect.getFieldValueFromResultSet(resultSet, columnName, columnType);
+
         Field field = entityMetadata.getFieldByColumnName(columnName);
         field.setAccessible(true);
-        field.set(entity, value);
+        try {
+            field.set(entity, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

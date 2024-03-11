@@ -36,6 +36,7 @@ public class ColumnsMetadata {
     }
 
     public static ColumnsMetadata fromClass(Class<?> clazz) {
+        // XXX: ColumnsMetadataInspector 를 만들어볼까?
         List<Field> allFields = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !isRealColumn(field))
                 .collect(Collectors.toList());
@@ -69,8 +70,12 @@ public class ColumnsMetadata {
                         EntityColumn::getField)
                 );
 
-//        RowMapperFactory 만 지우면 지울 수 있음
-        return new ColumnsMetadata(allEntityColumns, primaryKey, generalColumns, fieldByColumnNameMap, isRequiredId, associationFields);
+        return new ColumnsMetadata(allEntityColumns,
+                                   primaryKey,
+                                   generalColumns,
+                                   fieldByColumnNameMap,
+                                   isRequiredId,
+                                   associationFields);
     }
 
     public List<Association> getAssociations() {

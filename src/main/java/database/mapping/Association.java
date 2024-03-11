@@ -10,7 +10,6 @@ public class Association {
 
     public Association(String foreignKeyColumnName, Type entityType) {
         this.foreignKeyColumnName = foreignKeyColumnName;
-        // 안쓸예정
         this.entityType = entityType;
     }
 
