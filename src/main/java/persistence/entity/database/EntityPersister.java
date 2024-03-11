@@ -67,6 +67,6 @@ public class EntityPersister {
     }
 
     private Map<String, Object> columnValues(Object entity) {
-        return ColumnValueMap.fromEntity(entity).getMap();
+        return ColumnValueMap.valueMapFromEntity(entity);
     }
 }

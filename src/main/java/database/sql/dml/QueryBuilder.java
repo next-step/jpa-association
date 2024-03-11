@@ -40,12 +40,12 @@ public class QueryBuilder {
     }
 
     private Map<String, Object> columnValues(Object entity) {
-        return ColumnValueMap.fromEntity(entity).getMap();
+        return ColumnValueMap.valueMapFromEntity(entity);
     }
 
     /* UPDATE */
     public String buildUpdateQuery(long id, Object entity) {
-        Map<String, Object> map = ColumnValueMap.fromEntity(entity).getMap();
+        Map<String, Object> map = ColumnValueMap.valueMapFromEntity(entity);
         return new Update(entity.getClass()).buildQuery(id, map);
     }
 

@@ -7,20 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: 얘랑 RowMapperFactory 랑 로직이 겹치나?
+// TODO: 객체화될 일이 아예 없을까?
 public class ColumnValueMap {
 
-    private final Map<String, Object> columnValueMap;
-
-    private ColumnValueMap(Map<String, Object> columnValueMap) {
-        this.columnValueMap = columnValueMap;
+    private ColumnValueMap() {
     }
 
-    public static ColumnValueMap fromEntity(Object entity) {
-        return new ColumnValueMap(extractValues(entity));
-    }
-
-    public Map<String, Object> getMap() {
-        return columnValueMap;
+    public static Map<String, Object> valueMapFromEntity(Object entity) {
+        return extractValues(entity);
     }
 
     private static Map<String, Object> extractValues(Object entity) {

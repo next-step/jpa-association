@@ -30,7 +30,7 @@ class UpdateTest {
     @ParameterizedTest
     @EnumSource(TestCases.class)
     void buildUpdateQuery(TestCases testCase) {
-        Map<String, Object> map = ColumnValueMap.fromEntity(testCase.entity).getMap();
+        Map<String, Object> map = ColumnValueMap.valueMapFromEntity(testCase.entity);
         String actual = update.buildQuery(testCase.id, map);
         assertThat(actual).isEqualTo(testCase.expectedQuery);
     }
