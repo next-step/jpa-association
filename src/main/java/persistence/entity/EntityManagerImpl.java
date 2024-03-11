@@ -46,30 +46,31 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public void persist(Object entity) {
+    public <T> T persist(Object entity) {
         Class<?> clazz = entity.getClass();
 
         Long id = getRowId(entity);
         if (isInsertOperation(clazz, id)) {
-            insertEntity(entity, clazz);
-            return;
+            return (T) insertEntity(entity, clazz);
         }
-        updateEntity(entity, clazz, id);
+        return (T) updateEntity(entity, clazz, id);
     }
 
-    private void insertEntity(Object entity, Class<?> clazz) {
+    private Object insertEntity(Object entity, Class<?> clazz) {
         Long newId = entityPersister.insert(clazz, entity);
         Object load = entityLoader.load(clazz, newId).get();
         persistenceContext.addEntity(load);
+        return load;
     }
 
-    private void updateEntity(Object entity, Class<?> clazz, Long id) {
+    private Object updateEntity(Object entity, Class<?> clazz, Long id) {
         Object oldEntity = find(clazz, id);
         Map<String, Object> diff = EntitySnapshot.of(oldEntity).diff(EntitySnapshot.of(entity));
         if (!diff.isEmpty()) {
             entityPersister.update(clazz, id, diff);
             persistenceContext.addEntity(entity);
         }
+        return entity;
     }
 
     /**
