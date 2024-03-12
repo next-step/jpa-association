@@ -12,6 +12,8 @@ public interface AssociationTable {
 
     boolean isEager();
 
+    boolean isLazy();
+
     Class<?> getClazz();
 
     Field getField();

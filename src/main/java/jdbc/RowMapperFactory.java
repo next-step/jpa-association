@@ -1,5 +1,6 @@
 package jdbc;
 
+import net.sf.cglib.proxy.Enhancer;
 import persistence.sql.meta.AssociationTable;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;

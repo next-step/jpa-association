@@ -116,4 +116,12 @@ public class Table {
     public List<AssociationTable> getAssociationTables() {
         return associationTables.getTables();
     }
+
+    public boolean containsLazyAssociation() {
+        return associationTables.containsLazy();
+    }
+
+    public List<AssociationTable> getLazyAssociationTables() {
+        return associationTables.getLazyTables();
+    }
 }

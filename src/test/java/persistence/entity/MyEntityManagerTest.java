@@ -2,6 +2,7 @@ package persistence.entity;
 
 import database.dialect.H2Dialect;
 import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
@@ -13,6 +14,8 @@ import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.InsertQueryBuilder;
 import persistence.support.DatabaseSetup;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -69,6 +72,10 @@ class MyEntityManagerTest {
 
         //when
         Order order = entityManager.find(Order.class, 1L);
+        List<OrderItem> orderItems = order.getOrderItems();
+        for (OrderItem orderItem : orderItems) {
+            System.out.println("orderItem = " + orderItem);
+        }
 
         //then
         Assertions.assertThat(order.getOrderItems()).hasSize(2);

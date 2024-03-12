@@ -61,6 +61,7 @@ public class JdbcTemplate {
             while (resultSet.next()) {
                 result.add(rowMapper.mapRow(resultSet));
             }
+            System.out.println("sql = " + sql);
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
