@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ColumnsMetadata {
+    private final Class<?> clazz;
     private final List<EntityColumn> allEntityColumns;
     private final EntityColumn primaryKey;
     private final List<EntityColumn> generalColumns;
@@ -21,12 +22,14 @@ public class ColumnsMetadata {
     private final boolean isRequiredId;
     private final List<Field> associationFields;
 
-    private ColumnsMetadata(List<EntityColumn> allEntityColumns,
+    private ColumnsMetadata(Class<?> clazz,
+                            List<EntityColumn> allEntityColumns,
                             EntityColumn primaryKey,
                             List<EntityColumn> generalColumns,
                             Map<String, Field> fieldByColumnNameMap,
                             boolean isRequiredId,
                             List<Field> associationFields) {
+        this.clazz = clazz;
         this.allEntityColumns = allEntityColumns;
         this.primaryKey = primaryKey;
         this.generalColumns = generalColumns;
@@ -36,7 +39,7 @@ public class ColumnsMetadata {
     }
 
     public static ColumnsMetadata fromClass(Class<?> clazz) {
-        // XXX: ColumnsMetadataInspector 를 만들어볼까?
+        // TODO: ColumnsMetadataInspector 를 만들어볼까?
         List<Field> allFields = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !isRealColumn(field))
                 .collect(Collectors.toList());
@@ -70,7 +73,8 @@ public class ColumnsMetadata {
                         EntityColumn::getField)
                 );
 
-        return new ColumnsMetadata(allEntityColumns,
+        return new ColumnsMetadata(clazz,
+                                   allEntityColumns,
                                    primaryKey,
                                    generalColumns,
                                    fieldByColumnNameMap,
@@ -85,9 +89,17 @@ public class ColumnsMetadata {
                     JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
                     String foreignKeyColumnName = joinColumn.name();
                     Type[] actualTypeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-                    Type type = actualTypeArguments[0];
-                    return new Association(foreignKeyColumnName, type);
+                    Class<?> clazz = (Class<?>) actualTypeArguments[0];
+                    String fieldName = field.getName();
+                    return new Association(foreignKeyColumnName, clazz, fieldName);
                 })
+                .collect(Collectors.toList());
+    }
+
+    public List<Type> getAssociatedTypes() {
+        return associationFields.stream()
+                .filter(ColumnsMetadata::checkAssociationAnnotation)
+                .map(field -> ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
                 .collect(Collectors.toList());
     }
 
@@ -125,9 +137,18 @@ public class ColumnsMetadata {
         return (Long) primaryKey.getValue(entity);
     }
 
+    // TODO: columnname->fieldname 맵만 있으면 fieldByColumnNameMap 필요없네?
     public Field getFieldByColumnName(String columnName) {
         String upperCase = columnName.toUpperCase();
         return fieldByColumnNameMap.get(upperCase);
+    }
+
+    public Field getFieldByFieldName(String fieldName) {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isRequiredId() {

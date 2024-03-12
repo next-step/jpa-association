@@ -1,5 +1,8 @@
 package persistence.entity;
 
+import database.sql.ddl.QueryBuilder;
+import entity.Order;
+import entity.OrderItem;
 import entity.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -114,5 +117,21 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
                         "SELECT id, nick_name, old, email FROM users WHERE id = 1")
         );
     }
+
+//    @Test
+//    void scenario6() {
+//        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(Order.class, dialect));
+//        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(OrderItem.class, dialect));
+//
+//        EntityManager entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
+//
+//        Order order = entityManager.persist(new Order("1234"));
+//        entityManager.persist(new OrderItem("product1", 5, order.getId()));
+//        entityManager.persist(new OrderItem("product20", 50, order.getId()));
+//
+//        Order res = entityManager.find(Order.class, order.getId());
+//
+//        assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");
+//    }
 
 }

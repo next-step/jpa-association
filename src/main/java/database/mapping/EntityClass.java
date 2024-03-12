@@ -3,18 +3,18 @@ package database.mapping;
 import database.dialect.MySQLDialect;
 import jdbc.RowMapper;
 
-public class EntityClass {
-    private final Class<?> clazz;
-    private final RowMapper<Object> rowMapper;
+public class EntityClass<T> {
+    private final Class<T> clazz;
+    private final RowMapper<T> rowMapper;
 
-    private EntityClass(Class<?> clazz, RowMapper<Object> rowMapper) {
+    private EntityClass(Class<T> clazz, RowMapper<T> rowMapper) {
         this.clazz = clazz;
         this.rowMapper = rowMapper;
     }
 
-    public static EntityClass of(Class<?> clazz) {
-        RowMapper<Object> rowMapper = RowMapperFactory.create(clazz, MySQLDialect.getInstance());
-        return new EntityClass(clazz, rowMapper);
+    public static <T> EntityClass<T> of(Class<T> clazz) {
+        RowMapper<T> rowMapper = RowMapperFactory.create(clazz, MySQLDialect.getInstance());
+        return new EntityClass<>(clazz, rowMapper);
     }
 
     public Class<?> getClazz() {
@@ -25,7 +25,7 @@ public class EntityClass {
         return clazz.getName();
     }
 
-    public RowMapper<Object> getRowMapper() {
+    public RowMapper<T> getRowMapper() {
         return rowMapper;
     }
 

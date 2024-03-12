@@ -14,9 +14,19 @@ public class OrderItem {
 
     private Integer quantity;
 
+//    // 테이블 생성때문에 필요함
+//    @Column(name = "order_id", nullable = false)
+//    private Long orderId;
+
     public OrderItem(String product, int quantity) {
         this.product = product;
         this.quantity = quantity;
+    }
+
+    public OrderItem(String product, Integer quantity, Long orderId) {
+        this.product = product;
+        this.quantity = quantity;
+//        this.orderId = orderId;
     }
 
     public OrderItem() {
@@ -29,5 +39,17 @@ public class OrderItem {
                 ", product='" + product + '\'' +
                 ", quantity=" + quantity +
                 '}';
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
     }
 }

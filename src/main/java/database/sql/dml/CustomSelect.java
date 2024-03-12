@@ -32,14 +32,16 @@ public class CustomSelect {
     }
 
     public String buildQuery() {
-        return new StringJoiner(" ")
+        StringJoiner joiner = new StringJoiner(" ")
                 .add("SELECT")
                 .add(selectColumns())
                 .add("FROM")
                 .add(tableName)
-                .add(TABLE_ALIAS)
-                .add(joins())
-                .toString();
+                .add(TABLE_ALIAS);
+        if (!joins().isEmpty()) {
+            joiner.add(joins());
+        }
+        return joiner.toString();
     }
 
     private String selectColumns() {

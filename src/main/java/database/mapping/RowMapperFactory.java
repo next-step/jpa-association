@@ -14,13 +14,13 @@ public class RowMapperFactory {
     private RowMapperFactory() {
     }
 
-    public static RowMapper<Object> create(Class<?> clazz, Dialect dialect) {
+    public static <T> RowMapper<T> create(Class<T> clazz, Dialect dialect) {
         Constructor<?> declaredConstructor = getConstructor(clazz);
 
         return resultSet -> {
             ResultSetMetaData rsMetaData = resultSet.getMetaData();
             try {
-                Object object = declaredConstructor.newInstance();
+                T object = (T) declaredConstructor.newInstance();
 
                 for (int i = 1; i < rsMetaData.getColumnCount() + 1; i++) {
                     String columnName = rsMetaData.getColumnName(i);

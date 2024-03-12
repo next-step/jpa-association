@@ -43,9 +43,9 @@ class EntityLoaderTest extends H2DatabaseTest {
         entityManager.persist(p1);
         entityManager.persist(p2);
 
-        List<Object> result = entityLoader.load(Person.class, List.of(1L, 2L));
+        List<Person> result = entityLoader.load(Person.class, List.of(1L, 2L));
 
-        assertSamePerson((Person) result.get(0), p1, false);
-        assertSamePerson((Person) result.get(1), p2, false);
+        assertSamePerson(result.get(0), p1, false);
+        assertSamePerson(result.get(1), p2, false);
     }
 }

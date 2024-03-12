@@ -21,6 +21,30 @@ public class Order {
     public Order() {
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
     public Order(String orderNumber) {
         this.orderNumber = orderNumber;
     }

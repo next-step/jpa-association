@@ -1,16 +1,17 @@
 package database.mapping;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 public class Association {
 
     private final String foreignKeyColumnName;
-    private final Type entityType;
+    private final Class<?> entityType;
+    private final String fieldName;
 
-    public Association(String foreignKeyColumnName, Type entityType) {
+    public Association(String foreignKeyColumnName, Class<?> entityType, String fieldName) {
         this.foreignKeyColumnName = foreignKeyColumnName;
         this.entityType = entityType;
+        this.fieldName = fieldName;
     }
 
     public String getForeignKeyColumnName() {
@@ -27,5 +28,13 @@ public class Association {
 
     private EntityMetadata getEntityMetadata() {
         return EntityMetadataFactory.get(entityType);
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public Class<?> getEntityType() {
+        return entityType;
     }
 }

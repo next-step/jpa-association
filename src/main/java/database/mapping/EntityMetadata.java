@@ -6,6 +6,8 @@ import database.mapping.column.EntityColumn;
 import java.lang.reflect.Field;
 import java.util.List;
 
+// TODO: 정리할 수 있는 메서드 있나 확인
+// TODO: 책임 분리
 public class EntityMetadata {
     private final TableMetadata tableMetadata;
     private final ColumnsMetadata columnsMetadata;
@@ -62,11 +64,19 @@ public class EntityMetadata {
         return columnsMetadata.getFieldByColumnName(columnName);
     }
 
+    public Field getFieldByFieldName(String fieldName) {
+        return columnsMetadata.getFieldByFieldName(fieldName);
+    }
+
     public boolean requiresIdWhenInserting() {
         return columnsMetadata.isRequiredId();
     }
 
     public List<Association> getAssociations() {
         return columnsMetadata.getAssociations();
+    }
+
+    public boolean hasAssociation() {
+        return !columnsMetadata.getAssociatedTypes().isEmpty();
     }
 }
