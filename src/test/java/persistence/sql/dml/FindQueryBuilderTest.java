@@ -85,6 +85,6 @@ class FindQueryBuilderTest {
 
         String result = findQueryBuilder.buildById(id);
 
-        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders WHERE orders.id=1 JOIN order_items ON orders.id=order_items.order_id");
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1");
     }
 }

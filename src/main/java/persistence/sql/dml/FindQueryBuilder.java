@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class FindQueryBuilder {
 
-    private final static String FIND_ALL_QUERY_FORMAT = "SELECT %s FROM %s";
-    private final static String FIND_BY_ID_QUERY_FORMAT = "SELECT %s FROM %s WHERE %s";
+    private final static String Find_QUERY_FORMAT = "SELECT %s FROM %s";
+    private final static String WHERE_FORMAT = "WHERE %s";
 
     private final Table table;
 
@@ -23,7 +23,7 @@ public class FindQueryBuilder {
         String columnsClause = buildColumnsClause();
         String tableName = table.getName();
 
-        String findAllQuery = String.format(FIND_ALL_QUERY_FORMAT, columnsClause, tableName);
+        String findAllQuery = String.format(Find_QUERY_FORMAT, columnsClause, tableName);
         String joinClause = buildJoinClause();
 
         if (joinClause.isEmpty()) {
@@ -37,15 +37,16 @@ public class FindQueryBuilder {
 
         String columnsClause = buildColumnsClause();
         String tableName = table.getName();
-        String whereClause = byIdQueryBuilder.build();
 
-        String findByIdQuery = String.format(FIND_BY_ID_QUERY_FORMAT, columnsClause, tableName, whereClause);
+        String findQuery = String.format(Find_QUERY_FORMAT, columnsClause, tableName);
+        String byIdQuery = byIdQueryBuilder.build();
+        String whereClause = String.format(WHERE_FORMAT, byIdQuery);
         String joinClause = buildJoinClause();
 
         if (joinClause.isEmpty()) {
-            return findByIdQuery;
+            return String.join(" ", findQuery, whereClause);
         }
-        return String.join(" ", findByIdQuery, joinClause);
+        return String.join(" ", findQuery, joinClause, whereClause);
     }
 
     private String buildColumnsClause() {
