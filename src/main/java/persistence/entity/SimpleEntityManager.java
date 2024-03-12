@@ -8,6 +8,7 @@ import persistence.entity.persistencecontext.EntitySnapshot;
 import persistence.entity.persistencecontext.SimplePersistenceContext;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.persister.SimpleEntityPersister;
+import persistence.sql.meta.Table;
 
 public class SimpleEntityManager implements EntityManager {
 
@@ -31,10 +32,7 @@ public class SimpleEntityManager implements EntityManager {
         T entity = (T) persistenceContext.getEntity(clazz, id);
         if (entity == null) {
             entity = entityLoader.find(clazz, id);
-            EntityEntry entityEntry = EntityEntry.loading();
-            cacheEntity(entity);
-            persistenceContext.setEntityEntry(entity, entityEntry);
-            entityEntry.managed();
+            cacheEntityWithAssociations(entity);
         }
         return entity;
     }
@@ -68,6 +66,26 @@ public class SimpleEntityManager implements EntityManager {
             cacheEntity(entity);
         }
         return entity;
+    }
+
+    private void cacheEntityWithAssociations(Object entity) {
+        EntityEntry entityEntry = EntityEntry.loading();
+        cacheEntity(entity);
+        persistenceContext.setEntityEntry(entity, entityEntry);
+        entityEntry.managed();
+
+        Table table = Table.getInstance(entity.getClass());
+        table.getEagerRelationTables()
+            .forEach(relationTable -> {
+                Object relationEntity = table.getRelationValue(entity, relationTable);
+                if (relationEntity instanceof Iterable) {
+                    ((Iterable<?>) relationEntity).forEach(this::cacheEntityWithAssociations);
+                }
+
+                if (!(relationEntity instanceof Iterable)) {
+                    cacheEntityWithAssociations(relationEntity);
+                }
+            });
     }
 
     private void cacheEntity(Object entity) {

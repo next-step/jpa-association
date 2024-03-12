@@ -66,7 +66,7 @@ class TableTest {
         @Test
         void testGetColumns() {
             Table table = Table.getInstance(Person.class);
-            List<Column> columns = table.getColumns();
+            List<Column> columns = table.getSelectColumns();
             assertEquals(4, columns.size());
         }
     }

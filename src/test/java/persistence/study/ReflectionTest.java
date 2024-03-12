@@ -74,7 +74,7 @@ class ReflectionTest {
 
     @Test
     @DisplayName("private field에 값 할당")
-    public void private_타입_필드에_값_할당() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    void private_타입_필드에_값_할당() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Car car = carClass.getDeclaredConstructor().newInstance();
 
         Map<String, Object> map = Map.of(NAME_KEY, NAME_VALUE, PRICE_KEY, PRICE_VALUE);

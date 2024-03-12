@@ -11,8 +11,7 @@ import jakarta.persistence.OneToOne;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.h2.util.StringUtils;
@@ -103,8 +102,13 @@ public class Column {
     public void setFieldValue(Object object, Object value) {
         try {
             field.setAccessible(true);
-            if (field.getType() == List.class) {
-                ((List) getFieldValue(object)).add(value);
+            if (Collection.class.isAssignableFrom(value.getClass())) {
+                field.set(object, value);
+                return;
+            }
+
+            if (Collection.class.isAssignableFrom(field.getType())) {
+                ((Collection) getFieldValue(object)).add(value);
                 return;
             }
             field.set(object, value);

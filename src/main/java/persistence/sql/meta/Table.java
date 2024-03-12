@@ -39,8 +39,8 @@ public class Table {
         return relationTable.getOrDefault(table, Set.of());
     }
 
-    public List<Column> getColumns() {
-        return columns.getSelectColumns();
+    public Class<?> getClazz() {
+        return clazz;
     }
 
     public String getTableName() {
@@ -76,12 +76,18 @@ public class Table {
     }
 
     public boolean isEagerRelationEmpty() {
-        return columns.getRelationColumns().isEmpty();
+        return columns.getEagerRelationColumns().isEmpty();
     }
 
     public List<Table> getEagerRelationTables() {
         return columns.getEagerRelationColumns()
             .stream().map(Column::getRelationTable)
+            .collect(Collectors.toList());
+    }
+
+    public List<Column> getLazyRelationColumns() {
+        return columns.getRelationColumns().stream()
+            .filter(column -> !column.isEagerRelationColumn())
             .collect(Collectors.toList());
     }
 
@@ -114,10 +120,6 @@ public class Table {
         return Objects.hash(clazz);
     }
 
-    public List<Object> getRelationValues(Object entity) {
-        return columns.getRelationValues(entity);
-    }
-
     private static void setRelationTable(Table root, Columns columns) {
         columns.getRelationColumns().stream()
             .filter(Column::isOneToMany)
@@ -134,5 +136,17 @@ public class Table {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalArgumentException("엔티티 객체가 아닙니다.");
         }
+    }
+
+    public Object getRelationValue(Object entity, Table relationTable) {
+        return columns.getRelationColumns().stream()
+            .filter(column -> column.getRelationTable().equals(relationTable))
+            .findFirst()
+            .map(column -> column.getFieldValue(entity))
+            .orElseThrow(() -> new IllegalArgumentException("관계 컬럼이 존재하지 않습니다."));
+    }
+
+    public List<Object> getRelationValues(Object entity) {
+        return columns.getRelationValues(entity);
     }
 }

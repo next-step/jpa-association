@@ -6,7 +6,6 @@ import domain.Order;
 import domain.OrderItem;
 import domain.Person;
 import java.sql.SQLException;
-import java.util.stream.IntStream;
 import jdbc.JdbcTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -112,7 +111,7 @@ class SimpleEntityManagerTest {
             assertEquals(foundPerson1, foundPerson2);
         }
 
-        @DisplayName("Order entity를 검색 할 수 있다.")
+        @DisplayName("Order entity를 조회 후 oderItem을 lazy로 조회한다.")
         @Test
         void findTest_whenOrder() {
             // given
@@ -124,14 +123,15 @@ class SimpleEntityManagerTest {
             entityManager.persist(order);
 
             // when
-            Order foundOrder = entityManager.find(Order.class, 1L);
+            EntityManager manager = SimpleEntityManager.from(jdbcTemplate);
+            Order foundOrder = manager.find(Order.class, 1L);
 
             // then
             assertAll(
                 () -> assertEquals(foundOrder, order),
                 () -> assertEquals(foundOrder.getId(), order.getId()),
                 () -> assertEquals(foundOrder.getOrderNumber(), order.getOrderNumber()),
-                () -> assertEquals(foundOrder.getOrderItems(), order.getOrderItems())
+                () -> assertEquals(foundOrder.getOrderItems().size(), order.getOrderItems().size())
             );
         }
     }

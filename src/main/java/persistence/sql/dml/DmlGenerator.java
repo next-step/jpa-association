@@ -53,6 +53,12 @@ public class DmlGenerator {
             whereClause(table.getTableName(), Map.of(table.getIdColumn(), id));
     }
 
+    public String generateSelectQuery(Class<?> clazz, Map<Column, Object> conditions) {
+        Table table = getTable(clazz);
+        return selectQueryBuilder.generateQuery(table) +
+            whereClause(table.getTableName(), conditions);
+    }
+
     public String generateUpdateQuery(Object object) {
         Table table = getTable(object.getClass());
         return updateQueryBuilder.generateQuery(table, object) +

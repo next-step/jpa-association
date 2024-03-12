@@ -39,8 +39,7 @@ class SelectQueryBuilderTest {
             String query = selectQueryBuilder.generateQuery(Table.getInstance(Order.class));
 
             // then
-            assertEquals("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity " +
-                "FROM orders LEFT JOIN order_items ON orders.id = order_items.order_id", query);
+            assertEquals("SELECT orders.id,orders.order_number FROM orders", query);
         }
     }
 }

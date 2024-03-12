@@ -61,7 +61,7 @@ public class Columns {
 
     public List<Column> getSelectColumns() {
         return columns.stream()
-            .filter(column -> !column.isEagerRelationColumn())
+            .filter(column -> !column.isRelationColumn())
             .collect(Collectors.toList());
     }
 

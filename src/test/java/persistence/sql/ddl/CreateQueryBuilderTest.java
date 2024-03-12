@@ -35,7 +35,7 @@ class CreateQueryBuilderTest {
             String ddl = builder.generateQuery(table);
 
             //then
-            assertThat(ddl).isEqualTo("CREATE TABLE " + table.getTableName()+ " (id BIGINT AUTO_INCREMENT PRIMARY KEY,nick_name VARCHAR,old INTEGER,email VARCHAR NOT NULL)");
+            assertThat(ddl).isEqualTo("CREATE TABLE users (id BIGINT AUTO_INCREMENT PRIMARY KEY,nick_name VARCHAR,old INTEGER,email VARCHAR NOT NULL)");
         }
 
         @DisplayName("Order Entity와 OrderItem Entity 테이블 생성 ddl이 만들어지는지 확인한다.")
@@ -50,8 +50,8 @@ class CreateQueryBuilderTest {
             String ddl2 = builder.generateQuery(table1);
 
             //then
-            assertThat(ddl).isEqualTo("CREATE TABLE " + table.getTableName()+ " (id BIGINT AUTO_INCREMENT PRIMARY KEY,order_number VARCHAR)");
-            assertThat(ddl2).isEqualTo("CREATE TABLE " + table1.getTableName()+ " (id BIGINT AUTO_INCREMENT PRIMARY KEY,product VARCHAR,quantity INTEGER,order_id BIGINT,FOREIGN KEY (order_id) REFERENCES order_items(id))");
+            assertThat(ddl).isEqualTo("CREATE TABLE orders (id BIGINT AUTO_INCREMENT PRIMARY KEY,order_number VARCHAR)");
+            assertThat(ddl2).isEqualTo("CREATE TABLE order_items (id BIGINT AUTO_INCREMENT PRIMARY KEY,product VARCHAR,quantity INTEGER,order_id BIGINT,FOREIGN KEY (order_id) REFERENCES order_items(id))");
         }
     }
 }
