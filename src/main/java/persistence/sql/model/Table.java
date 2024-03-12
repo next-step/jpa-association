@@ -12,21 +12,24 @@ import java.util.stream.Collectors;
 
 public class Table implements BaseTable {
 
+    private final Class<?> entity;
+
     private final String name;
 
     private final PKColumn pkColumn;
 
     private final Columns columns;
 
-    private final List<JoinTable> joinTables;
+    private final List<JoinColumn> joinColumns;
 
     public Table(Class<?> entity) {
         validateEntity(entity);
 
+        this.entity = entity;
         this.name = buildTableName(entity);
         this.pkColumn = buildPKColumn(entity);
         this.columns = buildColumns(entity);
-        this.joinTables = buildJoinTables(entity);
+        this.joinColumns = buildJoinColumns(entity);
     }
 
     private void validateEntity(Class<?> entity) {
@@ -73,16 +76,25 @@ public class Table implements BaseTable {
         return field.isAnnotationPresent(Id.class);
     }
 
-    private List<JoinTable> buildJoinTables(Class<?> entity) {
+    private List<JoinColumn> buildJoinColumns(Class<?> entity) {
         Field[] fields = entity.getDeclaredFields();
         return Arrays.stream(fields)
                 .filter(this::hasJoinColumnAnnotation)
-                .map(JoinTable::new)
+                .map(JoinColumn::new)
                 .collect(Collectors.toList());
     }
 
     private boolean hasJoinColumnAnnotation(Field field) {
         return field.isAnnotationPresent(jakarta.persistence.JoinColumn.class);
+    }
+
+    public List<JoinColumn> getJoinColumns() {
+        return Collections.unmodifiableList(joinColumns);
+    }
+
+    @Override
+    public Class<?> getEntity() {
+        return entity;
     }
 
     @Override
@@ -98,11 +110,6 @@ public class Table implements BaseTable {
     @Override
     public Columns getColumns() {
         return columns;
-    }
-
-    @Override
-    public List<JoinTable> getJoinTables() {
-        return joinTables;
     }
 
     @Override
