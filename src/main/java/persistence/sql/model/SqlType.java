@@ -153,22 +153,10 @@ public enum SqlType {
     }
 
     public static SqlType of(Class<?> clazz) {
-        SqlType type = javaClassToJdbcTypeCodeMap.get(clazz);
-
-        if (type == null) {
-            throw new IllegalArgumentException("No mapping for jdbc type: " + clazz.getSimpleName());
-        }
-
-        return type;
+        return javaClassToJdbcTypeCodeMap.get(clazz);
     }
 
     public Class<?> toJavaClass() {
-        Class<?> clazz = jdbcTypeCodeToJavaClassMap.get(this);
-
-        if (clazz == null) {
-            throw new IllegalArgumentException("No mapping for java class: " + this.name());
-        }
-
-        return clazz;
+        return jdbcTypeCodeToJavaClassMap.get(this);
     }
 }
