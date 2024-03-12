@@ -62,4 +62,29 @@ class FindQueryBuilderTest {
                 Arguments.arguments(new Table(Person3.class), new Person3(3L, "qwerty", 3, "email2@email.com"), "SELECT users.id,users.nick_name,users.old,users.email FROM users WHERE users.id=3;")
         );
     }
+
+    @DisplayName("Order를 이용하여 find 조인 쿼리 확인하기")
+    @Test
+    void buildWithJoin() {
+        Table table = new Table(Order.class);
+
+        FindQueryBuilder findQueryBuilder = new FindQueryBuilder(table);
+
+        String result = findQueryBuilder.build();
+
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id");
+    }
+
+    @DisplayName("Order를 이용하여 findById 조인 쿼리 확인하기")
+    @Test
+    void buildByIdWithJoin() {
+        Table table = new Table(Order.class);
+
+        FindQueryBuilder findQueryBuilder = new FindQueryBuilder(table);
+        EntityId id = new EntityId(1L);
+
+        String result = findQueryBuilder.buildById(id);
+
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders WHERE orders.id=1 JOIN order_items ON orders.id=order_items.order_id");
+    }
 }
