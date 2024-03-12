@@ -27,4 +27,9 @@ public class JoinEntityColumn {
     public String getFieldName() {
         return columnNameProperty.getFieldName();
     }
+
+    public String parseTableAndColumn(String tableName) {
+        return tableName + "." + columnNameProperty.getColumnName();
+
+    }
 }

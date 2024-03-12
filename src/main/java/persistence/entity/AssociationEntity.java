@@ -1,12 +1,14 @@
 package persistence.entity;
 
-public interface AssociationEntity {
+import persistence.sql.column.JoinEntityColumn;
 
-    String getJoinColumnName();
+public interface AssociationEntity {
 
     String getJoinFieldName();
 
     boolean isLazy();
 
     <T> void setAssociationColumn(T rootEntity, Object o);
+
+    JoinEntityColumn getJoinEntityColumn();
 }

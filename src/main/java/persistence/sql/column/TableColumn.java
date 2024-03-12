@@ -3,18 +3,14 @@ package persistence.sql.column;
 import jakarta.persistence.Entity;
 import utils.CamelToSnakeCaseConverter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class TableColumn implements TableEntity {
 
     private final TableName name;
-    private final List<JoinTableColumn> joinTableColumn;
+    private final JoinTableColumns joinTableColumns;
 
     public TableColumn(Class<?> clazz) {
         validateEntityAnnotation(clazz);
-        this.joinTableColumn = new ArrayList<>(JoinTableColumn.fromOneToMany(clazz));
+        this.joinTableColumns = new JoinTableColumns(JoinTableColumn.fromOneToMany(clazz));
         this.name = new TableName(clazz);
     }
 
@@ -29,8 +25,8 @@ public class TableColumn implements TableEntity {
         return CamelToSnakeCaseConverter.convert(name.getValue());
     }
 
-    public List<JoinTableColumn> getJoinTableColumn() {
-        return joinTableColumn;
+    public JoinTableColumns getJoinTableColumns () {
+        return joinTableColumns;
     }
 
 }

@@ -27,11 +27,6 @@ public class OneToManyAssociationEntity implements AssociationEntity {
     }
 
     @Override
-    public String getJoinColumnName() {
-        return CamelToSnakeCaseConverter.convert(joinColumn.getColumnName());
-    }
-
-    @Override
     public String getJoinFieldName() {
         return joinColumn.getFieldName();
     }
@@ -51,6 +46,11 @@ public class OneToManyAssociationEntity implements AssociationEntity {
         } finally {
             field.setAccessible(false);
         }
+    }
+
+    @Override
+    public JoinEntityColumn getJoinEntityColumn() {
+        return joinColumn;
     }
 
 }

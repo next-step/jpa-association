@@ -1,13 +1,10 @@
 package persistence.sql.dml;
 
 import domain.Order;
-import domain.OrderItem;
 import jakarta.persistence.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import domain.Person;
-import persistence.sql.column.JoinTableColumn;
 import persistence.sql.column.TableColumn;
 
 import java.util.List;
@@ -51,7 +48,7 @@ class SelectQueryBuilderTest {
         //given
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
         TableColumn tableColumn = new TableColumn(Order.class);
-        String joinQuery = queryBuilder.build(Order.class).selectFromJoinClause(tableColumn.getJoinTableColumn());
+        String joinQuery = queryBuilder.build(Order.class).selectFromJoinClause(tableColumn.getJoinTableColumns());
 
         //when
         //then
@@ -65,7 +62,7 @@ class SelectQueryBuilderTest {
         TableColumn tableColumn = new TableColumn(Order.class);
 
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
-        String joinQuery = queryBuilder.build(Order.class).selectFromJoinWhereIdClause(tableColumn.getJoinTableColumn(), 1L);
+        String joinQuery = queryBuilder.build(Order.class).selectFromJoinWhereIdClause(tableColumn.getJoinTableColumns(), 1L);
 
         //when
         //then
@@ -78,7 +75,7 @@ class SelectQueryBuilderTest {
         //given
         TableColumn tableColumn = new TableColumn(TestOrder.class);
         SelectQueryBuilder queryBuilder = new SelectQueryBuilder();
-        String query = queryBuilder.build(TestOrder.class).selectFromJoinWhereIdClause(tableColumn.getJoinTableColumn(), 1L);
+        String query = queryBuilder.build(TestOrder.class).selectFromJoinWhereIdClause(tableColumn.getJoinTableColumns(), 1L);
         //when
         //then
         assertThat(query).isEqualTo("select orders.id, orders.order_number, test_order_item.id, test_order_item.product, test_order_item.quantity, test_person.id, test_person.nick_name, test_person.old, test_person.email from orders join test_order_item on orders.id = test_order_item.order_id join test_person on orders.id = test_person.test_person_id where orders.id = 1");

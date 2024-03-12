@@ -4,12 +4,12 @@ import jdbc.JdbcTemplate;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
 import persistence.sql.column.JoinTableColumn;
+import persistence.sql.column.JoinTableColumns;
 import persistence.sql.column.TableColumn;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.mapper.GenericRowMapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EntityLoaderImpl implements EntityLoader {
 
@@ -25,8 +25,8 @@ public class EntityLoaderImpl implements EntityLoader {
     public <T> List<T> findAll(Class<T> clazz) {
         SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
         TableColumn tableColumn = new TableColumn(clazz);
-        List<JoinTableColumn> joinTableColumns = tableColumn.getJoinTableColumn();
-        if (joinTableColumns.isEmpty()) {
+        JoinTableColumns joinTableColumns = tableColumn.getJoinTableColumns();
+        if (joinTableColumns.hasNotAssociation()) {
             String query = queryBuilder.selectFromClause();
             return jdbcTemplate.query(query, new GenericRowMapper<>(clazz));
         }
@@ -34,35 +34,32 @@ public class EntityLoaderImpl implements EntityLoader {
         return jdbcTemplate.query(query, new GenericRowMapper<>(clazz));
     }
 
-
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
         TableColumn tableColumn = new TableColumn(clazz);
-        List<JoinTableColumn> joinTableColumns = tableColumn.getJoinTableColumn();
-        if (joinTableColumns.isEmpty()) {
+        JoinTableColumns joinTableColumns = tableColumn.getJoinTableColumns();
+        if (joinTableColumns.hasNotAssociation()) {
             String query = queryBuilder.selectFromWhereIdClause(id);
             return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
         }
-        T instance = null;
+        T instance = getInstance(clazz, id, joinTableColumns);
 
-        boolean isEager = joinTableColumns.stream().anyMatch(joinTable -> !joinTable.getAssociationEntity().isLazy());
-        if (isEager) {
-            List<JoinTableColumn> eagerJoinTables = joinTableColumns.stream()
-                    .filter(joinTable -> !joinTable.getAssociationEntity().isLazy())
-                    .collect(Collectors.toList());
-            String query = queryBuilder.selectFromJoinWhereIdClause(eagerJoinTables, id);
-            instance = jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
-        }else{
-            String aa = queryBuilder.selectFromWhereIdClause(id);
-            instance = jdbcTemplate.queryForObject(aa, new GenericRowMapper<>(clazz));
-        }
-
-        List<JoinTableColumn> lazyJoinTables = joinTableColumns.stream()
-                .filter(joinTable -> joinTable.getAssociationEntity().isLazy())
-                .collect(Collectors.toList());
+        List<JoinTableColumn> lazyJoinTables = joinTableColumns.getLazyJoinTables();
         setProxy(lazyJoinTables, instance);
         return instance;
+    }
+
+    private <T> T getInstance(Class<T> clazz, Long id, JoinTableColumns joinTableColumns) {
+        SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
+        if (joinTableColumns.hasEager()) {
+            JoinTableColumns eagerJoinTables = joinTableColumns.getEagerJoinTables();
+            String query = queryBuilder.selectFromJoinWhereIdClause(eagerJoinTables, id);
+            return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
+        }
+
+        String fromQuery = queryBuilder.selectFromWhereIdClause(id);
+        return jdbcTemplate.queryForObject(fromQuery, new GenericRowMapper<>(clazz));
     }
 
     private <T> void setProxy(List<JoinTableColumn> lazyJoinTables, T rootEntity) {

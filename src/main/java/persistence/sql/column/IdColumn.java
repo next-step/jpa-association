@@ -5,7 +5,9 @@ import jakarta.persistence.Id;
 import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class IdColumn implements Column {

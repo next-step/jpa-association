@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 
 public class JoinTableColumn implements TableEntity {
 
+    private static final String JOIN_CLAUSE_FORMAT = " join %s on %s = %s";
+
     private static final String COMMA = ", ";
     private static final int MINIMUM_SIZE = 0;
 
-    private final TableName name;
+    private final TableName tableName;
 
     private final AssociationEntity associationEntity;
 
@@ -39,7 +41,7 @@ public class JoinTableColumn implements TableEntity {
         Class<?> associatedClass = getAssociatedClass(oneToManyField);
 
         this.idColumn = new IdColumn(associatedClass.getDeclaredFields());
-        this.name = new TableName(associatedClass);
+        this.tableName = new TableName(associatedClass);
         this.associationEntity = associationEntity;
         this.columns = new Columns(associatedClass.getDeclaredFields());
         this.clazz = associatedClass;
@@ -72,7 +74,7 @@ public class JoinTableColumn implements TableEntity {
 
     @Override
     public String getName() {
-        return CamelToSnakeCaseConverter.convert(name.getValue());
+        return CamelToSnakeCaseConverter.convert(tableName.getValue());
     }
 
     public String getColumnDefinition() {
@@ -121,5 +123,17 @@ public class JoinTableColumn implements TableEntity {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getJoinClauseWithAssociation(String rootTableName) {
+        JoinEntityColumn joinEntityColumn = associationEntity.getJoinEntityColumn();
+
+        String fkDefinition = joinEntityColumn.parseTableAndColumn(getName());
+        return String.format(JOIN_CLAUSE_FORMAT,
+                getName(),
+                idColumn.getTableAndColumnDefinition(rootTableName),
+                fkDefinition
+        );
+
     }
 }

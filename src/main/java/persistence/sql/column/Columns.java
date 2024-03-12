@@ -3,13 +3,18 @@ package persistence.sql.column;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
+import persistence.exception.CanNotGetObjectException;
 import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -73,6 +78,12 @@ public class Columns {
         return columns.values.stream()
                 .filter(this::isNotNull)
                 .anyMatch(column -> !column.getValue().equals(columnsNameValueMap.get(column.getName())));
+    }
+
+    public <T> void setGeneralColumn(ResultSet resultSet, T instance, TriConsumer<T> triConsumer) {
+        values.stream()
+                .filter(column -> !column.isAssociationEntity())
+                .forEach(column -> triConsumer.accept(resultSet, instance, column));
     }
 
     private boolean isNotNull(GeneralColumn column) {
