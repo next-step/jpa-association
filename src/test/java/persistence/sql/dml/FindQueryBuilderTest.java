@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -8,6 +9,7 @@ import persistence.entity.EntityBinder;
 import persistence.entity.EntityId;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
+import persistence.study.sql.ddl.Order;
 import persistence.study.sql.ddl.Person1;
 import persistence.study.sql.ddl.Person2;
 import persistence.study.sql.ddl.Person3;
@@ -31,9 +33,9 @@ class FindQueryBuilderTest {
 
     private static Stream<Arguments> build() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), "SELECT id,name,age FROM person1;"),
-                Arguments.arguments(new Table(Person2.class), "SELECT id,nick_name,old,email FROM person2;"),
-                Arguments.arguments(new Table(Person3.class), "SELECT id,nick_name,old,email FROM users;")
+                Arguments.arguments(new Table(Person1.class), "SELECT person1.id,person1.name,person1.age FROM person1;"),
+                Arguments.arguments(new Table(Person2.class), "SELECT person2.id,person2.nick_name,person2.old,person2.email FROM person2;"),
+                Arguments.arguments(new Table(Person3.class), "SELECT users.id,users.nick_name,users.old,users.email FROM users;")
         );
     }
 
@@ -55,9 +57,9 @@ class FindQueryBuilderTest {
 
     private static Stream<Arguments> buildById() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), new Person1(1L, "qwer", 1), "SELECT id,name,age FROM person1 WHERE id=1;"),
-                Arguments.arguments(new Table(Person2.class), new Person2(2L, "qwert", 2, "email@email.com"), "SELECT id,nick_name,old,email FROM person2 WHERE id=2;"),
-                Arguments.arguments(new Table(Person3.class), new Person3(3L, "qwerty", 3, "email2@email.com"), "SELECT id,nick_name,old,email FROM users WHERE id=3;")
+                Arguments.arguments(new Table(Person1.class), new Person1(1L, "qwer", 1), "SELECT person1.id,person1.name,person1.age FROM person1 WHERE person1.id=1;"),
+                Arguments.arguments(new Table(Person2.class), new Person2(2L, "qwert", 2, "email@email.com"), "SELECT person2.id,person2.nick_name,person2.old,person2.email FROM person2 WHERE person2.id=2;"),
+                Arguments.arguments(new Table(Person3.class), new Person3(3L, "qwerty", 3, "email2@email.com"), "SELECT users.id,users.nick_name,users.old,users.email FROM users WHERE users.id=3;")
         );
     }
 }

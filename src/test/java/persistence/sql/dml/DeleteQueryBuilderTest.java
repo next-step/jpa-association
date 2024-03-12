@@ -49,9 +49,9 @@ class DeleteQueryBuilderTest {
 
     private static Stream<Arguments> buildById() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), new Person1(1L, "q", 1), "DELETE FROM person1 WHERE id=1;"),
-                Arguments.arguments(new Table(Person2.class), new Person2(2L, "w", 2, "email@email.com"), "DELETE FROM person2 WHERE id=2;"),
-                Arguments.arguments(new Table(Person3.class), new Person3(3L, "e", 3, "email@email.com"), "DELETE FROM users WHERE id=3;")
+                Arguments.arguments(new Table(Person1.class), new Person1(1L, "q", 1), "DELETE FROM person1 WHERE person1.id=1;"),
+                Arguments.arguments(new Table(Person2.class), new Person2(2L, "w", 2, "email@email.com"), "DELETE FROM person2 WHERE person2.id=2;"),
+                Arguments.arguments(new Table(Person3.class), new Person3(3L, "e", 3, "email@email.com"), "DELETE FROM users WHERE users.id=3;")
         );
     }
 }

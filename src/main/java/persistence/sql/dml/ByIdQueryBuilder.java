@@ -22,6 +22,9 @@ public class ByIdQueryBuilder {
     private String buildWhereClause() {
         StringBuilder whereClauseBuilder = new StringBuilder();
 
+        String tableName = table.getName();
+        whereClauseBuilder.append(tableName + '.');
+
         String pkColumnName = table.getPKColumnName();
         whereClauseBuilder.append(pkColumnName)
                 .append('=')

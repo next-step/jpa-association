@@ -28,9 +28,9 @@ public class ByIdQueryBuilderTest {
 
     private static Stream<Arguments> build() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), new EntityId(1L), "id=1"),
-                Arguments.arguments(new Table(Person2.class), new EntityId(2L), "id=2"),
-                Arguments.arguments(new Table(Person3.class), new EntityId(500L), "id=500")
+                Arguments.arguments(new Table(Person1.class), new EntityId(1L), "person1.id=1"),
+                Arguments.arguments(new Table(Person2.class), new EntityId(2L), "person2.id=2"),
+                Arguments.arguments(new Table(Person3.class), new EntityId(500L), "users.id=500")
         );
     }
 }
