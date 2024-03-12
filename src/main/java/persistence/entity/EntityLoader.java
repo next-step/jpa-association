@@ -18,7 +18,7 @@ public class EntityLoader {
         Columns columns = Columns.createColumns(clazz);
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns);
         WhereBuilder whereBuilder = new WhereBuilder();
-        whereBuilder.and(BooleanExpression.eq(columns.getKeyColumnName(), id));
+        whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
 
         String query = selectQueryBuilder.build(whereBuilder);
         try {

@@ -26,7 +26,7 @@ public class EntityPersisterImpl implements EntityPersister {
     public boolean update(Object entity) {
         TableData table = TableData.from(entity.getClass());
         Columns columns = Columns.createColumnsWithValue(entity);
-        ColumnData keyColumn = columns.getKeyColumn();
+        ColumnData keyColumn = columns.getPkColumn();
 
         if(keyColumn.getValue() == null) {
             return false;
@@ -74,7 +74,7 @@ public class EntityPersisterImpl implements EntityPersister {
     @Override
     public void delete(Object entity) {
         Class<?> clazz = entity.getClass();
-        ColumnData idColumn = Columns.createColumnsWithValue(entity).getKeyColumn();
+        ColumnData idColumn = Columns.createColumnsWithValue(entity).getPkColumn();
 
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(clazz);
         WhereBuilder builder = new WhereBuilder();

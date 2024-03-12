@@ -76,7 +76,7 @@ class ColumnsTest {
     @Test
     public void testGetKeyColumns() {
         Columns columns = Columns.createColumns(Person.class);
-        ColumnData foundColumn = columns.getKeyColumn();
+        ColumnData foundColumn = columns.getPkColumn();
 
         assertThat(foundColumn.isPrimaryKey()).isTrue();
     }
@@ -85,7 +85,7 @@ class ColumnsTest {
     public void testGetKeyColumnName() {
         Columns columns = Columns.createColumns(Person.class);
 
-        assertThat(columns.getKeyColumnName()).isEqualTo("id");
+        assertThat(columns.getPkColumnName()).isEqualTo("id");
     }
 
     @Test

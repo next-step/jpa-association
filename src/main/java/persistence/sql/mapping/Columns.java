@@ -67,15 +67,15 @@ public class Columns implements Iterable<ColumnData> {
                 .collect(Collectors.toMap(ColumnData::getName, ColumnData::getValue));
     }
 
-    public ColumnData getKeyColumn() {
+    public ColumnData getPkColumn() {
         return columns.stream()
-                .filter(ColumnData::hasKeyType)
+                .filter(ColumnData::isPrimaryKey)
                 .findFirst()
                 .orElseThrow(IdAnnotationMissingException::new);
     }
 
-    public String getKeyColumnName() {
-        return getKeyColumn().getName();
+    public String getPkColumnName() {
+        return getPkColumn().getName();
     }
 
     private static void checkIsEntity(Class<?> entityClazz) {
