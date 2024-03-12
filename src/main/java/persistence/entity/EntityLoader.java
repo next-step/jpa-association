@@ -1,6 +1,7 @@
 package persistence.entity;
 
 import database.Database;
+import jakarta.persistence.EntityNotFoundException;
 import persistence.sql.dml.DMLQueryBuilder;
 import persistence.sql.model.Table;
 
@@ -19,7 +20,10 @@ public class EntityLoader {
         Table table = entityMetaCache.getTable(clazz);
         DMLQueryBuilder queryBuilder = new DMLQueryBuilder(table);
         String findByIdQuery = queryBuilder.buildFindByIdQuery(id);
-        return database.executeQueryForObject(clazz, findByIdQuery);
+        return database.executeQuery(clazz, findByIdQuery)
+                .stream()
+                .findAny()
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public boolean isExist(Object entity) {

@@ -2,10 +2,9 @@ package persistence.sql.dml;
 
 import persistence.entity.EntityId;
 import persistence.sql.model.BaseTable;
-import persistence.sql.model.JoinTable;
+import persistence.sql.model.JoinColumn;
 import persistence.sql.model.Table;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class FindQueryBuilder {
@@ -51,15 +50,15 @@ public class FindQueryBuilder {
 
     private String buildColumnsClause() {
         String columnNames = buildColumnNames(table);
-        String joinColumnNames = table.getJoinTables()
+        String joinColumnNames = table.getJoinColumns()
                 .stream()
+                .map(JoinColumn::getTable)
                 .map(this::buildColumnNames)
                 .collect(Collectors.joining(","));
 
         if (joinColumnNames.isEmpty()) {
             return columnNames;
         }
-
         return String.join(",", columnNames, joinColumnNames);
     }
 
@@ -71,12 +70,7 @@ public class FindQueryBuilder {
     }
 
     private String buildJoinClause() {
-        List<JoinTable> joinTables = table.getJoinTables();
-        return joinTables.stream()
-                .map(joinTable -> {
-                    JoinQueryBuilder joinQueryBuilder = new JoinQueryBuilder(table, joinTable);
-                    return joinQueryBuilder.build();
-                })
-                .collect(Collectors.joining(" "));
+        JoinQueryBuilder joinQueryBuilder = new JoinQueryBuilder(table);
+        return joinQueryBuilder.build();
     }
 }
