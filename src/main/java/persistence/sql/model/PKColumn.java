@@ -52,12 +52,11 @@ public class PKColumn implements BaseColumn {
         return column.getName();
     }
 
-    @Override
     public SqlType getType() {
-        return column.getType();
+        return column.getType()
+                .orElseThrow();
     }
 
-    @Override
     public List<SqlConstraint> getConstraints() {
         return column.getConstraints();
     }
