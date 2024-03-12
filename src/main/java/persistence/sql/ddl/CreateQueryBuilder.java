@@ -73,8 +73,8 @@ public class CreateQueryBuilder {
 
     private String buildColumnQuery(Column column) {
         StringBuilder columnBuilder = new StringBuilder();
-
-        SqlType sqlType = column.getType();
+        SqlType sqlType = column.getType()
+                .orElseThrow(() -> new IllegalArgumentException("Column type is no mapping for java type"));
         List<SqlConstraint> sqlConstraints = column.getConstraints();
 
         String name = column.getName();
