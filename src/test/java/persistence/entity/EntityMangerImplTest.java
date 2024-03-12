@@ -14,6 +14,8 @@ import persistence.sql.dml.InsertQueryBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
 
 class EntityMangerImplTest extends H2DBTestSupport {
     private final EntityPersister entityPersister = new EntityPersisterImpl(new H2GeneratedIdObtainStrategy(), jdbcTemplate);
@@ -167,6 +169,25 @@ class EntityMangerImplTest extends H2DBTestSupport {
     }
 
     @Test
+    @DisplayName("merge 시 dirty 가 아니면 update 하지 않는다.")
+    void doNotUpdateWhenEntityIsNotDirty() {
+        EntityPersister mockPersister = mock(EntityPersister.class);
+        EntityManger sut = new EntityMangerImpl(
+                mockPersister,
+                entityLoader,
+                persistenceContext,
+                entityEntryContext,
+                new EntityEntryCountProxyFactory()
+        );
+        Person person = new Person(null, "nick_name", 10, "test@test.com", null);
+        Person saved = (Person) sut.persist(person);
+
+        entityManger.merge(saved);
+        verify(mockPersister, never()).update(any());
+    }
+
+
+    @Test
     @DisplayName("update 시 entityEntry 의 상태를 saving->managed 순서로 변경.")
     void testStatusChangeToManagedWhenMerge() {
         EntityManger sut = new EntityMangerImpl(
@@ -179,6 +200,7 @@ class EntityMangerImplTest extends H2DBTestSupport {
         Person person = new Person(null, "nick_name", 10, "test@test.com", null);
         sut.persist(person);
         EntityKey entityKey = EntityKey.fromEntity(person);
+        person.changeName("new_nick_name");
 
         sut.merge(person);
 
