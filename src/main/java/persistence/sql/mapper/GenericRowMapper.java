@@ -1,6 +1,7 @@
 package persistence.sql.mapper;
 
 import jdbc.RowMapper;
+import net.sf.cglib.proxy.Enhancer;
 import persistence.exception.CanNotFindDeclaredConstructorException;
 import persistence.exception.CanNotGetObjectException;
 import persistence.sql.column.*;
@@ -27,6 +28,9 @@ public class GenericRowMapper<T> implements RowMapper<T> {
         setIdColumn(resultSet, rootEntity, new IdColumn(clazz.getDeclaredFields()));
         setGeneralColumn(resultSet, rootEntity, new Columns(clazz.getDeclaredFields()));
         for (JoinTableColumn joinTableColumn : tableColumn.getJoinTableColumn()) {
+            if(joinTableColumn.getAssociationEntity().isLazy()) {
+                continue;
+            }
             setAssociatedEntity(resultSet, joinTableColumn, rootEntity);
         }
         return rootEntity;
@@ -41,7 +45,8 @@ public class GenericRowMapper<T> implements RowMapper<T> {
 
             setIdColumn(resultSet, associatedEntity, joinTableColumnIdColumn);
             setGeneralColumn(resultSet, associatedEntity, joinTableColumnColumns);
-            setAssociationColumn(joinTableColumn, rootEntity, associatedEntity);
+            joinTableColumn.setAssociationColumn(rootEntity, associatedEntity);
+//            setAssociationColumn(joinTableColumn, rootEntity, associatedEntity);
         } while (resultSet.next());
     }
 

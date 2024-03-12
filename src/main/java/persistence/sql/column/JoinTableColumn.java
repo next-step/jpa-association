@@ -8,12 +8,15 @@ import utils.CamelToSnakeCaseConverter;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JoinTableColumn implements TableEntity {
 
+    private static final String COMMA = ", ";
     private static final int MINIMUM_SIZE = 0;
 
     private final TableName name;
@@ -32,13 +35,7 @@ public class JoinTableColumn implements TableEntity {
     }
 
     private JoinTableColumn(Field oneToManyField) {
-        OneToMany oneToMany = oneToManyField.getDeclaredAnnotation(OneToMany.class);
-
-        OneToManyAssociationEntity associationEntity = new OneToManyAssociationEntity(
-                new JoinEntityColumn(oneToManyField),
-                oneToMany.fetch()
-        );
-
+        OneToManyAssociationEntity associationEntity = new OneToManyAssociationEntity(oneToManyField);
         Class<?> associatedClass = getAssociatedClass(oneToManyField);
 
         this.idColumn = new IdColumn(associatedClass.getDeclaredFields());
@@ -49,7 +46,7 @@ public class JoinTableColumn implements TableEntity {
 
     }
 
-    private static Class<?> getAssociatedClass(Field oneToManyField) {
+    private Class<?> getAssociatedClass(Field oneToManyField) {
         ParameterizedType genericType = (ParameterizedType) oneToManyField.getGenericType();
         Type[] typeArguments = genericType.getActualTypeArguments();
         if (hasType(typeArguments)) {
@@ -78,6 +75,12 @@ public class JoinTableColumn implements TableEntity {
         return CamelToSnakeCaseConverter.convert(name.getValue());
     }
 
+    public String getColumnDefinition() {
+        String columnsDefinition = columns.getTableAndColumnDefinition(getName());
+        String idColumnDefinition = idColumn.getTableAndColumnDefinition(getName());
+        return idColumnDefinition + COMMA + columnsDefinition;
+    }
+
     public AssociationEntity getAssociationEntity() {
         return associationEntity;
     }
@@ -94,4 +97,29 @@ public class JoinTableColumn implements TableEntity {
         return clazz;
     }
 
+    public <T> void setAssociationColumn(T rootEntity, T associatedEntity) {
+        String joinFieldName = associationEntity.getJoinFieldName();
+        Field associationField = null;
+        try {
+            associationField = rootEntity.getClass().getDeclaredField(joinFieldName);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        associationField.setAccessible(true);
+        Collection<T> associationCollection = getAssociationCollection(associationField, rootEntity);
+        associationCollection.add(associatedEntity);
+    }
+
+    private <T> Collection<T> getAssociationCollection(Field associationField, T rootEntity) {
+        try {
+            Collection<T> associationCollection = (Collection<T>) associationField.get(rootEntity);
+            if (associationCollection == null) {
+                associationCollection = new ArrayList<>();
+                associationField.set(rootEntity, associationCollection);
+            }
+            return associationCollection;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

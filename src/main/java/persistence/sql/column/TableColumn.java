@@ -5,6 +5,7 @@ import utils.CamelToSnakeCaseConverter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TableColumn implements TableEntity {
 

@@ -5,7 +5,7 @@ import persistence.sql.column.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SelectQueryBuilder implements DmlQueryBuilder {
+public class SelectQueryBuilder {
     private static final String SELECT_QUERY_FORMAT = "select %s, %s from %s";
     private static final String TABLE_COLUMN_FORMAT = "%s.%s";
     private static final String WHERE_CLAUSE_FORMAT = " where %s = %d";
@@ -26,47 +26,39 @@ public class SelectQueryBuilder implements DmlQueryBuilder {
         return this;
     }
 
-    public String toStatement() {
-        return selectFromJoinClause();
-    }
-
-    @Override
-    public String toStatementWithId(Object id) {
-        return selectFromJoinClause() + whereClause(id);
-    }
-
-    private String whereClause(Object id) {
+    public String whereClause(Object id) {
         return String.format(WHERE_CLAUSE_FORMAT, parseTableAndColumn(tableColumn.getName(), idColumn.getName()), id);
     }
 
-    private String getSelectFromClause() {
+    public String selectFromWhereIdClause(Object id) {
+        return selectFromClause() + whereClause(id);
+    }
+
+    public String selectFromClause() {
         return String.format(SELECT_QUERY_FORMAT, idColumn.getName(), columns.getColumnNames(),
                 tableColumn.getName());
     }
 
-    private String selectFromJoinClause() {
-        List<JoinTableColumn> joinTableColumns = tableColumn.getJoinTableColumn();
-        if (joinTableColumns.isEmpty() || joinTableColumns.get(0).getAssociationEntity().isLazy()) {
-            return getSelectFromClause();
-        }
-        List<String> queries = joinTableColumns.stream()
-                .filter(joinTable -> !joinTable.getAssociationEntity().isLazy())
-                .map(joinTable -> getSelectFromWithAssociation(joinTable) + getJoinClauseWithAssociation(joinTable))
-                .collect(Collectors.toList());
-
-        return queries.get(0);
+    public String selectFromJoinWhereIdClause(List<JoinTableColumn> joinTableColumns, Object id) {
+        return selectFromJoinClause(joinTableColumns) + whereClause(id);
     }
 
-    private String getSelectFromWithAssociation(JoinTableColumn joinTable) {
-        String rootColumnsDefinition = getRootColumnDefinition();
-        String joinColumnsDefinition = getJoinColumnDefinition(joinTable, joinTable.getColumns());
-
-        return String.format(SELECT_QUERY_FORMAT,
-                rootColumnsDefinition,
-                joinColumnsDefinition,
-                tableColumn.getName());
+    public String selectFromJoinClause(List<JoinTableColumn> joinTableColumns) {
+        String selectFrom = String.format(SELECT_QUERY_FORMAT, getRootColumnsDefinition(), getAssociationColumnsDefinition(joinTableColumns), tableColumn.getName());
+        return selectFrom + getJoinColumn(joinTableColumns);
     }
 
+    private String getAssociationColumnsDefinition(List<JoinTableColumn> joinTableColumns) {
+        return joinTableColumns.stream()
+                .map(JoinTableColumn::getColumnDefinition)
+                .collect(Collectors.joining(COMMA));
+    }
+
+    private String getJoinColumn(List<JoinTableColumn> joinTableColumns) {
+        return joinTableColumns.stream()
+                .map(this::getJoinClauseWithAssociation)
+                .collect(Collectors.joining());
+    }
 
     private String getJoinClauseWithAssociation(JoinTableColumn joinTable) {
         String fkDefinition = parseTableAndColumn(joinTable.getName(), joinTable.getAssociationEntity().getJoinColumnName());
@@ -77,7 +69,7 @@ public class SelectQueryBuilder implements DmlQueryBuilder {
         );
     }
 
-    private String getRootColumnDefinition() {
+    private String getRootColumnsDefinition() {
         String rootTableName = tableColumn.getName();
 
         String rootTablePkColumnDefinition = parseTableAndColumn(rootTableName, idColumn.getName());
@@ -86,17 +78,6 @@ public class SelectQueryBuilder implements DmlQueryBuilder {
                 .map(column -> parseTableAndColumn(rootTableName, column.getName()))
                 .collect(Collectors.joining(COMMA));
         return rootTablePkColumnDefinition + COMMA + rootColumnsDefinition;
-    }
-
-    private String getJoinColumnDefinition(JoinTableColumn joinTable, Columns columns) {
-        String joinTableName = joinTable.getName();
-        IdColumn joinTableIdColumn = joinTable.getIdColumn();
-        String fkDefinition = parseTableAndColumn(joinTableName, joinTableIdColumn.getName());
-
-        String joinColumnsDefinition = columns.getValues().stream()
-                .map(column -> parseTableAndColumn(joinTableName, column.getName()))
-                .collect(Collectors.joining(COMMA));
-        return fkDefinition + COMMA + joinColumnsDefinition;
     }
 
     private String parseTableAndColumn(String tableName, String columnName) {

@@ -43,6 +43,13 @@ public class Columns {
                 .collect(Collectors.joining(COMMA));
     }
 
+    public String getTableAndColumnDefinition(String tableName) {
+        return values.stream()
+                .map(column -> column.getTableAndColumnDefinition(tableName))
+                .collect(Collectors.joining(COMMA));
+    }
+
+
     public String getColumnNames() {
         return this.values
                 .stream()

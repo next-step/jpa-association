@@ -1,7 +1,5 @@
 package persistence.entity;
 
-import jakarta.persistence.FetchType;
-
 public interface AssociationEntity {
 
     String getJoinColumnName();
@@ -9,4 +7,6 @@ public interface AssociationEntity {
     String getJoinFieldName();
 
     boolean isLazy();
+
+    <T> void setAssociationColumn(T rootEntity, Object o);
 }
