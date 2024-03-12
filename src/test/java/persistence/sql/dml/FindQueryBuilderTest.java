@@ -33,9 +33,9 @@ class FindQueryBuilderTest {
 
     private static Stream<Arguments> build() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), "SELECT person1.id,person1.name,person1.age FROM person1;"),
-                Arguments.arguments(new Table(Person2.class), "SELECT person2.id,person2.nick_name,person2.old,person2.email FROM person2;"),
-                Arguments.arguments(new Table(Person3.class), "SELECT users.id,users.nick_name,users.old,users.email FROM users;")
+                Arguments.arguments(new Table(Person1.class), "SELECT person1.id,person1.name,person1.age FROM person1"),
+                Arguments.arguments(new Table(Person2.class), "SELECT person2.id,person2.nick_name,person2.old,person2.email FROM person2"),
+                Arguments.arguments(new Table(Person3.class), "SELECT users.id,users.nick_name,users.old,users.email FROM users")
         );
     }
 
@@ -57,9 +57,9 @@ class FindQueryBuilderTest {
 
     private static Stream<Arguments> buildById() {
         return Stream.of(
-                Arguments.arguments(new Table(Person1.class), new Person1(1L, "qwer", 1), "SELECT person1.id,person1.name,person1.age FROM person1 WHERE person1.id=1;"),
-                Arguments.arguments(new Table(Person2.class), new Person2(2L, "qwert", 2, "email@email.com"), "SELECT person2.id,person2.nick_name,person2.old,person2.email FROM person2 WHERE person2.id=2;"),
-                Arguments.arguments(new Table(Person3.class), new Person3(3L, "qwerty", 3, "email2@email.com"), "SELECT users.id,users.nick_name,users.old,users.email FROM users WHERE users.id=3;")
+                Arguments.arguments(new Table(Person1.class), new Person1(1L, "qwer", 1), "SELECT person1.id,person1.name,person1.age FROM person1 WHERE person1.id=1"),
+                Arguments.arguments(new Table(Person2.class), new Person2(2L, "qwert", 2, "email@email.com"), "SELECT person2.id,person2.nick_name,person2.old,person2.email FROM person2 WHERE person2.id=2"),
+                Arguments.arguments(new Table(Person3.class), new Person3(3L, "qwerty", 3, "email2@email.com"), "SELECT users.id,users.nick_name,users.old,users.email FROM users WHERE users.id=3")
         );
     }
 

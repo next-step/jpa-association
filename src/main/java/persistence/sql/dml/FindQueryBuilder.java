@@ -25,6 +25,10 @@ public class FindQueryBuilder {
 
         String findAllQuery = String.format(FIND_ALL_QUERY_FORMAT, columnsClause, tableName);
         String joinClause = buildJoinClause();
+
+        if (joinClause.isEmpty()) {
+            return findAllQuery;
+        }
         return String.join(" ", findAllQuery, joinClause);
     }
 
@@ -37,24 +41,25 @@ public class FindQueryBuilder {
 
         String findByIdQuery = String.format(FIND_BY_ID_QUERY_FORMAT, columnsClause, tableName, whereClause);
         String joinClause = buildJoinClause();
+
+        if (joinClause.isEmpty()) {
+            return findByIdQuery;
+        }
         return String.join(" ", findByIdQuery, joinClause);
     }
 
     private String buildColumnsClause() {
-        StringBuilder columnsClauseBuilder = new StringBuilder();
-
         String columnNames = buildColumnNames(table);
-        columnsClauseBuilder.append(columnNames);
-
-        columnsClauseBuilder.append(',');
-
         String joinColumnNames = table.getJoinTables()
                 .stream()
                 .map(this::buildColumnNames)
                 .collect(Collectors.joining(","));
-        columnsClauseBuilder.append(joinColumnNames);
 
-        return columnsClauseBuilder.toString();
+        if (joinColumnNames.isEmpty()) {
+            return columnNames;
+        }
+
+        return String.join(",", columnNames, joinColumnNames);
     }
 
     private String buildColumnNames(BaseTable table) {
