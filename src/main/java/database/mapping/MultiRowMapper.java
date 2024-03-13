@@ -8,11 +8,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 // TODO: 테스트 추가
-public class MapRowMapper<T> implements RowMapper<RowMap<T>> {
+public class MultiRowMapper<T> implements RowMapper<RowMap<T>> {
     private final Class<T> clazz;
     private final MySQLDialect dialect;
 
-    public MapRowMapper(Class<T> clazz, MySQLDialect dialect) {
+    public MultiRowMapper(Class<T> clazz, MySQLDialect dialect) {
         this.clazz = clazz;
         this.dialect = dialect;
     }

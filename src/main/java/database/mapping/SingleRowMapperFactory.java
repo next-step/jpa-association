@@ -10,8 +10,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-public class RowMapperFactory {
-    private RowMapperFactory() {
+public class SingleRowMapperFactory {
+    private SingleRowMapperFactory() {
     }
 
     public static <T> RowMapper<T> create(Class<T> clazz, Dialect dialect) {
