@@ -3,6 +3,7 @@ package database.mapping.column;
 import jakarta.persistence.Column;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 public abstract class AbstractEntityColumn implements EntityColumn {
     private static final int DEFAULT_COLUMN_LENGTH = 255;
@@ -42,6 +43,11 @@ public abstract class AbstractEntityColumn implements EntityColumn {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Type getFieldType() {
+        return field.getType();
     }
 
     protected static Integer getColumnLength(Field field) {

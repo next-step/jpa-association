@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import persistence.entity.context.ObjectNotFoundException;
 import testsupport.H2DatabaseTest;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -118,20 +120,19 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
         );
     }
 
-//    @Test
-//    void scenario6() {
-//        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(Order.class, dialect));
-//        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(OrderItem.class, dialect));
-//
-//        EntityManager entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
-//
-//        Order order = entityManager.persist(new Order("1234"));
-//        entityManager.persist(new OrderItem("product1", 5, order.getId()));
-//        entityManager.persist(new OrderItem("product20", 50, order.getId()));
-//
-//        Order res = entityManager.find(Order.class, order.getId());
-//
-//        assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");
-//    }
+    @Test
+    void scenario6() {
+        List<Class<?>> allEntities = List.of(Order.class, OrderItem.class);
+        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(Order.class, allEntities, dialect));
+        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(OrderItem.class, allEntities, dialect));
 
+        loggingJdbcTemplate.execute("INSERT INTO orders (orderNumber) VALUES (1234)");
+        loggingJdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product1', 5, 1)");
+        loggingJdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product20', 50, 1)");
+
+        EntityManager entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
+
+        Order res = entityManager.find(Order.class, 1L);
+        assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");
+    }
 }

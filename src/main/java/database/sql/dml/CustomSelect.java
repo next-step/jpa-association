@@ -72,7 +72,8 @@ public class CustomSelect {
         StringJoiner joiner = new StringJoiner(", ");
 
         joiner.add(columnWithAlias(association.getForeignKeyColumnName(), alias));
-        for (String column : association.getColumnNames()) {
+        List<String> columnNames = EntityMetadataFactory.get(association.getEntityType()).getAllColumnNames();
+        for (String column : columnNames) {
             joiner.add(columnWithAlias(column, alias));
         }
 

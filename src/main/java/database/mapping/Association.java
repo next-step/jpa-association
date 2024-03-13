@@ -1,6 +1,8 @@
 package database.mapping;
 
-import java.util.List;
+import database.dialect.Dialect;
+
+import java.lang.reflect.Type;
 
 public class Association {
 
@@ -18,23 +20,30 @@ public class Association {
         return foreignKeyColumnName;
     }
 
-    public String getTableName() {
-        return getEntityMetadata().getTableName();
-    }
-
-    public List<String> getColumnNames() {
-        return getEntityMetadata().getAllColumnNames();
-    }
-
-    private EntityMetadata getEntityMetadata() {
-        return EntityMetadataFactory.get(entityType);
-    }
-
     public String getFieldName() {
         return fieldName;
     }
 
     public Class<?> getEntityType() {
         return entityType;
+    }
+
+    public String getTableName() {
+        return getOwnerEntityMetadata().getTableName();
+    }
+
+    private EntityMetadata getOwnerEntityMetadata() {
+        return EntityMetadataFactory.get(entityType);
+    }
+
+    //    @Override
+    public String toColumnDefinition(Dialect dialect) {
+        return foreignKeyColumnName + " " + getForeignKeyColumnType(dialect) + " NOT NULL";
+    }
+
+    private String getForeignKeyColumnType(Dialect dialect) {
+        Type foreignKeyColumnType = getOwnerEntityMetadata().getPrimaryKey().getFieldType();
+
+        return dialect.convertToSqlTypeDefinition((Class<?>) foreignKeyColumnType, 0);
     }
 }

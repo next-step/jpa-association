@@ -3,6 +3,7 @@ package database.mapping;
 import database.dialect.Dialect;
 import database.mapping.column.EntityColumn;
 import database.mapping.column.EntityColumnFactory;
+import database.mapping.column.PrimaryKeyEntityColumn;
 import jakarta.persistence.*;
 
 import java.lang.reflect.Field;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 public class ColumnsMetadata {
     private final Class<?> clazz;
     private final List<EntityColumn> allEntityColumns;
-    private final EntityColumn primaryKey;
+    private final PrimaryKeyEntityColumn primaryKey;
     private final List<EntityColumn> generalColumns;
     private final Map<String, Field> fieldByColumnNameMap;
     private final boolean isRequiredId;
@@ -24,7 +25,7 @@ public class ColumnsMetadata {
 
     private ColumnsMetadata(Class<?> clazz,
                             List<EntityColumn> allEntityColumns,
-                            EntityColumn primaryKey,
+                            PrimaryKeyEntityColumn primaryKey,
                             List<EntityColumn> generalColumns,
                             Map<String, Field> fieldByColumnNameMap,
                             boolean isRequiredId,
@@ -51,7 +52,7 @@ public class ColumnsMetadata {
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst().get();
 
-        EntityColumn primaryKey = EntityColumnFactory.fromField(primaryKeyField);
+        PrimaryKeyEntityColumn primaryKey = (PrimaryKeyEntityColumn) EntityColumnFactory.fromField(primaryKeyField);
 
         boolean isRequiredId = !primaryKeyField.isAnnotationPresent(GeneratedValue.class);
         List<EntityColumn> generalColumns = allFields.stream()
@@ -119,6 +120,10 @@ public class ColumnsMetadata {
         return allEntityColumns.stream()
                 .map(entityColumn -> entityColumn.toColumnDefinition(dialect))
                 .collect(Collectors.toList());
+    }
+
+    public PrimaryKeyEntityColumn getPrimaryKey() {
+        return primaryKey;
     }
 
     public String getPrimaryKeyColumnName() {

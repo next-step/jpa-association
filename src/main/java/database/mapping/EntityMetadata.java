@@ -4,21 +4,60 @@ import database.dialect.Dialect;
 import database.mapping.column.EntityColumn;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO: 정리할 수 있는 메서드 있나 확인
 // TODO: 책임 분리
 public class EntityMetadata {
+    private final Class<?> clazz;
     private final TableMetadata tableMetadata;
     private final ColumnsMetadata columnsMetadata;
 
-    private EntityMetadata(TableMetadata tableMetadata, ColumnsMetadata columnsMetadata) {
+    private EntityMetadata(Class<?> clazz, TableMetadata tableMetadata, ColumnsMetadata columnsMetadata) {
+        this.clazz = clazz;
         this.tableMetadata = tableMetadata;
         this.columnsMetadata = columnsMetadata;
     }
 
+    /**
+     * entities 목록 안에 this.clazz 와 관련된 필드가 있는지 찾아보고 돌려줌
+     */
+    public List<String> getJoinColumnDefinitions(Dialect dialect, List<Class<?>> entities) {
+        List<Association> ret = getAssociationFromOtherEntities(entities);
+
+        if (ret.isEmpty()) {
+            return List.of();
+        } else {
+            List<String> definitions = new ArrayList<>();
+
+            Association association = ret.get(0);
+            String definition = association.toColumnDefinition(dialect);
+            definitions.add(definition);
+
+            return definitions;
+        }
+    }
+
+    // XXX: ColumnMetadata 쪽으로 로직 옮기기
+    private List<Association> getAssociationFromOtherEntities(List<Class<?>> entities) {
+        List<Association> ret = new ArrayList<>();
+        for (Class<?> entity : entities) {
+            if (entity == clazz) continue;
+            EntityMetadata entityMetadata = EntityMetadataFactory.get(entity);
+            for (Association association : entityMetadata.getAssociations()) {
+                if (association.getEntityType() == clazz) {
+                    ret.add(association);
+                }
+            }
+        }
+        return ret;
+    }
+
     static EntityMetadata fromClass(Class<?> clazz) {
         return new EntityMetadata(
+                clazz,
                 new TableMetadata(clazz),
                 ColumnsMetadata.fromClass(clazz)
         );
@@ -54,6 +93,10 @@ public class EntityMetadata {
 
     public List<EntityColumn> getGeneralColumns() {
         return columnsMetadata.getGeneralColumns();
+    }
+
+    public EntityColumn getPrimaryKey() {
+        return columnsMetadata.getPrimaryKey();
     }
 
     public Long getPrimaryKeyValue(Object entity) {
