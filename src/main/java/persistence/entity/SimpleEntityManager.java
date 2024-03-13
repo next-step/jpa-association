@@ -106,7 +106,6 @@ public class SimpleEntityManager implements EntityManager {
         Object snapshot = persistenceContext.getDatabaseSnapshot(id, entity);
         if (snapshot != null) {
             return snapshot;
-
         }
 
         Class<?> clazz = entity.getClass();

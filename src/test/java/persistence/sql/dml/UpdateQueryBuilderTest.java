@@ -19,6 +19,6 @@ class UpdateQueryBuilderTest {
         EntityId id = new EntityId(1L);
         String result = updateQueryBuilder.buildById(id);
 
-        assertThat(result).isEqualTo("UPDATE users SET (id,nick_name,old,email) = (1,'qwer',123,'qwe@qwe.com') WHERE id=1;");
+        assertThat(result).isEqualTo("UPDATE users SET (id,nick_name,old,email) = (1,'qwer',123,'qwe@qwe.com') WHERE users.id=1;");
     }
 }

@@ -1,14 +1,16 @@
 package persistence.sql.dml;
 
 import persistence.entity.EntityId;
+import persistence.sql.model.BaseTable;
+import persistence.sql.model.JoinColumn;
 import persistence.sql.model.Table;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 public class FindQueryBuilder {
 
-    private final static String FIND_ALL_QUERY_FORMAT = "SELECT %s FROM %s;";
-    private final static String FIND_BY_ID_QUERY_FORMAT = "SELECT %s FROM %s WHERE %s;";
+    private final static String Find_QUERY_FORMAT = "SELECT %s FROM %s";
+    private final static String WHERE_FORMAT = "WHERE %s";
 
     private final Table table;
 
@@ -19,7 +21,14 @@ public class FindQueryBuilder {
     public String build() {
         String columnsClause = buildColumnsClause();
         String tableName = table.getName();
-        return String.format(FIND_ALL_QUERY_FORMAT, columnsClause, tableName);
+
+        String findAllQuery = String.format(Find_QUERY_FORMAT, columnsClause, tableName);
+        String joinClause = buildJoinClause();
+
+        if (joinClause.isEmpty()) {
+            return findAllQuery;
+        }
+        return String.join(" ", findAllQuery, joinClause);
     }
 
     public String buildById(EntityId id) {
@@ -27,18 +36,41 @@ public class FindQueryBuilder {
 
         String columnsClause = buildColumnsClause();
         String tableName = table.getName();
-        String whereClause = byIdQueryBuilder.build();
 
-        return String.format(FIND_BY_ID_QUERY_FORMAT, columnsClause, tableName, whereClause);
+        String findQuery = String.format(Find_QUERY_FORMAT, columnsClause, tableName);
+        String byIdQuery = byIdQueryBuilder.build();
+        String whereClause = String.format(WHERE_FORMAT, byIdQuery);
+        String joinClause = buildJoinClause();
+
+        if (joinClause.isEmpty()) {
+            return String.join(" ", findQuery, whereClause);
+        }
+        return String.join(" ", findQuery, joinClause, whereClause);
     }
 
     private String buildColumnsClause() {
-        StringBuilder columnsClauseBuilder = new StringBuilder();
+        String columnNames = buildColumnNames(table);
+        String joinColumnNames = table.getJoinColumns()
+                .stream()
+                .map(JoinColumn::getTable)
+                .map(this::buildColumnNames)
+                .collect(Collectors.joining(","));
 
-        List<String> columnNames = table.getAllColumnNames();
-        String joinedColumnNames = String.join(",", columnNames);
-        columnsClauseBuilder.append(joinedColumnNames);
+        if (joinColumnNames.isEmpty()) {
+            return columnNames;
+        }
+        return String.join(",", columnNames, joinColumnNames);
+    }
 
-        return columnsClauseBuilder.toString();
+    private String buildColumnNames(BaseTable table) {
+        String tableName = table.getName();
+        return table.getAllColumnNames()
+                .stream()
+                .collect(Collectors.joining("," + tableName + ".", tableName + ".", ""));
+    }
+
+    private String buildJoinClause() {
+        JoinQueryBuilder joinQueryBuilder = new JoinQueryBuilder(table);
+        return joinQueryBuilder.build();
     }
 }

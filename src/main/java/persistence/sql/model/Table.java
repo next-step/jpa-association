@@ -10,7 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Table {
+public class Table implements BaseTable {
+
+    private final Class<?> entity;
 
     private final String name;
 
@@ -18,12 +20,16 @@ public class Table {
 
     private final Columns columns;
 
+    private final List<JoinColumn> joinColumns;
+
     public Table(Class<?> entity) {
         validateEntity(entity);
 
+        this.entity = entity;
         this.name = buildTableName(entity);
         this.pkColumn = buildPKColumn(entity);
         this.columns = buildColumns(entity);
+        this.joinColumns = buildJoinColumns(entity);
     }
 
     private void validateEntity(Class<?> entity) {
@@ -58,34 +64,60 @@ public class Table {
         return new PKColumn(pkField);
     }
 
-    private boolean hasIdAnnotation(Field field) {
-        return field.isAnnotationPresent(Id.class);
-    }
-
     private Columns buildColumns(Class<?> entity) {
         Field[] fields = entity.getDeclaredFields();
         List<Field> columnFields = Arrays.stream(fields)
-                .filter(field -> !hasIdAnnotation(field))
+                .filter(field -> !hasIdAnnotation(field) && !hasJoinColumnAnnotation(field))
                 .collect(Collectors.toList());
         return new Columns(columnFields);
     }
 
+    private boolean hasIdAnnotation(Field field) {
+        return field.isAnnotationPresent(Id.class);
+    }
+
+    private List<JoinColumn> buildJoinColumns(Class<?> entity) {
+        Field[] fields = entity.getDeclaredFields();
+        return Arrays.stream(fields)
+                .filter(this::hasJoinColumnAnnotation)
+                .map(JoinColumn::new)
+                .collect(Collectors.toList());
+    }
+
+    private boolean hasJoinColumnAnnotation(Field field) {
+        return field.isAnnotationPresent(jakarta.persistence.JoinColumn.class);
+    }
+
+    public List<JoinColumn> getJoinColumns() {
+        return Collections.unmodifiableList(joinColumns);
+    }
+
+    @Override
+    public Class<?> getEntity() {
+        return entity;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public PKColumn getPKColumn() {
         return pkColumn;
     }
 
+    @Override
     public Columns getColumns() {
         return columns;
     }
 
+    @Override
     public String getPKColumnName() {
         return pkColumn.getName();
     }
 
+    @Override
     public List<String> getAllColumnNames() {
         List<String> allColumnNames = new ArrayList<>();
 

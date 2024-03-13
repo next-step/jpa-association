@@ -1,6 +1,7 @@
 package persistence.sql.model;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Transient;
 import util.CaseConverter;
 
@@ -8,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class Column implements BaseColumn {
 
@@ -41,11 +43,21 @@ public class Column implements BaseColumn {
             return column.name();
         }
 
+        jakarta.persistence.JoinColumn joinColumn = field.getDeclaredAnnotation(JoinColumn.class);
+        if (joinColumn != null && hasName(joinColumn)) {
+            return joinColumn.name();
+        }
+
         String name = field.getName();
         return CaseConverter.camelToSnake(name);
     }
 
     private boolean hasName(jakarta.persistence.Column column) {
+        String name = column.name();
+        return !name.isEmpty();
+    }
+
+    private boolean hasName(JoinColumn column) {
         String name = column.name();
         return !name.isEmpty();
     }
@@ -87,12 +99,10 @@ public class Column implements BaseColumn {
         return name;
     }
 
-    @Override
-    public SqlType getType() {
-        return type;
+    public Optional<SqlType> getType() {
+        return Optional.ofNullable(type);
     }
 
-    @Override
     public List<SqlConstraint> getConstraints() {
         return Collections.unmodifiableList(constraints);
     }
