@@ -36,7 +36,6 @@ public class Association {
         return EntityMetadataFactory.get(entityType);
     }
 
-    //    @Override
     public String toColumnDefinition(Dialect dialect) {
         return foreignKeyColumnName + " " + getForeignKeyColumnType(dialect) + " NOT NULL";
     }

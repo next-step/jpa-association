@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import database.dialect.MySQLDialect;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
 import jdbc.JdbcTemplate;
@@ -30,7 +31,7 @@ public class EntityManagerImpl implements EntityManager {
     public static EntityManagerImpl from(JdbcTemplate jdbcTemplate) {
         return new EntityManagerImpl(
                 new PersistenceContextImpl(),
-                new EntityLoader(jdbcTemplate),
+                new EntityLoader(jdbcTemplate, MySQLDialect.getInstance()),
                 new EntityPersister(jdbcTemplate),
                 new CollectionLoader(jdbcTemplate));
     }

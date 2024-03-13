@@ -1,5 +1,6 @@
 package persistence.entity.database;
 
+import database.dialect.MySQLDialect;
 import entity.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class EntityLoaderTest extends H2DatabaseTest {
     @BeforeEach
     void setUp() {
         entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
-        entityLoader = new EntityLoader(loggingJdbcTemplate);
+        entityLoader = new EntityLoader(loggingJdbcTemplate, MySQLDialect.getInstance());
     }
 
     @Test

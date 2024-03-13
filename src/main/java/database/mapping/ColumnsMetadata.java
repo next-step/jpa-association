@@ -4,11 +4,12 @@ import database.dialect.Dialect;
 import database.mapping.column.EntityColumn;
 import database.mapping.column.EntityColumnFactory;
 import database.mapping.column.PrimaryKeyEntityColumn;
-import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,22 +22,19 @@ public class ColumnsMetadata {
     private final List<EntityColumn> generalColumns;
     private final Map<String, Field> fieldByColumnNameMap;
     private final boolean isRequiredId;
-    private final List<Field> associationFields;
 
     private ColumnsMetadata(Class<?> clazz,
                             List<EntityColumn> allEntityColumns,
                             PrimaryKeyEntityColumn primaryKey,
                             List<EntityColumn> generalColumns,
                             Map<String, Field> fieldByColumnNameMap,
-                            boolean isRequiredId,
-                            List<Field> associationFields) {
+                            boolean isRequiredId) {
         this.clazz = clazz;
         this.allEntityColumns = allEntityColumns;
         this.primaryKey = primaryKey;
         this.generalColumns = generalColumns;
         this.fieldByColumnNameMap = fieldByColumnNameMap;
         this.isRequiredId = isRequiredId;
-        this.associationFields = associationFields;
     }
 
     public static ColumnsMetadata fromClass(Class<?> clazz) {
@@ -60,10 +58,6 @@ public class ColumnsMetadata {
                 .filter(columnMetadata -> !columnMetadata.isPrimaryKeyField())
                 .collect(Collectors.toList());
 
-        List<Field> associationFields = Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(OneToMany.class))
-                .collect(Collectors.toList());
-
         // TODO: H2 에서는 ResultSet 에서 돌아온 결과의 컬럼명이 대문자로 구성되어 있어서, 쉬운 비교를 위해서 미리 변환해서 저장해둠.
         // dialect 마다 상황이 다를 수도 있음. (대소문자를 구별해서 nick_name과 NICK_NAME 을 다르게 처리하는 경우에는 에러 발생한다)
 
@@ -79,33 +73,8 @@ public class ColumnsMetadata {
                                    primaryKey,
                                    generalColumns,
                                    fieldByColumnNameMap,
-                                   isRequiredId,
-                                   associationFields);
-    }
-
-    public List<Association> getAssociations() {
-        return associationFields.stream()
-                .filter(ColumnsMetadata::checkAssociationAnnotation)
-                .map(field -> {
-                    JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-                    String foreignKeyColumnName = joinColumn.name();
-                    Type[] actualTypeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-                    Class<?> clazz = (Class<?>) actualTypeArguments[0];
-                    String fieldName = field.getName();
-                    return new Association(foreignKeyColumnName, clazz, fieldName);
-                })
-                .collect(Collectors.toList());
-    }
-
-    public List<Type> getAssociatedTypes() {
-        return associationFields.stream()
-                .filter(ColumnsMetadata::checkAssociationAnnotation)
-                .map(field -> ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0])
-                .collect(Collectors.toList());
-    }
-
-    private static boolean checkAssociationAnnotation(Field field) {
-        return field.isAnnotationPresent(OneToMany.class) && field.isAnnotationPresent(JoinColumn.class);
+                                   isRequiredId
+        );
     }
 
     private static boolean isRealColumn(Field field) {
