@@ -13,9 +13,26 @@ public class JdbcTemplate {
         this.connection = connection;
     }
 
-    public void execute(final String sql) {
+    public boolean execute(final String sql) {
         try (final Statement statement = connection.createStatement()) {
-            statement.execute(sql);
+            return statement.execute(sql);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object executeInsertQuery(final String sql) {
+        try (final Statement statement = connection.createStatement()) {
+            int resultSize = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+            if (resultSize == 0) {
+                throw new RuntimeException("Expected greater than 1 result");
+            }
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getObject(1);
+                }
+                throw new RuntimeException("not found generated key");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
