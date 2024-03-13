@@ -20,7 +20,7 @@ public class EntityLoader {
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
 
-        String query = selectQueryBuilder.build(whereBuilder);
+        String query = selectQueryBuilder.build(whereBuilder, null);
         try {
             return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
         } catch (Exception e) {

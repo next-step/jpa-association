@@ -63,7 +63,10 @@ class DMLQueryGeneratorH2DbTest {
         jdbcTemplate.execute(insertQueryBuilder.build(person1));
         jdbcTemplate.execute(insertQueryBuilder.build(person2));
 
-        List<Person> persons = jdbcTemplate.query(selectQueryBuilder.build(new WhereBuilder()), new PersonRowMapper());
+        List<Person> persons = jdbcTemplate.query(
+                selectQueryBuilder.build(new WhereBuilder(), null),
+                new PersonRowMapper()
+        );
 
         assertSoftly(softly -> {
             softly.assertThat(persons).hasSize(2);

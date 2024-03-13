@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import jakarta.persistence.criteria.Join;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
@@ -14,12 +15,16 @@ public class SelectQueryBuilder {
         this.columns = columns;
     }
 
-    public String build(WhereBuilder whereBuilder) {
+    public String build(WhereBuilder whereBuilder, JoinBuilder joinBuilder) {
         StringBuilder query = new StringBuilder();
         query.append("select ");
         query.append(selectClause());
         query.append(" from ");
         query.append(table.getName());
+
+        if(joinBuilder != null) {
+            query.append(joinBuilder.build());
+        }
 
         if(whereBuilder.isEmpty()) {
             return query.toString();
