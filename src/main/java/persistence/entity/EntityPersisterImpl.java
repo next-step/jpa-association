@@ -34,7 +34,7 @@ public class EntityPersisterImpl implements EntityPersister {
 
         UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(table, columns);
         WhereBuilder whereBuilder = new WhereBuilder();
-        whereBuilder.and(eq(keyColumn.getName(), keyColumn.getValue()));
+        whereBuilder.and(eq(keyColumn.getNameWithTable(), keyColumn.getValue()));
 
         jdbcTemplate.execute(updateQueryBuilder.build(entity, whereBuilder));
 
@@ -74,11 +74,12 @@ public class EntityPersisterImpl implements EntityPersister {
     @Override
     public void delete(Object entity) {
         Class<?> clazz = entity.getClass();
+        TableData table = TableData.from(clazz);
         ColumnData idColumn = Columns.createColumnsWithValue(entity).getPkColumn();
 
         DeleteQueryBuilder deleteQueryBuilder = new DeleteQueryBuilder(clazz);
         WhereBuilder builder = new WhereBuilder();
-        builder.and(eq(idColumn.getName(), idColumn.getValue()));
+        builder.and(eq(idColumn.getNameWithTable(), idColumn.getValue()));
 
         jdbcTemplate.execute(deleteQueryBuilder.build(builder));
     }

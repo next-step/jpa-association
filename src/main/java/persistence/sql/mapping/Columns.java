@@ -30,10 +30,11 @@ public class Columns implements Iterable<ColumnData> {
 
     public static Columns createColumns(Class<?> clazz) {
         checkIsEntity(clazz);
+        TableData table = TableData.from(clazz);
         List<ColumnData> columns = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(OneToMany.class))
-                .map(ColumnData::createColumn)
+                .map(field -> ColumnData.createColumn(table.getName(), field))
                 .collect(Collectors.toList());
 
         OneToManyData oneToManyData = extractOneToManyData(clazz);
@@ -73,6 +74,13 @@ public class Columns implements Iterable<ColumnData> {
         return columns.stream()
                 .filter(ColumnData::isNotPrimaryKey)
                 .map(ColumnData::getName)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getNamesWithTableName() {
+        return columns.stream()
+                .filter(ColumnData::isNotPrimaryKey)
+                .map(ColumnData::getNameWithTable)
                 .collect(Collectors.toList());
     }
 

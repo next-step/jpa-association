@@ -85,7 +85,7 @@ class ColumnsTest {
     public void testGetKeyColumnName() {
         Columns columns = Columns.createColumns(Person.class);
 
-        assertThat(columns.getPkColumnName()).isEqualTo("id");
+        assertThat(columns.getPkColumnName()).isEqualTo("users.id");
     }
 
     @Test

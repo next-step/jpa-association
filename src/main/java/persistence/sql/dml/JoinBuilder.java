@@ -15,18 +15,14 @@ public class JoinBuilder {
 
     public String build() {
         StringBuilder query = new StringBuilder();
-        OneToManyData association = columns.getOneToMany();
+        OneToManyData association = columns.getEagerAssociations().get(0);
         String joinTableName = association.getJoinTableName();
 
         query.append(" join ");
         query.append(joinTableName);
         query.append(" on ");
-        query.append(table.getName());
-        query.append(".");
         query.append(columns.getPkColumnName());
         query.append(" = ");
-        query.append(joinTableName);
-        query.append(".");
         query.append(association.getJoinColumnName());
 
         return query.toString();

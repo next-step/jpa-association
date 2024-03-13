@@ -18,7 +18,7 @@ class SelectQueryBuilderTest {
     @Test
     @DisplayName("요구사항2: findAll 쿼리 생성")
     void testFindAll() {
-        String expected = "select id, nick_name, old, email from users";
+        String expected = "select users.id, users.nick_name, users.old, users.email from users";
         WhereBuilder booleanBuilder = new WhereBuilder();
         String selectQuery = selectQueryBuilder.build(booleanBuilder, null);
 
@@ -29,7 +29,7 @@ class SelectQueryBuilderTest {
     @DisplayName("요구사항3: findById 쿼리 생성")
     void testFindById() {
         int id = 1;
-        String expected = String.format("select id, nick_name, old, email from users where id = %s", id);
+        String expected = String.format("select users.id, users.nick_name, users.old, users.email from users where id = %s", id);
         WhereBuilder booleanBuilder = new WhereBuilder();
         booleanBuilder.and(eq("id", id));
         String selectQuery = selectQueryBuilder.build(booleanBuilder, null);
@@ -46,7 +46,7 @@ class SelectQueryBuilderTest {
         JoinBuilder joinBuilder = new JoinBuilder(table, columns);
         int id = 1;
         String expected = String.format(
-                "select id, orderNumber from orders join order_items on orders.id = order_items.order_id where id = %s",
+                "select orders.id, orders.order_number, order_items.id, order_items.product, order_items.quantity from orders join order_items on orders.id = order_items.order_id where id = %s",
                 id
         );
         WhereBuilder booleanBuilder = new WhereBuilder();

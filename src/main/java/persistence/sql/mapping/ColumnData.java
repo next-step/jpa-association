@@ -1,14 +1,13 @@
 package persistence.sql.mapping;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import org.apache.commons.lang3.StringUtils;
 import persistence.sql.mapping.exception.GenerationTypeMissingException;
 
 import java.lang.reflect.Field;
 
 public class ColumnData {
+    private final String tableName;
     private final String name;
     private final int type;
     private Object value;
@@ -16,7 +15,15 @@ public class ColumnData {
     private final GenerationType generationType;
     private final boolean isNullable;
 
-    private ColumnData(String name, int type, boolean isPk, GenerationType generationType, boolean isNullable) {
+    private ColumnData(
+            String tableName,
+            String name,
+            int type,
+            boolean isPk,
+            GenerationType generationType,
+            boolean isNullable
+    ) {
+        this.tableName = tableName;
         this.name = name;
         this.type = type;
         this.isPk = isPk;
@@ -24,9 +31,10 @@ public class ColumnData {
         this.isNullable = isNullable;
     }
 
-    public static ColumnData createColumn(Field field) {
+    public static ColumnData createColumn(String tableName, Field field) {
         Column column = field.getAnnotation(Column.class);
         return new ColumnData(
+                tableName,
                 extractName(field, column),
                 extractDataType(field),
                 extractIsPrimaryKey(field),
@@ -35,8 +43,8 @@ public class ColumnData {
         );
     }
 
-    public static ColumnData createColumnWithValue(Field field, Object object) {
-        ColumnData columnData = createColumn(field);
+    public static ColumnData createColumnWithValue(String tableName, Field field, Object object) {
+        ColumnData columnData = createColumn(tableName, field);
         columnData.setValue(extractValue(field, object));
         return columnData;
     }
@@ -54,9 +62,9 @@ public class ColumnData {
     }
 
     private static String extractName(Field field, Column column) {
-        String columnName = field.getName();
+        String columnName = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(field.getName()), '_').toLowerCase();
         if (column != null && !column.name().isEmpty()) {
-            columnName = column.name();
+            return column.name();
         }
         return columnName;
     }
@@ -95,6 +103,9 @@ public class ColumnData {
 
     public String getName() {
         return name;
+    }
+    public String getNameWithTable() {
+        return String.format("%s.%s", tableName, name);
     }
 
     public Object getValue() {
