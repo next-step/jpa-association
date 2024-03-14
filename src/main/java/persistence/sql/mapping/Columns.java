@@ -6,7 +6,6 @@ import jakarta.persistence.Transient;
 import persistence.sql.ddl.exception.AnnotationMissingException;
 import persistence.sql.ddl.exception.IdAnnotationMissingException;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -16,11 +15,11 @@ import java.util.stream.Collectors;
 public class Columns implements Iterable<ColumnData> {
 
     private final List<ColumnData> columns;
-    private final OneToManyData oneToMany;
+    private final List<OneToManyData> associations;
 
-    private Columns(List<ColumnData> columns, OneToManyData oneToMany) {
+    private Columns(List<ColumnData> columns, List<OneToManyData> associations) {
         this.columns = columns;
-        this.oneToMany = oneToMany;
+        this.associations = associations;
     }
 
     @Override
@@ -37,37 +36,23 @@ public class Columns implements Iterable<ColumnData> {
                 .map(field -> ColumnData.createColumn(table.getName(), field))
                 .collect(Collectors.toList());
 
-        OneToManyData oneToManyData = extractOneToManyData(clazz);
-
         checkHasPrimaryKey(columns);
-        return new Columns(columns, oneToManyData);
+        return new Columns(columns, extractAssociations(clazz));
     }
 
     public static Columns createColumnsWithValue(Object entity) {
         Class<?> clazz = entity.getClass();
         checkIsEntity(clazz);
+        TableData table = TableData.from(clazz);
+
         List<ColumnData> columns = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(OneToMany.class))
-                .map(field -> ColumnData.createColumnWithValue(field, entity))
+                .map(field -> ColumnData.createColumnWithValue(table.getName(), field, entity))
                 .collect(Collectors.toList());
 
-        OneToManyData oneToManyData = extractOneToManyData(clazz);
-
         checkHasPrimaryKey(columns);
-        return new Columns(columns, oneToManyData);
-    }
-
-    private static OneToManyData extractOneToManyData(Class<?> clazz) {
-        OneToManyData oneToManyData = null;
-        Field oneToManyField = Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(OneToMany.class))
-                .findFirst()
-                .orElse(null);
-        if (oneToManyField != null) {
-            oneToManyData = OneToManyData.from(oneToManyField);
-        }
-        return oneToManyData;
+        return new Columns(columns, extractAssociations(clazz));
     }
 
     public List<String> getNames() {
@@ -105,7 +90,7 @@ public class Columns implements Iterable<ColumnData> {
     }
 
     public String getPkColumnName() {
-        return getPkColumn().getName();
+        return getPkColumn().getNameWithTable();
     }
 
     private static void checkIsEntity(Class<?> entityClazz) {
@@ -120,7 +105,20 @@ public class Columns implements Iterable<ColumnData> {
         }
     }
 
-    public OneToManyData getOneToMany() {
-        return oneToMany;
+    private static List<OneToManyData> extractAssociations(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(OneToMany.class))
+                .map(OneToManyData::from)
+                .collect(Collectors.toList());
+    }
+
+    public List<OneToManyData> getEagerAssociations() {
+        return associations.stream()
+                .filter(OneToManyData::isEagerLoad)
+                .collect(Collectors.toList());
+    }
+
+    public boolean hasAssociation() {
+        return !associations.isEmpty();
     }
 }

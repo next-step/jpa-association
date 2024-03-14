@@ -6,17 +6,20 @@ import jakarta.persistence.OneToMany;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 public class OneToManyData {
-    private String joinColumnName;
-    private TableData referenceTable;
-    private FetchType fetchType;
+    private final TableData referenceTable;
+    private final Class<?> referenceEntityClazz;
+    private final String joinColumnName;
+    private final FetchType fetchType;
+    private final Field field;
 
-    private OneToManyData(String joinColumnName, TableData referenceTable, FetchType fetchType) {
+    private OneToManyData(String joinColumnName, FetchType fetchType, Class<?> referenceEntityClazz, Field field) {
         this.joinColumnName = joinColumnName;
-        this.referenceTable = referenceTable;
         this.fetchType = fetchType;
+        this.referenceEntityClazz = referenceEntityClazz;
+        this.referenceTable = TableData.from(referenceEntityClazz);
+        this.field = field;
     }
 
     public static OneToManyData from(Field field) {
@@ -28,16 +31,33 @@ public class OneToManyData {
 
         return new OneToManyData(
                 joinColumn.name(),
-                TableData.from(referenceClazz),
-                oneToMany.fetch()
+                oneToMany.fetch(),
+                referenceClazz,
+                field
         );
     }
 
     public String getJoinColumnName() {
-        return joinColumnName;
+        return String.format("%s.%s", referenceTable.getName(), joinColumnName);
     }
 
     public String getJoinTableName() {
         return referenceTable.getName();
+    }
+
+    public boolean isLazyLoad() {
+        return fetchType == FetchType.LAZY;
+    }
+
+    public Class<?> getReferenceEntityClazz() {
+        return referenceEntityClazz;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public boolean isEagerLoad() {
+        return fetchType == FetchType.EAGER;
     }
 }

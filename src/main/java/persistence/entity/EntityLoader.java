@@ -16,15 +16,16 @@ public class EntityLoader {
     public <T> T find(Class<T> clazz, Object id) {
         TableData table = TableData.from(clazz);
         Columns columns = Columns.createColumns(clazz);
+
+        if(columns.hasAssociation()) {
+            CollectionLoader collectionLoader = new CollectionLoader(jdbcTemplate, table, columns);
+            return collectionLoader.load(clazz, id);
+        }
+
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns);
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
-
         String query = selectQueryBuilder.build(whereBuilder, null);
-        try {
-            return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
     }
 }
