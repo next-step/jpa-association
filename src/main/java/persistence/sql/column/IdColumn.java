@@ -12,7 +12,6 @@ import java.util.function.Function;
 
 public class IdColumn implements Column {
 
-    private static final String TABLE_COLUMN_FORMAT = "%s.%s";
     private static final String PK_FORMAT = "%s %s %s";
     private static final String PRIMARY_KEY = "primary key";
 
@@ -87,8 +86,4 @@ public class IdColumn implements Column {
         return field;
     }
 
-    @Override
-    public String getTableAndColumnDefinition(String tableName) {
-        return String.format(TABLE_COLUMN_FORMAT, tableName, getName());
-    }
 }

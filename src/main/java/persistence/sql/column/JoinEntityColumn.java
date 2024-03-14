@@ -1,10 +1,11 @@
 package persistence.sql.column;
 
 import jakarta.persistence.JoinColumn;
+import persistence.sql.dialect.Dialect;
 
 import java.lang.reflect.Field;
 
-public class JoinEntityColumn {
+public class JoinEntityColumn implements Column {
 
     private final ColumnNameProperty columnNameProperty;
 
@@ -20,7 +21,13 @@ public class JoinEntityColumn {
         return joinField.getName();
     }
 
-    public String getColumnName() {
+    @Override
+    public String getDefinition(Dialect dialect) {
+        return null;
+    }
+
+    @Override
+    public String getName() {
         return columnNameProperty.getColumnName();
     }
 
@@ -28,8 +35,9 @@ public class JoinEntityColumn {
         return columnNameProperty.getFieldName();
     }
 
-    public String parseTableAndColumn(String tableName) {
-        return tableName + "." + columnNameProperty.getColumnName();
-
+    @Override
+    public Field getField() {
+        throw new UnsupportedOperationException("Not supported");
     }
+
 }

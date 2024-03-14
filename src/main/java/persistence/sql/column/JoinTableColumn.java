@@ -126,9 +126,9 @@ public class JoinTableColumn implements TableEntity {
     }
 
     public String getJoinClauseWithAssociation(String rootTableName) {
-        JoinEntityColumn joinEntityColumn = associationEntity.getJoinEntityColumn();
+        Column joinEntityColumn = associationEntity.getJoinEntityColumn();
 
-        String fkDefinition = joinEntityColumn.parseTableAndColumn(getName());
+        String fkDefinition = joinEntityColumn.getTableAndColumnDefinition(getName());
         return String.format(JOIN_CLAUSE_FORMAT,
                 getName(),
                 idColumn.getTableAndColumnDefinition(rootTableName),

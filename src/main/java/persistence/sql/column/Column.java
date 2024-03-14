@@ -14,5 +14,7 @@ public interface Column {
 
     Field getField();
 
-    String getTableAndColumnDefinition(String name);
+    default String getTableAndColumnDefinition(String tableName) {
+        return tableName + "." + getName();
+    }
 }

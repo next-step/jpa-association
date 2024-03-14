@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 
 public class GeneralColumn implements Column {
 
-    private static final String TABLE_COLUMN_FORMAT = "%s.%s";
     private static final String DEFAULT_COLUMN_FORMAT = "%s %s";
     private static final String QUOTES = "'";
 
@@ -54,10 +53,6 @@ public class GeneralColumn implements Column {
     public String getDefinition(Dialect dialect) {
         return String.format(DEFAULT_COLUMN_FORMAT, name.getValue(),
                 dialect.getColumnType(field.getType()).getColumnDefinition() + nullable.getDefinition());
-    }
-
-    public String getTableAndColumnDefinition(String tableName) {
-        return String.format(TABLE_COLUMN_FORMAT, tableName, getName());
     }
 
     @Override

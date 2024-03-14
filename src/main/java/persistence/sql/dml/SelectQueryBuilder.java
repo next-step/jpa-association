@@ -2,9 +2,6 @@ package persistence.sql.dml;
 
 import persistence.sql.column.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class SelectQueryBuilder {
     private static final String SELECT_QUERY_FORMAT = "select %s, %s from %s";
     private static final String WHERE_CLAUSE_FORMAT = " where %s = %d";
@@ -24,8 +21,16 @@ public class SelectQueryBuilder {
         return this;
     }
 
+    public String whereClause(Column joinColumn, String joinTableName, Object id) {
+        return String.format(WHERE_CLAUSE_FORMAT, joinColumn.getTableAndColumnDefinition(joinTableName), id);
+    }
+
     public String whereClause(Object id) {
-        return String.format(WHERE_CLAUSE_FORMAT,idColumn.getTableAndColumnDefinition(tableColumn.getName()), id);
+        return String.format(WHERE_CLAUSE_FORMAT, idColumn.getTableAndColumnDefinition(tableColumn.getName()), id);
+    }
+
+    public String selectFromWhereIdClause(Column joinColumn, String joinTableName, Object id) {
+        return selectFromClause() + whereClause(joinColumn, joinTableName, id);
     }
 
     public String selectFromWhereIdClause(Object id) {

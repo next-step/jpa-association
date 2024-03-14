@@ -3,9 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
-import persistence.sql.column.JoinTableColumn;
-import persistence.sql.column.JoinTableColumns;
-import persistence.sql.column.TableColumn;
+import persistence.sql.column.*;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.mapper.GenericRowMapper;
 
@@ -22,18 +20,6 @@ public class EntityLoaderImpl implements EntityLoader {
         this.selectQueryBuilder = new SelectQueryBuilder();
     }
 
-    public <T> List<T> findAll(Class<T> clazz) {
-        SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
-        TableColumn tableColumn = new TableColumn(clazz);
-        JoinTableColumns joinTableColumns = tableColumn.getJoinTableColumns();
-        if (joinTableColumns.hasNotAssociation()) {
-            String query = queryBuilder.selectFromClause();
-            return jdbcTemplate.query(query, new GenericRowMapper<>(clazz));
-        }
-        String query = queryBuilder.selectFromJoinClause(joinTableColumns);
-        return jdbcTemplate.query(query, new GenericRowMapper<>(clazz));
-    }
-
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
@@ -46,7 +32,7 @@ public class EntityLoaderImpl implements EntityLoader {
         T instance = getInstance(clazz, id, joinTableColumns);
 
         List<JoinTableColumn> lazyJoinTables = joinTableColumns.getLazyJoinTables();
-        setProxy(lazyJoinTables, instance);
+        setProxy(lazyJoinTables, instance, id);
         return instance;
     }
 
@@ -62,18 +48,31 @@ public class EntityLoaderImpl implements EntityLoader {
         return jdbcTemplate.queryForObject(fromQuery, new GenericRowMapper<>(clazz));
     }
 
-    private <T> void setProxy(List<JoinTableColumn> lazyJoinTables, T rootEntity) {
+    private <T> void setProxy(List<JoinTableColumn> lazyJoinTables, T rootEntity, Object id) {
         for (JoinTableColumn lazyJoinTable : lazyJoinTables) {
-            Enhancer enhancer = createEnhancer(lazyJoinTable.getClazz());
+            Enhancer enhancer = createEnhancer(lazyJoinTable, id);
             Object proxy = enhancer.create();
             lazyJoinTable.getAssociationEntity().setAssociationColumn(rootEntity, proxy);
         }
     }
 
-    private <T> Enhancer createEnhancer(Class<T> clazz) {
+    private Enhancer createEnhancer(JoinTableColumn lazyJoinTable, Object id) {
+        Column joinEntityColumn = lazyJoinTable.getAssociationEntity().getJoinEntityColumn();
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(List.class);
-        enhancer.setCallback((LazyLoader) () -> findAll(clazz));
+        enhancer.setCallback((LazyLoader) () -> findAllAssociation(lazyJoinTable.getClazz(), joinEntityColumn, id));
         return enhancer;
+    }
+
+    private <T> List<T> findAllAssociation(Class<T> clazz, Column joinEntityColumn, Object id) {
+        TableColumn tableColumn = new TableColumn(clazz);
+        JoinTableColumns joinTableColumns = tableColumn.getJoinTableColumns();
+        SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
+        if (joinTableColumns.hasNotAssociation()) {
+            String query = queryBuilder.selectFromWhereIdClause(joinEntityColumn, tableColumn.getName(), id);
+            return jdbcTemplate.query(query, new GenericRowMapper<>(clazz));
+        }
+        String query = queryBuilder.selectFromJoinWhereIdClause(joinTableColumns, id);
+        return jdbcTemplate.query(query, new GenericRowMapper<>(clazz));
     }
 }
