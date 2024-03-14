@@ -39,6 +39,11 @@ public class OneToManyTable implements AssociationTable {
     }
 
     @Override
+    public boolean isLazy() {
+        return fetchType.equals(FetchType.LAZY);
+    }
+
+    @Override
     public Class<?> getClazz() {
         return table.getClazz();
     }
