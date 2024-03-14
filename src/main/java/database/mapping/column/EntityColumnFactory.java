@@ -1,4 +1,5 @@
 package database.mapping.column;
+
 import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;

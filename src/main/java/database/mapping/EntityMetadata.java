@@ -6,19 +6,28 @@ import database.mapping.column.EntityColumn;
 import java.lang.reflect.Field;
 import java.util.List;
 
+// TODO: 정리할 수 있는 메서드 있나 확인
+// TODO: 책임 분리
 public class EntityMetadata {
+    private final Class<?> clazz;
     private final TableMetadata tableMetadata;
     private final ColumnsMetadata columnsMetadata;
+    private final EntityAssociationMetadata entityAssociationMetadata;
 
-    private EntityMetadata(TableMetadata tableMetadata, ColumnsMetadata columnsMetadata) {
+    private EntityMetadata(Class<?> clazz, TableMetadata tableMetadata, ColumnsMetadata columnsMetadata,
+                           EntityAssociationMetadata entityAssociationMetadata) {
+        this.clazz = clazz;
         this.tableMetadata = tableMetadata;
         this.columnsMetadata = columnsMetadata;
+        this.entityAssociationMetadata = entityAssociationMetadata;
     }
 
-    public static EntityMetadata fromClass(Class<?> clazz) {
+    static EntityMetadata fromClass(Class<?> clazz) {
         return new EntityMetadata(
+                clazz,
                 new TableMetadata(clazz),
-                ColumnsMetadata.fromClass(clazz)
+                ColumnsMetadata.fromClass(clazz),
+                new EntityAssociationMetadata(clazz)
         );
     }
 
@@ -54,6 +63,10 @@ public class EntityMetadata {
         return columnsMetadata.getGeneralColumns();
     }
 
+    public EntityColumn getPrimaryKey() {
+        return columnsMetadata.getPrimaryKey();
+    }
+
     public Long getPrimaryKeyValue(Object entity) {
         return columnsMetadata.getPrimaryKeyValue(entity);
     }
@@ -62,7 +75,23 @@ public class EntityMetadata {
         return columnsMetadata.getFieldByColumnName(columnName);
     }
 
+    public Field getFieldByFieldName(String fieldName) {
+        return columnsMetadata.getFieldByFieldName(fieldName);
+    }
+
     public boolean requiresIdWhenInserting() {
         return columnsMetadata.isRequiredId();
+    }
+
+    public List<Association> getAssociations() {
+        return entityAssociationMetadata.getAssociations();
+    }
+
+    public boolean hasAssociation() {
+        return !entityAssociationMetadata.getAssociatedTypes().isEmpty();
+    }
+
+    public List<String> getJoinColumnDefinitions(Dialect dialect, List<Class<?>> entities) {
+        return entityAssociationMetadata.getJoinColumnDefinitions(dialect, entities);
     }
 }

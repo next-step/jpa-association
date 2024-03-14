@@ -15,7 +15,7 @@ class MySQLDialectTest {
     }
 
     private void assertConversion(Class<?> entityType, Integer columnLength, String databaseType) {
-        Dialect dialect = MySQLDialect.INSTANCE;
+        Dialect dialect = MySQLDialect.getInstance();
 
         assertThat(dialect.convertToSqlTypeDefinition(entityType, columnLength)).isEqualTo(databaseType);
     }

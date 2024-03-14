@@ -1,4 +1,6 @@
-package database.sql.dml.where;
+package database.sql.dml;
+
+import database.sql.dml.where.FilterExpression;
 
 import java.util.List;
 import java.util.Map;
@@ -7,16 +9,22 @@ import java.util.stream.Collectors;
 public class WhereClause {
     private final Map<String, Object> conditionMap;
     private final List<String> allColumnNames;
+    private final String alias;
 
-    private WhereClause(Map<String, Object> conditionMap, List<String> allColumnNames) {
+    private WhereClause(Map<String, Object> conditionMap, List<String> allColumnNames, String alias) {
         this.conditionMap = conditionMap;
         this.allColumnNames = allColumnNames;
+        this.alias = alias;
+    }
+
+    public static WhereClause from(Map<String, Object> conditionMap, List<String> allColumnNames, String alias) {
+        checkColumnNameInCondition(conditionMap, allColumnNames);
+
+        return new WhereClause(conditionMap, allColumnNames, alias);
     }
 
     public static WhereClause from(Map<String, Object> conditionMap, List<String> allColumnNames) {
-        checkColumnNameInCondition(conditionMap, allColumnNames);
-
-        return new WhereClause(conditionMap, allColumnNames);
+        return from(conditionMap, allColumnNames, null);
     }
 
     private static void checkColumnNameInCondition(Map<String, Object> conditionMap, List<String> allColumnNames) {
@@ -38,8 +46,16 @@ public class WhereClause {
                 .collect(Collectors.joining(" AND ", "WHERE ", ""));
     }
 
-    private static String columnAndValue(String columnName, Object value) {
-        FilterExpression expr = FilterExpression.from(columnName, value);
+    private String columnAndValue(String columnName, Object value) {
+        String columnNameWithAlias = columnNameWithAlias(columnName);
+        FilterExpression expr = FilterExpression.from(columnNameWithAlias, value);
         return expr.toQuery();
+    }
+
+    private String columnNameWithAlias(String columnName) {
+        if (alias != null)
+            return alias + "." + columnName;
+
+        return columnName;
     }
 }

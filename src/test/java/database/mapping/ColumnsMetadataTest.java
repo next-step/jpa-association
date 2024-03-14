@@ -2,17 +2,15 @@ package database.mapping;
 
 import database.dialect.Dialect;
 import database.dialect.MySQLDialect;
-import database.mapping.column.EntityColumn;
-import database.sql.Person;
+import entity.Person;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ColumnsMetadataTest {
-    private final Dialect dialect = MySQLDialect.INSTANCE;
+    private final Dialect dialect = MySQLDialect.getInstance();
 
     private final ColumnsMetadata columnsMetadata = ColumnsMetadata.fromClass(Person.class);
 
@@ -43,17 +41,6 @@ class ColumnsMetadataTest {
     void getGeneralColumnNames() {
         List<String> generalColumnNames = columnsMetadata.getGeneralColumnNames();
         assertThat(generalColumnNames).containsExactly("nick_name", "old", "email");
-    }
-
-    @Test
-    void getGeneralColumns() {
-        List<EntityColumn> columns = columnsMetadata.getGeneralColumns();
-        assertAll(
-                () -> assertThat(columns).hasSize(3),
-                () -> assertThat(columns.get(0).getFieldName()).isEqualTo("name"),
-                () -> assertThat(columns.get(1).getFieldName()).isEqualTo("age"),
-                () -> assertThat(columns.get(2).getFieldName()).isEqualTo("email")
-        );
     }
 
     @Test

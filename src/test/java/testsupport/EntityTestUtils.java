@@ -1,7 +1,7 @@
 package testsupport;
 
-import database.sql.Person;
-import database.sql.dml.SelectQueryBuilder;
+import database.sql.dml.Select;
+import entity.Person;
 import jdbc.JdbcTemplate;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class EntityTestUtils {
     }
 
     public static List<Person> findPeople(JdbcTemplate jdbcTemplate) {
-        String query = new SelectQueryBuilder(Person.class).buildQuery();
+        String query = new Select(Person.class).buildQuery();
         return jdbcTemplate.query(query, resultSet -> new Person(
                 resultSet.getLong("id"),
                 resultSet.getString("nick_name"),

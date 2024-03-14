@@ -1,6 +1,5 @@
 package database.sql.dml;
 
-import database.mapping.EntityMetadata;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,7 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class InsertQueryBuilderTest {
+class InsertTest {
+
     static List<Arguments> testCases() {
         return List.of(
                 arguments(Map.of("nick_name", "abc"), "INSERT INTO users (nick_name) VALUES ('abc')"),
@@ -33,7 +33,7 @@ class InsertQueryBuilderTest {
     @ParameterizedTest
     @MethodSource("testCases")
     void buildInsertQuery(Map<String, Object> valueMap, String expected) {
-        String actual = new InsertQueryBuilder(EntityMetadata.fromClass(Person4.class))
+        String actual = new Insert(Person4.class)
                 .values(valueMap)
                 .toQueryString();
         assertThat(actual).isEqualTo(expected);
@@ -42,7 +42,7 @@ class InsertQueryBuilderTest {
     @Test
     void insertQueryWithId() {
         Map<String, Object> valueMap = Map.of("nick_name", "abc", "old", 14, "email", "a@b.com");
-        String actual = new InsertQueryBuilder(EntityMetadata.fromClass(Person4.class))
+        String actual = new Insert(Person4.class)
                 .id(10L)
                 .values(valueMap)
                 .toQueryString();
@@ -51,7 +51,7 @@ class InsertQueryBuilderTest {
 
     @Test
     void insertIntoEntityWithNoId() {
-        String actual = new InsertQueryBuilder(EntityMetadata.fromClass(NoAutoIncrementUser.class))
+        String actual = new Insert(NoAutoIncrementUser.class)
                 .id(10L)
                 .values(Map.of("nick_name", "abc", "old", 14, "email", "a@b.com"))
                 .toQueryString();

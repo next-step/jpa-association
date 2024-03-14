@@ -1,75 +1,92 @@
 package persistence.entity;
 
-import database.mapping.EntityClass;
+import database.dialect.MySQLDialect;
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import jdbc.JdbcTemplate;
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
 import persistence.entity.data.EntitySnapshot;
+import persistence.entity.database.CollectionLoader;
 import persistence.entity.database.EntityLoader;
 import persistence.entity.database.EntityPersister;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
     private final EntityLoader entityLoader;
     private final EntityPersister entityPersister;
+    private final CollectionLoader collectionLoader;
 
     private EntityManagerImpl(PersistenceContext persistenceContext, EntityLoader entityLoader,
-                              EntityPersister entityPersister) {
+                              EntityPersister entityPersister, CollectionLoader collectionLoader) {
         this.persistenceContext = persistenceContext;
         this.entityLoader = entityLoader;
         this.entityPersister = entityPersister;
+        this.collectionLoader = collectionLoader;
     }
 
     public static EntityManagerImpl from(JdbcTemplate jdbcTemplate) {
         return new EntityManagerImpl(
                 new PersistenceContextImpl(),
-                new EntityLoader(jdbcTemplate),
-                new EntityPersister(jdbcTemplate));
+                new EntityLoader(jdbcTemplate, MySQLDialect.getInstance()),
+                new EntityPersister(jdbcTemplate),
+                new CollectionLoader(jdbcTemplate));
     }
 
     @Override
     public <T> T find(Class<T> clazz, Long id) {
         Object cached = persistenceContext.getEntity(clazz, id);
         if (Objects.isNull(cached)) {
-            Optional<Object> load = entityLoader.load(clazz, id);
-            if (load.isPresent()) {
-                Object object = load.get();
-                persistenceContext.addEntity(object);
-            }
+            loadEntity(clazz, id);
         }
         return (T) persistenceContext.getEntity(clazz, id);
     }
 
+    private <T> void loadEntity(Class<T> clazz, Long id) {
+        if (hasAssociation(clazz)) {
+            collectionLoader.load(clazz, id).ifPresent(persistenceContext::addEntity);
+        } else {
+            entityLoader.load(clazz, id).ifPresent(persistenceContext::addEntity);
+        }
+    }
+
+    private static <T> boolean hasAssociation(Class<T> clazz) {
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        return entityMetadata.hasAssociation();
+    }
+
     @Override
-    public void persist(Object entity) {
+    public <T> T persist(Object entity) {
         Class<?> clazz = entity.getClass();
 
         Long id = getRowId(entity);
         if (isInsertOperation(clazz, id)) {
-            insertEntity(entity, clazz);
-            return;
+            return (T) insertEntity(entity, clazz);
         }
-        updateEntity(entity, clazz, id);
+        return (T) updateEntity(entity, clazz, id);
     }
 
-    private void insertEntity(Object entity, Class<?> clazz) {
+    private <T> T insertEntity(Object entity, Class<T> clazz) {
         Long newId = entityPersister.insert(clazz, entity);
-        Object load = entityLoader.load(clazz, newId).get();
-        persistenceContext.addEntity(load);
+        T load = entityLoader.load(clazz, newId).get();
+        // TODO: lazy/eager 분리할 때 여길 깔끔하게 할 수 있을까?
+        if (!hasAssociation(clazz)) {
+            persistenceContext.addEntity(load);
+        }
+        return load;
     }
 
-    private void updateEntity(Object entity, Class<?> clazz, Long id) {
+    private Object updateEntity(Object entity, Class<?> clazz, Long id) {
         Object oldEntity = find(clazz, id);
         Map<String, Object> diff = EntitySnapshot.of(oldEntity).diff(EntitySnapshot.of(entity));
         if (!diff.isEmpty()) {
             entityPersister.update(clazz, id, diff);
             persistenceContext.addEntity(entity);
         }
+        return entity;
     }
 
     /**
@@ -95,9 +112,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private static Long getRowId(Object entity) {
         Class<?> clazz = entity.getClass();
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata entityMetadata = entityClass.getMetadata();
-
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         return entityMetadata.getPrimaryKeyValue(entity);
     }
 }

@@ -1,9 +1,9 @@
 package persistence.entity.database;
 
-import database.mapping.EntityClass;
-import database.mapping.EntityMetadata;
-import database.sql.dml.SelectByPrimaryKeyQueryBuilder;
-import database.sql.dml.SelectQueryBuilder;
+import database.dialect.MySQLDialect;
+import database.mapping.SingleRowMapperFactory;
+import database.sql.dml.Select;
+import database.sql.dml.SelectByPrimaryKey;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 
@@ -14,26 +14,24 @@ import java.util.Optional;
 
 public class EntityLoader {
     private final JdbcTemplate jdbcTemplate;
+    private final MySQLDialect dialect;
 
-    public EntityLoader(JdbcTemplate jdbcTemplate) {
+    public EntityLoader(JdbcTemplate jdbcTemplate, MySQLDialect dialect) {
         this.jdbcTemplate = jdbcTemplate;
+        this.dialect = dialect;
     }
 
-    public List<Object> load(Class<?> clazz, Collection<Long> ids) {
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
-        RowMapper<Object> rowMapper = entityClass.getRowMapper();
+    public <T> List<T> load(Class<T> clazz, Collection<Long> ids) {
+        RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
-        String query = new SelectQueryBuilder(metadata).buildQuery(Map.of("id", ids));
+        String query = new Select(clazz).buildQuery(Map.of("id", ids));
         return jdbcTemplate.query(query, rowMapper);
     }
 
-    public Optional<Object> load(Class<?> clazz, Long id) {
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
-        RowMapper<Object> rowMapper = entityClass.getRowMapper();
+    public <T> Optional<T> load(Class<T> clazz, Long id) {
+        RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
-        String query = new SelectByPrimaryKeyQueryBuilder(metadata).buildQuery(id);
+        String query = new SelectByPrimaryKey(clazz).buildQuery(id);
         return jdbcTemplate.query(query, rowMapper).stream().findFirst();
     }
 }

@@ -11,12 +11,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ColumnMetadataTest {
-    private final Dialect dialect = MySQLDialect.INSTANCE;
+    private final Dialect dialect = MySQLDialect.getInstance();
     private final ColumnsMetadata columnsMetadata = ColumnsMetadata.fromClass(Person4.class);
 
     @Test
     void getTableNameWithoutTableAnnotation() {
-        EntityMetadata entityMetadata = EntityMetadata.fromClass(OldPerson1.class);
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(OldPerson1.class);
         String tableName = entityMetadata.getTableName();
         assertThat(tableName).isEqualTo("OldPerson1");
     }

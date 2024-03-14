@@ -1,6 +1,7 @@
 package database.sql.dml;
 
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 
 import static database.sql.Util.quote;
 
-public class InsertQueryBuilder {
+public class Insert {
     private final String tableName;
     private final String primaryKeyColumnName;
     private final List<String> columnNames;
@@ -18,22 +19,25 @@ public class InsertQueryBuilder {
     private boolean includeIdField;
     private Map<String, Object> values;
 
-    public InsertQueryBuilder(EntityMetadata metadata) {
-        this.includeIdField = false;
-        this.id = null;
+    public Insert(Class<?> clazz) {
+        this(EntityMetadataFactory.get(clazz));
+    }
 
+    private Insert(EntityMetadata metadata) {
         tableName = metadata.getTableName();
         primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
         columnNames = metadata.getGeneralColumnNames();
+        id = null;
+        includeIdField = false;
     }
 
-    public InsertQueryBuilder id(Long id) {
+    public Insert id(Long id) {
         this.includeIdField = id != null;
         this.id = id;
         return this;
     }
 
-    public InsertQueryBuilder values(Map<String, Object> values) {
+    public Insert values(Map<String, Object> values) {
         this.values = values;
         return this;
     }

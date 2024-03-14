@@ -1,6 +1,7 @@
 package persistence.entity.data;
 
 import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import database.mapping.column.EntityColumn;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class EntitySnapshot {
             return newSnapshot;
         }
 
-        EntityMetadata entityMetadata = EntityMetadata.fromClass(entity.getClass());
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(entity.getClass());
         for (EntityColumn column : entityMetadata.getGeneralColumns()) {
             String key = column.getColumnName();
             Object value = column.getValue(entity);

@@ -1,6 +1,7 @@
 package persistence.entity.database;
 
-import database.sql.Person;
+import database.dialect.MySQLDialect;
+import entity.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import persistence.entity.EntityManagerImpl;
@@ -18,7 +19,7 @@ class EntityLoaderTest extends H2DatabaseTest {
     @BeforeEach
     void setUp() {
         entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
-        entityLoader = new EntityLoader(loggingJdbcTemplate);
+        entityLoader = new EntityLoader(loggingJdbcTemplate, MySQLDialect.getInstance());
     }
 
     @Test
@@ -43,9 +44,9 @@ class EntityLoaderTest extends H2DatabaseTest {
         entityManager.persist(p1);
         entityManager.persist(p2);
 
-        List<Object> result = entityLoader.load(Person.class, List.of(1L, 2L));
+        List<Person> result = entityLoader.load(Person.class, List.of(1L, 2L));
 
-        assertSamePerson((Person) result.get(0), p1, false);
-        assertSamePerson((Person) result.get(1), p2, false);
+        assertSamePerson(result.get(0), p1, false);
+        assertSamePerson(result.get(1), p2, false);
     }
 }

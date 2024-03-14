@@ -1,11 +1,11 @@
 package persistence.entity.database;
 
 import database.mapping.ColumnValueMap;
-import database.mapping.EntityClass;
 import database.mapping.EntityMetadata;
-import database.sql.dml.DeleteQueryBuilder;
-import database.sql.dml.InsertQueryBuilder;
-import database.sql.dml.UpdateQueryBuilder;
+import database.mapping.EntityMetadataFactory;
+import database.sql.dml.Delete;
+import database.sql.dml.Insert;
+import database.sql.dml.Update;
 import jdbc.JdbcTemplate;
 
 import java.util.Map;
@@ -22,21 +22,20 @@ public class EntityPersister {
     }
 
     public Long insert(Class<?> clazz, Object entity) {
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
+        EntityMetadata metadata = EntityMetadataFactory.get(clazz);
 
         Long id = metadata.getPrimaryKeyValue(entity);
-        checkGenerationStrategy(metadata, id);
+        checkGenerationStrategy(metadata.requiresIdWhenInserting(), id, metadata.getEntityClassName());
         id = metadata.requiresIdWhenInserting() ? id : null;
-        InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(metadata)
+        Insert insert = new Insert(clazz)
                 .id(id)
                 .values(columnValues(entity));
-        return jdbcTemplate.execute(insertQueryBuilder.toQueryString());
+        return jdbcTemplate.execute(insert.toQueryString());
     }
 
-    private void checkGenerationStrategy(EntityMetadata entityMetadata, Long id) {
-        if (entityMetadata.requiresIdWhenInserting() && id == null) {
-            throw new PrimaryKeyMissingException(entityMetadata.getEntityClassName());
+    private void checkGenerationStrategy(boolean requiresIdWhenInserting, Long id, String entityClassName) {
+        if (requiresIdWhenInserting && id == null) {
+            throw new PrimaryKeyMissingException(entityClassName);
         }
     }
 
@@ -49,24 +48,18 @@ public class EntityPersister {
     }
 
     private void doUpdate(Class<?> clazz, Long id, Map<String, Object> map) {
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
-
-        UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(metadata);
-        String query = updateQueryBuilder.buildQuery(id, map);
+        Update update = new Update(clazz);
+        String query = update.buildQuery(id, map);
         jdbcTemplate.execute(query);
     }
 
     public void delete(Class<?> clazz, Long id) {
-        EntityClass entityClass = EntityClass.of(clazz);
-        EntityMetadata metadata = entityClass.getMetadata();
-
-        DeleteQueryBuilder deleteQueryBuilder1 = new DeleteQueryBuilder(metadata);
-        String query = deleteQueryBuilder1.buildQuery(Map.of("id", id));
+        Delete delete = new Delete(clazz);
+        String query = delete.buildQuery(Map.of("id", id));
         jdbcTemplate.execute(query);
     }
 
     private Map<String, Object> columnValues(Object entity) {
-        return ColumnValueMap.fromEntity(entity).getMap();
+        return ColumnValueMap.valueMapFromEntity(entity);
     }
 }

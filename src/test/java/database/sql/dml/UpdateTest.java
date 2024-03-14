@@ -8,8 +8,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UpdateQueryBuilderTest {
-    private final UpdateQueryBuilder updateQueryBuilder = new UpdateQueryBuilder(Person4.class);
+class UpdateTest {
+    private final Update update = new Update(Person4.class);
 
     enum TestCases {
         WITH_NULL_FIELDS(123L, newPerson4("닉네임", null, null), "UPDATE users SET nick_name = '닉네임', old = NULL, email = NULL WHERE id = 123"),
@@ -30,8 +30,8 @@ class UpdateQueryBuilderTest {
     @ParameterizedTest
     @EnumSource(TestCases.class)
     void buildUpdateQuery(TestCases testCase) {
-        Map<String, Object> map = ColumnValueMap.fromEntity(testCase.entity).getMap();
-        String actual = updateQueryBuilder.buildQuery(testCase.id, map);
+        Map<String, Object> map = ColumnValueMap.valueMapFromEntity(testCase.entity);
+        String actual = update.buildQuery(testCase.id, map);
         assertThat(actual).isEqualTo(testCase.expectedQuery);
     }
 

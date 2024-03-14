@@ -1,6 +1,6 @@
 package persistence.entity.data;
 
-import database.sql.Person;
+import entity.Person;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

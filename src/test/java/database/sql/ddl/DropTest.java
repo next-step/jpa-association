@@ -5,7 +5,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DropQueryBuilderTest {
+class DropTest {
     private final QueryBuilder builder = QueryBuilder.getInstance();
 
     @ParameterizedTest

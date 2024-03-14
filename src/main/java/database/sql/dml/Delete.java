@@ -1,25 +1,25 @@
 package database.sql.dml;
 
 import database.mapping.EntityMetadata;
-import database.sql.dml.where.WhereClause;
+import database.mapping.EntityMetadataFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class DeleteQueryBuilder {
+public class Delete {
     private final String tableName;
     private final List<String> allColumnNames;
     private final String primaryKeyColumnName;
 
-    public DeleteQueryBuilder(EntityMetadata entityMetadata) {
+    public Delete(Class<?> clazz) {
+        this(EntityMetadataFactory.get(clazz));
+    }
+
+    private Delete(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
         this.allColumnNames = entityMetadata.getAllColumnNames();
-    }
-
-    public DeleteQueryBuilder(Class<?> clazz) {
-        this(EntityMetadata.fromClass(clazz));
     }
 
     public String buildQuery(Map<String, Object> conditionMap) {
