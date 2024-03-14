@@ -10,8 +10,15 @@ public class JoinTableColumns {
     private static final String COMMA = ", ";
     private final List<JoinTableColumn> values;
 
+    private boolean hasEager;
+    private boolean hasLazy;
+
     public JoinTableColumns(List<JoinTableColumn> values) {
         this.values = new ArrayList<>(values);
+        this.hasEager = values.stream()
+                .anyMatch(joinTable -> !joinTable.getAssociationEntity().isLazy());
+        this.hasLazy = values.stream()
+                .anyMatch(joinTable -> joinTable.getAssociationEntity().isLazy());
     }
 
     public List<JoinTableColumn> getValues() {
@@ -44,8 +51,11 @@ public class JoinTableColumns {
     }
 
     public boolean hasEager() {
-        return values.stream()
-                .anyMatch(joinTable -> !joinTable.getAssociationEntity().isLazy());
+        return hasEager;
+    }
+
+    public boolean hasLazy() {
+        return hasLazy;
     }
 
     public boolean hasNotAssociation() {

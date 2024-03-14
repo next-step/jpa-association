@@ -29,13 +29,8 @@ public class EntityLoaderImpl implements EntityLoader {
             String query = queryBuilder.selectFromWhereIdClause(id);
             return jdbcTemplate.queryForObject(query, new GenericRowMapper<>(clazz));
         }
-        T instance = getInstance(clazz, id, joinTableColumns);
-
-        List<JoinTableColumn> lazyJoinTables = joinTableColumns.getLazyJoinTables();
-        setProxy(lazyJoinTables, instance, id);
-        return instance;
+        return getInstance(clazz, id, joinTableColumns);
     }
-
     private <T> T getInstance(Class<T> clazz, Long id, JoinTableColumns joinTableColumns) {
         SelectQueryBuilder queryBuilder = selectQueryBuilder.build(clazz);
         if (joinTableColumns.hasEager()) {
@@ -45,7 +40,13 @@ public class EntityLoaderImpl implements EntityLoader {
         }
 
         String fromQuery = queryBuilder.selectFromWhereIdClause(id);
-        return jdbcTemplate.queryForObject(fromQuery, new GenericRowMapper<>(clazz));
+        T instance = jdbcTemplate.queryForObject(fromQuery, new GenericRowMapper<>(clazz));
+
+        if (joinTableColumns.hasLazy()) {
+            List<JoinTableColumn> lazyJoinTables = joinTableColumns.getLazyJoinTables();
+            setProxy(lazyJoinTables, instance, id);
+        }
+        return instance;
     }
 
     private <T> void setProxy(List<JoinTableColumn> lazyJoinTables, T rootEntity, Object id) {

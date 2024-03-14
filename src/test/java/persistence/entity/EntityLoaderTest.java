@@ -86,12 +86,12 @@ class EntityLoaderTest {
         jdbcTemplate.execute("insert into orders (id, order_number) values (1, 'order1')");
         jdbcTemplate.execute("insert into order_items (id, product, quantity, order_id) values (1, 'product1', 1, 1)");
         jdbcTemplate.execute("insert into order_items (id, product, quantity, order_id) values (2, 'product2', 2, 1)");
-
+        
+        jdbcTemplate.execute("insert into orders (id, order_number) values (2, 'order2')");
+        jdbcTemplate.execute("insert into order_items (id, product, quantity, order_id) values (3, 'product3', 2, 2)");
         //when
         EntityLoader entityLoader = new EntityLoaderImpl(jdbcTemplate);
         Order order = entityLoader.find(Order.class, 1L);
-
-        ;
         //then
         assertAll(
                 () -> assertThat(order.getOrderItems()).isNotExactlyInstanceOf(List.class),
