@@ -35,21 +35,24 @@ public class MyEntityLoader implements EntityLoader {
         RowMapper<T> rowMapper = RowMapperFactory.create(clazz);
         T object = jdbcTemplate.queryForObject(query, rowMapper);
         if (table.containsLazyAssociation()) {
-            List<AssociationTable> associationTables = table.getLazyAssociationTables();
-            for (AssociationTable associationTable : associationTables) {
-                setProxy(associationTable, object);
-            }
+            setProxyForLazyAssociationTables(table.getAssociationTables(), object);
         }
         return object;
     }
 
+    private <T> void setProxyForLazyAssociationTables(List<AssociationTable> associationTables, T object) {
+        for (AssociationTable associationTable : associationTables) {
+            setProxy(associationTable, object);
+        }
+    }
+
     private <T> void setProxy(AssociationTable associationTable, T object) {
-        Object proxy = proxyFactory.createProxy(associationTable.getClazz());
-        associationTable.getField().setAccessible(true);
         try {
+            Object proxy = proxyFactory.createProxy(associationTable.getClazz());
+            associationTable.getField().setAccessible(true);
             associationTable.getField().set(object, proxy);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Access denied to set proxy for lazy association table field");
         } finally {
             associationTable.getField().setAccessible(false);
         }
