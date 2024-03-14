@@ -72,10 +72,6 @@ class MyEntityManagerTest {
 
         //when
         Order order = entityManager.find(Order.class, 1L);
-        List<OrderItem> orderItems = order.getOrderItems();
-        for (OrderItem orderItem : orderItems) {
-            System.out.println("orderItem = " + orderItem);
-        }
 
         //then
         Assertions.assertThat(order.getOrderItems()).hasSize(2);
