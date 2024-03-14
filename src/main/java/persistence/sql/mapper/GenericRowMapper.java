@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.BiFunction;
 
 public class GenericRowMapper<T> implements RowMapper<T> {
     private final Class<T> clazz;
@@ -25,8 +26,14 @@ public class GenericRowMapper<T> implements RowMapper<T> {
 
         TableColumn tableColumn = new TableColumn(clazz);
         setIdColumn(resultSet, rootEntity, new IdColumn(clazz.getDeclaredFields()));
-        setGeneralColumn(resultSet, rootEntity, new Columns(clazz.getDeclaredFields()));
-        for (JoinTableColumn joinTableColumn : tableColumn.getJoinTableColumn()) {
+        Columns columns = new Columns(clazz.getDeclaredFields());
+
+        columns.setGeneralColumn(resultSet, rootEntity, this::setColumnValue);
+        JoinTableColumns joinTableColumns = tableColumn.getJoinTableColumns();
+        for (JoinTableColumn joinTableColumn : joinTableColumns.getValues()) {
+            if(joinTableColumn.getAssociationEntity().isLazy()) {
+                continue;
+            }
             setAssociatedEntity(resultSet, joinTableColumn, rootEntity);
         }
         return rootEntity;
@@ -40,8 +47,8 @@ public class GenericRowMapper<T> implements RowMapper<T> {
             T associatedEntity = createInstance((Class<T>) joinTableColumn.getClazz());
 
             setIdColumn(resultSet, associatedEntity, joinTableColumnIdColumn);
-            setGeneralColumn(resultSet, associatedEntity, joinTableColumnColumns);
-            setAssociationColumn(joinTableColumn, rootEntity, associatedEntity);
+            joinTableColumnColumns.setGeneralColumn(resultSet, associatedEntity, this::setColumnValue);
+            joinTableColumn.setAssociationColumn(rootEntity, associatedEntity);
         } while (resultSet.next());
     }
 
@@ -58,41 +65,6 @@ public class GenericRowMapper<T> implements RowMapper<T> {
         setColumnValue(resultSet, instance, idColumn);
     }
 
-    private void setGeneralColumn(ResultSet resultSet, T instance, Columns columns) {
-        columns.getValues().stream()
-                .filter(column -> !column.isAssociationEntity())
-                .forEach(column -> setColumnValue(resultSet, instance, column));
-    }
-
-    private void setAssociationColumn(JoinTableColumn joinTableColumn, T rootEntity, T associatedEntity) {
-        String joinFieldName = joinTableColumn.getAssociationEntity().getJoinFieldName();
-        Field associationField = getDeclaredField(clazz, joinFieldName);
-        associationField.setAccessible(true);
-        Collection<T> associationCollection = getAssociationCollection(associationField, rootEntity);
-        associationCollection.add(associatedEntity);
-    }
-
-    private Collection<T> getAssociationCollection(Field associationField, T rootEntity) {
-        try {
-            Collection<T> associationCollection = (Collection<T>) associationField.get(rootEntity);
-            if (associationCollection == null) {
-                associationCollection = new ArrayList<>();
-                associationField.set(rootEntity, associationCollection);
-            }
-            return associationCollection;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Field getDeclaredField(Class<T> clazz, String fieldName) {
-        try {
-            return clazz.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private void setColumnValue(ResultSet resultSet, T instance, Column column) {
         String columnName = column.getName();
         TableColumn tableColumn = new TableColumn(instance.getClass());
@@ -104,4 +76,5 @@ public class GenericRowMapper<T> implements RowMapper<T> {
             throw new CanNotGetObjectException("[ERROR] field의 값을 불러오는데 실패했습니다. object: " + columnName, e);
         }
     }
+
 }

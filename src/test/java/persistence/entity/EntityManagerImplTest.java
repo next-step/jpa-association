@@ -42,7 +42,7 @@ class EntityManagerImplTest {
 		table = new TableColumn(personEntity);
 		dialect = new MysqlDialect();
 		persistContext = new HibernatePersistContext();
-		entityLoader = new EntityLoaderImpl(jdbcTemplate, dialect);
+		entityLoader = new EntityLoaderImpl(jdbcTemplate);
 		entityManager = new EntityManagerImpl(
 			dialect,
 			persistContext,

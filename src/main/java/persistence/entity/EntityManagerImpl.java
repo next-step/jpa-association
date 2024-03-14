@@ -18,7 +18,7 @@ public class EntityManagerImpl implements EntityManager {
     private final EntityLoader entityLoader;
 
     public EntityManagerImpl(JdbcTemplate jdbcTemplate, Dialect dialect) {
-        this(dialect, new HibernatePersistContext(), new EntityPersisterImpl(jdbcTemplate, dialect), new EntityLoaderImpl(jdbcTemplate, dialect));
+        this(dialect, new HibernatePersistContext(), new EntityPersisterImpl(jdbcTemplate, dialect), new EntityLoaderImpl(jdbcTemplate));
     }
 
     public EntityManagerImpl(Dialect dialect, PersistenceContext persistContext, EntityPersister entityPersister, EntityLoader entityLoader) {
