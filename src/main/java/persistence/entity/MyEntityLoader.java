@@ -3,9 +3,8 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import jdbc.RowMapperFactory;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.LazyLoader;
-import persistence.sql.dml.SelectAllQueryBuilder;
+import persistence.proxy.MyProxyFactory;
+import persistence.proxy.ProxyFactory;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.meta.AssociationTable;
 import persistence.sql.meta.Table;
@@ -16,10 +15,12 @@ public class MyEntityLoader implements EntityLoader {
 
     private final JdbcTemplate jdbcTemplate;
     private final SelectQueryBuilder selectQueryBuilder;
+    private final ProxyFactory proxyFactory;
 
     public MyEntityLoader(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.selectQueryBuilder = SelectQueryBuilder.getInstance();
+        this.proxyFactory = new MyProxyFactory(jdbcTemplate);
     }
 
     @Override
@@ -43,21 +44,14 @@ public class MyEntityLoader implements EntityLoader {
     }
 
     private <T> void setProxy(AssociationTable associationTable, T object) {
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(List.class);
-        enhancer.setCallback((LazyLoader) () -> findAll(associationTable.getClazz()));
-        Object proxy = enhancer.create();
+        Object proxy = proxyFactory.createProxy(associationTable.getClazz());
         associationTable.getField().setAccessible(true);
         try {
             associationTable.getField().set(object, proxy);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        } finally {
+            associationTable.getField().setAccessible(false);
         }
-    }
-
-    private List<?> findAll(Class<?> clazz) {
-        SelectAllQueryBuilder selectAllQueryBuilder = new SelectAllQueryBuilder();
-        RowMapper<?> rowMapper = RowMapperFactory.create(clazz);
-        return jdbcTemplate.query(selectAllQueryBuilder.build(clazz), rowMapper);
     }
 }
