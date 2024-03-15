@@ -13,7 +13,7 @@
 
 ### 🚀 2단계 - LazyLoading by Proxy
 
-- [ ] 요구사항 1 - CGLib Proxy 적용
+- [x] 요구사항 1 - CGLib Proxy 적용
 - [ ] 요구사항 2 - 조회 시 프록시 객체를 사용해 적용해보자
 
 ### 🚀 3단계 - OneToMany (FetchType.LAZY)
