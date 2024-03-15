@@ -18,8 +18,8 @@ class EntityLoaderTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
-        entityLoader = new EntityLoader(loggingJdbcTemplate, MySQLDialect.getInstance());
+        entityManager = EntityManagerImpl.from(jdbcTemplate);
+        entityLoader = new EntityLoader(jdbcTemplate, MySQLDialect.getInstance());
     }
 
     @Test

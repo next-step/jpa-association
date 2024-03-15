@@ -18,7 +18,7 @@ class EntityManagerImplTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
+        entityManager = EntityManagerImpl.from(jdbcTemplate);
     }
 
     @Test
@@ -51,7 +51,7 @@ class EntityManagerImplTest extends H2DatabaseTest {
         Person person2 = newPerson(null, "zzzzzz", 44, "zzzzz@d.com");
         entityManager.persist(person2);
 
-        List<Person> people = findPeople(loggingJdbcTemplate);
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(2);
         assertSamePerson(people.get(0), person, false);
         assertSamePerson(people.get(1), person2, false);
@@ -62,11 +62,11 @@ class EntityManagerImplTest extends H2DatabaseTest {
         Person person = newPerson(null, "abc123", 14, "c123@d.com");
         entityManager.persist(person);
 
-        Person personToUpdate = newPerson(getLastSavedId(loggingJdbcTemplate), "abc123", 15, "zzzzz@d.com");
+        Person personToUpdate = newPerson(getLastSavedId(jdbcTemplate), "abc123", 15, "zzzzz@d.com");
         entityManager.persist(personToUpdate);
         entityManager.persist(personToUpdate);
 
-        List<Person> people = findPeople(loggingJdbcTemplate);
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(1);
         assertSamePerson(people.get(0), personToUpdate, true);
     }
@@ -76,10 +76,10 @@ class EntityManagerImplTest extends H2DatabaseTest {
         Person person = newPerson(null, "abc123", 14, "c123@d.com");
         entityManager.persist(person);
 
-        Person person1 = entityManager.find(Person.class, getLastSavedId(loggingJdbcTemplate));
+        Person person1 = entityManager.find(Person.class, getLastSavedId(jdbcTemplate));
         entityManager.remove(person1);
 
-        List<Person> people = findPeople(loggingJdbcTemplate);
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(0);
     }
 }
