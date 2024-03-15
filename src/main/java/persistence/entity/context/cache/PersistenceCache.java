@@ -11,8 +11,8 @@ public class PersistenceCache {
         this.cache.put(key, entity);
     }
 
-    public <T> T get(final EntityKey key) {
-        return (T) this.cache.get(key);
+    public Object get(final EntityKey key) {
+        return this.cache.get(key);
     }
 
     public void remove(final EntityKey key) {

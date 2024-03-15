@@ -12,7 +12,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
     private final EntityEntryContext entityEntryContext = new EntityEntryContext();
 
     @Override
-    public <T> T getEntity(final Object key, final String className) {
+    public Object getEntity(final Object key, final String className) {
         final EntityKey entityKey = generateEntityKey(key, className);
         return this.cache.get(entityKey);
     }
@@ -49,7 +49,7 @@ public class StatefulPersistenceContext implements PersistenceContext {
         return this.getEntityEntry(key, entity.getClass());
     }
 
-    private <T> EntityKey generateEntityKey(final Object key, final String className) {
+    private EntityKey generateEntityKey(final Object key, final String className) {
         return new EntityKey(key, className);
     }
 }

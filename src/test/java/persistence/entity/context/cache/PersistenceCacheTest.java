@@ -23,7 +23,7 @@ class PersistenceCacheTest {
         persistenceCache.add(entityKey, entity);
 
         // then
-        final PersonV3 cachedEntity = persistenceCache.get(entityKey);
+        final Object cachedEntity = persistenceCache.get(entityKey);
         assertEquals(entity, cachedEntity);
     }
 
@@ -36,7 +36,7 @@ class PersistenceCacheTest {
         persistenceCache.add(entityKey, entity);
 
         // when
-        final PersonV3 cachedEntity = persistenceCache.get(entityKey);
+        final Object cachedEntity = persistenceCache.get(entityKey);
 
         // then
         assertEquals(entity, cachedEntity);
@@ -54,7 +54,7 @@ class PersistenceCacheTest {
         persistenceCache.remove(entityKey);
 
         // then
-        final PersonV3 cachedEntity = persistenceCache.get(entityKey);
+        final Object cachedEntity = persistenceCache.get(entityKey);
         assertNull(cachedEntity);
     }
 
