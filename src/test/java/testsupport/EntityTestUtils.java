@@ -1,5 +1,7 @@
 package testsupport;
 
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import database.sql.dml.Select;
 import entity.Person;
 import jdbc.JdbcTemplate;
@@ -28,7 +30,11 @@ public class EntityTestUtils {
     }
 
     public static List<Person> findPeople(JdbcTemplate jdbcTemplate) {
-        String query = new Select(Person.class).buildQuery();
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(Person.class);
+        String query = new Select(
+                entityMetadata.getTableName(),
+                entityMetadata.getAllColumnNames()
+        ).buildQuery();
         return jdbcTemplate.query(query, resultSet -> new Person(
                 resultSet.getLong("id"),
                 resultSet.getString("nick_name"),

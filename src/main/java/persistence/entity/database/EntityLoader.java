@@ -1,6 +1,8 @@
 package persistence.entity.database;
 
 import database.dialect.MySQLDialect;
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import database.mapping.rowmapper.SingleRowMapperFactory;
 import database.sql.dml.Select;
 import database.sql.dml.SelectByPrimaryKey;
@@ -24,7 +26,12 @@ public class EntityLoader {
     public <T> List<T> load(Class<T> clazz, Collection<Long> ids) {
         RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
-        String query = new Select(clazz).buildQuery(Map.of("id", ids));
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Select(
+                entityMetadata.getTableName(),
+                entityMetadata.getAllColumnNames())
+                .where(Map.of("id", ids))
+                .buildQuery();
         return jdbcTemplate.query(query, rowMapper);
     }
 
