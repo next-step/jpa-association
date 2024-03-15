@@ -72,7 +72,7 @@ class FindQueryBuilderTest {
 
         String result = findQueryBuilder.build();
 
-        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id");
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders LEFT JOIN order_items ON orders.id=order_items.order_id");
     }
 
     @DisplayName("Order를 이용하여 findById 조인 쿼리 확인하기")
@@ -85,6 +85,6 @@ class FindQueryBuilderTest {
 
         String result = findQueryBuilder.buildById(id);
 
-        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1");
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders LEFT JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1");
     }
 }
