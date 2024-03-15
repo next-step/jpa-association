@@ -157,6 +157,12 @@ public enum SqlType {
     }
 
     public Class<?> toJavaClass() {
-        return jdbcTypeCodeToJavaClassMap.get(this);
+        Class<?> clazz = jdbcTypeCodeToJavaClassMap.get(this);
+
+        if (clazz == null) {
+            throw new IllegalArgumentException("No mapping for java class: " + this.name());
+        }
+
+        return clazz;
     }
 }

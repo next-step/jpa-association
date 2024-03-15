@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class Column implements BaseColumn {
 
@@ -99,8 +98,11 @@ public class Column implements BaseColumn {
         return name;
     }
 
-    public Optional<SqlType> getType() {
-        return Optional.ofNullable(type);
+    public SqlType getType() {
+        if (type == null) {
+            throw new IllegalStateException("Column type is no mapping for jdbc type: " + field.getType());
+        }
+        return type;
     }
 
     public List<SqlConstraint> getConstraints() {
