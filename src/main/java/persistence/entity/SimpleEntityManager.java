@@ -46,6 +46,22 @@ public class SimpleEntityManager implements EntityManager {
 
     @Override
     public <T> T getReference(Class<T> clazz, EntityId id) {
+        EntityEntry entityEntry = persistenceContext.getEntityEntry(clazz, id);
+
+        if (entityEntry == null) {
+            return null;
+        }
+
+        Status status = entityEntry.status();
+
+        if (status == Status.GONE) {
+            throw new EntityNotFoundException();
+        }
+
+        if (status == Status.MANAGED) {
+            return persistenceContext.getEntity(clazz, id);
+        }
+
         return null;
     }
 
