@@ -1,7 +1,7 @@
 package persistence.entity.database;
 
 import database.dialect.MySQLDialect;
-import database.mapping.SingleRowMapperFactory;
+import database.mapping.rowmapper.SingleRowMapperFactory;
 import database.sql.dml.Select;
 import database.sql.dml.SelectByPrimaryKey;
 import jdbc.JdbcTemplate;

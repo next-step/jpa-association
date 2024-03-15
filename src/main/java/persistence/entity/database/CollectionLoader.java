@@ -1,9 +1,9 @@
 package persistence.entity.database;
 
 import database.dialect.MySQLDialect;
-import database.mapping.MultiRowMapper;
-import database.mapping.RowMap;
-import database.mapping.RowMapMerger;
+import database.mapping.rowmapper.MultiRowMapper;
+import database.mapping.rowmapper.RowMap;
+import database.mapping.rowmapper.RowMapMerger;
 import database.sql.dml.CustomSelect;
 import jdbc.JdbcTemplate;
 

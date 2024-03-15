@@ -1,23 +1,16 @@
-package database.mapping;
+package database.sql.dml.part;
 
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import database.mapping.column.EntityColumn;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO: 얘랑 RowMapperFactory 랑 로직이 겹치나?
-// TODO: 객체화될 일이 아예 없을까?
-public class ColumnValueMap {
+public class ValueClause {
 
-    private ColumnValueMap() {
-    }
-
-    public static Map<String, Object> valueMapFromEntity(Object entity) {
-        return extractValues(entity);
-    }
-
-    private static Map<String, Object> extractValues(Object entity) {
+    public static Map<String, Object> fromEntity(Object entity) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(entity.getClass());
         List<EntityColumn> generalColumns = entityMetadata.getGeneralColumns();
 

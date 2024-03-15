@@ -1,6 +1,5 @@
 package persistence.entity.database;
 
-import database.mapping.ColumnValueMap;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
 import database.sql.dml.Delete;
@@ -29,7 +28,7 @@ public class EntityPersister {
         id = metadata.requiresIdWhenInserting() ? id : null;
         Insert insert = new Insert(clazz)
                 .id(id)
-                .values(columnValues(entity));
+                .valuesFromEntity(entity);
         return jdbcTemplate.execute(insert.toQueryString());
     }
 
@@ -40,16 +39,12 @@ public class EntityPersister {
     }
 
     public void update(Class<?> clazz, Long id, Map<String, Object> changes) {
-        doUpdate(clazz, id, changes);
+        String query = new Update(clazz).buildQuery(id, changes);
+        jdbcTemplate.execute(query);
     }
 
     public void update(Class<?> clazz, Long id, Object entity) {
-        update(clazz, id, columnValues(entity));
-    }
-
-    private void doUpdate(Class<?> clazz, Long id, Map<String, Object> map) {
-        Update update = new Update(clazz);
-        String query = update.buildQuery(id, map);
+        String query = new Update(clazz).buildQueryByEntity(id, entity);
         jdbcTemplate.execute(query);
     }
 
@@ -57,9 +52,5 @@ public class EntityPersister {
         Delete delete = new Delete(clazz);
         String query = delete.buildQuery(Map.of("id", id));
         jdbcTemplate.execute(query);
-    }
-
-    private Map<String, Object> columnValues(Object entity) {
-        return ColumnValueMap.valueMapFromEntity(entity);
     }
 }

@@ -1,4 +1,7 @@
-package database.mapping;
+package database.mapping.rowmapper;
+
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -79,7 +79,6 @@ public class EntityAssociationMetadata {
                 .collect(Collectors.toList());
     }
 
-
     public List<Type> getAssociatedTypes() {
         return associationFields.stream()
                 .filter(EntityAssociationMetadata::checkAssociationAnnotation)

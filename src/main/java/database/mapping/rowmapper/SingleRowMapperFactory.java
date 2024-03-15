@@ -1,6 +1,8 @@
-package database.mapping;
+package database.mapping.rowmapper;
 
 import database.dialect.Dialect;
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import jdbc.RowMapper;
 
 import java.lang.reflect.Constructor;

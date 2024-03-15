@@ -1,4 +1,4 @@
-package database.mapping;
+package database.dialect;
 
 import java.util.HashMap;
 import java.util.Map;

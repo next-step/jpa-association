@@ -70,15 +70,11 @@ class HelloTargetTest {
         assertThat(objectNames).isEqualTo((List.of("lazy-load-proxy")));
 
         proxy.sayHello("");
-        ;
         assertThat(objectNames).isEqualTo((List.of("lazy-load-proxy", "lazy-load-proxy")));
 
         proxy.sayHello("");
-        ;
         proxy.sayHello("");
-        ;
         proxy.sayHello("");
-        ;
         assertThat(objectNames).isEqualTo((List.of(
                 "lazy-load-proxy",
                 "lazy-load-proxy",

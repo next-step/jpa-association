@@ -2,6 +2,7 @@ package database.sql.dml;
 
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import database.sql.dml.part.ValueClause;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,11 @@ public class Insert {
 
     public Insert values(Map<String, Object> values) {
         this.values = values;
+        return this;
+    }
+
+    public Insert valuesFromEntity(Object entity) {
+        this.values = ValueClause.fromEntity(entity);
         return this;
     }
 

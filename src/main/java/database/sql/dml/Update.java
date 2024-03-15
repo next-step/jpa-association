@@ -3,6 +3,7 @@ package database.sql.dml;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
 import database.mapping.column.EntityColumn;
+import database.sql.dml.part.ValueClause;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,10 @@ public class Update {
                              tableName,
                              setClauses(changes),
                              whereClauses(id));
+    }
+
+    public String buildQueryByEntity(long id, Object entity) {
+        return buildQuery(id, ValueClause.fromEntity(entity));
     }
 
     private String setClauses(Map<String, Object> changes) {

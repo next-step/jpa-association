@@ -1,10 +1,7 @@
 package database.sql.dml;
 
-import database.mapping.ColumnValueMap;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,8 +27,7 @@ class UpdateTest {
     @ParameterizedTest
     @EnumSource(TestCases.class)
     void buildUpdateQuery(TestCases testCase) {
-        Map<String, Object> map = ColumnValueMap.valueMapFromEntity(testCase.entity);
-        String actual = update.buildQuery(testCase.id, map);
+        String actual = update.buildQueryByEntity(testCase.id, testCase.entity);
         assertThat(actual).isEqualTo(testCase.expectedQuery);
     }
 

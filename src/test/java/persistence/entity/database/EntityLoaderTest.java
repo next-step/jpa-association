@@ -32,7 +32,7 @@ class EntityLoaderTest extends H2DatabaseTest {
         Person person = new Person(null, "abc123", 14, "c123@d.com");
         entityManager.persist(person);
 
-        Person found = (Person) entityLoader.load(Person.class, 1L).get();
+        Person found = entityLoader.load(Person.class, 1L).get();
 
         assertSamePerson(found, person, false);
     }

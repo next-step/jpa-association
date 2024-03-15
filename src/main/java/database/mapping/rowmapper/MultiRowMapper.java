@@ -1,4 +1,4 @@
-package database.mapping;
+package database.mapping.rowmapper;
 
 import database.dialect.MySQLDialect;
 import jdbc.RowMapper;
