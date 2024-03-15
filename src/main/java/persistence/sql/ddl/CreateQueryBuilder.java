@@ -54,7 +54,7 @@ public class CreateQueryBuilder {
     }
 
     private String getKeyClause() {
-        ColumnData keyColumn = columns.getKeyColumn();
-        return String.format("%s KEY (%s)", dialect.mapKeyType(keyColumn.getKeyType()), keyColumn.getName());
+        ColumnData keyColumn = columns.getPkColumn();
+        return String.format("%s KEY (%s)", "PRIMARY", keyColumn.getName());
     }
 }

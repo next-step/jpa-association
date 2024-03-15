@@ -1,53 +1,60 @@
 package persistence.sql.mapping;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import persistence.sql.ddl.KeyType;
+import jakarta.persistence.*;
+import org.apache.commons.lang3.StringUtils;
 import persistence.sql.mapping.exception.GenerationTypeMissingException;
 
 import java.lang.reflect.Field;
 
 public class ColumnData {
+    private final String tableName;
     private final String name;
     private final int type;
     private Object value;
-    private final KeyType keyType;
+    private final boolean isPk;
     private final GenerationType generationType;
     private final boolean isNullable;
 
-    private ColumnData(String name, int type, KeyType keyType, GenerationType generationType, boolean isNullable) {
+    private ColumnData(
+            String tableName,
+            String name,
+            int type,
+            boolean isPk,
+            GenerationType generationType,
+            boolean isNullable
+    ) {
+        this.tableName = tableName;
         this.name = name;
         this.type = type;
-        this.keyType = keyType;
+        this.isPk = isPk;
         this.generationType = generationType;
         this.isNullable = isNullable;
     }
 
-    public static ColumnData createColumn(Field field) {
+    public static ColumnData createColumn(String tableName, Field field) {
         Column column = field.getAnnotation(Column.class);
         return new ColumnData(
+                tableName,
                 extractName(field, column),
                 extractDataType(field),
-                extractKeyType(field, column),
+                extractIsPrimaryKey(field),
                 extractGenerationType(field),
                 extractIsNullable(column)
         );
     }
 
-    public static ColumnData createColumnWithValue(Field field, Object object) {
-        ColumnData columnData = createColumn(field);
+    public static ColumnData createColumnWithValue(String tableName, Field field, Object object) {
+        ColumnData columnData = createColumn(tableName, field);
         columnData.setValue(extractValue(field, object));
         return columnData;
     }
 
     public boolean isPrimaryKey() {
-        return keyType == KeyType.PRIMARY;
+        return isPk;
     }
 
     public boolean isNotPrimaryKey() {
-        return !isPrimaryKey();
+        return !isPk;
     }
 
     private void setValue(Object value) {
@@ -55,9 +62,9 @@ public class ColumnData {
     }
 
     private static String extractName(Field field, Column column) {
-        String columnName = field.getName();
+        String columnName = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(field.getName()), '_').toLowerCase();
         if (column != null && !column.name().isEmpty()) {
-            columnName = column.name();
+            return column.name();
         }
         return columnName;
     }
@@ -90,20 +97,15 @@ public class ColumnData {
         return generatedValue.strategy();
     }
 
-    // TODO: Key 관련부분 하이버네이트 참고해보기
-    private static KeyType extractKeyType(Field field, Column column) {
-        if (extractIsPrimaryKey(field)) {
-            return KeyType.PRIMARY;
-        }
-        return null;
-    }
-
     private static boolean extractIsPrimaryKey(Field field) {
         return field.isAnnotationPresent(Id.class);
     }
 
     public String getName() {
         return name;
+    }
+    public String getNameWithTable() {
+        return String.format("%s.%s", tableName, name);
     }
 
     public Object getValue() {
@@ -122,18 +124,10 @@ public class ColumnData {
         return generationType != null;
     }
 
-    public boolean hasKeyType() {
-        return keyType != null;
-    }
-
     public GenerationType getGenerationType() {
         if(!hasGenerationType()) {
             throw new GenerationTypeMissingException();
         }
         return generationType;
-    }
-
-    public KeyType getKeyType() {
-        return keyType;
     }
 }

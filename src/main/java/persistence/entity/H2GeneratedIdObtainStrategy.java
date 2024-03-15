@@ -5,6 +5,7 @@ import persistence.sql.dialect.H2Dialect;
 
 public class H2GeneratedIdObtainStrategy implements GeneratedIdObtainStrategy {
     private final H2Dialect h2Dialect = new H2Dialect();
+    private final String idColumnName = "IDENTITY()";
 
     @Override
     public String getQueryString() {
@@ -13,6 +14,6 @@ public class H2GeneratedIdObtainStrategy implements GeneratedIdObtainStrategy {
 
     @Override
     public RowMapper<Object> getRowMapper() {
-        return rs -> rs.getObject("IDENTITY()");
+        return rs -> rs.getObject(idColumnName);
     }
 }
