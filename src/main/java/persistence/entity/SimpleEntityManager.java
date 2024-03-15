@@ -2,6 +2,8 @@ package persistence.entity;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
 import persistence.sql.model.Table;
 
 import java.util.Objects;
@@ -49,7 +51,9 @@ public class SimpleEntityManager implements EntityManager {
         EntityEntry entityEntry = persistenceContext.getEntityEntry(clazz, id);
 
         if (entityEntry == null) {
-            return null;
+            T entityProxy = createEntityProxy(clazz, id);
+            persistenceContext.addEntity(id, entityProxy);
+            return entityProxy;
         }
 
         Status status = entityEntry.status();
@@ -62,7 +66,21 @@ public class SimpleEntityManager implements EntityManager {
             return persistenceContext.getEntity(clazz, id);
         }
 
-        return null;
+        entityEntry.loading();
+        T entityProxy = createEntityProxy(clazz, id);
+        persistenceContext.addEntity(id, entityProxy);
+        return entityProxy;
+    }
+
+    private <T> T createEntityProxy(Class<T> clazz, EntityId id) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(clazz);
+        enhancer.setCallbacks(new Callback[]{
+                new EntityGetIdProxy(id),
+                new EntityLazyLoader(this, clazz, id)
+        });
+        enhancer.setCallbackFilter(new EntityCallbackFilter());
+        return (T) enhancer.create();
     }
 
     @Override
@@ -78,6 +96,7 @@ public class SimpleEntityManager implements EntityManager {
     public void merge(Object entity) {
         if (!isExist(entity)) {
             EntityId id = persister.create(entity);
+            bindEntityId(entity, id);
             persistenceContext.addEntity(id, entity);
             return;
         }
@@ -85,6 +104,7 @@ public class SimpleEntityManager implements EntityManager {
         EntityEntry entry = persistenceContext.getEntityEntry(entity);
         if (entry == null) {
             EntityId id = persister.update(entity);
+            bindEntityId(entity, id);
             persistenceContext.addEntity(id, entity);
             return;
         }
@@ -100,6 +120,11 @@ public class SimpleEntityManager implements EntityManager {
             EntityId id = persister.update(entity);
             persistenceContext.addEntity(id, entity);
         }
+    }
+
+    private void bindEntityId(Object entity, EntityId id) {
+        EntityBinder entityBinder = new EntityBinder(entity);
+        entityBinder.bindEntityId(id);
     }
 
     private boolean isExist(Object entity) {

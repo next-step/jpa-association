@@ -68,9 +68,9 @@ class SimpleEntityManagerTest {
         String createTableQuery = ddlQueryBuilder.buildCreateQuery();
         jdbcTemplate.execute(createTableQuery);
 
-        Stream<Person3> persons = createPersons();
-
-        persons.forEach(person -> entityManager.persist(person));
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (null, 'qwer1', 1, 'email1@email.com')");
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (null, 'qwer2', 2, 'email2@email.com')");
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (null, 'qwer3', 3, 'email3@email.com')");
     }
 
     @AfterEach
@@ -79,14 +79,6 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute(dropQuery);
 
         entityManager = new SimpleEntityManager(entityPersister, entityLoader);
-    }
-
-    private Stream<Person3> createPersons() {
-        return Stream.of(
-                new Person3("qwer1", 1, "email1@email.com"),
-                new Person3("qwer2", 2, "email2@email.com"),
-                new Person3("qwer3", 3, "email3@email.com")
-        );
     }
 
     @DisplayName("person을 이용하여 find 메서드 테스트")

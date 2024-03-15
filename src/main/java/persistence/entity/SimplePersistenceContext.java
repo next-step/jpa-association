@@ -23,9 +23,6 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public void addEntity(EntityId id, Object entity) {
-        EntityBinder entityBinder = new EntityBinder(entity);
-        entityBinder.bindEntityId(id);
-
         EntityKey key = createEntityKey(entity, id);
         cache.put(key, entity);
         snapshot.put(key, entity);
