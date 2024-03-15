@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import java.util.List;
 import java.util.Objects;
 import jdbc.JdbcTemplate;
 import persistence.entity.loader.EntityLoader;
@@ -8,6 +9,8 @@ import persistence.entity.persistencecontext.EntitySnapshot;
 import persistence.entity.persistencecontext.SimplePersistenceContext;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.persister.SimpleEntityPersister;
+import persistence.entity.proxy.LazyLoadingProxyFactory;
+import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
 
 public class SimpleEntityManager implements EntityManager {
@@ -32,18 +35,16 @@ public class SimpleEntityManager implements EntityManager {
         T entity = (T) persistenceContext.getEntity(clazz, id);
         if (entity == null) {
             entity = entityLoader.find(clazz, id);
-            cacheEntityWithAssociations(entity);
+            setLazyRelation(Table.getInstance(clazz).getLazyRelationColumns(), entity);
+            cacheEntityWithAssociations(entity, EntityEntry.loading());
         }
         return entity;
     }
 
     @Override
     public <T> T persist(T entity) {
-        EntityEntry entityEntry = EntityEntry.saving();
         entityPersister.insert(entity);
-        cacheEntity(entity);
-        persistenceContext.setEntityEntry(entity, entityEntry);
-        entityEntry.managed();
+        cacheEntityWithAssociations(entity, EntityEntry.saving());
         return entity;
     }
 
@@ -68,28 +69,43 @@ public class SimpleEntityManager implements EntityManager {
         return entity;
     }
 
-    private void cacheEntityWithAssociations(Object entity) {
-        EntityEntry entityEntry = EntityEntry.loading();
+    private void cacheEntityWithAssociations(Object entity, EntityEntry entityEntry) {
+        prepareEntityForCaching(entity, entityEntry);
+        cacheAssociations(entity);
+        entityEntry.managed();
+    }
+
+    private EntityEntry prepareEntityForCaching(Object entity, EntityEntry entityEntry) {
         cacheEntity(entity);
         persistenceContext.setEntityEntry(entity, entityEntry);
-        entityEntry.managed();
-
-        Table table = Table.getInstance(entity.getClass());
-        table.getEagerRelationTables()
-            .forEach(relationTable -> {
-                Object relationEntity = table.getRelationValue(entity, relationTable);
-                if (relationEntity instanceof Iterable) {
-                    ((Iterable<?>) relationEntity).forEach(this::cacheEntityWithAssociations);
-                }
-
-                if (!(relationEntity instanceof Iterable)) {
-                    cacheEntityWithAssociations(relationEntity);
-                }
-            });
+        return entityEntry;
     }
 
     private void cacheEntity(Object entity) {
         persistenceContext.addEntity(entity);
         persistenceContext.getDatabaseSnapshot(entity);
+    }
+
+    private void cacheAssociations(Object entity) {
+        Table table = Table.getInstance(entity.getClass());
+        table.getEagerRelationTables().forEach(relationTable -> {
+            Object relationEntity = table.getRelationValue(entity, relationTable);
+            processRelationEntity(relationEntity);
+        });
+    }
+
+    private void setLazyRelation(List<Column> lazyRelationColumns, Object entity) {
+        for (Column lazyRelationColumn : lazyRelationColumns) {
+            lazyRelationColumn.setFieldValue(entity, LazyLoadingProxyFactory.create(Table.getInstance(entity.getClass()),
+                lazyRelationColumn.getRelationTable(), entity, entityLoader, this::processRelationEntity));
+        }
+    }
+
+    private void processRelationEntity(Object relationEntity) {
+        if (relationEntity instanceof Iterable) {
+            ((Iterable<?>)relationEntity).forEach(entity -> cacheEntityWithAssociations(entity, EntityEntry.loading()));
+            return;
+        }
+        cacheEntityWithAssociations(relationEntity, EntityEntry.loading());
     }
 }
