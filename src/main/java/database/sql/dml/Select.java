@@ -2,6 +2,7 @@ package database.sql.dml;
 
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import database.sql.dml.part.WhereClause;
 
 import java.util.List;
 import java.util.Map;

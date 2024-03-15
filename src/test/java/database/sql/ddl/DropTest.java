@@ -6,7 +6,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DropTest {
-    private final QueryBuilder builder = QueryBuilder.getInstance();
 
     @ParameterizedTest
     @CsvSource(value = {
@@ -15,7 +14,7 @@ class DropTest {
             "database.sql.ddl.OldPerson3:DROP TABLE users"
     }, delimiter = ':')
     void buildDeleteQuery(Class<?> clazz, String expected) {
-        String actual = builder.buildDeleteQuery(clazz);
+        String actual = new Drop(clazz).buildQuery();
 
         assertThat(actual).isEqualTo(expected);
     }

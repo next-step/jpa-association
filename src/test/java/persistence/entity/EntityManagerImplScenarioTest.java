@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import database.sql.ddl.QueryBuilder;
+import database.sql.ddl.Create;
 import entity.Order;
 import entity.OrderItem;
 import entity.Person;
@@ -123,8 +123,8 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
     @DisplayName("FetchType.EAGER 연관관계를 가진 객체를 가져오기")
     void scenario6() {
         List<Class<?>> allEntities = List.of(Order.class, OrderItem.class);
-        jdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(Order.class, allEntities, dialect));
-        jdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(OrderItem.class, allEntities, dialect));
+        jdbcTemplate.execute(new Create(Order.class, allEntities, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(OrderItem.class, allEntities, dialect).buildQuery());
 
         jdbcTemplate.execute("INSERT INTO orders (orderNumber) VALUES (1234)");
         jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product1', 5, 1)");

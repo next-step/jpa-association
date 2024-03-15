@@ -1,4 +1,4 @@
-package database.sql.dml.where;
+package database.sql.dml.part.where;
 
 public class FilterExpression {
     public static final String EMPTY = "";

@@ -1,6 +1,6 @@
-package database.sql.dml;
+package database.sql.dml.part;
 
-import database.sql.dml.where.FilterExpression;
+import database.sql.dml.part.where.FilterExpression;
 
 import java.util.List;
 import java.util.Map;
