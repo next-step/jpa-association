@@ -92,6 +92,10 @@ public class Table implements BaseTable {
         return Collections.unmodifiableList(joinColumns);
     }
 
+    public boolean hasJoinColumn() {
+        return !joinColumns.isEmpty();
+    }
+
     @Override
     public Class<?> getEntity() {
         return entity;
