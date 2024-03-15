@@ -51,8 +51,12 @@ public class EntityPersister {
     }
 
     public void delete(Class<?> clazz, Long id) {
-        Delete delete = new Delete(clazz);
-        String query = delete.buildQuery(Map.of("id", id));
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Delete(entityMetadata.getTableName(),
+                                   entityMetadata.getPrimaryKeyColumnName(),
+                                   entityMetadata.getAllColumnNames())
+                .id(id)
+                .buildQuery();
         jdbcTemplate.execute(query);
     }
 }

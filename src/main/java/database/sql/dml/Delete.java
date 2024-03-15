@@ -1,7 +1,5 @@
 package database.sql.dml;
 
-import database.mapping.EntityMetadata;
-import database.mapping.EntityMetadataFactory;
 import database.sql.dml.part.WhereClause;
 
 import java.util.List;
@@ -12,33 +10,35 @@ public class Delete {
     private final String tableName;
     private final List<String> allColumnNames;
     private final String primaryKeyColumnName;
+    private WhereClause where;
 
-    public Delete(Class<?> clazz) {
-        this(EntityMetadataFactory.get(clazz));
+    public Delete(String tableName, String primaryKeyColumnName, List<String> allColumnNames) {
+        this.tableName = tableName;
+        this.primaryKeyColumnName = primaryKeyColumnName;
+        this.allColumnNames = allColumnNames;
+
+        this.where = null;
     }
 
-    private Delete(EntityMetadata entityMetadata) {
-        this.tableName = entityMetadata.getTableName();
-        this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
-        this.allColumnNames = entityMetadata.getAllColumnNames();
+    public Delete where(Map<String, Object> whereMap) {
+        this.where = WhereClause.from(whereMap, allColumnNames);
+        return this;
     }
 
-    public String buildQuery(Map<String, Object> conditionMap) {
+    public Delete id(Long id) {
+        this.where(Map.of(primaryKeyColumnName, id));
+        return this;
+    }
+
+    public String buildQuery() {
         StringJoiner query = new StringJoiner(" ")
                 .add("DELETE")
                 .add("FROM").add(tableName);
-        String whereClause = whereClause(conditionMap);
-        if (!whereClause.isEmpty()) {
+
+        if (where != null) {
+            String whereClause = where.toQuery();
             query.add(whereClause);
         }
         return query.toString();
-    }
-
-    public String buildQuery(long id) {
-        return buildQuery(Map.of(primaryKeyColumnName, id));
-    }
-
-    private String whereClause(Map<String, Object> conditionMap) {
-        return WhereClause.from(conditionMap, allColumnNames).toQuery();
     }
 }
