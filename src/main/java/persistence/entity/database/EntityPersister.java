@@ -26,7 +26,9 @@ public class EntityPersister {
         Long id = metadata.getPrimaryKeyValue(entity);
         checkGenerationStrategy(metadata.requiresIdWhenInserting(), id, metadata.getEntityClassName());
         id = metadata.requiresIdWhenInserting() ? id : null;
-        Insert insert = new Insert(clazz)
+        Insert insert = new Insert(metadata.getTableName(),
+                                   metadata.getPrimaryKeyColumnName(),
+                                   metadata.getGeneralColumnNames())
                 .id(id)
                 .valuesFromEntity(entity);
         return jdbcTemplate.execute(insert.toQueryString());

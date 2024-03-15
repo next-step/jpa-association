@@ -1,5 +1,7 @@
 package database.sql.dml;
 
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -33,7 +35,10 @@ class InsertTest {
     @ParameterizedTest
     @MethodSource("testCases")
     void buildInsertQuery(Map<String, Object> valueMap, String expected) {
-        String actual = new Insert(Person4.class)
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
+        String actual = new Insert(entityMetadata.getTableName(),
+                                   entityMetadata.getPrimaryKeyColumnName(),
+                                   entityMetadata.getGeneralColumnNames())
                 .values(valueMap)
                 .toQueryString();
         assertThat(actual).isEqualTo(expected);
@@ -42,7 +47,10 @@ class InsertTest {
     @Test
     void insertQueryWithId() {
         Map<String, Object> valueMap = Map.of("nick_name", "abc", "old", 14, "email", "a@b.com");
-        String actual = new Insert(Person4.class)
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
+        String actual = new Insert(entityMetadata.getTableName(),
+                                   entityMetadata.getPrimaryKeyColumnName(),
+                                   entityMetadata.getGeneralColumnNames())
                 .id(10L)
                 .values(valueMap)
                 .toQueryString();
@@ -51,7 +59,10 @@ class InsertTest {
 
     @Test
     void insertIntoEntityWithNoId() {
-        String actual = new Insert(NoAutoIncrementUser.class)
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(NoAutoIncrementUser.class);
+        String actual = new Insert(entityMetadata.getTableName(),
+                                   entityMetadata.getPrimaryKeyColumnName(),
+                                   entityMetadata.getGeneralColumnNames())
                 .id(10L)
                 .values(Map.of("nick_name", "abc", "old", 14, "email", "a@b.com"))
                 .toQueryString();
