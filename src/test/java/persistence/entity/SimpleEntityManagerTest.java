@@ -171,4 +171,14 @@ class SimpleEntityManagerTest {
         String findAllQuery = dmlQueryBuilder.buildFindAllQuery();
         return jdbcTemplate.query(findAllQuery, new Person3RowMapper());
     }
+
+    @DisplayName("getReference는 프록시를 반환한다.")
+    @Test
+    void getReference() {
+        Person3 reference = entityManager.getReference(Person3.class, new EntityId(1L));
+        Class<? extends Person3> clazz = reference.getClass();
+
+        String result = clazz.toString();
+        assertThat(result).contains("EnhancerByCGLIB");
+    }
 }
