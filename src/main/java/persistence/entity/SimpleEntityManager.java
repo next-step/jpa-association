@@ -45,6 +45,11 @@ public class SimpleEntityManager implements EntityManager {
     }
 
     @Override
+    public <T> T getReference(Class<T> clazz, EntityId id) {
+        return null;
+    }
+
+    @Override
     public void persist(Object entity) {
         if (isExist(entity)) {
             throw new EntityExistsException();
