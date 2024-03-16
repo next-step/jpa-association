@@ -28,7 +28,10 @@ class ValueClauseTest {
     void valueSql() {
         ValueClause valueClause = ValueClause.from(person, domainTypes);
 
-        assertThat(valueClause.toSql()).isEqualTo("1,'신성수',20,'tlstjdtn@nextstep.com'");
+        assertThat(valueClause.toSql()).isEqualTo("1,\n" +
+                "'신성수',\n" +
+                "20,\n" +
+                "'tlstjdtn@nextstep.com'");
     }
 
     @DisplayName("필드이름을 찾지 못할떄, 에러를 발생시킨다.")

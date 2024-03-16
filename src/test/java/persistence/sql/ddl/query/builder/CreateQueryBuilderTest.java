@@ -1,6 +1,7 @@
 package persistence.sql.ddl.query.builder;
 
 import domain.LegacyPerson;
+import domain.Order;
 import domain.Person;
 import domain.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,9 @@ class CreateQueryBuilderTest {
         );
 
         final String expected = "CREATE TABLE LegacyPerson(\n" +
-                "id BIGINT PRIMARY KEY,name VARCHAR,age INTEGER\n" +
+                "id BIGINT PRIMARY KEY,\n" +
+                "name VARCHAR,\n" +
+                "age INTEGER\n" +
                 ");";
 
         assertThat(createQueryBuilder.toSql()).isEqualTo(expected);
@@ -59,7 +62,10 @@ class CreateQueryBuilderTest {
         );
 
         final String expected = "CREATE TABLE Person(\n" +
-                "id BIGINT PRIMARY KEY AUTO_INCREMENT,nick_name VARCHAR,old INTEGER,email VARCHAR  NOT NULL\n" +
+                "id BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "nick_name VARCHAR,\n" +
+                "old INTEGER,\n" +
+                "email VARCHAR  NOT NULL\n" +
                 ");";
 
         assertThat(createQueryBuilder.toSql()).isEqualTo(expected);
@@ -75,9 +81,32 @@ class CreateQueryBuilderTest {
         );
 
         final String expected = "CREATE TABLE users(\n" +
-                "id BIGINT PRIMARY KEY AUTO_INCREMENT,nick_name VARCHAR,old INTEGER,email VARCHAR  NOT NULL\n" +
+                "id BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "nick_name VARCHAR,\n" +
+                "old INTEGER,\n" +
+                "email VARCHAR  NOT NULL\n" +
                 ");";
 
         assertThat(createQueryBuilder.toSql()).isEqualTo(expected);
     }
+
+    @DisplayName("외래키가 필요한 테이블일 경우 컬럼이 추가된다.")
+    @Test
+    void isExistForeKey() {
+        EntityMappingTable entityMappingTable = EntityMappingTable.from(Order.class);
+
+        CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.of(
+                entityMappingTable,
+                typeMapper,
+                constraints
+        );
+
+        assertThat(createQueryBuilder.toSql()).isEqualTo("CREATE TABLE orders(\n" +
+                "id BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "orderNumber VARCHAR,\n" +
+                "order_id BIGINT,\n" +
+                "FOREIGN KEY (order_id) REFERENCES order_items(id)\n" +
+                ");");
+    }
+
 }

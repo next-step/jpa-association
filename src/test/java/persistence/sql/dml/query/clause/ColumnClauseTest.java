@@ -23,6 +23,9 @@ class ColumnClauseTest {
     void columnSql() {
         ColumnClause columnClause = new ColumnClause(domainTypes.getColumnName());
 
-        assertThat(columnClause.toSql()).isEqualTo("id,nick_name,old,email");
+        assertThat(columnClause.toSql()).isEqualTo("id,\n" +
+                "nick_name,\n" +
+                "old,\n" +
+                "email");
     }
 }

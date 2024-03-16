@@ -24,6 +24,12 @@ class InsertQueryBuilderTest {
 
         String sql = insertQueryBuilder.toSql(entityMappingTable.getTableName(), columnClause, valueClause);
 
-        assertThat(sql).isEqualTo("INSERT INTO Person (id,nick_name,old,email) VALUES (1,'신성수',20,'tlstjdtn@nextstep.com')");
+        assertThat(sql).isEqualTo("INSERT INTO Person (id,\n" +
+                "nick_name,\n" +
+                "old,\n" +
+                "email) VALUES (1,\n" +
+                "'신성수',\n" +
+                "20,\n" +
+                "'tlstjdtn@nextstep.com')");
     }
 }
