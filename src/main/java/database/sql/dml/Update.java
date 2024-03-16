@@ -32,7 +32,7 @@ public class Update {
     }
 
     public Update changes(Object entity) {
-        this.changes(ValueClause.fromEntity(entity));
+        this.changes(ValueClause.fromEntity(entity, generalColumns));
         return this;
     }
 

@@ -41,7 +41,7 @@ public class Insert {
     }
 
     public Insert valuesFromEntity(Object entity) {
-        this.values = ValueClause.fromEntity(entity);
+        this.values = ValueClause.fromEntity(entity, generalColumns);
         return this;
     }
 
