@@ -10,20 +10,24 @@ import persistence.sql.entity.model.TableName;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static persistence.sql.constant.SqlConstant.COMMA;
+import static persistence.sql.constant.SqlConstant.LINE_COMMA;
 import static persistence.sql.constant.SqlFormat.CREATE;
 
 public class CreateQueryBuilder {
 
     private final TableName tableName;
     private final List<ColumnBuilder> columnBuilders;
+    private final ForeignKeyBuilder foreignKeyBuilder;
 
     private CreateQueryBuilder(final TableName tableName,
-                               final List<ColumnBuilder> columnBuilders) {
+                               final List<ColumnBuilder> columnBuilders,
+                               final ForeignKeyBuilder foreignKeyBuilder) {
         this.tableName = tableName;
         this.columnBuilders = columnBuilders;
+        this.foreignKeyBuilder = foreignKeyBuilder;
     }
 
     public static CreateQueryBuilder of(final EntityMappingTable entityMappingTable,
@@ -33,7 +37,8 @@ public class CreateQueryBuilder {
                 entityMappingTable.getDomainTypes(),
                 typeMapper,
                 constantTypeMapper);
-        return new CreateQueryBuilder(entityMappingTable.getTableName(), columnBuilders);
+        ForeignKeyBuilder foreignKeyBuilder = new ForeignKeyBuilder(entityMappingTable);
+        return new CreateQueryBuilder(entityMappingTable.getTableName(), columnBuilders, foreignKeyBuilder);
     }
 
     private static List<ColumnBuilder> getColumnBuilders(final DomainTypes domainTypes,
@@ -49,9 +54,15 @@ public class CreateQueryBuilder {
     public String toSql() {
         String columns = columnBuilders.stream()
                 .map(ColumnBuilder::build)
-                .collect(Collectors.joining(COMMA.getValue()));
+                .collect(Collectors.joining(LINE_COMMA.getValue()));
 
-        return String.format(CREATE.getFormat(), tableName.getName(), columns);
+        String columnSql = Stream.of(columns, foreignKeyBuilder.toSql())
+                .filter(column -> !column.isEmpty())
+                .collect(Collectors.joining(LINE_COMMA.getValue()));
+
+        return String.format(CREATE.getFormat(),
+                tableName.getName(),
+                columnSql);
     }
 
 }
