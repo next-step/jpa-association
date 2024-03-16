@@ -16,7 +16,7 @@ public class EntitySnapshot {
     public static EntitySnapshot from(Object entity) {
         Table table = Table.getInstance(entity.getClass());
 
-        int hash = Objects.hash(entity.getClass(), table.getColumns().stream()
+        int hash = Objects.hash(entity.getClass(), table.getSelectColumns().stream()
             .map(column -> column.getFieldValue(entity))
             .map(String::valueOf)
             .collect(Collectors.joining(COMMA.getValue())));

@@ -2,10 +2,8 @@ package persistence.entity.persister;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import jdbc.JdbcTemplate;
 import persistence.sql.dml.DmlGenerator;
-import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
 
 public class SimpleEntityPersister implements EntityPersister {

@@ -1,9 +1,5 @@
 package persistence.entity;
 
-import persistence.entity.persistencecontext.EntityKey;
-import persistence.entity.persistencecontext.EntitySnapshot;
-import persistence.sql.meta.Table;
-
 public class EntityEntry {
     private EntityState state;
 

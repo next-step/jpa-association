@@ -51,6 +51,7 @@ public class JdbcTemplate {
     }
 
     public <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
+        System.out.println(sql);
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             final List<T> result = new ArrayList<>();
             while (resultSet.next()) {

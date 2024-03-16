@@ -22,16 +22,14 @@ public class EntityRowMapper<T> implements RowMapper {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             Table table = Table.getInstance(clazz);
-            setFieldValues(instance, table.getTableName(), table.getColumns(), resultSet);
+            setFieldValues(instance, table.getTableName(), table.getSelectColumns(), resultSet);
             List<Column> eagerRelationColumns = table.getEagerRelationColumns();
-
             if (eagerRelationColumns.isEmpty()) {
                 return instance;
             }
             do {
                 setEagerRelationFieldValues(resultSet, eagerRelationColumns, instance);
             } while (resultSet.next());
-
             return instance;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
@@ -52,7 +50,7 @@ public class EntityRowMapper<T> implements RowMapper {
             .forEach(column -> {
                 Table relationTable = column.getRelationTable();
                 Object relatedInstance = relationTable.getClassInstance();
-                setFieldValues(relatedInstance, relationTable.getTableName(), relationTable.getColumns(), resultSet);
+                setFieldValues(relatedInstance, relationTable.getTableName(), relationTable.getSelectColumns(), resultSet);
                 column.setFieldValue(instance, relatedInstance);
             });
     }

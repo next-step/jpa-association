@@ -26,7 +26,7 @@ public class CreateQueryBuilder {
     }
 
     private String generateColumnDefinitions(Table table) {
-        return table.getColumns()
+        return table.getSelectColumns()
             .stream()
             .map(fieldBuilder::generate)
             .collect(Collectors.joining(COMMA.getValue()));

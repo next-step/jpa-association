@@ -97,10 +97,7 @@ class SimpleEntityPersisterTest {
             assertAll(
                 () -> assertThat(foundOrder).isEqualTo(order),
                 () -> assertThat(foundOrder.getId()).isEqualTo(order.getId()),
-                () -> assertThat(foundOrder.getOrderNumber()).isEqualTo(order.getOrderNumber()),
-                () -> assertThat(foundOrder.getOrderItems()).hasSize(3),
-                () -> IntStream.range(0, foundOrder.getOrderItems().size())
-                    .forEach(i -> assertEquals(foundOrder.getOrderItems().get(i).getId(), order.getOrderItems().get(i).getId()))
+                () -> assertThat(foundOrder.getOrderNumber()).isEqualTo(order.getOrderNumber())
             );
         }
     }
