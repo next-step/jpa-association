@@ -1,6 +1,7 @@
-package persistence.entity;
+package persistence.entity.proxy;
 
 import net.sf.cglib.proxy.FixedValue;
+import persistence.entity.common.EntityId;
 
 public class EntityGetIdProxy implements FixedValue {
 

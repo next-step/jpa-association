@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import persistence.entity.common.EntityId;
+import persistence.entity.entitymanager.PersistenceContext;
+import persistence.entity.entitymanager.SimplePersistenceContext;
 import persistence.study.sql.ddl.Person2;
 import persistence.study.sql.ddl.Person3;
 

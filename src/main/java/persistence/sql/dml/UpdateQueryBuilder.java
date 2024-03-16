@@ -1,7 +1,7 @@
 package persistence.sql.dml;
 
-import persistence.entity.EntityBinder;
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.Column;
 import persistence.sql.model.Columns;
 import persistence.sql.model.PKColumn;

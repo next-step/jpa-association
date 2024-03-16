@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.BaseTable;
 import persistence.sql.model.JoinColumn;
 import persistence.sql.model.Table;

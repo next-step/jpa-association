@@ -1,6 +1,8 @@
-package persistence.entity;
+package persistence.entity.proxy;
 
 import net.sf.cglib.proxy.LazyLoader;
+import persistence.entity.common.EntityId;
+import persistence.entity.entitymanager.EntityManager;
 
 public class EntityLazyLoader implements LazyLoader {
 

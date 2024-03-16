@@ -1,4 +1,8 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
+
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityId;
+import persistence.entity.common.EntityKey;
 
 import java.util.HashMap;
 import java.util.Map;

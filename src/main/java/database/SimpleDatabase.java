@@ -1,7 +1,7 @@
 package database;
 
 import jdbc.JdbcTemplate;
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 
 import java.util.List;
 

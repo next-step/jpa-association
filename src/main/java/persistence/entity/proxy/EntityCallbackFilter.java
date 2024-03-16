@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.proxy;
 
 import net.sf.cglib.proxy.CallbackFilter;
 

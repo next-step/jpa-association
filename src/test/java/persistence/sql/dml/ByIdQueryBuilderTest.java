@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person1;
 import persistence.study.sql.ddl.Person2;

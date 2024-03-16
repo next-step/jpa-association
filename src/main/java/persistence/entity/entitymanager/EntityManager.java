@@ -1,4 +1,6 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
+
+import persistence.entity.common.EntityId;
 
 public interface EntityManager {
 

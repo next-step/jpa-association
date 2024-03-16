@@ -1,6 +1,6 @@
 package database;
 
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 
 import java.util.List;
 

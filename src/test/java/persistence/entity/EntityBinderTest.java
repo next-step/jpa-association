@@ -2,6 +2,7 @@ package persistence.entity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.common.EntityBinder;
 import persistence.sql.model.Column;
 import persistence.study.sql.ddl.Person2;
 import persistence.study.sql.ddl.Person3;

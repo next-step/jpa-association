@@ -1,9 +1,15 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityId;
+import persistence.entity.common.EntityMetaCache;
+import persistence.entity.proxy.EntityCallbackFilter;
+import persistence.entity.proxy.EntityGetIdProxy;
+import persistence.entity.proxy.EntityLazyLoader;
 import persistence.sql.model.Table;
 
 import java.util.Objects;

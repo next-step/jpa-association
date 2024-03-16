@@ -1,12 +1,11 @@
 package persistence.sql.dml;
 
 import org.junit.jupiter.api.Test;
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Person3;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class UpdateQueryBuilderTest {
 
