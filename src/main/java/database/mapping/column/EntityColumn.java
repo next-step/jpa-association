@@ -1,7 +1,5 @@
 package database.mapping.column;
 
-import database.dialect.Dialect;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
@@ -13,9 +11,11 @@ public interface EntityColumn {
 
     String getColumnName();
 
-    String toColumnDefinition(Dialect dialect);
-
     boolean isPrimaryKeyField();
 
     Type getFieldType();
+
+    Class<?> getType();
+
+    Integer getColumnLength();
 }

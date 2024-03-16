@@ -1,6 +1,5 @@
 package database.mapping;
 
-import database.dialect.Dialect;
 import database.mapping.column.EntityColumn;
 import database.mapping.column.EntityColumnFactory;
 import database.mapping.column.PrimaryKeyEntityColumn;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ColumnsMetadata {
     private final Class<?> clazz;
-    private final List<EntityColumn> allEntityColumns;
+    public final List<EntityColumn> allEntityColumns; // XXX: 임시
     private final PrimaryKeyEntityColumn primaryKey;
     private final List<EntityColumn> generalColumns;
     private final Map<String, Field> fieldByColumnNameMap;
@@ -83,12 +82,6 @@ public class ColumnsMetadata {
 
     public List<String> getAllColumnNames() {
         return allEntityColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.toList());
-    }
-
-    public List<String> getColumnDefinitions(Dialect dialect) {
-        return allEntityColumns.stream()
-                .map(entityColumn -> entityColumn.toColumnDefinition(dialect))
-                .collect(Collectors.toList());
     }
 
     public PrimaryKeyEntityColumn getPrimaryKey() {

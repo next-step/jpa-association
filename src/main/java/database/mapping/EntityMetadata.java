@@ -1,6 +1,5 @@
 package database.mapping;
 
-import database.dialect.Dialect;
 import database.mapping.column.EntityColumn;
 
 import java.lang.reflect.Field;
@@ -11,7 +10,7 @@ import java.util.List;
 public class EntityMetadata {
     private final Class<?> clazz;
     private final TableMetadata tableMetadata;
-    private final ColumnsMetadata columnsMetadata;
+    public final ColumnsMetadata columnsMetadata; // XXX: 임시
     private final EntityAssociationMetadata entityAssociationMetadata;
 
     private EntityMetadata(Class<?> clazz, TableMetadata tableMetadata, ColumnsMetadata columnsMetadata,
@@ -41,14 +40,6 @@ public class EntityMetadata {
 
     public List<String> getAllColumnNames() {
         return columnsMetadata.getAllColumnNames();
-    }
-
-    public String getJoinedAllColumnNames() {
-        return String.join(", ", columnsMetadata.getAllColumnNames());
-    }
-
-    public List<String> getColumnDefinitions(Dialect dialect) {
-        return columnsMetadata.getColumnDefinitions(dialect);
     }
 
     public String getPrimaryKeyColumnName() {
@@ -91,7 +82,7 @@ public class EntityMetadata {
         return !entityAssociationMetadata.getAssociatedTypes().isEmpty();
     }
 
-    public List<String> getJoinColumnDefinitions(Dialect dialect, List<Class<?>> entities) {
-        return entityAssociationMetadata.getJoinColumnDefinitions(dialect, entities);
+    public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
+        return entityAssociationMetadata.getAssociationRelatedToOtherEntities(entities);
     }
 }

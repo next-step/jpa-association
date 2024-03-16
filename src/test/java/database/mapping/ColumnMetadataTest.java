@@ -27,15 +27,16 @@ class ColumnMetadataTest {
         assertThat(allColumnNames).containsExactly("id", "nick_name", "old", "email");
     }
 
-    @Test
-    void getColumnDefinitions() {
-        List<String> res = columnsMetadata.getColumnDefinitions(dialect);
-        assertThat(res).containsExactly(
-                "id BIGINT AUTO_INCREMENT PRIMARY KEY",
-                "nick_name VARCHAR(255) NULL",
-                "old INT NULL",
-                "email VARCHAR(255) NOT NULL");
-    }
+    //XXX: Create 테스트로 넘기기
+//    @Test
+//    void getColumnDefinitions() {
+//        List<String> res = columnsMetadata.getColumnDefinitions(dialect);
+//        assertThat(res).containsExactly(
+//                "id BIGINT AUTO_INCREMENT PRIMARY KEY",
+//                "nick_name VARCHAR(255) NULL",
+//                "old INT NULL",
+//                "email VARCHAR(255) NOT NULL");
+//    }
 
     @Test
     void getPrimaryKeyColumnName() {

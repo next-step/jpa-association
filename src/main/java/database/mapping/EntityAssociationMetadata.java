@@ -1,6 +1,5 @@
 package database.mapping;
 
-import database.dialect.Dialect;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
@@ -24,22 +23,7 @@ public class EntityAssociationMetadata {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * entities 목록 안에 this.clazz 와 관련된 필드가 있는지 찾아보고 돌려줌
-     */
-    public List<String> getJoinColumnDefinitions(Dialect dialect, List<Class<?>> entities) {
-        List<Association> associationRelatedToOtherEntities = getAssociationRelatedToOtherEntities(entities);
-
-        if (associationRelatedToOtherEntities.isEmpty()) {
-            return List.of();
-        } else {
-            return associationRelatedToOtherEntities.stream()
-                    .map(association -> association.toColumnDefinition(dialect))
-                    .collect(Collectors.toList());
-        }
-    }
-
-    private List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
+    public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
         return entities.stream()
                 .filter(this::exceptMe)
                 .flatMap(this::getAssociationsBetweenMeAndOther)
