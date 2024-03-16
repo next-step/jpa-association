@@ -1,28 +1,21 @@
 package database.sql.dml;
 
-import database.mapping.EntityMetadata;
-import database.mapping.EntityMetadataFactory;
+import java.util.List;
 
 public class SelectByPrimaryKey {
-    private final String tableName;
-    private final String primaryKeyColumnName;
-    private final String joinedAllColumnNames;
+    private final Select select;
+    private Long id;
 
-    public SelectByPrimaryKey(Class<?> clazz) {
-        this(EntityMetadataFactory.get(clazz));
+    public SelectByPrimaryKey(String tableName, List<String> allColumnNames) {
+        select = new Select(tableName, allColumnNames);
     }
 
-    private SelectByPrimaryKey(EntityMetadata entityMetadata) {
-        this.tableName = entityMetadata.getTableName();
-        this.primaryKeyColumnName = entityMetadata.getPrimaryKeyColumnName();
-        this.joinedAllColumnNames = entityMetadata.getJoinedAllColumnNames();
+    public SelectByPrimaryKey byId(Long id) {
+        this.id = id;
+        return this;
     }
 
-    public String buildQuery(Long id) {
-        return String.format("SELECT %s FROM %s WHERE %s = %d",
-                             joinedAllColumnNames,
-                             tableName,
-                             primaryKeyColumnName,
-                             id);
+    public String buildQuery() {
+        return select.id(this.id).buildQuery();
     }
 }

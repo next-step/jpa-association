@@ -38,7 +38,8 @@ public class EntityLoader {
     public <T> Optional<T> load(Class<T> clazz, Long id) {
         RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
-        String query = new SelectByPrimaryKey(clazz).buildQuery(id);
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new SelectByPrimaryKey(entityMetadata.getTableName(), entityMetadata.getAllColumnNames()).byId(id).buildQuery();
         return jdbcTemplate.query(query, rowMapper).stream().findFirst();
     }
 }
