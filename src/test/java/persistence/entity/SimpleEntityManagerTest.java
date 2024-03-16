@@ -10,6 +10,11 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import persistence.entity.common.EntityId;
+import persistence.entity.entitymanager.EntityLoader;
+import persistence.entity.entitymanager.EntityManager;
+import persistence.entity.entitymanager.EntityPersister;
+import persistence.entity.entitymanager.SimpleEntityManager;
 import persistence.sql.ddl.DDLQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -68,9 +73,9 @@ class SimpleEntityManagerTest {
         String createTableQuery = ddlQueryBuilder.buildCreateQuery();
         jdbcTemplate.execute(createTableQuery);
 
-        Stream<Person3> persons = createPersons();
-
-        persons.forEach(person -> entityManager.persist(person));
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (null, 'qwer1', 1, 'email1@email.com')");
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (null, 'qwer2', 2, 'email2@email.com')");
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (null, 'qwer3', 3, 'email3@email.com')");
     }
 
     @AfterEach
@@ -79,14 +84,6 @@ class SimpleEntityManagerTest {
         jdbcTemplate.execute(dropQuery);
 
         entityManager = new SimpleEntityManager(entityPersister, entityLoader);
-    }
-
-    private Stream<Person3> createPersons() {
-        return Stream.of(
-                new Person3("qwer1", 1, "email1@email.com"),
-                new Person3("qwer2", 2, "email2@email.com"),
-                new Person3("qwer3", 3, "email3@email.com")
-        );
     }
 
     @DisplayName("person을 이용하여 find 메서드 테스트")
@@ -178,5 +175,15 @@ class SimpleEntityManagerTest {
     private List<Person3> findAllPerson() {
         String findAllQuery = dmlQueryBuilder.buildFindAllQuery();
         return jdbcTemplate.query(findAllQuery, new Person3RowMapper());
+    }
+
+    @DisplayName("getReference는 프록시를 반환한다.")
+    @Test
+    void getReference() {
+        Person3 reference = entityManager.getReference(Person3.class, new EntityId(1L));
+        Class<? extends Person3> clazz = reference.getClass();
+
+        String result = clazz.toString();
+        assertThat(result).contains("EnhancerByCGLIB");
     }
 }

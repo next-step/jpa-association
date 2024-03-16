@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.common;
 
 import persistence.sql.model.BaseColumn;
 import persistence.sql.model.PKColumn;

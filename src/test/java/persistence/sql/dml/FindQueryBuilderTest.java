@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import persistence.entity.EntityBinder;
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.PKColumn;
 import persistence.sql.model.Table;
 import persistence.study.sql.ddl.Order;
@@ -72,7 +72,7 @@ class FindQueryBuilderTest {
 
         String result = findQueryBuilder.build();
 
-        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id");
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders LEFT JOIN order_items ON orders.id=order_items.order_id");
     }
 
     @DisplayName("Order를 이용하여 findById 조인 쿼리 확인하기")
@@ -85,6 +85,6 @@ class FindQueryBuilderTest {
 
         String result = findQueryBuilder.buildById(id);
 
-        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1");
+        assertThat(result).isEqualTo("SELECT orders.id,orders.order_number,order_items.id,order_items.product,order_items.quantity FROM orders LEFT JOIN order_items ON orders.id=order_items.order_id WHERE orders.id=1");
     }
 }

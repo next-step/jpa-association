@@ -19,6 +19,6 @@ class JoinQueryBuilderTest {
 
         String result = joinQueryBuilder.build();
 
-        assertThat(result).isEqualTo("JOIN order_items ON orders.id=order_items.order_id");
+        assertThat(result).isEqualTo("LEFT JOIN order_items ON orders.id=order_items.order_id");
     }
 }

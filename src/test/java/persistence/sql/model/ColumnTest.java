@@ -22,7 +22,7 @@ class ColumnTest {
     void newColumn(Column column, String name, SqlType type, List<SqlConstraint> constraints) throws NoSuchFieldException {
         assertSoftly(softly -> {
             softly.assertThat(column.getName()).isEqualTo(name);
-            softly.assertThat(column.getType().get()).isEqualTo(type);
+            softly.assertThat(column.getType()).isEqualTo(type);
             softly.assertThat(column.getConstraints()).isEqualTo(constraints);
         });
     }

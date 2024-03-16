@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.Table;
 
 public class DMLQueryBuilder {

@@ -53,8 +53,7 @@ public class PKColumn implements BaseColumn {
     }
 
     public SqlType getType() {
-        return column.getType()
-                .orElseThrow();
+        return column.getType();
     }
 
     public List<SqlConstraint> getConstraints() {

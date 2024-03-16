@@ -1,11 +1,11 @@
 package persistence.sql.dml;
 
-import persistence.entity.EntityId;
+import persistence.entity.common.EntityId;
 import persistence.sql.model.Table;
 
 public class ByIdQueryBuilder {
 
-    private final static String BY_ID_QUERY_FORMAT = "WHERE %s";
+    private final static String BY_ID_QUERY_FORMAT = "%s.%s=%s";
 
     private final Table table;
     private final EntityId id;
@@ -16,20 +16,8 @@ public class ByIdQueryBuilder {
     }
 
     public String build() {
-        return buildWhereClause();
-    }
-
-    private String buildWhereClause() {
-        StringBuilder whereClauseBuilder = new StringBuilder();
-
         String tableName = table.getName();
-        whereClauseBuilder.append(tableName + '.');
-
         String pkColumnName = table.getPKColumnName();
-        whereClauseBuilder.append(pkColumnName)
-                .append('=')
-                .append(id);
-
-        return whereClauseBuilder.toString();
+        return String.format(BY_ID_QUERY_FORMAT, tableName, pkColumnName, id);
     }
 }

@@ -3,7 +3,7 @@ package persistence.sql.model;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-import persistence.entity.EntityMetaCache;
+import persistence.entity.common.EntityMetaCache;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

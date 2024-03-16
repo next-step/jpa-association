@@ -1,7 +1,10 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
 
 import database.Database;
 import jakarta.persistence.EntityNotFoundException;
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityId;
+import persistence.entity.common.EntityMetaCache;
 import persistence.sql.dml.DMLQueryBuilder;
 import persistence.sql.model.Table;
 

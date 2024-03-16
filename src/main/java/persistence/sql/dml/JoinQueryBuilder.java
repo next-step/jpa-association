@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class JoinQueryBuilder {
 
-    private final static String JOIN_QUERY_FORMAT = "JOIN %s ON %s=%s";
+    private final static String JOIN_QUERY_FORMAT = "LEFT JOIN %s ON %s=%s";
 
     private final Table table;
 

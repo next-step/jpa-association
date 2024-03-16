@@ -1,6 +1,6 @@
 package persistence.sql.dml;
 
-import persistence.entity.EntityBinder;
+import persistence.entity.common.EntityBinder;
 import persistence.sql.model.Column;
 import persistence.sql.model.Columns;
 import persistence.sql.model.Table;

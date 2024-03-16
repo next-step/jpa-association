@@ -3,6 +3,8 @@ package persistence.entity;
 import database.*;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.*;
+import persistence.entity.common.EntityId;
+import persistence.entity.entitymanager.EntityPersister;
 import persistence.sql.ddl.DDLQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;

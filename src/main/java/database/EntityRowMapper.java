@@ -1,8 +1,8 @@
 package database;
 
 import jdbc.RowMapper;
-import persistence.entity.EntityBinder;
-import persistence.entity.EntityMetaCache;
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityMetaCache;
 import persistence.sql.model.BaseColumn;
 import persistence.sql.model.JoinColumn;
 import persistence.sql.model.PKColumn;

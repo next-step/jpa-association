@@ -1,4 +1,8 @@
-package persistence.entity;
+package persistence.entity.entitymanager;
+
+import persistence.entity.common.EntityBinder;
+import persistence.entity.common.EntityId;
+import persistence.entity.common.EntityKey;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +27,6 @@ public class SimplePersistenceContext implements PersistenceContext {
 
     @Override
     public void addEntity(EntityId id, Object entity) {
-        EntityBinder entityBinder = new EntityBinder(entity);
-        entityBinder.bindEntityId(id);
-
         EntityKey key = createEntityKey(entity, id);
         cache.put(key, entity);
         snapshot.put(key, entity);
