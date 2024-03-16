@@ -1,5 +1,7 @@
 package persistence.sql.entity.loader;
 
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,11 +17,22 @@ class EntityLoaderImplTest extends H2Database {
     private Person person1;
     private Person person2;
 
+    private Order insertOrder;
+    private OrderItem jpaOrderItem;
+
 
     @BeforeEach
     void setUp() {
         this.person1 = new Person(1L, "박재성", 10, "jason");
         this.person2 = new Person(2L, "이동규", 20, "cu");
+
+        this.jpaOrderItem = new OrderItem(1L, "만들면서 배우는 JPA", 1);
+        this.insertOrder = new Order(1L, "nextstep jpa 강의", List.of(jpaOrderItem));
+
+        entityPersister.deleteAll(Order.class);
+        entityPersister.deleteAll(OrderItem.class);
+        entityPersister.insert(jpaOrderItem);
+        entityPersister.insert(insertOrder);
 
         entityPersister.deleteAll(Person.class);
         entityPersister.insert(person1);
@@ -40,7 +53,6 @@ class EntityLoaderImplTest extends H2Database {
         Person person = entityLoader.find(Person.class, 3);
 
         assertThat(person).isNull();
-        ;
     }
 
     @DisplayName("엔티티에 매핑된 테이블 값을 모두 조회한다.")
@@ -51,5 +63,12 @@ class EntityLoaderImplTest extends H2Database {
         assertThat(persons).containsExactly(person1, person2);
     }
 
+    @DisplayName("주문에서 연관된 데이터를 같이 조회한다.")
+    @Test
+    void eagerFind() {
+        Order order = entityLoader.find(Order.class, 1);
+
+        assertThat(order).isEqualTo(insertOrder);
+    }
 
 }
