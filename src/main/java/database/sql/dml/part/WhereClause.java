@@ -11,11 +11,13 @@ public class WhereClause {
     private final Map<String, Object> conditionMap;
     private final List<String> allColumnNames;
     private final String alias;
+    private boolean withWhereClause;
 
     private WhereClause(Map<String, Object> conditionMap, List<String> allColumnNames, String alias) {
         this.conditionMap = conditionMap;
         this.allColumnNames = allColumnNames;
         this.alias = alias;
+        this.withWhereClause = true;
     }
 
     public static WhereClause from(Map<String, Object> conditionMap, List<EntityColumn> allColumns) {
@@ -37,15 +39,21 @@ public class WhereClause {
         }
     }
 
+    public WhereClause withWhereClause(boolean bool) {
+        this.withWhereClause = bool;
+        return this;
+    }
+
     public String toQuery() {
         if (conditionMap.isEmpty()) {
             return FilterExpression.EMPTY;
         }
 
+        String prefix = withWhereClause ? "WHERE " : "";
         return allColumnNames.stream()
                 .filter(conditionMap::containsKey)
                 .map(columnName -> columnAndValue(columnName, conditionMap.get(columnName)))
-                .collect(Collectors.joining(" AND ", "WHERE ", ""));
+                .collect(Collectors.joining(" AND ", prefix, ""));
     }
 
     private String columnAndValue(String columnName, Object value) {
