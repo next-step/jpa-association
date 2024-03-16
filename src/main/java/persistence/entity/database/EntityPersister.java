@@ -41,20 +41,32 @@ public class EntityPersister {
     }
 
     public void update(Class<?> clazz, Long id, Map<String, Object> changes) {
-        String query = new Update(clazz).buildQuery(id, changes);
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Update(entityMetadata.getTableName(),
+                                  entityMetadata.getGeneralColumns(),
+                                  entityMetadata.getPrimaryKey())
+                .changes(changes)
+                .byId(id)
+                .buildQuery();
         jdbcTemplate.execute(query);
     }
 
     public void update(Class<?> clazz, Long id, Object entity) {
-        String query = new Update(clazz).buildQueryByEntity(id, entity);
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Update(entityMetadata.getTableName(),
+                                  entityMetadata.getGeneralColumns(),
+                                  entityMetadata.getPrimaryKey())
+                .changes(entity)
+                .byId(id)
+                .buildQuery();
         jdbcTemplate.execute(query);
     }
 
     public void delete(Class<?> clazz, Long id) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         String query = new Delete(entityMetadata.getTableName(),
-                                   entityMetadata.getPrimaryKeyColumnName(),
-                                   entityMetadata.getAllColumnNames())
+                                  entityMetadata.getPrimaryKeyColumnName(),
+                                  entityMetadata.getAllColumnNames())
                 .id(id)
                 .buildQuery();
         jdbcTemplate.execute(query);
