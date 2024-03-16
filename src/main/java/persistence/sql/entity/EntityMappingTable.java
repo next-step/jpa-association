@@ -48,11 +48,19 @@ public class EntityMappingTable {
     }
 
     public TableName getTableName() {
-        if(table != null) {
+        if (table != null) {
             return new TableName(table.name());
         }
 
         return tableName;
+    }
+
+    public String getAcronymsAndTableName() {
+        return getTableName().getAcronymsAndTableName();
+    }
+
+    public String getAcronyms() {
+        return getTableName().getAcronyms();
     }
 
     public DomainTypes getDomainTypes() {
@@ -65,6 +73,12 @@ public class EntityMappingTable {
                 .filter(DomainType::isPrimaryDomain)
                 .findFirst()
                 .orElseThrow(NotFoundIdException::new);
+    }
+
+    public boolean isEagerType() {
+        return domainTypes.getDomainTypes()
+                .stream()
+                .map(DomainType::isJoinColumn).findAny().isPresent();
     }
 
 }
