@@ -1,9 +1,11 @@
 package persistence.sql.entity.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 
 import java.lang.reflect.Field;
+import java.util.List;
+
+import static persistence.sql.constant.SqlConstant.DOT;
 
 public class NormalDomainType implements DomainType {
 
@@ -28,7 +30,15 @@ public class NormalDomainType implements DomainType {
     }
 
     public Class<?> getClassType() {
+        if(entityColumn.getClassType() == List.class) {
+            return Long.class;
+        }
         return entityColumn.getClassType();
+    }
+
+    @Override
+    public Field getField() {
+        return field;
     }
 
     public String getValue() {
@@ -77,9 +87,29 @@ public class NormalDomainType implements DomainType {
     @Override
     public String getColumnName() {
         Column columnAnnotation = field.getAnnotation(Column.class);
+        if(isJoinColumn()) {
+            return getJoinColumn();
+        }
+
         if (columnAnnotation != null && !columnAnnotation.name().isEmpty()) {
             return columnAnnotation.name();
         }
         return entityColumn.getName();
     }
+
+    @Override
+    public boolean isJoinColumn() {
+        return field.isAnnotationPresent(JoinColumn.class);
+    }
+
+    @Override
+    public String getAcronyms(String tableName) {
+        return tableName + DOT.getValue() + this.getColumnName();
+    }
+
+    public String getJoinColumn() {
+        return field.getDeclaredAnnotation(JoinColumn.class).name();
+    }
+
+
 }
