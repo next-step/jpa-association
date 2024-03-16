@@ -65,7 +65,6 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
         final List<Object> children = new ArrayList<>();
 
         do {
-            System.out.println(resultSet.getObject("order_items.product"));
             Object childEntity = createEntity(referenceEntityClazz);
             for (Field field : getFields(referenceEntityClazz)) {
                 field.setAccessible(true);
