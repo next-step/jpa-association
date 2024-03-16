@@ -69,7 +69,6 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
             for (Field field : getFields(referenceEntityClazz)) {
                 field.setAccessible(true);
                 ColumnData column = ColumnData.createColumn(table.getName(), field);
-                Object value = resultSet.getObject(column.getNameWithTable());
                 innerSet(childEntity, field, resultSet.getObject(column.getNameWithTable()));
             }
             children.add(childEntity);
