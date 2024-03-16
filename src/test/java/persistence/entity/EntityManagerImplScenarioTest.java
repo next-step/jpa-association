@@ -1,16 +1,11 @@
 package persistence.entity;
 
-import database.sql.ddl.Create;
-import entity.Order;
-import entity.OrderItem;
 import entity.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.context.ObjectNotFoundException;
 import testsupport.H2DatabaseTest;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -117,22 +112,5 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
                         "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
                         "SELECT id, nick_name, old, email FROM users WHERE id = 1")
         );
-    }
-
-    @Test
-    @DisplayName("FetchType.EAGER 연관관계를 가진 객체를 가져오기")
-    void scenario6() {
-        List<Class<?>> allEntities = List.of(Order.class, OrderItem.class);
-        jdbcTemplate.execute(new Create(Order.class, allEntities, dialect).buildQuery());
-        jdbcTemplate.execute(new Create(OrderItem.class, allEntities, dialect).buildQuery());
-
-        jdbcTemplate.execute("INSERT INTO orders (orderNumber) VALUES (1234)");
-        jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product1', 5, 1)");
-        jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product20', 50, 1)");
-
-        EntityManager entityManager = EntityManagerImpl.from(jdbcTemplate);
-
-        Order res = entityManager.find(Order.class, 1L);
-        assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");
     }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-// TODO: StringJoiner 너무 많다. 필요 없는 것 삭제
 public class CustomSelect {
     private static final String TABLE_ALIAS = "t";
     private static final String ASSOCIATED_TABLE_ALIAS_PREFIX = "a";

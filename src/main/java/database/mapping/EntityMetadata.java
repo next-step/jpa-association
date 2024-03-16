@@ -55,7 +55,6 @@ public class EntityMetadata {
         return columnsMetadata.getFieldByFieldName(fieldName);
     }
 
-
     // primary key
 
     public PrimaryKeyEntityColumn getPrimaryKey() {
@@ -83,6 +82,7 @@ public class EntityMetadata {
     public boolean hasAssociation() {
         return !entityAssociationMetadata.getAssociatedTypes().isEmpty();
     }
+
     public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
         return entityAssociationMetadata.getAssociationRelatedToOtherEntities(entities);
     }

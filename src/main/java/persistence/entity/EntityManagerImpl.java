@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import database.dialect.Dialect;
 import database.dialect.MySQLDialect;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
@@ -29,9 +30,11 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     public static EntityManagerImpl from(JdbcTemplate jdbcTemplate) {
+        // XXX: dialect 인자 뽑아내기
+        Dialect dialect = MySQLDialect.getInstance();
         return new EntityManagerImpl(
                 new PersistenceContextImpl(),
-                new EntityLoader(jdbcTemplate, MySQLDialect.getInstance()),
+                new EntityLoader(jdbcTemplate, dialect),
                 new EntityPersister(jdbcTemplate),
                 new CollectionLoader(jdbcTemplate));
     }

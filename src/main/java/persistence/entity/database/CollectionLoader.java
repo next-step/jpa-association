@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+// XXX: CustomSelect 를 사용하는 것 외에 Collection 이란 이름을 붙이는 것이 어색함
+// XXX: CollectionLoader 의 목적을 명확히
 public class CollectionLoader {
     private final JdbcTemplate jdbcTemplate;
 

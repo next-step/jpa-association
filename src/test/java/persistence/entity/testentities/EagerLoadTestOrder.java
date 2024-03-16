@@ -1,12 +1,12 @@
-package entity;
+package persistence.entity.testentities;
 
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "orders")
-public class Order {
+@Table(name = "eagerload_orders")
+public class EagerLoadTestOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,11 +14,11 @@ public class Order {
 
     private String orderNumber;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems;
+    private List<EagerLoadTestOrderItem> orderItems;
 
-    public Order() {
+    public EagerLoadTestOrder() {
     }
 
     public void setId(Long id) {
@@ -29,7 +29,7 @@ public class Order {
         return id;
     }
 
-    public Order(String orderNumber) {
+    public EagerLoadTestOrder(String orderNumber) {
         this.orderNumber = orderNumber;
     }
 
