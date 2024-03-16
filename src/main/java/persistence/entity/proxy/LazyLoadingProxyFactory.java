@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.LazyLoader;
+import persistence.entity.EntityEntry;
+import persistence.entity.EntityManager;
 import persistence.entity.loader.EntityLoader;
 import persistence.sql.meta.Column;
 import persistence.sql.meta.Table;
@@ -16,12 +18,12 @@ public class LazyLoadingProxyFactory {
     }
 
     public static Object create(Table root, Table relationTable, Object instance, EntityLoader entityLoader,
-                                Consumer<List<?>> externalFunction) {
+                                EntityManager entityManager) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(root.getRelationValue(instance, relationTable).getClass());
         enhancer.setCallback((LazyLoader) () -> Table.getRelationColumns(relationTable)
             .stream().filter(entry -> entry.getKey().equals(root))
-            .map(entry -> callback(root, relationTable, instance, entityLoader, entry.getValue(), externalFunction))
+            .map(entry -> callback(root, relationTable, instance, entityLoader, entry.getValue(), entityManager))
             .findFirst()
             .orElse(Collections.emptyList()));
 
@@ -29,9 +31,9 @@ public class LazyLoadingProxyFactory {
     }
 
     private static List<?> callback(Table root, Table relationTable, Object instance, EntityLoader entityLoader,
-                                    Column column, Consumer<List<?>> externalFunction) {
+                                    Column column, EntityManager entityManager) {
         List<?> result = entityLoader.find(relationTable.getClazz(), Map.of(column, root.getIdValue(instance)));
-        externalFunction.accept(result);
+        result.forEach(entity -> entityManager.cacheEntityWithAssociations(entity, EntityEntry.loading()));
         return result;
     }
 }
