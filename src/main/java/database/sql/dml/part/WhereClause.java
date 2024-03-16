@@ -1,5 +1,6 @@
 package database.sql.dml.part;
 
+import database.mapping.column.EntityColumn;
 import database.sql.dml.part.where.FilterExpression;
 
 import java.util.List;
@@ -17,14 +18,15 @@ public class WhereClause {
         this.alias = alias;
     }
 
-    public static WhereClause from(Map<String, Object> conditionMap, List<String> allColumnNames, String alias) {
+    public static WhereClause from(Map<String, Object> conditionMap, List<EntityColumn> allColumns) {
+        return from(conditionMap, allColumns, null);
+    }
+
+    public static WhereClause from(Map<String, Object> conditionMap, List<EntityColumn> allColumns, String alias) {
+        List<String> allColumnNames = allColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.toList());
         checkColumnNameInCondition(conditionMap, allColumnNames);
 
         return new WhereClause(conditionMap, allColumnNames, alias);
-    }
-
-    public static WhereClause from(Map<String, Object> conditionMap, List<String> allColumnNames) {
-        return from(conditionMap, allColumnNames, null);
     }
 
     private static void checkColumnNameInCondition(Map<String, Object> conditionMap, List<String> allColumnNames) {

@@ -1,24 +1,26 @@
 package database.sql.dml;
 
+import database.mapping.column.EntityColumn;
 import database.sql.dml.part.WhereClause;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public class Select {
     private final String tableName;
-    private final List<String> allColumnNames;
+    private final List<EntityColumn> allEntityColumns;
     private WhereClause where;
 
-    public Select(String tableName, List<String> allColumnNames) {
+    public Select(String tableName, List<EntityColumn> allEntityColumns) {
         this.tableName = tableName;
-        this.allColumnNames = allColumnNames;
+        this.allEntityColumns = allEntityColumns;
         this.where = null;
     }
 
     public Select where(Map<String, Object> whereMap) {
-        this.where = WhereClause.from(whereMap, allColumnNames);
+        this.where = WhereClause.from(whereMap, allEntityColumns);
         return this;
     }
 
@@ -29,7 +31,7 @@ public class Select {
     public String buildQuery() {
         StringJoiner query = new StringJoiner(" ")
                 .add("SELECT")
-                .add(getJoinedAllColumnNames())
+                .add(joinAllColumnNames())
                 .add("FROM").add(tableName);
 
         if (where != null) {
@@ -40,7 +42,7 @@ public class Select {
         return query.toString();
     }
 
-    private String getJoinedAllColumnNames() {
-        return String.join(", ", allColumnNames);
+    private String joinAllColumnNames() {
+        return allEntityColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.joining(", "));
     }
 }

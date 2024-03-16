@@ -26,9 +26,10 @@ public class EntityPersister {
         Long id = metadata.getPrimaryKeyValue(entity);
         checkGenerationStrategy(metadata.requiresIdWhenInserting(), id, metadata.getEntityClassName());
         id = metadata.requiresIdWhenInserting() ? id : null;
+
         Insert insert = new Insert(metadata.getTableName(),
-                                   metadata.getPrimaryKeyColumnName(),
-                                   metadata.getGeneralColumnNames())
+                                   metadata.getPrimaryKey(),
+                                   metadata.getGeneralColumns())
                 .id(id)
                 .valuesFromEntity(entity);
         return jdbcTemplate.execute(insert.toQueryString());
@@ -65,8 +66,9 @@ public class EntityPersister {
     public void delete(Class<?> clazz, Long id) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         String query = new Delete(entityMetadata.getTableName(),
-                                  entityMetadata.getPrimaryKeyColumnName(),
-                                  entityMetadata.getAllColumnNames())
+                                  entityMetadata.getAllEntityColumns(),
+                                  entityMetadata.getPrimaryKey()
+        )
                 .id(id)
                 .buildQuery();
         jdbcTemplate.execute(query);

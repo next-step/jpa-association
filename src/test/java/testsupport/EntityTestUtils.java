@@ -33,7 +33,7 @@ public class EntityTestUtils {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(Person.class);
         String query = new Select(
                 entityMetadata.getTableName(),
-                entityMetadata.getAllColumnNames()
+                entityMetadata.getAllEntityColumns()
         ).buildQuery();
         return jdbcTemplate.query(query, resultSet -> new Person(
                 resultSet.getLong("id"),

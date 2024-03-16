@@ -3,6 +3,7 @@ package persistence.entity.database;
 import database.dialect.MySQLDialect;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import database.mapping.column.EntityColumn;
 import database.mapping.rowmapper.SingleRowMapperFactory;
 import database.sql.dml.Select;
 import database.sql.dml.SelectByPrimaryKey;
@@ -27,9 +28,8 @@ public class EntityLoader {
         RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        String query = new Select(
-                entityMetadata.getTableName(),
-                entityMetadata.getAllColumnNames())
+        List<EntityColumn> allEntityColumns = entityMetadata.getAllEntityColumns();
+        String query = new Select(entityMetadata.getTableName(), allEntityColumns)
                 .where(Map.of("id", ids))
                 .buildQuery();
         return jdbcTemplate.query(query, rowMapper);
@@ -39,7 +39,10 @@ public class EntityLoader {
         RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        String query = new SelectByPrimaryKey(entityMetadata.getTableName(), entityMetadata.getAllColumnNames()).byId(id).buildQuery();
+        String query = new SelectByPrimaryKey(
+                entityMetadata.getTableName(),
+                entityMetadata.getAllEntityColumns()
+        ).byId(id).buildQuery();
         return jdbcTemplate.query(query, rowMapper).stream().findFirst();
     }
 }

@@ -1,5 +1,7 @@
 package database.sql.dml;
 
+import database.mapping.column.EntityColumn;
+import database.mapping.column.PrimaryKeyEntityColumn;
 import database.sql.dml.part.WhereClause;
 
 import java.util.List;
@@ -8,25 +10,25 @@ import java.util.StringJoiner;
 
 public class Delete {
     private final String tableName;
-    private final List<String> allColumnNames;
-    private final String primaryKeyColumnName;
+    private final PrimaryKeyEntityColumn primaryKey;
+    private final List<EntityColumn> allColumns;
     private WhereClause where;
 
-    public Delete(String tableName, String primaryKeyColumnName, List<String> allColumnNames) {
+    public Delete(String tableName, List<EntityColumn> allColumns, PrimaryKeyEntityColumn primaryKey) {
         this.tableName = tableName;
-        this.primaryKeyColumnName = primaryKeyColumnName;
-        this.allColumnNames = allColumnNames;
+        this.primaryKey = primaryKey;
+        this.allColumns = allColumns;
 
         this.where = null;
     }
 
     public Delete where(Map<String, Object> whereMap) {
-        this.where = WhereClause.from(whereMap, allColumnNames);
+        this.where = WhereClause.from(whereMap, allColumns);
         return this;
     }
 
     public Delete id(Long id) {
-        this.where(Map.of(primaryKeyColumnName, id));
+        this.where(Map.of(primaryKey.getColumnName(), id));
         return this;
     }
 

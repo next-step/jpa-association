@@ -37,8 +37,8 @@ class InsertTest {
     void buildInsertQuery(Map<String, Object> valueMap, String expected) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
         String actual = new Insert(entityMetadata.getTableName(),
-                                   entityMetadata.getPrimaryKeyColumnName(),
-                                   entityMetadata.getGeneralColumnNames())
+                                   entityMetadata.getPrimaryKey(),
+                                   entityMetadata.getGeneralColumns())
                 .values(valueMap)
                 .toQueryString();
         assertThat(actual).isEqualTo(expected);
@@ -49,8 +49,8 @@ class InsertTest {
         Map<String, Object> valueMap = Map.of("nick_name", "abc", "old", 14, "email", "a@b.com");
         EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
         String actual = new Insert(entityMetadata.getTableName(),
-                                   entityMetadata.getPrimaryKeyColumnName(),
-                                   entityMetadata.getGeneralColumnNames())
+                                   entityMetadata.getPrimaryKey(),
+                                   entityMetadata.getGeneralColumns())
                 .id(10L)
                 .values(valueMap)
                 .toQueryString();
@@ -61,8 +61,8 @@ class InsertTest {
     void insertIntoEntityWithNoId() {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(NoAutoIncrementUser.class);
         String actual = new Insert(entityMetadata.getTableName(),
-                                   entityMetadata.getPrimaryKeyColumnName(),
-                                   entityMetadata.getGeneralColumnNames())
+                                   entityMetadata.getPrimaryKey(),
+                                   entityMetadata.getGeneralColumns())
                 .id(10L)
                 .values(Map.of("nick_name", "abc", "old", 14, "email", "a@b.com"))
                 .toQueryString();

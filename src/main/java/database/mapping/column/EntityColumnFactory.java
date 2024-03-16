@@ -8,8 +8,16 @@ public class EntityColumnFactory {
     public static EntityColumn fromField(Field field) {
         boolean isId = field.isAnnotationPresent(Id.class);
         if (isId) {
-            return PrimaryKeyEntityColumn.create(field);
+            return fromPrimaryKeyField(field);
         }
+        return fromGeneralField(field);
+    }
+
+    private static PrimaryKeyEntityColumn fromPrimaryKeyField(Field field) {
+        return PrimaryKeyEntityColumn.create(field);
+    }
+
+    public static GeneralEntityColumn fromGeneralField(Field field) {
         return GeneralEntityColumn.create(field);
     }
 }

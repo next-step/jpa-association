@@ -3,6 +3,7 @@ package database.sql.dml;
 import database.mapping.Association;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import database.mapping.column.EntityColumn;
 import database.sql.dml.part.WhereClause;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class CustomSelect {
     private static final String ASSOCIATED_TABLE_ALIAS_PREFIX = "a";
 
     private final String tableName;
-    private final List<String> allColumnNames;
+    private final List<EntityColumn> allEntityColumns;
     private final List<Association> associations;
 
     public CustomSelect(Class<?> clazz) {
@@ -25,7 +26,7 @@ public class CustomSelect {
 
     private CustomSelect(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
-        this.allColumnNames = entityMetadata.getAllColumnNames();
+        this.allEntityColumns = entityMetadata.getAllEntityColumns();
         this.associations = entityMetadata.getAssociations();
     }
 
@@ -58,8 +59,8 @@ public class CustomSelect {
     }
 
     private String primaryTableColumns() {
-        return allColumnNames.stream()
-                .map(columnName -> columnWithAlias(columnName, TABLE_ALIAS))
+        return allEntityColumns.stream()
+                .map(entityColumn -> columnWithAlias(entityColumn.getColumnName(), TABLE_ALIAS))
                 .collect(Collectors.joining(", "));
     }
 
@@ -74,9 +75,10 @@ public class CustomSelect {
         StringJoiner joiner = new StringJoiner(", ");
 
         joiner.add(columnWithAlias(association.getForeignKeyColumnName(), alias));
-        List<String> columnNames = EntityMetadataFactory.get(association.getEntityType()).getAllColumnNames();
-        for (String column : columnNames) {
-            joiner.add(columnWithAlias(column, alias));
+
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(association.getEntityType());
+        for (EntityColumn allEntityColumn : entityMetadata.getAllEntityColumns()) {
+            joiner.add(columnWithAlias(allEntityColumn.getColumnName(), alias));
         }
 
         return joiner.toString();
@@ -114,6 +116,6 @@ public class CustomSelect {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return WhereClause.from(conditionMap, allColumnNames, TABLE_ALIAS).toQuery();
+        return WhereClause.from(conditionMap, allEntityColumns, TABLE_ALIAS).toQuery();
     }
 }

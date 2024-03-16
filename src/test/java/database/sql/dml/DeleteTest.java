@@ -15,8 +15,8 @@ class DeleteTest {
     {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
         delete = new Delete(entityMetadata.getTableName(),
-                            EntityMetadataFactory.get(Person4.class).getPrimaryKeyColumnName(),
-                            EntityMetadataFactory.get(Person4.class).getAllColumnNames());
+                            entityMetadata.getAllEntityColumns(), entityMetadata.getPrimaryKey()
+        );
     }
 
     enum TestCases {
