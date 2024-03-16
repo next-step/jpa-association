@@ -34,7 +34,12 @@ class SelectQueryBuilderTest {
         ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
         WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
-        assertThat(selectQueryBuilder.toSql(tableName, columnClause, whereClause)).isEqualTo("SELECT id,nick_name,old,email FROM Person ");
+        assertThat(selectQueryBuilder.toSql(tableName, columnClause, whereClause)).isEqualTo("SELECT id,\n" +
+                "nick_name,\n" +
+                "old,\n" +
+                "email \n" +
+                " FROM Person \n" +
+                " ");
     }
 
     @DisplayName("조건문 있는 SELECT문을 반환한다.")
@@ -46,7 +51,12 @@ class SelectQueryBuilderTest {
         Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(domainType.getColumnName(), "1")));
         WhereClause whereClause = new WhereClause(criteria);
 
-        assertThat(selectQueryBuilder.toSql(tableName, columnClause, whereClause)).isEqualTo("SELECT id,nick_name,old,email FROM Person WHERE id='1'");
+        assertThat(selectQueryBuilder.toSql(tableName, columnClause, whereClause)).isEqualTo("SELECT id,\n" +
+                "nick_name,\n" +
+                "old,\n" +
+                "email \n" +
+                " FROM Person \n" +
+                " WHERE id='1'");
     }
 
 }
