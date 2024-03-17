@@ -7,5 +7,5 @@
 
 ### 🚀 2단계 - LazyLoading by Proxy
 
-- [ ] CGLib Proxy 적용
-- [ ] 조회 시 프록시 객체를 사용해 적용해보자
+- [x] CGLib Proxy 적용
+- [x] 조회 시 프록시 객체를 사용해 적용해보자
