@@ -3,6 +3,7 @@ package persistence.sql.dml.query.clause;
 import jakarta.persistence.Id;
 import persistence.sql.dml.exception.IllegalFieldValueException;
 import persistence.sql.dml.exception.InvalidFieldValueException;
+import persistence.sql.dml.exception.InvalidJoinEntityException;
 import persistence.sql.dml.exception.NotFoundFieldNameException;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.DomainTypes;
@@ -65,7 +66,7 @@ public class ValueClause {
             field.setAccessible(true);
             return (List) field.get(instance);
         } catch (Exception e) {
-            throw new IllegalFieldValueException();
+            throw new InvalidJoinEntityException();
         }
     }
 
