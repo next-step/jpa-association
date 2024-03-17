@@ -1,19 +1,18 @@
 package persistence.entity.metadata;
 
+import jakarta.persistence.JoinColumn;
+
 import java.lang.reflect.Field;
 
 public class RelationEntityTable {
-
     private final RelationType relationType;
-    private final Class<?> entity;
+    private final Class<?> entityClass;
     private Field rootField;
-    private final String joinColumnName;
 
-    public RelationEntityTable(RelationType relationType, Class<?> entity, Field rootField, String joinColumnName) {
+    public RelationEntityTable(RelationType relationType, Class<?> entityClass, Field rootField) {
         this.relationType = relationType;
-        this.entity = entity;
+        this.entityClass = entityClass;
         this.rootField = rootField;
-        this.joinColumnName = joinColumnName;
     }
 
     public RelationType getRelationType() {
@@ -21,12 +20,15 @@ public class RelationEntityTable {
     }
 
 
-    public Class<?> getEntity() {
-        return entity;
+    public Class<?> getEntityClass() {
+        return entityClass;
     }
 
-    public String getJoinColumnName() {
-        return joinColumnName;
+    public String getJoinColumn() {
+        if (rootField.isAnnotationPresent(JoinColumn.class)) {
+            return rootField.getAnnotation(JoinColumn.class).name();
+        }
+        return null;
     }
 
     public Field getRootField() {

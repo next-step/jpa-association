@@ -24,24 +24,38 @@ public class DefaultEntityLoader implements EntityLoader {
     public <T> T find(Class<T> clazz, Long id) {
         try {
             EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(clazz);
-            String sql = getSelectDefaultQuery(entityMetadata, id);
 
-            T object = jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
+            T entity = getEntity(clazz, entityMetadata, id);
+            setRelationEntity(entityMetadata, entity, id);
 
-            if (!entityMetadata.getRelationEntityTables().isEmpty()) {
-                for (RelationEntityTable relation : entityMetadata.getRelationEntityTables()) {
-                    String joinSql = getSelectJoinQuery(entityMetadata, entityMetaManager.getEntityMetadata(relation.getEntity()), relation.getJoinColumnName(), id);
-                    List<?> data = jdbcTemplate.query(joinSql, new DefaultRowMapper<>(relation.getEntity()));
-
-                    entityMetadata.setValue(object, relation.getRootField(), data);
-                }
-            }
-
-            return object;
+            return entity;
         } catch (RuntimeException e) {
             throw new RuntimeException("Entity not found", e);
         }
     }
+
+    private void setRelationEntity(EntityMetadata entityMetadata, Object entity, Long id) {
+        if (!entityMetadata.getRelationEntityTables().isEmpty()) {
+            for (RelationEntityTable relation : entityMetadata.getRelationEntityTables()) {
+                List<?> relationEntity = getRelationEntity(entityMetadata, relation, id);
+                if (!relationEntity.isEmpty()) {
+                    entityMetadata.setValue(entity, relation.getRootField(), getRelationEntity(entityMetadata, relation, id));
+                }
+            }
+        }
+    }
+
+    private <T> T getEntity(Class<T> clazz, EntityMetadata entityMetadata, Long id) {
+        String sql = getSelectDefaultQuery(entityMetadata, id);
+
+        return jdbcTemplate.queryForObject(sql, new DefaultRowMapper<>(clazz));
+    }
+
+    private List<?> getRelationEntity(EntityMetadata entityMetadata, RelationEntityTable relation, Object id) {
+        String joinSql = getSelectJoinQuery(entityMetadata, entityMetaManager.getEntityMetadata(relation.getEntityClass()), relation.getJoinColumn(), id);
+        return jdbcTemplate.query(joinSql, new DefaultRowMapper<>(relation.getEntityClass()));
+    }
+
 
     private String getSelectDefaultQuery(EntityMetadata entityMetadata, Object id) {
         return dmlQueryBuilder.selectByIdQuery(entityMetadata.getTableName(), entityMetadata.getColumns(), id);

@@ -81,9 +81,9 @@ public class DMLQueryBuilderTest {
     public void selectJoinQueryTest() {
         EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(Order.class);
         RelationEntityTable joinTable = entityMetadata.getRelationEntityTables().get(0);
-        EntityMetadata joinEntityMeta = entityMetaManager.getEntityMetadata(joinTable.getEntity());
+        EntityMetadata joinEntityMeta = entityMetaManager.getEntityMetadata(joinTable.getEntityClass());
 
-        String query = dmlQueryBuilder.selectJoinQuery(entityMetadata, joinEntityMeta, joinTable.getJoinColumnName(), 1L);
+        String query = dmlQueryBuilder.selectJoinQuery(entityMetadata, joinEntityMeta, joinTable.getJoinColumn(), 1L);
 
         assertEquals("SELECT order_items.id, order_items.product, order_items.quantity, order_items.order_id FROM orders LEFT JOIN order_items ON orders.id = order_items.order_id WHERE orders.id = 1", query);
     }

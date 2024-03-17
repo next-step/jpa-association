@@ -104,4 +104,5 @@ class EntityManagerImplTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Entity not found");
     }
+
 }

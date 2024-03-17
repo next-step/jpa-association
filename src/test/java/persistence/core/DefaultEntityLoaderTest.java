@@ -61,12 +61,13 @@ class DefaultEntityLoaderTest {
     public void findRelationEntityTest() {
         Order order = entityLoader.find(Order.class, 1L);
         List<OrderItem> orderItems = order.getOrderItems();
-        System.out.println("orderItems > " + orderItems);
 
         assertAll(
-                () -> assertNotNull(order),
-                () -> assertEquals(order.getId(), 1L),
-                () -> assertEquals(order.getOrderNumber(), "1")
+                () -> assertNotNull(orderItems),
+                () -> assertEquals(orderItems.size(), 1),
+                () -> assertEquals(orderItems.get(0).getProduct(), "product"),
+                () -> assertEquals(orderItems.get(0).getQuantity(), 2),
+                () -> assertEquals(orderItems.get(0).getOrderId(), 1L)
         );
     }
 
@@ -87,12 +88,12 @@ class DefaultEntityLoaderTest {
 
         entityPersister.insert(order);
 
-//        OrderItem orderItem = new OrderItem();
-//        orderItem.setProduct("product");
-//        orderItem.setQuantity(2);
-//        orderItem.setOrderId(1L);
-//
-//        entityPersister.insert(orderItem);
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct("product");
+        orderItem.setQuantity(2);
+        orderItem.setOrderId(1L);
+
+        entityPersister.insert(orderItem);
     }
 
 
