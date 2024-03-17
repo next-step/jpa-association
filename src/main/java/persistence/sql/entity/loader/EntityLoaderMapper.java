@@ -59,7 +59,7 @@ public class EntityLoaderMapper {
                         return;
                     }
 
-                    setField(instance, field, getValue(resultSet, domainType.getAcronyms(entityMappingTable.getTableName().getAcronyms())));
+                    setField(instance, field, getValue(resultSet, domainType.getAlias(entityMappingTable.getTableName().getAlias())));
                 });
 
         return instance;

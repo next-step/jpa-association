@@ -52,7 +52,7 @@ public class EagerSelectQueryBuilder {
                     if (domainType.isJoinColumn()) {
                         return createSubColumn(domainType);
                     }
-                    return domainType.getAcronyms(tableName.getAcronyms());
+                    return domainType.getAlias(tableName.getAlias());
                 })
                 .collect(Collectors.toList());
 
@@ -66,12 +66,12 @@ public class EagerSelectQueryBuilder {
 
         return subEntityMappingTable.getDomainTypes().getColumnName()
                 .stream()
-                .map(column -> subTableName.getAcronyms() + DOT.getValue() + column)
+                .map(column -> subTableName.getAlias() + DOT.getValue() + column)
                 .collect(Collectors.joining(LINE_COMMA.getValue()));
     }
 
     private String createFrom(EntityMappingTable mainEntityMapping) {
-        String mainTable = mainEntityMapping.getAcronymsAndTableName();
+        String mainTable = mainEntityMapping.getAliasAndTableName();
 
         String joinColumns = mainEntityMapping.getDomainTypes()
                 .getDomainTypes()
@@ -88,9 +88,9 @@ public class EagerSelectQueryBuilder {
         EntityMappingTable subEntity = EntityMappingTable.from(subClass);
 
         return String.format(LEFT_JOIN.getFormat(),
-                subEntity.getAcronymsAndTableName(),
-                domainType.getAcronyms(mainEntityMapping.getAcronyms()),
-                subEntity.getPkDomainTypes().getAcronyms(subEntity.getAcronyms()));
+                subEntity.getAliasAndTableName(),
+                domainType.getAlias(mainEntityMapping.getAlias()),
+                subEntity.getPkDomainTypes().getAlias(subEntity.getAlias()));
     }
 
 }

@@ -103,7 +103,7 @@ public class NormalDomainType implements DomainType {
     }
 
     @Override
-    public String getAcronyms(String tableName) {
+    public String getAlias(String tableName) {
         return tableName + DOT.getValue() + this.getColumnName();
     }
 

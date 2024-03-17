@@ -55,12 +55,12 @@ public class EntityMappingTable {
         return tableName;
     }
 
-    public String getAcronymsAndTableName() {
-        return getTableName().getAcronymsAndTableName();
+    public String getAliasAndTableName() {
+        return getTableName().getAliasAndTableName();
     }
 
-    public String getAcronyms() {
-        return getTableName().getAcronyms();
+    public String getAlias() {
+        return getTableName().getAlias();
     }
 
     public DomainTypes getDomainTypes() {

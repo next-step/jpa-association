@@ -20,5 +20,5 @@ public interface DomainType {
 
     boolean isJoinColumn();
 
-    String getAcronyms(String tableName);
+    String getAlias(String tableName);
 }

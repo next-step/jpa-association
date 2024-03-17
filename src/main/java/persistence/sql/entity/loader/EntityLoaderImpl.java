@@ -68,7 +68,7 @@ public class EntityLoaderImpl implements EntityLoader {
                                final PrimaryDomainType primaryDomainType,
                                final Object id,
                                final Class<T> clazz) {
-        Criterion criterion = Criterion.of(primaryDomainType.getAcronyms(entityMappingTable.getTableName().getAcronyms()), id.toString());
+        Criterion criterion = Criterion.of(primaryDomainType.getAlias(entityMappingTable.getTableName().getAlias()), id.toString());
         Criteria criteria = Criteria.ofCriteria(Collections.singletonList(criterion));
         final WhereClause whereClause = new WhereClause(criteria);
 
