@@ -60,11 +60,11 @@ public class ValueClause {
                 .orElseThrow(InvalidFieldValueException::new);
     }
 
-    private static List getObjectValue(final Object instance,
+    private static List<Object> getObjectValue(final Object instance,
                                        final Field field) {
         try {
             field.setAccessible(true);
-            return (List) field.get(instance);
+            return (List<Object>) field.get(instance);
         } catch (Exception e) {
             throw new InvalidJoinEntityException();
         }
