@@ -48,4 +48,14 @@ public class OrderItem {
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id=" + id +
+                ", product='" + product + '\'' +
+                ", quantity=" + quantity +
+                ", orderId=" + orderId +
+                '}';
+    }
 }
