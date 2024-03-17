@@ -8,10 +8,8 @@ import persistence.sql.entity.model.DomainTypes;
 import persistence.sql.entity.model.TableName;
 
 import java.util.List;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static persistence.sql.constant.SqlConstant.LINE_COMMA;
 import static persistence.sql.constant.SqlFormat.CREATE;
@@ -38,14 +36,13 @@ public class CreateQueryBuilder {
                 typeMapper,
                 constantTypeMapper);
         ForeignKeyBuilder foreignKeyBuilder = new ForeignKeyBuilder(entityMappingTable);
-        return new CreateQueryBuilder(entityMappingTable.getTableName(), columnBuilders, foreignKeyBuilder);
+        return new CreateQueryBuilder(entityMappingTable.getTable(), columnBuilders, foreignKeyBuilder);
     }
 
     private static List<ColumnBuilder> getColumnBuilders(final DomainTypes domainTypes,
                                                          final TypeMapper typeMapper,
                                                          final ConstraintsMapper constantTypeMapper) {
-        Spliterator<DomainType> spliterator = domainTypes.spliterator();
-        return StreamSupport.stream(spliterator, false)
+        return domainTypes.getDomainTypeStream()
                 .filter(DomainType::isEntityColumn)
                 .map(domainType -> new ColumnBuilder(domainType, typeMapper, constantTypeMapper))
                 .collect(Collectors.toList());

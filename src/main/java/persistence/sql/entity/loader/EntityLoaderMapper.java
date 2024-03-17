@@ -10,17 +10,15 @@ import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.SubEntityType;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.stream.StreamSupport;
 
 public class EntityLoaderMapper {
 
-    private EntityLoaderMapper() {}
+    private EntityLoaderMapper() {
+    }
 
     private static class EntityLoaderMapperSingleton {
         private static final EntityLoaderMapper ENTITY_LOADER_MAPPER = new EntityLoaderMapper();
@@ -34,12 +32,12 @@ public class EntityLoaderMapper {
         EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         T instance = createInstance(clazz);
 
-        Spliterator<DomainType> spliterator = entityMappingTable.getDomainTypes().spliterator();
-        StreamSupport.stream(spliterator, false)
+        entityMappingTable.getDomainTypeStream()
                 .forEach(domainType -> {
                     Field field = getField(clazz, domainType.getName());
                     setField(instance, field, getValue(resultSet, domainType.getColumnName()));
                 });
+
 
         return instance;
     }
@@ -48,19 +46,18 @@ public class EntityLoaderMapper {
         EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         T instance = createInstance(clazz);
 
-        Spliterator<DomainType> spliterator = entityMappingTable.getDomainTypes().spliterator();
-        StreamSupport.stream(spliterator, false)
+        entityMappingTable.getDomainTypeStream()
                 .forEach(domainType -> {
                     Field field = getField(clazz, domainType.getName());
 
-                    if(field.isAnnotationPresent(JoinColumn.class)) {
+                    if (field.isAnnotationPresent(JoinColumn.class)) {
                         List<Object> result = subObjectMapping(resultSet, domainType);
 
                         setField(instance, field, result);
                         return;
                     }
 
-                    setField(instance, field, getValue(resultSet, domainType.getAlias(entityMappingTable.getTableName().getAlias())));
+                    setField(instance, field, getValue(resultSet, domainType.getAlias(entityMappingTable.getTable().getAlias())));
                 });
 
         return instance;
@@ -76,16 +73,16 @@ public class EntityLoaderMapper {
             do {
                 Object subInstance = createInstance(subEntityType.getSubClass());
 
-                Spliterator<DomainType> subSpliterator = subEntity.getDomainTypes().spliterator();
-                StreamSupport.stream(subSpliterator, false)
+                subEntity.getDomainTypeStream()
                         .forEach(subDomainType -> {
                             Field subField = getField(subEntityType.getSubClass(), subDomainType.getName());
                             setField(subInstance,
                                     subField,
-                                    getValue(resultSet, subEntity.getTableName().getName() + "." + subDomainType.getColumnName()));
+                                    getValue(resultSet, subEntity.getTable().getName() + "." + subDomainType.getColumnName()));
                         });
+
                 result.add(subInstance);
-            } while(resultSet.next());
+            } while (resultSet.next());
         } catch (SQLException e) {
             throw new InstanceException();
         }

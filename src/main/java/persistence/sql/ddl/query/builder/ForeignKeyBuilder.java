@@ -4,8 +4,6 @@ import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.SubEntityType;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.Spliterator;
 import java.util.stream.Collectors;
 
 import static persistence.sql.constant.SqlConstant.COMMA;
@@ -31,7 +29,7 @@ public class ForeignKeyBuilder {
 
         return String.format(FOREIGN_KEY.getFormat(),
                 domainType.getColumnName(),
-                subEntity.getTableName().getName());
+                subEntity.getTableName());
     }
 
 }

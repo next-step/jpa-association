@@ -33,11 +33,11 @@ public class EntityLoaderImpl implements EntityLoader {
     @Override
     public <T> List<T> findAll(Class<T> clazz) {
         EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
-        ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        ColumnClause columnClause = new ColumnClause(entityMappingTable.getColumnName());
         WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
         String sql = selectQueryBuilder.toSql(
-                entityMappingTable.getTableName(),
+                entityMappingTable.getTable(),
                 columnClause,
                 whereClause);
 
@@ -48,7 +48,7 @@ public class EntityLoaderImpl implements EntityLoader {
     public <T> T find(Class<T> clazz, Object id) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         final PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
-        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getColumnName());
         final Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(primaryDomainType.getColumnName(), id.toString())));
         final WhereClause whereClause = new WhereClause(criteria);
 
@@ -57,7 +57,7 @@ public class EntityLoaderImpl implements EntityLoader {
         }
 
         final String sql = selectQueryBuilder.toSql(
-                entityMappingTable.getTableName(),
+                entityMappingTable.getTable(),
                 columnClause,
                 whereClause);
 
@@ -68,7 +68,7 @@ public class EntityLoaderImpl implements EntityLoader {
                                final PrimaryDomainType primaryDomainType,
                                final Object id,
                                final Class<T> clazz) {
-        Criterion criterion = Criterion.of(primaryDomainType.getAlias(entityMappingTable.getTableName().getAlias()), id.toString());
+        Criterion criterion = Criterion.of(primaryDomainType.getAlias(entityMappingTable.getTable().getAlias()), id.toString());
         Criteria criteria = Criteria.ofCriteria(Collections.singletonList(criterion));
         final WhereClause whereClause = new WhereClause(criteria);
 

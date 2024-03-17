@@ -32,7 +32,7 @@ class UpdateQueryBuilderTest {
         UpdateQueryBuilder updateQueryBuilder = UpdateQueryBuilder.getInstance();
         UpdateColumnClause updateColumnClause = UpdateColumnClause.from(entityMappingTable.getDomainTypes());
 
-        assertThat(updateQueryBuilder.toSql(entityMappingTable.getTableName(), updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
+        assertThat(updateQueryBuilder.toSql(entityMappingTable.getTable(), updateColumnClause, whereClause)).isEqualTo("UPDATE Person SET nick_name='박재성',old=20,email='jason@nextstep.com' WHERE id='1'");
     }
 
 }

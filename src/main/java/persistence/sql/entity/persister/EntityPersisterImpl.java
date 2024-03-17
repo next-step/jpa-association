@@ -39,27 +39,27 @@ public class EntityPersisterImpl implements EntityPersister {
 
         UpdateColumnClause updateColumnClause = UpdateColumnClause.from(entityMappingTable.getDomainTypes());
 
-        return jdbcTemplate.execute(updateQueryBuilder.toSql(entityMappingTable.getTableName(), updateColumnClause, whereClause));
+        return jdbcTemplate.execute(updateQueryBuilder.toSql(entityMappingTable.getTable(), updateColumnClause, whereClause));
     }
 
     @Override
     public void insert(final Object entity) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(entity.getClass());
 
-        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getColumnName());
         final ValueClause valueClause = ValueClause.from(entity, entityMappingTable.getDomainTypes());
 
-        jdbcTemplate.executeUpdate(insertQueryBuilder.toSql(entityMappingTable.getTableName(), columnClause, valueClause));
+        jdbcTemplate.executeUpdate(insertQueryBuilder.toSql(entityMappingTable.getTable(), columnClause, valueClause));
     }
 
     @Override
     public Object insertWithPk(final Object entity) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(entity.getClass());
 
-        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
+        final ColumnClause columnClause = new ColumnClause(entityMappingTable.getColumnName());
         final ValueClause valueClause = ValueClause.from(entity, entityMappingTable.getDomainTypes());
 
-        return jdbcTemplate.executeAndReturnKey(insertQueryBuilder.toSql(entityMappingTable.getTableName(), columnClause, valueClause));
+        return jdbcTemplate.executeAndReturnKey(insertQueryBuilder.toSql(entityMappingTable.getTable(), columnClause, valueClause));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class EntityPersisterImpl implements EntityPersister {
 
         final WhereClause whereClause = new WhereClause(Criteria.fromPkCriterion(primaryDomainType));
 
-        jdbcTemplate.executeUpdate(deleteQueryBuilder.toSql(entityMappingTable.getTableName(), whereClause));
+        jdbcTemplate.executeUpdate(deleteQueryBuilder.toSql(entityMappingTable.getTable(), whereClause));
     }
 
     @Override
@@ -77,6 +77,6 @@ public class EntityPersisterImpl implements EntityPersister {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         final WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
-        jdbcTemplate.execute(deleteQueryBuilder.toSql(entityMappingTable.getTableName(), whereClause));
+        jdbcTemplate.execute(deleteQueryBuilder.toSql(entityMappingTable.getTable(), whereClause));
     }
 }

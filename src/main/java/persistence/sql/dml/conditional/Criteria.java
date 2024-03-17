@@ -36,6 +36,6 @@ public class Criteria {
 
         return criterion.stream()
                 .map(Criterion::toSql)
-                .collect(Collectors.joining(AND.getValue() + BLANK.getValue()));
+                .collect(Collectors.joining(BLANK_AND.getValue()));
     }
 }

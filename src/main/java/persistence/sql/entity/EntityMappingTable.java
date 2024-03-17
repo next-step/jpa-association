@@ -7,10 +7,8 @@ import persistence.sql.entity.model.DomainTypes;
 import persistence.sql.entity.model.PrimaryDomainType;
 import persistence.sql.entity.model.TableName;
 
-import java.util.Iterator;
-import java.util.Spliterator;
+import java.util.List;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class EntityMappingTable {
 
@@ -49,7 +47,7 @@ public class EntityMappingTable {
                 null;
     }
 
-    public TableName getTableName() {
+    public TableName getTable() {
         if (table != null) {
             return new TableName(table.name());
         }
@@ -57,16 +55,24 @@ public class EntityMappingTable {
         return tableName;
     }
 
+    public String getTableName() {
+        return getTable().getName();
+    }
+
     public Stream<DomainType> getDomainTypeStream() {
         return domainTypes.getDomainTypeStream();
     }
 
+    public List<String> getColumnName() {
+        return domainTypes.getColumnName();
+    }
+
     public String getAliasAndTableName() {
-        return getTableName().getAliasAndTableName();
+        return getTable().getAliasAndTableName();
     }
 
     public String getAlias() {
-        return getTableName().getAlias();
+        return getTable().getAlias();
     }
 
     public DomainTypes getDomainTypes() {
@@ -74,8 +80,7 @@ public class EntityMappingTable {
     }
 
     public PrimaryDomainType getPkDomainTypes() {
-        Spliterator<DomainType> spliterator = domainTypes.spliterator();
-        return (PrimaryDomainType) StreamSupport.stream(spliterator, false)
+        return (PrimaryDomainType) domainTypes.getDomainTypeStream()
                 .filter(DomainType::isPrimaryDomain)
                 .findFirst()
                 .orElseThrow(NotFoundIdException::new);

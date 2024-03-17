@@ -4,10 +4,10 @@ import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.DomainTypes;
 import persistence.sql.entity.model.SubEntityType;
 import persistence.sql.entity.model.TableName;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,11 +44,9 @@ public class EagerSelectQueryBuilder {
     }
 
     private String createColumn(final EntityMappingTable mainEntityMapping) {
-        TableName tableName = mainEntityMapping.getTableName();
+        TableName tableName = mainEntityMapping.getTable();
 
-        List<String> columnList = mainEntityMapping.getDomainTypes()
-                .getDomainTypes()
-                .stream()
+        List<String> columnList = mainEntityMapping.getDomainTypeStream()
                 .map(domainType -> {
                     if (domainType.isJoinColumn()) {
                         return createSubColumn(domainType);
@@ -63,9 +61,9 @@ public class EagerSelectQueryBuilder {
     private String createSubColumn(final DomainType domainType) {
         SubEntityType subEntityType = new SubEntityType(domainType);
         EntityMappingTable subEntityMappingTable = EntityMappingTable.from(subEntityType.getSubClass());
-        TableName subTableName = subEntityMappingTable.getTableName();
+        TableName subTableName = subEntityMappingTable.getTable();
 
-        return subEntityMappingTable.getDomainTypes().getColumnName()
+        return subEntityMappingTable.getColumnName()
                 .stream()
                 .map(column -> subTableName.getAlias() + DOT.getValue() + column)
                 .collect(Collectors.joining(LINE_COMMA.getValue()));
@@ -74,9 +72,7 @@ public class EagerSelectQueryBuilder {
     private String createFrom(EntityMappingTable mainEntityMapping) {
         String mainTable = mainEntityMapping.getAliasAndTableName();
 
-        String joinColumns = mainEntityMapping.getDomainTypes()
-                .getDomainTypes()
-                .stream()
+        String joinColumns = mainEntityMapping.getDomainTypeStream()
                 .filter(DomainType::isJoinColumn)
                 .map(domainType -> createJoinTable(mainEntityMapping, domainType))
                 .collect(Collectors.joining(LINE_COMMA.getValue()));

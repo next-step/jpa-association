@@ -49,7 +49,7 @@ public class ValueClause {
     }
 
     private static String getJoinEntity(final Object instance, final DomainType domainType) {
-        List value = getObjectValue(instance, getField(instance.getClass(), domainType.getName()));
+        List<Object> value = getObjectValue(instance, getField(instance.getClass(), domainType.getName()));
         Object subInstance = value.get(ZERO);
 
         return Arrays.stream(value.get(ZERO).getClass()
