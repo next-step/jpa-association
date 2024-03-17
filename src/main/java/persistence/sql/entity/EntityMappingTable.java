@@ -7,7 +7,9 @@ import persistence.sql.entity.model.DomainTypes;
 import persistence.sql.entity.model.PrimaryDomainType;
 import persistence.sql.entity.model.TableName;
 
+import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class EntityMappingTable {
@@ -53,6 +55,10 @@ public class EntityMappingTable {
         }
 
         return tableName;
+    }
+
+    public Stream<DomainType> getDomainTypeStream() {
+        return domainTypes.getDomainTypeStream();
     }
 
     public String getAliasAndTableName() {

@@ -2,8 +2,10 @@ package persistence.sql.ddl.query.builder;
 
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.SubEntityType;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Spliterator;
 import java.util.stream.Collectors;
 
 import static persistence.sql.constant.SqlConstant.COMMA;
@@ -17,19 +19,19 @@ public class ForeignKeyBuilder {
     }
 
     public String toSql() {
-        return entityMappingTable.getDomainTypes().getDomainTypes()
-                .stream()
+        return entityMappingTable.getDomainTypeStream()
                 .filter(DomainType::isJoinColumn)
                 .map(this::getForeignKey)
                 .collect(Collectors.joining(COMMA.getValue()));
     }
 
     private String getForeignKey(final DomainType domainType) {
-        Class<?> subClass = (Class<?>) ((ParameterizedType) domainType.getField().getGenericType()).getActualTypeArguments()[0];
-        EntityMappingTable subEntity = EntityMappingTable.from(subClass);
+        SubEntityType subEntityType = new SubEntityType(domainType);
+        EntityMappingTable subEntity = EntityMappingTable.from(subEntityType.getSubClass());
 
         return String.format(FOREIGN_KEY.getFormat(),
-                domainType.getColumnName(), subEntity.getTableName().getName());
+                domainType.getColumnName(),
+                subEntity.getTableName().getName());
     }
 
 }

@@ -4,6 +4,7 @@ import persistence.sql.dml.query.clause.ColumnClause;
 import persistence.sql.dml.query.clause.WhereClause;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.SubEntityType;
 import persistence.sql.entity.model.TableName;
 
 import java.lang.reflect.ParameterizedType;
@@ -60,8 +61,8 @@ public class EagerSelectQueryBuilder {
     }
 
     private String createSubColumn(final DomainType domainType) {
-        Class<?> subClass = (Class<?>) ((ParameterizedType) domainType.getField().getGenericType()).getActualTypeArguments()[0];
-        EntityMappingTable subEntityMappingTable = EntityMappingTable.from(subClass);
+        SubEntityType subEntityType = new SubEntityType(domainType);
+        EntityMappingTable subEntityMappingTable = EntityMappingTable.from(subEntityType.getSubClass());
         TableName subTableName = subEntityMappingTable.getTableName();
 
         return subEntityMappingTable.getDomainTypes().getColumnName()
@@ -84,8 +85,8 @@ public class EagerSelectQueryBuilder {
     }
 
     private String createJoinTable(final EntityMappingTable mainEntityMapping, final DomainType domainType) {
-        Class<?> subClass = (Class<?>) ((ParameterizedType) domainType.getField().getGenericType()).getActualTypeArguments()[0];
-        EntityMappingTable subEntity = EntityMappingTable.from(subClass);
+        SubEntityType subEntityType = new SubEntityType(domainType);
+        EntityMappingTable subEntity = EntityMappingTable.from(subEntityType.getSubClass());
 
         return String.format(LEFT_JOIN.getFormat(),
                 subEntity.getAliasAndTableName(),

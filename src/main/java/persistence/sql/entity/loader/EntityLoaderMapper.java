@@ -7,6 +7,7 @@ import persistence.sql.dml.exception.InvalidFieldValueException;
 import persistence.sql.dml.exception.NotFoundFieldException;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
+import persistence.sql.entity.model.SubEntityType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -68,17 +69,17 @@ public class EntityLoaderMapper {
     private List<Object> subObjectMapping(ResultSet resultSet, DomainType domainType) {
         List<Object> result = new ArrayList<>();
 
-        Class<?> subClass = (Class<?>) ((ParameterizedType) domainType.getField().getGenericType()).getActualTypeArguments()[0];
-        EntityMappingTable subEntity = EntityMappingTable.from(subClass);
+        SubEntityType subEntityType = new SubEntityType(domainType);
+        EntityMappingTable subEntity = EntityMappingTable.from(subEntityType.getSubClass());
 
         try {
             do {
-                Object subInstance = createInstance(subClass);
+                Object subInstance = createInstance(subEntityType.getSubClass());
 
                 Spliterator<DomainType> subSpliterator = subEntity.getDomainTypes().spliterator();
                 StreamSupport.stream(subSpliterator, false)
                         .forEach(subDomainType -> {
-                            Field subField = getField(subClass, subDomainType.getName());
+                            Field subField = getField(subEntityType.getSubClass(), subDomainType.getName());
                             setField(subInstance,
                                     subField,
                                     getValue(resultSet, subEntity.getTableName().getName() + "." + subDomainType.getColumnName()));
