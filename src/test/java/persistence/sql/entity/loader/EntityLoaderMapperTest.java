@@ -44,7 +44,7 @@ class EntityLoaderMapperTest extends H2Database {
         final ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
         WhereClause whereClause = new WhereClause(Criteria.fromPkCriterion(primaryDomainType));
 
-        String sql = selectQueryBuilder.toSql(entityMappingTable.getTableName(), columnClause, whereClause);
+        String sql = selectQueryBuilder.toSql(entityMappingTable.getTable(), columnClause, whereClause);
 
         Person person = executeQuery(sql);
 

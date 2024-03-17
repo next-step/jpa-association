@@ -9,7 +9,8 @@ public enum SqlConstant {
     LINE_COMMA(",\n"),
     LINE("\n"),
     DOT("."),
-    AND("AND");
+    AND("AND"),
+    BLANK_AND("AND ");
 
     private final String value;
 

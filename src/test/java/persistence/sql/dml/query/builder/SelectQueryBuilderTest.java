@@ -30,7 +30,7 @@ class SelectQueryBuilderTest {
     @DisplayName("조건문 없는 SELECT문을 반환한다.")
     @Test
     void sqlTest() {
-        TableName tableName = entityMappingTable.getTableName();
+        TableName tableName = entityMappingTable.getTable();
         ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
         WhereClause whereClause = new WhereClause(Criteria.emptyInstance());
 
@@ -45,7 +45,7 @@ class SelectQueryBuilderTest {
     @DisplayName("조건문 있는 SELECT문을 반환한다.")
     @Test
     void whereSqlTest() {
-        TableName tableName = entityMappingTable.getTableName();
+        TableName tableName = entityMappingTable.getTable();
         ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
         DomainType domainType = entityMappingTable.getPkDomainTypes();
         Criteria criteria = Criteria.ofCriteria(Collections.singletonList(Criterion.of(domainType.getColumnName(), "1")));

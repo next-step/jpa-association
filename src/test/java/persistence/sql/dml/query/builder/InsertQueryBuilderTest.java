@@ -22,7 +22,7 @@ class InsertQueryBuilderTest {
         ColumnClause columnClause = new ColumnClause(entityMappingTable.getDomainTypes().getColumnName());
         ValueClause valueClause = ValueClause.from(person, entityMappingTable.getDomainTypes());
 
-        String sql = insertQueryBuilder.toSql(entityMappingTable.getTableName(), columnClause, valueClause);
+        String sql = insertQueryBuilder.toSql(entityMappingTable.getTable(), columnClause, valueClause);
 
         assertThat(sql).isEqualTo("INSERT INTO Person (id,\n" +
                 "nick_name,\n" +

@@ -31,7 +31,7 @@ class EagerSelectQueryBuilderTest {
     @Test
     @DisplayName("joinColumn 이 있는 엔티티에서 쿼리문을 반환한다.")
     void eagerToSql() {
-        String asName = orderEntityMappingTable.getAcronyms();
+        String asName = orderEntityMappingTable.getAlias();
         String pkName = orderEntityMappingTable.getPkDomainTypes().getColumnName();
 
         Criteria criteria = Criteria.ofCriteria(List.of(Criterion.of(asName + "." + pkName, "1")));
@@ -52,7 +52,7 @@ class EagerSelectQueryBuilderTest {
     @DisplayName("joinColunn이 없는 엔티티에서 쿼리문을 반환한다.")
     @Test
     void lazyToSql() {
-        String asName = personEntityMappingTable.getAcronyms();
+        String asName = personEntityMappingTable.getAlias();
         String pkName = personEntityMappingTable.getPkDomainTypes().getColumnName();
 
         Criteria criteria = Criteria.ofCriteria(List.of(Criterion.of(asName + "." + pkName, "1")));

@@ -3,6 +3,7 @@ package persistence.sql.dml.query.clause;
 import jakarta.persistence.Id;
 import persistence.sql.dml.exception.IllegalFieldValueException;
 import persistence.sql.dml.exception.InvalidFieldValueException;
+import persistence.sql.dml.exception.InvalidJoinEntityException;
 import persistence.sql.dml.exception.NotFoundFieldNameException;
 import persistence.sql.entity.model.DomainType;
 import persistence.sql.entity.model.DomainTypes;
@@ -48,7 +49,7 @@ public class ValueClause {
     }
 
     private static String getJoinEntity(final Object instance, final DomainType domainType) {
-        List value = getObjectValue(instance, getField(instance.getClass(), domainType.getName()));
+        List<Object> value = getObjectValue(instance, getField(instance.getClass(), domainType.getName()));
         Object subInstance = value.get(ZERO);
 
         return Arrays.stream(value.get(ZERO).getClass()
@@ -59,13 +60,13 @@ public class ValueClause {
                 .orElseThrow(InvalidFieldValueException::new);
     }
 
-    private static List getObjectValue(final Object instance,
+    private static List<Object> getObjectValue(final Object instance,
                                        final Field field) {
         try {
             field.setAccessible(true);
-            return (List) field.get(instance);
+            return (List<Object>) field.get(instance);
         } catch (Exception e) {
-            throw new IllegalFieldValueException();
+            throw new InvalidJoinEntityException();
         }
     }
 

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DomainTypes implements Iterable<DomainType> {
 
@@ -35,6 +36,10 @@ public class DomainTypes implements Iterable<DomainType> {
 
     public List<DomainType> getDomainTypes() {
         return domainTypes;
+    }
+
+    public Stream<DomainType> getDomainTypeStream() {
+        return domainTypes.stream();
     }
 
     public List<String> getColumnName() {

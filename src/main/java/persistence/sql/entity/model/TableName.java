@@ -14,14 +14,14 @@ public class TableName {
         return name;
     }
 
-    public String getAcronyms() {
+    public String getAlias() {
         return name.replaceAll(UNDER.getValue(), EMPTY.getValue())
                 .toLowerCase();
     }
 
-    public String getAcronymsAndTableName() {
+    public String getAliasAndTableName() {
         return getName() +
                 BLANK.getValue() +
-                getAcronyms();
+                getAlias();
     }
 }
