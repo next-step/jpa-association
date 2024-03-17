@@ -8,10 +8,9 @@ import java.util.stream.Collectors;
 public class Table {
 
     private final String name;
-
     private final Map<String, Column> columns;
-
     private final PrimaryKey primaryKey;
+    private List<TableJoin> tableJoins;
 
     public Table(String name) {
         this.name = name;
