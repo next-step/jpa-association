@@ -98,8 +98,6 @@ class EntityManagerImplTest {
 
         entityManager.persist(person);
 
-        System.out.println("------------------------------------------- remove start ");
-
         entityManager.remove(person);
 
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))

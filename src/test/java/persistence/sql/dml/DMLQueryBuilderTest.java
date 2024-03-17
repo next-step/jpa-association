@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.core.EntityMetaManager;
+import persistence.entity.Order;
 import persistence.entity.Person;
 import persistence.entity.metadata.EntityMetadata;
+import persistence.entity.metadata.RelationEntityTable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,7 +35,7 @@ public class DMLQueryBuilderTest {
         EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
         String query = dmlQueryBuilder.insertSql(entityMetadata.getTableName(), entityMetadata.getColumns(), entityMetadata.getColumnValues(person));
 
-        assertEquals("INSERT INTO users (nick_name, old, email) VALUES ('"+name+"', "+age+", '"+email+"')", query);
+        assertEquals("INSERT INTO users (nick_name, old, email) VALUES ('" + name + "', " + age + ", '" + email + "')", query);
     }
 
     @Test
@@ -51,7 +53,7 @@ public class DMLQueryBuilderTest {
         EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
         String query = dmlQueryBuilder.selectByIdQuery(entityMetadata.getTableName(), entityMetadata.getColumns(), 1L);
 
-        assertEquals("SELECT id, nick_name, old, email FROM users WHERE id = 1", query);
+        assertEquals("SELECT users.id, users.nick_name, users.old, users.email FROM users WHERE users.id = 1", query);
     }
 
     @Test
@@ -71,6 +73,19 @@ public class DMLQueryBuilderTest {
         EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(person.getClass());
         String query = dmlQueryBuilder.updateSql(entityMetadata.getTableName(), entityMetadata.getColumns(), entityMetadata.getColumnValues(person));
 
-        assertEquals("UPDATE users SET nick_name = '"+name+"', old = "+age+", email = '"+email+"' WHERE id = 1", query);
+        assertEquals("UPDATE users SET nick_name = '" + name + "', old = " + age + ", email = '" + email + "' WHERE id = 1", query);
     }
+
+    @Test
+    @DisplayName("join query 생성")
+    public void selectJoinQueryTest() {
+        EntityMetadata entityMetadata = entityMetaManager.getEntityMetadata(Order.class);
+        RelationEntityTable joinTable = entityMetadata.getRelationEntityTables().get(0);
+        EntityMetadata joinEntityMeta = entityMetaManager.getEntityMetadata(joinTable.getEntity());
+
+        String query = dmlQueryBuilder.selectJoinQuery(entityMetadata, joinEntityMeta, joinTable.getJoinColumnName(), 1L);
+
+        assertEquals("SELECT order_items.id, order_items.product, order_items.quantity, order_items.order_id FROM orders LEFT JOIN order_items ON orders.id = order_items.order_id WHERE orders.id = 1", query);
+    }
+
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.GenerationType;
 import java.lang.reflect.Field;
 
 public class EntityColumn {
+    private String tableName;
     private Field field;
     private String fieldName;
     private String columnName;
@@ -13,6 +14,14 @@ public class EntityColumn {
     private boolean isNullable;
     private GenerationType generationType;
     private int length;
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
 
     public Field getField() {
         return field;
@@ -111,4 +120,5 @@ public class EntityColumn {
             throw new RuntimeException(e);
         }
     }
+
 }

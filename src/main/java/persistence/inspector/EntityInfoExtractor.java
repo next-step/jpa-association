@@ -1,13 +1,19 @@
 package persistence.inspector;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EntityInfoExtractor {
+
+    private static List<Class<? extends Annotation>> RELATIONSHIP_ANNOTATIONS =
+            Arrays.asList(OneToMany.class, ManyToOne.class, OneToOne.class, ManyToMany.class);
 
     public static String getColumnName(Field field) {
         return EntityFieldInspector.getColumnName(field);
@@ -26,11 +32,30 @@ public class EntityInfoExtractor {
         return EntityFieldInspector.hasAnnotation(id, Id.class);
     }
 
+    public static List<Field> getAllFields(Class<?> clazz) {
+        return ClsssMetadataInspector.getAllFields(clazz);
+    }
+
     public static List<Field> getColumns(Class<?> clazz) {
         return ClsssMetadataInspector.getAllFields(clazz)
                 .stream()
                 .filter(EntityFieldInspector::isPersistable)
                     .collect(Collectors.toList());
     }
+
+    public static boolean isRelationshipField(Field field) {
+        return RELATIONSHIP_ANNOTATIONS.stream()
+                .anyMatch(annotation -> field.isAnnotationPresent(annotation));
+    }
+
+    public static Class<?> getFieldClassType(Field field) {
+        if (field.getGenericType() instanceof ParameterizedType) {
+            ParameterizedType genericType = (ParameterizedType) field.getGenericType();
+            Type[] actualTypeArguments = genericType.getActualTypeArguments();
+            return (Class<?>) actualTypeArguments[0];
+        }
+        return field.getType();
+    }
+
 
 }

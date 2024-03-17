@@ -2,9 +2,7 @@ package persistence.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.entity.Person;
-import persistence.entity.Person1;
-import persistence.entity.Person2;
+import persistence.entity.*;
 import persistence.entity.metadata.EntityMetadata;
 import persistence.entity.metadata.EntityMetadataBuilder;
 
@@ -32,6 +30,8 @@ public class EntityMetaManager {
         putEntityMetadata(Person.class);
         putEntityMetadata(Person1.class);
         putEntityMetadata(Person2.class);
+        putEntityMetadata(Order.class);
+        putEntityMetadata(OrderItem.class);
     }
 
     protected EntityMetadata putEntityMetadata(Class<?> clazz) {

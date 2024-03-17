@@ -35,4 +35,6 @@ public class ClsssMetadataInspector extends EntityFieldInspector{
             .collect(Collectors.toList());
     }
 
+
+
 }

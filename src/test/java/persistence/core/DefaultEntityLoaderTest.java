@@ -7,9 +7,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.entity.Order;
+import persistence.entity.OrderItem;
 import persistence.entity.Person;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,6 +33,7 @@ class DefaultEntityLoaderTest {
         entityLoader = new DefaultEntityLoader(jdbcTemplate);
 
         createTable();
+        insertSampleData(2);
     }
 
     @AfterEach
@@ -41,7 +45,6 @@ class DefaultEntityLoaderTest {
     @Test
     @DisplayName("findById Test")
     public void findTest() throws Exception {
-        insertSampleData(5);
 
         Person select = entityLoader.find(Person.class, 2L);
 
@@ -51,8 +54,22 @@ class DefaultEntityLoaderTest {
                 () -> assertEquals(select.getName(), "jinny_1"),
                 () -> assertEquals(select.getAge(), 31)
         );
-
     }
+
+    @Test
+    @DisplayName("find with RelationEntity Test")
+    public void findRelationEntityTest() {
+        Order order = entityLoader.find(Order.class, 1L);
+        List<OrderItem> orderItems = order.getOrderItems();
+        System.out.println("orderItems > " + orderItems);
+
+        assertAll(
+                () -> assertNotNull(order),
+                () -> assertEquals(order.getId(), 1L),
+                () -> assertEquals(order.getOrderNumber(), "1")
+        );
+    }
+
 
     private void insertSampleData(int count) {
         for (int i = 0; i < count; i++) {
@@ -63,15 +80,32 @@ class DefaultEntityLoaderTest {
 
             entityPersister.insert(person);
         }
+
+        Order order = new Order();
+        order.setId(1L);
+        order.setOrderNumber("1");
+
+        entityPersister.insert(order);
+
+//        OrderItem orderItem = new OrderItem();
+//        orderItem.setProduct("product");
+//        orderItem.setQuantity(2);
+//        orderItem.setOrderId(1L);
+//
+//        entityPersister.insert(orderItem);
     }
 
 
     private void createTable() {
         ddlExcuteor.createTable(Person.class);
+        ddlExcuteor.createTable(Order.class);
+        ddlExcuteor.createTable(OrderItem.class);
     }
 
     private void dropTable() {
         ddlExcuteor.dropTable(Person.class);
+        ddlExcuteor.dropTable(Order.class);
+        ddlExcuteor.dropTable(OrderItem.class);
     }
 
 }
