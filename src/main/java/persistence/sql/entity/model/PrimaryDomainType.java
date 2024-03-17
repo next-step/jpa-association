@@ -7,6 +7,8 @@ import persistence.sql.dml.exception.InvalidFieldValueException;
 
 import java.lang.reflect.Field;
 
+import static persistence.sql.constant.SqlConstant.DOT;
+
 public class PrimaryDomainType implements DomainType {
 
     private final Field field;
@@ -79,5 +81,20 @@ public class PrimaryDomainType implements DomainType {
     @Override
     public Class<?> getClassType() {
         return entityColumn.getClassType();
+    }
+
+    @Override
+    public boolean isJoinColumn() {
+        return false;
+    }
+
+    @Override
+    public Field getField() {
+        return field;
+    }
+
+    @Override
+    public String getAcronyms(String tableName) {
+        return tableName + DOT.getValue() + this.getColumnName();
     }
 }

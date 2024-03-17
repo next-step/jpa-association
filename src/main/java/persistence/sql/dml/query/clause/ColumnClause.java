@@ -2,7 +2,7 @@ package persistence.sql.dml.query.clause;
 
 import java.util.List;
 
-import static persistence.sql.constant.SqlConstant.COMMA;
+import static persistence.sql.constant.SqlConstant.LINE_COMMA;
 
 public class ColumnClause {
 
@@ -13,7 +13,7 @@ public class ColumnClause {
     }
 
     public String toSql() {
-        return String.join(COMMA.getValue(), columns);
+        return String.join(LINE_COMMA.getValue(), columns);
     }
 
 }

@@ -2,6 +2,8 @@ package persistence.sql.db;
 
 import database.DatabaseServer;
 import database.H2;
+import domain.Order;
+import domain.OrderItem;
 import domain.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,10 +12,7 @@ import persistence.sql.ddl.query.builder.DropQueryBuilder;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.DialectResolutionInfo;
 import persistence.sql.dialect.database.Database;
-import persistence.sql.dml.query.builder.DeleteQueryBuilder;
-import persistence.sql.dml.query.builder.InsertQueryBuilder;
-import persistence.sql.dml.query.builder.SelectQueryBuilder;
-import persistence.sql.dml.query.builder.UpdateQueryBuilder;
+import persistence.sql.dml.query.builder.*;
 import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.loader.EntityLoader;
 import persistence.sql.entity.loader.EntityLoaderImpl;
@@ -28,12 +27,14 @@ import java.sql.SQLException;
 public abstract class H2Database {
 
     protected static EntityMappingTable entityMappingTable;
+    protected static EntityMappingTable eagerEntityMappingTable;
 
     protected static DatabaseServer server;
 
     protected static JdbcTemplate jdbcTemplate;
 
     protected static SelectQueryBuilder selectQueryBuilder;
+    protected static EagerSelectQueryBuilder eagerSelectQueryBuilder;
     protected static InsertQueryBuilder insertQueryBuilder;
     protected static UpdateQueryBuilder updateQueryBuilder;
     protected static DeleteQueryBuilder deleteQueryBuilder;
@@ -51,6 +52,7 @@ public abstract class H2Database {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         selectQueryBuilder = SelectQueryBuilder.getInstance();
+        eagerSelectQueryBuilder = EagerSelectQueryBuilder.getInstance();
         insertQueryBuilder = InsertQueryBuilder.getInstance();
         updateQueryBuilder = UpdateQueryBuilder.getInstance();
         deleteQueryBuilder = DeleteQueryBuilder.getInstance();
@@ -64,7 +66,8 @@ public abstract class H2Database {
         entityLoader = new EntityLoaderImpl(
                 jdbcTemplate,
                 entityLoaderMapper,
-                selectQueryBuilder);
+                selectQueryBuilder,
+                eagerSelectQueryBuilder);
         entityManager = new EntityManagerImpl(entityLoader, entityPersister);
 
         createTable();
@@ -77,7 +80,20 @@ public abstract class H2Database {
         CreateQueryBuilder createQueryBuilder = CreateQueryBuilder.of(entityMappingTable, dialect.getTypeMapper(), dialect.getConstantTypeMapper());
         DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(entityMappingTable);
 
+        eagerEntityMappingTable = EntityMappingTable.from(Order.class);
+        CreateQueryBuilder eagerCreateBuilder = CreateQueryBuilder.of(eagerEntityMappingTable, dialect.getTypeMapper(), dialect.getConstantTypeMapper());
+        DropQueryBuilder eagerDropBuilder = new DropQueryBuilder(eagerEntityMappingTable);
+
+        EntityMappingTable orderItemEntityMappingTable = EntityMappingTable.from(OrderItem.class);
+        CreateQueryBuilder orderItemCreateBuilder = CreateQueryBuilder.of(orderItemEntityMappingTable, dialect.getTypeMapper(), dialect.getConstantTypeMapper());
+        DropQueryBuilder orderItemDropBuilder = new DropQueryBuilder(orderItemEntityMappingTable);
+
         jdbcTemplate.execute(dropQueryBuilder.toSql());
+        jdbcTemplate.execute(eagerDropBuilder.toSql());
+        jdbcTemplate.execute(orderItemDropBuilder.toSql());
+
         jdbcTemplate.execute(createQueryBuilder.toSql());
+        jdbcTemplate.execute(orderItemCreateBuilder.toSql());
+        jdbcTemplate.execute(eagerCreateBuilder.toSql());
     }
 }

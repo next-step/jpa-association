@@ -5,6 +5,10 @@ public enum SqlConstant {
     EMPTY(""),
     BLANK(" "),
     COMMA(","),
+    UNDER("_"),
+    LINE_COMMA(",\n"),
+    LINE("\n"),
+    DOT("."),
     AND("AND");
 
     private final String value;

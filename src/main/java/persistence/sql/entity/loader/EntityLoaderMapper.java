@@ -1,5 +1,6 @@
 package persistence.sql.entity.loader;
 
+import jakarta.persistence.JoinColumn;
 import persistence.sql.dml.exception.FieldSetValueException;
 import persistence.sql.dml.exception.InstanceException;
 import persistence.sql.dml.exception.InvalidFieldValueException;
@@ -8,7 +9,11 @@ import persistence.sql.entity.EntityMappingTable;
 import persistence.sql.entity.model.DomainType;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.StreamSupport;
 
@@ -36,6 +41,54 @@ public class EntityLoaderMapper {
                 });
 
         return instance;
+    }
+
+    public <T> T eagerMapper(Class<T> clazz, ResultSet resultSet) {
+        EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
+        T instance = createInstance(clazz);
+
+        Spliterator<DomainType> spliterator = entityMappingTable.getDomainTypes().spliterator();
+        StreamSupport.stream(spliterator, false)
+                .forEach(domainType -> {
+                    Field field = getField(clazz, domainType.getName());
+
+                    if(field.isAnnotationPresent(JoinColumn.class)) {
+                        List<Object> result = subObjectMapping(resultSet, domainType);
+
+                        setField(instance, field, result);
+                        return;
+                    }
+
+                    setField(instance, field, getValue(resultSet, domainType.getAcronyms(entityMappingTable.getTableName().getAcronyms())));
+                });
+
+        return instance;
+    }
+
+    private List<Object> subObjectMapping(ResultSet resultSet, DomainType domainType) {
+        List<Object> result = new ArrayList<>();
+
+        Class<?> subClass = (Class<?>) ((ParameterizedType) domainType.getField().getGenericType()).getActualTypeArguments()[0];
+        EntityMappingTable subEntity = EntityMappingTable.from(subClass);
+
+        try {
+            do {
+                Object subInstance = createInstance(subClass);
+
+                Spliterator<DomainType> subSpliterator = subEntity.getDomainTypes().spliterator();
+                StreamSupport.stream(subSpliterator, false)
+                        .forEach(subDomainType -> {
+                            Field subField = getField(subClass, subDomainType.getName());
+                            setField(subInstance,
+                                    subField,
+                                    getValue(resultSet, subEntity.getTableName().getName() + "." + subDomainType.getColumnName()));
+                        });
+                result.add(subInstance);
+            } while(resultSet.next());
+        } catch (SQLException e) {
+            throw new InstanceException();
+        }
+        return result;
     }
 
     private <T> T createInstance(final Class<T> clazz) {

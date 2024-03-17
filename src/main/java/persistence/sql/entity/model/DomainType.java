@@ -1,5 +1,7 @@
 package persistence.sql.entity.model;
 
+import java.lang.reflect.Field;
+
 public interface DomainType {
 
     boolean isPrimaryDomain();
@@ -14,4 +16,9 @@ public interface DomainType {
 
     Class<?> getClassType();
 
+    Field getField();
+
+    boolean isJoinColumn();
+
+    String getAcronyms(String tableName);
 }
