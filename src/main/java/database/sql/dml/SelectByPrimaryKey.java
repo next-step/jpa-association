@@ -8,8 +8,8 @@ public class SelectByPrimaryKey {
     private final Select select;
     private Long id;
 
-    public SelectByPrimaryKey(String tableName, List<EntityColumn> allEntityColumns) {
-        select = new Select(tableName, allEntityColumns);
+    public SelectByPrimaryKey(String tableName, List<String> allFieldNames) {
+        select = new Select(tableName, allFieldNames);
     }
 
     public SelectByPrimaryKey byId(Long id) {

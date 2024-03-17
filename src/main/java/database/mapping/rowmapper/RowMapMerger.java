@@ -1,11 +1,17 @@
 package database.mapping.rowmapper;
 
+import database.dialect.Dialect;
 import database.mapping.Association;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import jdbc.JdbcTemplate;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.LazyLoader;
+import persistence.entity.database.EntityLoader;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -13,10 +19,17 @@ import java.util.stream.Collectors;
 public class RowMapMerger<T> {
     private final List<RowMap<T>> rowMaps;
     private final Class<T> clazz;
+    private final List<Association> associations;
+    private final JdbcTemplate jdbcTemplate;
+    private final Dialect dialect;
 
-    public RowMapMerger(List<RowMap<T>> rowMaps, Class<T> clazz) {
+    public RowMapMerger(List<RowMap<T>> rowMaps, Class<T> clazz, List<Association> associations,
+                        JdbcTemplate jdbcTemplate, Dialect dialect) {
         this.rowMaps = rowMaps;
         this.clazz = clazz;
+        this.associations = associations;
+        this.jdbcTemplate = jdbcTemplate;
+        this.dialect = dialect;
     }
 
     public Optional<T> merge() {
@@ -26,14 +39,26 @@ public class RowMapMerger<T> {
 
         T entity = rowMaps.get(0).getParentEntity();
 
-        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        List<Association> associations = entityMetadata.getAssociations();
-        for (Association association : associations) {
-            // TODO: 연관관계가 Collection 이 아니면 달라져야 함
-            setFieldValue(entity, association.getFieldName(), filterEntitiesByType(association.getEntityType()));
+        for (Association association : this.associations) {
+            if (association.isLazyLoad()) {
+                setFieldValue(entity, association.getFieldName(), lazyLoadProxy(association));
+            } else {
+                // TODO: 연관관계가 Collection 이 아니면 달라져야 함
+                setFieldValue(entity, association.getFieldName(), filterEntitiesByType(association.getEntityType()));
+            }
         }
 
         return Optional.of(entity);
+    }
+
+    private Object lazyLoadProxy(Association association) {
+        Class<?> entityType = association.getAssociationType(); // XXX 코드정리
+        Class<?> entityType1 = association.getEntityType();
+
+        return Enhancer.create(entityType, (LazyLoader) () -> {
+            EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
+            return entityLoader.load(entityType1, Map.of(association.getForeignKeyColumnName(), 1L));
+        });
     }
 
     private <R> void setFieldValue(R entity, String fieldName, Object value) {

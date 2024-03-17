@@ -37,7 +37,7 @@ public class Update {
     }
 
     public Update byId(long id) {
-        this.where = WhereClause.from(Map.of(primaryKey.getColumnName(), id), List.of(primaryKey));
+        this.where = WhereClause.from(Map.of(primaryKey.getColumnName(), id), List.of(primaryKey.getColumnName()));
         return this;
     }
 

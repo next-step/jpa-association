@@ -46,7 +46,7 @@ class SelectTest {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(entityClass);
         return new Select(
                 entityMetadata.getTableName(),
-                entityMetadata.getAllEntityColumns());
+                entityMetadata.getAllFieldNames());
     }
 
 }

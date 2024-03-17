@@ -13,7 +13,7 @@ class SelectByPrimaryKeyTest {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
         selectByPrimaryKey = new SelectByPrimaryKey(
                 entityMetadata.getTableName(),
-                entityMetadata.getAllEntityColumns()
+                entityMetadata.getAllFieldNames()
         );
     }
 

@@ -18,10 +18,11 @@ public class CustomSelect {
     private static final String SELECT = "SELECT %s FROM %s";
     private static final String QUERY_WITH_WHERE = "%s WHERE %s";
     private static final String LEFT_JOIN_CLAUSE = "LEFT JOIN %s ON %s = %s";
-    public static final String COLUMNS_DELIMITER = ", ";
+    private static final String COLUMNS_DELIMITER = ", ";
 
     private final String tableName;
     private final List<EntityColumn> allEntityColumns;
+    private final List<String> allFieldNames;
     private final List<Association> associations;
 
     public CustomSelect(Class<?> clazz) {
@@ -31,6 +32,7 @@ public class CustomSelect {
     private CustomSelect(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.allEntityColumns = entityMetadata.getAllEntityColumns();
+        this.allFieldNames = entityMetadata.getAllFieldNames();
         this.associations = entityMetadata.getAssociations();
     }
 
@@ -51,6 +53,7 @@ public class CustomSelect {
         List<String> columns = new LinkedList<>();
         columns.addAll(primaryTableColumns());
         for (int tableIndex = 0; tableIndex < associations.size(); tableIndex++) {
+            if (associations.get(tableIndex).isLazyLoad()) continue;
             columns.addAll(associatedTableColumns(tableIndex));
         }
 
@@ -82,6 +85,7 @@ public class CustomSelect {
     private List<String> joins() {
         List<String> joins = new ArrayList<>();
         for (int index = 0; index < associations.size(); index++) {
+            if (associations.get(index).isLazyLoad()) continue;
             joins.add(eachJoin(index));
         }
         return joins;
@@ -110,7 +114,7 @@ public class CustomSelect {
     }
 
     private String whereClause(Map<String, Object> conditionMap) {
-        return WhereClause.from(conditionMap, allEntityColumns, TABLE_ALIAS)
+        return WhereClause.from(conditionMap, allFieldNames, TABLE_ALIAS)
                 .withWhereClause(false)
                 .toQuery();
     }

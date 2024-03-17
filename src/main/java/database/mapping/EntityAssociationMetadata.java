@@ -52,14 +52,7 @@ public class EntityAssociationMetadata {
     public List<Association> getAssociations() {
         return associationFields.stream()
                 .filter(EntityAssociationMetadata::checkAssociationAnnotation)
-                .map(field -> {
-                    JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-                    String foreignKeyColumnName = joinColumn.name();
-                    Type[] actualTypeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-                    Class<?> clazz = (Class<?>) actualTypeArguments[0];
-                    String fieldName = field.getName();
-                    return new Association(foreignKeyColumnName, clazz, fieldName);
-                })
+                .map(Association::fromField)
                 .collect(Collectors.toList());
     }
 

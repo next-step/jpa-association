@@ -36,7 +36,7 @@ public class EntityManagerImpl implements EntityManager {
                 new PersistenceContextImpl(),
                 new EntityLoader(jdbcTemplate, dialect),
                 new EntityPersister(jdbcTemplate),
-                new CollectionLoader(jdbcTemplate));
+                new CollectionLoader(jdbcTemplate, dialect));
     }
 
     @Override

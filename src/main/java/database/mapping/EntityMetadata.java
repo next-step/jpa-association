@@ -5,7 +5,9 @@ import database.mapping.column.GeneralEntityColumn;
 import database.mapping.column.PrimaryKeyEntityColumn;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO: 정리할 수 있는 메서드 있나 확인
 // TODO: 책임 분리
@@ -21,6 +23,19 @@ public class EntityMetadata {
         this.tableMetadata = tableMetadata;
         this.columnsMetadata = columnsMetadata;
         this.entityAssociationMetadata = entityAssociationMetadata;
+    }
+
+    public List<String> getAllFieldNames() {
+        // XXX 코드정리
+        List<String> ret = new ArrayList<>();
+        ret.addAll(columnsMetadata.getAllEntityColumns().stream().map(EntityColumn::getColumnName)
+                           .collect(Collectors.toList()));
+        List<Class<?>> allEntities = AllEntities.getEntities(); // XXX: AllEntities 로 전부 변경하고 여기 지우기
+        List<Association> associationRelatedToOtherEntities = getAssociationRelatedToOtherEntities(allEntities);
+        for (Association association : associationRelatedToOtherEntities) {
+            ret.add(association.getForeignKeyColumnName());
+        }
+        return ret;
     }
 
     static EntityMetadata fromClass(Class<?> clazz) {

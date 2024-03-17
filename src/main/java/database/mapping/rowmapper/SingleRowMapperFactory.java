@@ -55,6 +55,7 @@ public class SingleRowMapperFactory {
         Object value = dialect.getFieldValueFromResultSet(resultSet, columnName, columnType);
 
         Field field = entityMetadata.getFieldByColumnName(columnName);
+        if (field==null) return; // XXX: 여기 아예 안들어오게
         field.setAccessible(true);
         try {
             field.set(entity, value);

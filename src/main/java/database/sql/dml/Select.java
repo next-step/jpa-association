@@ -1,26 +1,26 @@
 package database.sql.dml;
 
-import database.mapping.column.EntityColumn;
 import database.sql.dml.part.WhereClause;
 
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class Select {
+    private static final String COLUMNS_DELIMITER = ", ";
+
     private final String tableName;
-    private final List<EntityColumn> allEntityColumns;
+    private final List<String> allFieldNames;
     private WhereClause where;
 
-    public Select(String tableName, List<EntityColumn> allEntityColumns) {
+    public Select(String tableName, List<String> allFieldNames) {
         this.tableName = tableName;
-        this.allEntityColumns = allEntityColumns;
+        this.allFieldNames = allFieldNames;
         this.where = null;
     }
 
     public Select where(Map<String, Object> whereMap) {
-        this.where = WhereClause.from(whereMap, allEntityColumns);
+        this.where = WhereClause.from(whereMap, allFieldNames);
         return this;
     }
 
@@ -43,6 +43,6 @@ public class Select {
     }
 
     private String joinAllColumnNames() {
-        return allEntityColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.joining(", "));
+        return String.join(COLUMNS_DELIMITER, allFieldNames);
     }
 }

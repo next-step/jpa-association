@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import database.mapping.AllEntities;
 import database.sql.ddl.Create;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,11 @@ class OneToManyScenarioTest extends H2DatabaseTest {
     @BeforeEach
     void setUp() {
         entityManager = EntityManagerImpl.from(jdbcTemplate);
+
+        AllEntities.register(EagerLoadTestOrder.class);
+        AllEntities.register(EagerLoadTestOrderItem.class);
+        AllEntities.register(LazyLoadTestOrder.class);
+        AllEntities.register(LazyLoadTestOrderItem.class);
 
         List<Class<?>> allEntities = List.of(EagerLoadTestOrder.class, EagerLoadTestOrderItem.class,
                                              LazyLoadTestOrder.class, LazyLoadTestOrderItem.class);
@@ -51,5 +57,18 @@ class OneToManyScenarioTest extends H2DatabaseTest {
     void scenario6() {
         EagerLoadTestOrder res = entityManager.find(EagerLoadTestOrder.class, 1L);
         assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");
+    }
+
+    @Test
+    @DisplayName("FetchType.LAZY 연관관계를 가진 객체를 가져오기")
+    void scenario7() {
+        LazyLoadTestOrder res = entityManager.find(LazyLoadTestOrder.class, 1L);
+        List<LazyLoadTestOrderItem> orderItems = res.getOrderItems();
+        assertThat(orderItems.size()).isEqualTo(2);
+
+        assertThat(executedQueries).isEqualTo(List.of(
+                "SELECT t.id, t.orderNumber FROM lazyload_orders t WHERE t.id = 1",
+                "SELECT id, product, quantity, order_id FROM lazyload_order_items WHERE order_id = 1"
+        ));
     }
 }
