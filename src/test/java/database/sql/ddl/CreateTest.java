@@ -2,6 +2,7 @@ package database.sql.ddl;
 
 import database.dialect.Dialect;
 import database.dialect.MySQLDialect;
+import entity.Person;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -60,5 +61,13 @@ class CreateTest {
         Long id;
 
         String name;
+    }
+
+    @Test
+    void getColumnDefinitions() {
+        assertCreateQuery(
+                Person.class,
+                "CREATE TABLE users (id BIGINT AUTO_INCREMENT PRIMARY KEY, nick_name VARCHAR(255) NULL, old INT NULL, email VARCHAR(255) NOT NULL)"
+        );
     }
 }

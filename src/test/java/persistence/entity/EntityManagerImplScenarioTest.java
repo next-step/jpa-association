@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import database.sql.ddl.QueryBuilder;
+import database.sql.ddl.Create;
 import entity.Order;
 import entity.OrderItem;
 import entity.Person;
@@ -22,7 +22,7 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
+        entityManager = EntityManagerImpl.from(jdbcTemplate);
     }
 
     @Test
@@ -41,7 +41,7 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
         assertAll(
                 () -> assertSamePerson(fetchedPerson, person, false),
                 () -> assertThrows(ObjectNotFoundException.class, () -> entityManager.find(Person.class, 1L)),
-                () -> assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
+                () -> assertThat(executedQueries).containsExactly(
                         "INSERT INTO users (nick_name, old, email) VALUES ('abc', 7, 'def@example.com')",
                         "SELECT id, nick_name, old, email FROM users WHERE id = 1",
                         "DELETE FROM users WHERE id = 1"
@@ -65,7 +65,7 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
     @Test
     @DisplayName("1st 캐시에 없는 row 를 id 로 업데이트하려고 해도 insert 됨. (IDENTITY 전략) load 후에 persist 하면 update 됨")
     void scenario3() {
-        loggingJdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (20, '가나다', 21, 'email@test.com')");
+        jdbcTemplate.execute("INSERT INTO users (id, nick_name, old, email) VALUES (20, '가나다', 21, 'email@test.com')");
 
         // id 20 무시됨
         entityManager.persist(new Person(20L, "가나다라", 22, "email2@test.com"));
@@ -74,7 +74,7 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
         entityManager.find(Person.class, 20L);
         entityManager.persist(new Person(20L, "가나다라마", 22, "email2@test.com"));
 
-        assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
+        assertThat(executedQueries).containsExactly(
                 "INSERT INTO users (id, nick_name, old, email) VALUES (20, '가나다', 21, 'email@test.com')",
                 "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
                 "SELECT id, nick_name, old, email FROM users WHERE id = 1",
@@ -93,9 +93,8 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
 
         entityManager.remove(fetchedPerson);
         entityManager.remove(fetchedPerson);
-        System.out.println(loggingJdbcTemplate.executedQueries);
 
-        assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
+        assertThat(executedQueries).containsExactly(
                 "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
                 "SELECT id, nick_name, old, email FROM users WHERE id = 1",
                 "DELETE FROM users WHERE id = 1"
@@ -113,7 +112,7 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
         Person fetched = entityManager.find(Person.class, 1L);
         assertAll(
                 () -> assertSamePerson(fetched, person, false),
-                () -> assertThat(loggingJdbcTemplate.executedQueries).containsExactly(
+                () -> assertThat(executedQueries).containsExactly(
                         "SELECT id, nick_name, old, email FROM users WHERE id = 20",
                         "INSERT INTO users (nick_name, old, email) VALUES ('가나다라', 22, 'email2@test.com')",
                         "SELECT id, nick_name, old, email FROM users WHERE id = 1")
@@ -121,16 +120,17 @@ class EntityManagerImplScenarioTest extends H2DatabaseTest {
     }
 
     @Test
+    @DisplayName("FetchType.EAGER 연관관계를 가진 객체를 가져오기")
     void scenario6() {
         List<Class<?>> allEntities = List.of(Order.class, OrderItem.class);
-        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(Order.class, allEntities, dialect));
-        loggingJdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(OrderItem.class, allEntities, dialect));
+        jdbcTemplate.execute(new Create(Order.class, allEntities, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(OrderItem.class, allEntities, dialect).buildQuery());
 
-        loggingJdbcTemplate.execute("INSERT INTO orders (orderNumber) VALUES (1234)");
-        loggingJdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product1', 5, 1)");
-        loggingJdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product20', 50, 1)");
+        jdbcTemplate.execute("INSERT INTO orders (orderNumber) VALUES (1234)");
+        jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product1', 5, 1)");
+        jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('product20', 50, 1)");
 
-        EntityManager entityManager = EntityManagerImpl.from(loggingJdbcTemplate);
+        EntityManager entityManager = EntityManagerImpl.from(jdbcTemplate);
 
         Order res = entityManager.find(Order.class, 1L);
         assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");

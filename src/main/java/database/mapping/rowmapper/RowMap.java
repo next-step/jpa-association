@@ -1,4 +1,8 @@
-package database.mapping;
+package database.mapping.rowmapper;
+
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
+import database.mapping.column.EntityColumn;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -27,8 +31,8 @@ public class RowMap<T> {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
 
         R entity = initiate(clazz);
-        for (String columnName : entityMetadata.getAllColumnNames()) {
-            setField(entity, columnName);
+        for (EntityColumn allEntityColumn : entityMetadata.getAllEntityColumns()) {
+            setField(entity, allEntityColumn.getColumnName());
         }
         return entity;
     }

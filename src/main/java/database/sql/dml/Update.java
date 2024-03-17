@@ -1,8 +1,9 @@
 package database.sql.dml;
 
-import database.mapping.EntityMetadata;
-import database.mapping.EntityMetadataFactory;
-import database.mapping.column.EntityColumn;
+import database.mapping.column.GeneralEntityColumn;
+import database.mapping.column.PrimaryKeyEntityColumn;
+import database.sql.dml.part.ValueClause;
+import database.sql.dml.part.WhereClause;
 
 import java.util.List;
 import java.util.Map;
@@ -12,36 +13,50 @@ import static database.sql.Util.quote;
 
 public class Update {
     private final String tableName;
-    private final List<EntityColumn> generalColumns;
+    private final List<GeneralEntityColumn> generalColumns;
+    private final PrimaryKeyEntityColumn primaryKey;
+    private Map<String, Object> changes;
+    private WhereClause where;
 
-    public Update(Class<?> clazz) {
-        this(EntityMetadataFactory.get(clazz));
+    public Update(String tableName, List<GeneralEntityColumn> generalColumns, PrimaryKeyEntityColumn primaryKey) {
+        this.tableName = tableName;
+        this.generalColumns = generalColumns;
+        this.primaryKey = primaryKey;
+        this.changes = null;
+        this.where = null;
     }
 
-    private Update(EntityMetadata entityMetadata) {
-        this.tableName = entityMetadata.getTableName();
-        this.generalColumns = entityMetadata.getGeneralColumns();
+    public Update changes(Map<String, Object> changes) {
+        this.changes = changes;
+        return this;
     }
 
-    public String buildQuery(long id, Map<String, Object> changes) {
-        return String.format("UPDATE %s SET %s WHERE %s",
+    public Update changes(Object entity) {
+        this.changes(ValueClause.fromEntity(entity, generalColumns));
+        return this;
+    }
+
+    public Update byId(long id) {
+        this.where = WhereClause.from(Map.of(primaryKey.getColumnName(), id), List.of(primaryKey));
+        return this;
+    }
+
+    public String buildQuery() {
+        return String.format("UPDATE %s SET %s %s",
                              tableName,
-                             setClauses(changes),
-                             whereClauses(id));
+                             setClauses(),
+                             where.toQuery());
     }
 
-    private String setClauses(Map<String, Object> changes) {
+    private String setClauses() {
         StringJoiner joiner = new StringJoiner(", ");
-        for (EntityColumn generalColumn : generalColumns) {
-            String key = generalColumn.getColumnName();
-            if (changes.containsKey(key)) {
-                joiner.add(String.format("%s = %s", key, quote(changes.get(key))));
+        for (GeneralEntityColumn generalColumn : generalColumns) {
+            String columnName = generalColumn.getColumnName();
+
+            if (changes.containsKey(columnName)) {
+                joiner.add(String.format("%s = %s", columnName, quote(changes.get(columnName))));
             }
         }
         return joiner.toString();
-    }
-
-    private String whereClauses(long id) {
-        return String.format("id = %d", id);
     }
 }

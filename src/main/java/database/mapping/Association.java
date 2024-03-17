@@ -36,11 +36,7 @@ public class Association {
         return EntityMetadataFactory.get(entityType);
     }
 
-    public String toColumnDefinition(Dialect dialect) {
-        return foreignKeyColumnName + " " + getForeignKeyColumnType(dialect) + " NOT NULL";
-    }
-
-    private String getForeignKeyColumnType(Dialect dialect) {
+    public String getForeignKeyColumnType(Dialect dialect) {
         Type foreignKeyColumnType = getOwnerEntityMetadata().getPrimaryKey().getFieldType();
 
         return dialect.convertToSqlTypeDefinition((Class<?>) foreignKeyColumnType, 0);

@@ -50,6 +50,16 @@ public abstract class AbstractEntityColumn implements EntityColumn {
         return field.getType();
     }
 
+    @Override
+    public Class<?> getType() {
+        return type;
+    }
+
+    @Override
+    public Integer getColumnLength() {
+        return columnLength;
+    }
+
     protected static Integer getColumnLength(Field field) {
         Column columnAnnotation = field.getAnnotation(Column.class);
         if (columnAnnotation != null) {

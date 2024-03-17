@@ -3,7 +3,7 @@ package persistence;
 import database.DatabaseServer;
 import database.H2;
 import database.dialect.MySQLDialect;
-import database.sql.ddl.QueryBuilder;
+import database.sql.ddl.Create;
 import entity.Order;
 import entity.OrderItem;
 import jdbc.JdbcTemplate;
@@ -24,8 +24,8 @@ public class Application {
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
             MySQLDialect dialect = MySQLDialect.getInstance();
 
-            jdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(Order.class, dialect));
-            jdbcTemplate.execute(QueryBuilder.getInstance().buildCreateQuery(OrderItem.class, dialect));
+            jdbcTemplate.execute(new Create(Order.class, dialect).buildQuery());
+            jdbcTemplate.execute(new Create(OrderItem.class, dialect).buildQuery());
 //
             EntityManager entityManager = EntityManagerImpl.from(jdbcTemplate);
 
@@ -40,8 +40,6 @@ public class Application {
             Order res = entityManager.find(Order.class, order.getId());
             System.out.println("--------");
             System.out.println(res);
-
-//            jdbcTemplate.execute(database.sql.dml.QueryBuilder.getInstance().buildCustomSelectQuery(Order.class));
 
             server.stop();
         } catch (Exception e) {

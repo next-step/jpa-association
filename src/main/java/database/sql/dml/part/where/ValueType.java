@@ -1,4 +1,4 @@
-package database.sql.dml.where;
+package database.sql.dml.part.where;
 
 import database.sql.Util;
 

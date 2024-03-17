@@ -1,7 +1,8 @@
 package database.mapping;
 
-import database.dialect.Dialect;
 import database.mapping.column.EntityColumn;
+import database.mapping.column.GeneralEntityColumn;
+import database.mapping.column.PrimaryKeyEntityColumn;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -39,38 +40,13 @@ public class EntityMetadata {
         return tableMetadata.getEntityClassName();
     }
 
-    public List<String> getAllColumnNames() {
-        return columnsMetadata.getAllColumnNames();
+    // all columns
+
+    public List<EntityColumn> getAllEntityColumns() {
+        return columnsMetadata.getAllEntityColumns();
     }
 
-    public String getJoinedAllColumnNames() {
-        return String.join(", ", columnsMetadata.getAllColumnNames());
-    }
-
-    public List<String> getColumnDefinitions(Dialect dialect) {
-        return columnsMetadata.getColumnDefinitions(dialect);
-    }
-
-    public String getPrimaryKeyColumnName() {
-        return columnsMetadata.getPrimaryKeyColumnName();
-    }
-
-    public List<String> getGeneralColumnNames() {
-        return columnsMetadata.getGeneralColumnNames();
-    }
-
-    public List<EntityColumn> getGeneralColumns() {
-        return columnsMetadata.getGeneralColumns();
-    }
-
-    public EntityColumn getPrimaryKey() {
-        return columnsMetadata.getPrimaryKey();
-    }
-
-    public Long getPrimaryKeyValue(Object entity) {
-        return columnsMetadata.getPrimaryKeyValue(entity);
-    }
-
+    // all fields
     public Field getFieldByColumnName(String columnName) {
         return columnsMetadata.getFieldByColumnName(columnName);
     }
@@ -79,8 +55,25 @@ public class EntityMetadata {
         return columnsMetadata.getFieldByFieldName(fieldName);
     }
 
+
+    // primary key
+
+    public PrimaryKeyEntityColumn getPrimaryKey() {
+        return columnsMetadata.getPrimaryKey();
+    }
+
+    public Long getPrimaryKeyValue(Object entity) {
+        return columnsMetadata.getPrimaryKeyValue(entity);
+    }
+
     public boolean requiresIdWhenInserting() {
         return columnsMetadata.isRequiredId();
+    }
+
+    // general columns
+
+    public List<GeneralEntityColumn> getGeneralColumns() {
+        return columnsMetadata.getGeneralColumns();
     }
 
     public List<Association> getAssociations() {
@@ -90,8 +83,7 @@ public class EntityMetadata {
     public boolean hasAssociation() {
         return !entityAssociationMetadata.getAssociatedTypes().isEmpty();
     }
-
-    public List<String> getJoinColumnDefinitions(Dialect dialect, List<Class<?>> entities) {
-        return entityAssociationMetadata.getJoinColumnDefinitions(dialect, entities);
+    public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
+        return entityAssociationMetadata.getAssociationRelatedToOtherEntities(entities);
     }
 }

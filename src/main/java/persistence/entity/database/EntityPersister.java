@@ -1,6 +1,5 @@
 package persistence.entity.database;
 
-import database.mapping.ColumnValueMap;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
 import database.sql.dml.Delete;
@@ -27,9 +26,12 @@ public class EntityPersister {
         Long id = metadata.getPrimaryKeyValue(entity);
         checkGenerationStrategy(metadata.requiresIdWhenInserting(), id, metadata.getEntityClassName());
         id = metadata.requiresIdWhenInserting() ? id : null;
-        Insert insert = new Insert(clazz)
+
+        Insert insert = new Insert(metadata.getTableName(),
+                                   metadata.getPrimaryKey(),
+                                   metadata.getGeneralColumns())
                 .id(id)
-                .values(columnValues(entity));
+                .valuesFromEntity(entity);
         return jdbcTemplate.execute(insert.toQueryString());
     }
 
@@ -40,26 +42,35 @@ public class EntityPersister {
     }
 
     public void update(Class<?> clazz, Long id, Map<String, Object> changes) {
-        doUpdate(clazz, id, changes);
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Update(entityMetadata.getTableName(),
+                                  entityMetadata.getGeneralColumns(),
+                                  entityMetadata.getPrimaryKey())
+                .changes(changes)
+                .byId(id)
+                .buildQuery();
+        jdbcTemplate.execute(query);
     }
 
     public void update(Class<?> clazz, Long id, Object entity) {
-        update(clazz, id, columnValues(entity));
-    }
-
-    private void doUpdate(Class<?> clazz, Long id, Map<String, Object> map) {
-        Update update = new Update(clazz);
-        String query = update.buildQuery(id, map);
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Update(entityMetadata.getTableName(),
+                                  entityMetadata.getGeneralColumns(),
+                                  entityMetadata.getPrimaryKey())
+                .changes(entity)
+                .byId(id)
+                .buildQuery();
         jdbcTemplate.execute(query);
     }
 
     public void delete(Class<?> clazz, Long id) {
-        Delete delete = new Delete(clazz);
-        String query = delete.buildQuery(Map.of("id", id));
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
+        String query = new Delete(entityMetadata.getTableName(),
+                                  entityMetadata.getAllEntityColumns(),
+                                  entityMetadata.getPrimaryKey()
+        )
+                .id(id)
+                .buildQuery();
         jdbcTemplate.execute(query);
-    }
-
-    private Map<String, Object> columnValues(Object entity) {
-        return ColumnValueMap.valueMapFromEntity(entity);
     }
 }

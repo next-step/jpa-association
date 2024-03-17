@@ -1,7 +1,8 @@
 package database.sql.dml;
 
-import database.mapping.EntityMetadata;
-import database.mapping.EntityMetadataFactory;
+import database.mapping.column.GeneralEntityColumn;
+import database.mapping.column.PrimaryKeyEntityColumn;
+import database.sql.dml.part.ValueClause;
 
 import java.util.List;
 import java.util.Map;
@@ -12,21 +13,18 @@ import static database.sql.Util.quote;
 
 public class Insert {
     private final String tableName;
-    private final String primaryKeyColumnName;
-    private final List<String> columnNames;
+    private final List<GeneralEntityColumn> generalColumns;
+    private final PrimaryKeyEntityColumn primaryKey;
 
     private Long id;
     private boolean includeIdField;
     private Map<String, Object> values;
 
-    public Insert(Class<?> clazz) {
-        this(EntityMetadataFactory.get(clazz));
-    }
+    public Insert(String tableName, PrimaryKeyEntityColumn primaryKey, List<GeneralEntityColumn> generalColumns) {
+        this.tableName = tableName;
+        this.primaryKey = primaryKey;
+        this.generalColumns = generalColumns;
 
-    private Insert(EntityMetadata metadata) {
-        tableName = metadata.getTableName();
-        primaryKeyColumnName = metadata.getPrimaryKeyColumnName();
-        columnNames = metadata.getGeneralColumnNames();
         id = null;
         includeIdField = false;
     }
@@ -42,6 +40,11 @@ public class Insert {
         return this;
     }
 
+    public Insert valuesFromEntity(Object entity) {
+        this.values = ValueClause.fromEntity(entity, generalColumns);
+        return this;
+    }
+
     public String toQueryString() {
         if (values == null) throw new RuntimeException("values are required");
 
@@ -49,7 +52,8 @@ public class Insert {
     }
 
     private List<String> columns(Map<String, Object> valueMap) {
-        return columnNames.stream()
+        return generalColumns.stream()
+                .map(GeneralEntityColumn::getColumnName)
                 .filter(valueMap::containsKey)
                 .collect(Collectors.toList());
     }
@@ -58,7 +62,7 @@ public class Insert {
         List<String> columns = columns(values);
         StringJoiner joiner = new StringJoiner(", ");
         if (includeIdField) {
-            joiner.add(primaryKeyColumnName);
+            joiner.add(primaryKey.getColumnName());
         }
         columns.forEach(joiner::add);
         return joiner.toString();

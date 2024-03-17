@@ -1,5 +1,7 @@
 package database.sql.dml;
 
+import database.mapping.EntityMetadata;
+import database.mapping.EntityMetadataFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -8,7 +10,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DeleteTest {
-    private final Delete delete = new Delete(Person4.class);
+    private final Delete delete;
+
+    {
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
+        delete = new Delete(entityMetadata.getTableName(),
+                            entityMetadata.getAllEntityColumns(), entityMetadata.getPrimaryKey()
+        );
+    }
 
     enum TestCases {
         BY_PRIMARY_KEY(Map.of("nick_name", "foo"),
@@ -37,6 +46,6 @@ class DeleteTest {
         Map<String, Object> where = testCases.conditionMap;
         String expectedQuery = testCases.expectedQuery;
 
-        assertThat(delete.buildQuery(where)).isEqualTo(expectedQuery);
+        assertThat(delete.where(where).buildQuery()).isEqualTo(expectedQuery);
     }
 }

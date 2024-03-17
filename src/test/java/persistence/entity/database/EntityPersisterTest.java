@@ -17,7 +17,7 @@ class EntityPersisterTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityPersister = new EntityPersister(loggingJdbcTemplate);
+        entityPersister = new EntityPersister(jdbcTemplate);
     }
 
     @Test
@@ -29,7 +29,7 @@ class EntityPersisterTest extends H2DatabaseTest {
         entityPersister.insert(Person.class, person2);
 
         // 잘 들어가있어야 한다
-        List<Person> people = findPeople(loggingJdbcTemplate);
+        List<Person> people = findPeople(jdbcTemplate);
         assertSamePerson(people.get(0), person, false);
         assertThat(people.get(0).getId()).isNotZero();
         assertSamePerson(people.get(1), person2, false);
@@ -49,13 +49,13 @@ class EntityPersisterTest extends H2DatabaseTest {
         entityPersister.insert(Person.class, person);
 
         // 동일한 id 의 Person 객체로 update 한 후
-        Long savedId = getLastSavedId(loggingJdbcTemplate);
+        Long savedId = getLastSavedId(jdbcTemplate);
         Person personUpdating = newPerson(savedId, "updated name", 20, "updated@email.com");
 
         entityPersister.update(Person.class, savedId, personUpdating);
 
         // 남아있는 한개의 row 가 잘 업데이트돼야 한다
-        List<Person> people = findPeople(loggingJdbcTemplate);
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(1);
         Person found = people.get(0);
         assertSamePerson(found, personUpdating, true);
@@ -68,11 +68,11 @@ class EntityPersisterTest extends H2DatabaseTest {
         entityPersister.insert(Person.class, person);
 
         // 그 row 를 삭제하고
-        Long savedId = getLastSavedId(loggingJdbcTemplate);
+        Long savedId = getLastSavedId(jdbcTemplate);
         entityPersister.delete(Person.class, savedId);
 
         // 개수를 세면 0개여야 한다.
-        List<Person> people = findPeople(loggingJdbcTemplate);
+        List<Person> people = findPeople(jdbcTemplate);
         assertThat(people).hasSize(0);
     }
 }
