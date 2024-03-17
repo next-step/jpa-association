@@ -20,11 +20,11 @@ public class ForeignKeyBuilder {
         return entityMappingTable.getDomainTypes().getDomainTypes()
                 .stream()
                 .filter(DomainType::isJoinColumn)
-                .map(this::getFeignKey)
+                .map(this::getForeignKey)
                 .collect(Collectors.joining(COMMA.getValue()));
     }
 
-    private String getFeignKey(final DomainType domainType) {
+    private String getForeignKey(final DomainType domainType) {
         Class<?> subClass = (Class<?>) ((ParameterizedType) domainType.getField().getGenericType()).getActualTypeArguments()[0];
         EntityMappingTable subEntity = EntityMappingTable.from(subClass);
 
