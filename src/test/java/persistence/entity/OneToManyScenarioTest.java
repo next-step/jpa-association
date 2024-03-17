@@ -14,32 +14,30 @@ import testsupport.H2DatabaseTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OneToManyScenarioTest extends H2DatabaseTest {
     private EntityManagerImpl entityManager;
 
     @BeforeEach
     void setUp() {
-        entityManager = EntityManagerImpl.from(jdbcTemplate);
+        entityManager = EntityManagerImpl.from(jdbcTemplate, dialect);
 
         AllEntities.register(EagerLoadTestOrder.class);
         AllEntities.register(EagerLoadTestOrderItem.class);
         AllEntities.register(LazyLoadTestOrder.class);
         AllEntities.register(LazyLoadTestOrderItem.class);
 
-        List<Class<?>> allEntities = List.of(EagerLoadTestOrder.class, EagerLoadTestOrderItem.class,
-                                             LazyLoadTestOrder.class, LazyLoadTestOrderItem.class);
-
         jdbcTemplate.execute("DROP TABLE eagerload_orders IF EXISTS");
         jdbcTemplate.execute("DROP TABLE eagerload_order_items IF EXISTS");
         jdbcTemplate.execute("DROP TABLE lazyload_orders IF EXISTS");
         jdbcTemplate.execute("DROP TABLE lazyload_order_items IF EXISTS");
 
-        jdbcTemplate.execute(new Create(EagerLoadTestOrder.class, allEntities, dialect).buildQuery());
-        jdbcTemplate.execute(new Create(EagerLoadTestOrderItem.class, allEntities, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(EagerLoadTestOrder.class, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(EagerLoadTestOrderItem.class, dialect).buildQuery());
 
-        jdbcTemplate.execute(new Create(LazyLoadTestOrder.class, allEntities, dialect).buildQuery());
-        jdbcTemplate.execute(new Create(LazyLoadTestOrderItem.class, allEntities, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(LazyLoadTestOrder.class, dialect).buildQuery());
+        jdbcTemplate.execute(new Create(LazyLoadTestOrderItem.class, dialect).buildQuery());
 
         jdbcTemplate.execute("INSERT INTO eagerload_orders (orderNumber) VALUES (1234)");
         jdbcTemplate.execute("INSERT INTO eagerload_order_items (product, quantity, order_id) VALUES ('product1', 5, 1)");
@@ -55,8 +53,24 @@ class OneToManyScenarioTest extends H2DatabaseTest {
     @Test
     @DisplayName("FetchType.EAGER 연관관계를 가진 객체를 가져오기")
     void scenario6() {
-        EagerLoadTestOrder res = entityManager.find(EagerLoadTestOrder.class, 1L);
-        assertThat(res.toString()).isEqualTo("Order{id=1, orderNumber='1234', orderItems=[OrderItem{id=1, product='product1', quantity=5}, OrderItem{id=1, product='product20', quantity=50}]}");
+        EagerLoadTestOrder order = entityManager.find(EagerLoadTestOrder.class, 1L);
+
+        assertAll(
+                () -> assertThat(order.getId()).isEqualTo(1L),
+                () -> assertThat(order.getOrderNumber()).isEqualTo("1234"),
+                () -> assertThat(order.getOrderItems()).hasSize(2),
+
+                () -> assertThat(order.getOrderItems().get(0).getId()).isEqualTo(1L),
+                () -> assertThat(order.getOrderItems().get(0).getProduct()).isEqualTo("product1"),
+                () -> assertThat(order.getOrderItems().get(0).getQuantity()).isEqualTo(5),
+
+                () -> assertThat(order.getOrderItems().get(1).getId()).isEqualTo(2L),
+                () -> assertThat(order.getOrderItems().get(1).getProduct()).isEqualTo("product20"),
+                () -> assertThat(order.getOrderItems().get(1).getQuantity()).isEqualTo(50),
+
+                () -> assertThat(executedQueries).isEqualTo(List.of(
+                        "SELECT t.id, t.orderNumber, a0.order_id, a0.id, a0.product, a0.quantity FROM eagerload_orders t LEFT JOIN eagerload_order_items a0 ON t.id = a0.order_id WHERE t.id = 1"))
+        );
     }
 
     @Test

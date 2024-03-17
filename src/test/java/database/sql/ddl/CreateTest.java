@@ -2,8 +2,10 @@ package database.sql.ddl;
 
 import database.dialect.Dialect;
 import database.dialect.MySQLDialect;
+import database.mapping.AllEntities;
 import entity.Person;
 import jakarta.persistence.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -14,6 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateTest {
     private final Dialect dialect = MySQLDialect.getInstance();
+
+    @BeforeAll
+    static void setUpEntities() {
+        AllEntities.register(Departure.class);
+    }
 
     @ParameterizedTest
     @CsvSource(value = {
@@ -28,13 +35,7 @@ class CreateTest {
     @Test
     void buildCreateQueryForAssociatedEntity() {
         assertCreateQuery(Departure.class, "CREATE TABLE Departure (id BIGINT PRIMARY KEY)");
-        assertCreateQuery(Employee.class, List.of(Departure.class), "CREATE TABLE Employee (id BIGINT PRIMARY KEY, name VARCHAR(255) NULL, departure_id BIGINT NOT NULL)");
-    }
-
-    private void assertCreateQuery(Class<?> clazz, List<Class<?>> entities, String expected) {
-        Create create = new Create(clazz, entities, dialect);
-        String actual = create.buildQuery();
-        assertThat(actual).isEqualTo(expected);
+        assertCreateQuery(Employee.class, "CREATE TABLE Employee (id BIGINT PRIMARY KEY, name VARCHAR(255) NULL, departure_id BIGINT NOT NULL)");
     }
 
     private void assertCreateQuery(Class<?> clazz, String expected) {

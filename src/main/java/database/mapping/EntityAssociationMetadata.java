@@ -23,8 +23,8 @@ public class EntityAssociationMetadata {
                 .collect(Collectors.toList());
     }
 
-    public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
-        return entities.stream()
+    public List<Association> getAssociationRelatedToOtherEntities() {
+        return AllEntities.getEntities().stream()
                 .filter(this::exceptMe)
                 .flatMap(this::getAssociationsBetweenMeAndOther)
                 .collect(Collectors.toList());
@@ -46,7 +46,7 @@ public class EntityAssociationMetadata {
     }
 
     private boolean isConnectedToMe(Association association) {
-        return association.getEntityType() == clazz;
+        return association.getFieldGenericType() == clazz;
     }
 
     public List<Association> getAssociations() {

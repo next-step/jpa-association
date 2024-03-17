@@ -50,16 +50,16 @@ public class MySQLDialect implements Dialect {
     }
 
     @Override
-    public Object getFieldValueFromResultSet(ResultSet resultSet, String columnName, int sqlType) throws SQLException {
+    public Object getFieldValueFromResultSet(ResultSet resultSet, int columnIndex, int sqlType) throws SQLException {
         switch (sqlType) {
             case BIGINT:
-                return resultSet.getLong(columnName);
+                return resultSet.getLong(columnIndex);
             case INTEGER:
-                return resultSet.getInt(columnName);
+                return resultSet.getInt(columnIndex);
             case VARCHAR:
-                return resultSet.getString(columnName);
+                return resultSet.getString(columnIndex);
             default:
-                throw new UnsupportedOperationException("아직 변환 지원 안하는 타입입나다: " + sqlType);
+                throw new UnsupportedOperationException("아직 변환 지원 안하는 타입입니다: " + sqlType);
         }
     }
 

@@ -2,7 +2,7 @@ package database.sql.dml;
 
 import database.mapping.column.GeneralEntityColumn;
 import database.mapping.column.PrimaryKeyEntityColumn;
-import database.sql.dml.part.ValueClause;
+import database.sql.dml.part.ValueMap;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class Insert {
 
     private Long id;
     private boolean includeIdField;
-    private Map<String, Object> values;
+    private ValueMap values;
 
     public Insert(String tableName, PrimaryKeyEntityColumn primaryKey, List<GeneralEntityColumn> generalColumns) {
         this.tableName = tableName;
@@ -35,14 +35,13 @@ public class Insert {
         return this;
     }
 
-    public Insert values(Map<String, Object> values) {
-        this.values = values;
+    public Insert values(ValueMap valueMap) {
+        this.values = valueMap;
         return this;
     }
 
     public Insert valuesFromEntity(Object entity) {
-        this.values = ValueClause.fromEntity(entity, generalColumns);
-        return this;
+        return this.values(ValueMap.fromEntity(entity, generalColumns));
     }
 
     public String toQueryString() {
@@ -51,7 +50,7 @@ public class Insert {
         return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columnClauses(), valueClauses());
     }
 
-    private List<String> columns(Map<String, Object> valueMap) {
+    private List<String> columns(ValueMap valueMap) {
         return generalColumns.stream()
                 .map(GeneralEntityColumn::getColumnName)
                 .filter(valueMap::containsKey)
@@ -59,22 +58,20 @@ public class Insert {
     }
 
     private String columnClauses() {
-        List<String> columns = columns(values);
         StringJoiner joiner = new StringJoiner(", ");
         if (includeIdField) {
             joiner.add(primaryKey.getColumnName());
         }
-        columns.forEach(joiner::add);
+        columns(values).forEach(joiner::add);
         return joiner.toString();
     }
 
     private String valueClauses() {
-        List<String> columns = columns(values);
         StringJoiner joiner = new StringJoiner(", ");
         if (includeIdField) {
             joiner.add(quote(id));
         }
-        columns.forEach(key -> joiner.add(quote(values.get(key))));
+        columns(values).forEach(key -> joiner.add(quote(values.get(key))));
         return joiner.toString();
     }
 }

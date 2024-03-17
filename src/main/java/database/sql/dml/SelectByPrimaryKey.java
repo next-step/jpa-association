@@ -1,7 +1,5 @@
 package database.sql.dml;
 
-import database.mapping.column.EntityColumn;
-
 import java.util.List;
 
 public class SelectByPrimaryKey {

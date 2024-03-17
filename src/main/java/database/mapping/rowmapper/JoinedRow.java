@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 // TODO: 테스트 추가
-public class RowMap<T> {
+public class JoinedRow<T> {
     private final Class<T> clazz;
     private final Map<String, Object> map;
 
-    public RowMap(Class<T> clazz) {
+    public JoinedRow(Class<T> clazz) {
         this.clazz = clazz;
         this.map = new HashMap<>();
     }
@@ -23,7 +23,7 @@ public class RowMap<T> {
         map.put(mapKey(tableName, columnName), value);
     }
 
-    public T getParentEntity() {
+    public T getOwnerEntity() {
         return mapValues(clazz);
     }
 

@@ -3,6 +3,7 @@ package persistence.entity.data;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
 import database.mapping.column.EntityColumn;
+import database.sql.dml.part.ValueMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class EntitySnapshot {
         return newSnapshot;
     }
 
-    public Map<String, Object> diff(EntitySnapshot newEntitySnapshot) {
+    public ValueMap diff(EntitySnapshot newEntitySnapshot) {
         Map<String, Object> changes = new HashMap<>();
 
         for (String key : newEntitySnapshot.snapshot.keySet()) {
@@ -41,7 +42,7 @@ public class EntitySnapshot {
                 changes.put(key, newValue);
             }
         }
-        return changes;
+        return ValueMap.from(changes);
     }
 
     private boolean isDiffer(Object oldValue, Object newValue) {

@@ -18,7 +18,7 @@ class EntityManagerImplTest extends H2DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        entityManager = EntityManagerImpl.from(jdbcTemplate);
+        entityManager = EntityManagerImpl.from(jdbcTemplate, dialect);
     }
 
     @Test

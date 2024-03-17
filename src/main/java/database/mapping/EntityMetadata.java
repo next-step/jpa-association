@@ -30,8 +30,7 @@ public class EntityMetadata {
         List<String> ret = new ArrayList<>();
         ret.addAll(columnsMetadata.getAllEntityColumns().stream().map(EntityColumn::getColumnName)
                            .collect(Collectors.toList()));
-        List<Class<?>> allEntities = AllEntities.getEntities(); // XXX: AllEntities 로 전부 변경하고 여기 지우기
-        List<Association> associationRelatedToOtherEntities = getAssociationRelatedToOtherEntities(allEntities);
+        List<Association> associationRelatedToOtherEntities = getAssociationRelatedToOtherEntities();
         for (Association association : associationRelatedToOtherEntities) {
             ret.add(association.getForeignKeyColumnName());
         }
@@ -98,7 +97,7 @@ public class EntityMetadata {
         return !entityAssociationMetadata.getAssociatedTypes().isEmpty();
     }
 
-    public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
-        return entityAssociationMetadata.getAssociationRelatedToOtherEntities(entities);
+    public List<Association> getAssociationRelatedToOtherEntities() {
+        return entityAssociationMetadata.getAssociationRelatedToOtherEntities();
     }
 }

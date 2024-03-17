@@ -5,9 +5,8 @@ import database.mapping.EntityMetadataFactory;
 import database.sql.dml.Delete;
 import database.sql.dml.Insert;
 import database.sql.dml.Update;
+import database.sql.dml.part.ValueMap;
 import jdbc.JdbcTemplate;
-
-import java.util.Map;
 
 /**
  * 엔터티의 메타데이터와 데이터베이스 매핑 정보를 제공하고,
@@ -41,7 +40,7 @@ public class EntityPersister {
         }
     }
 
-    public void update(Class<?> clazz, Long id, Map<String, Object> changes) {
+    public void update(Class<?> clazz, Long id, ValueMap changes) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         String query = new Update(entityMetadata.getTableName(),
                                   entityMetadata.getGeneralColumns(),
@@ -57,7 +56,7 @@ public class EntityPersister {
         String query = new Update(entityMetadata.getTableName(),
                                   entityMetadata.getGeneralColumns(),
                                   entityMetadata.getPrimaryKey())
-                .changes(entity)
+                .changesFromEntity(entity)
                 .byId(id)
                 .buildQuery();
         jdbcTemplate.execute(query);

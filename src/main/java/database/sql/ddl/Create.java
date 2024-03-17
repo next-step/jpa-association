@@ -18,18 +18,14 @@ public class Create {
     private final PrimaryKeyEntityColumn primaryKey;
     private final List<GeneralEntityColumn> generalColumns;
 
-    public Create(Class<?> clazz, List<Class<?>> entities, Dialect dialect) {
+    public Create(Class<?> clazz, Dialect dialect) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         this.tableName = entityMetadata.getTableName();
         this.primaryKey = entityMetadata.getPrimaryKey();
         this.generalColumns = entityMetadata.getGeneralColumns();
 
         this.dialect = dialect;
-        this.associationRelatedToOtherEntities = entityMetadata.getAssociationRelatedToOtherEntities(entities);
-    }
-
-    public Create(Class<?> clazz, Dialect dialect) {
-        this(clazz, List.of(), dialect);
+        this.associationRelatedToOtherEntities = entityMetadata.getAssociationRelatedToOtherEntities();
     }
 
     public String buildQuery() {

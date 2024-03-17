@@ -37,7 +37,7 @@ class UpdateTest {
     @EnumSource(TestCases.class)
     void buildUpdateQuery(TestCases testCase) {
         String actual = update
-                .changes(testCase.entity)
+                .changesFromEntity(testCase.entity)
                 .byId(testCase.id)
                 .buildQuery();
         assertThat(actual).isEqualTo(testCase.expectedQuery);

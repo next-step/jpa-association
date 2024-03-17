@@ -1,9 +1,9 @@
 package database.sql.dml;
 
 import database.sql.dml.part.WhereClause;
+import database.sql.dml.part.WhereMap;
 
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 
 public class Select {
@@ -19,13 +19,17 @@ public class Select {
         this.where = null;
     }
 
-    public Select where(Map<String, Object> whereMap) {
+    public Select where(WhereMap whereMap) {
         this.where = WhereClause.from(whereMap, allFieldNames);
         return this;
     }
 
     public Select id(Long id) {
-        return this.where(Map.of("id", id));
+        return where(WhereMap.of("id", id));
+    }
+
+    public Select ids(List<Long> ids) {
+        return where(WhereMap.of("id", ids));
     }
 
     public String buildQuery() {

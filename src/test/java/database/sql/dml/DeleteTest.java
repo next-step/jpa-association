@@ -2,10 +2,9 @@ package database.sql.dml;
 
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import database.sql.dml.part.WhereMap;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,22 +20,22 @@ class DeleteTest {
     }
 
     enum TestCases {
-        BY_PRIMARY_KEY(Map.of("nick_name", "foo"),
+        BY_PRIMARY_KEY(WhereMap.of("nick_name", "foo"),
                        "DELETE FROM users WHERE nick_name = 'foo'"),
-        TWO_CONDITIONS1(Map.of("old", 18, "email", "example@email.com"),
+        TWO_CONDITIONS1(WhereMap.of("old", 18, "email", "example@email.com"),
                         "DELETE FROM users WHERE old = 18 AND email = 'example@email.com'"),
-        TWO_CONDITIONS2(Map.of("nick_name", "foo"),
+        TWO_CONDITIONS2(WhereMap.of("nick_name", "foo"),
                         "DELETE FROM users WHERE nick_name = 'foo'"),
-        ONE_CONDITIONS1(Map.of("old", 18),
+        ONE_CONDITIONS1(WhereMap.of("old", 18),
                         "DELETE FROM users WHERE old = 18"),
-        ONE_CONDITIONS2(Map.of("nick_name", "foo"),
+        ONE_CONDITIONS2(WhereMap.of("nick_name", "foo"),
                         "DELETE FROM users WHERE nick_name = 'foo'");
 
-        final Map<String, Object> conditionMap;
-        final String expectedQuery;
+        private final String expectedQuery;
+        private final WhereMap whereMap;
 
-        TestCases(Map<String, Object> conditionMap, String expectedQuery) {
-            this.conditionMap = conditionMap;
+        TestCases(WhereMap whereMap, String expectedQuery) {
+            this.whereMap = whereMap;
             this.expectedQuery = expectedQuery;
         }
     }
@@ -44,9 +43,9 @@ class DeleteTest {
     @ParameterizedTest
     @EnumSource(TestCases.class)
     void assertDeleteQuery(TestCases testCases) {
-        Map<String, Object> where = testCases.conditionMap;
+        WhereMap whereMap = testCases.whereMap;
         String expectedQuery = testCases.expectedQuery;
 
-        assertThat(delete.where(where).buildQuery()).isEqualTo(expectedQuery);
+        assertThat(delete.where(whereMap).buildQuery()).isEqualTo(expectedQuery);
     }
 }

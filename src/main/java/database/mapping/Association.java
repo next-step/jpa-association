@@ -30,13 +30,11 @@ public class Association {
         return field.getName();
     }
 
-    // XXX:이름
-    public Class<?> getAssociationType() {
+    public Class<?> getFieldType() {
         return field.getType();
     }
 
-    // XXX:이름
-    public Class<?> getEntityType() {
+    public Class<?> getFieldGenericType() {
         return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
     }
 
@@ -45,7 +43,7 @@ public class Association {
     }
 
     private EntityMetadata getOwnerEntityMetadata() {
-        return EntityMetadataFactory.get(this.getEntityType());
+        return EntityMetadataFactory.get(this.getFieldGenericType());
     }
 
     public String getForeignKeyColumnType(Dialect dialect) {

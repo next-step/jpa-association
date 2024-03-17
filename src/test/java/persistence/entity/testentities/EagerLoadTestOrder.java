@@ -33,12 +33,11 @@ public class EagerLoadTestOrder {
         this.orderNumber = orderNumber;
     }
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", orderNumber='" + orderNumber + '\'' +
-                ", orderItems=" + orderItems +
-                '}';
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public List<EagerLoadTestOrderItem> getOrderItems() {
+        return orderItems;
     }
 }

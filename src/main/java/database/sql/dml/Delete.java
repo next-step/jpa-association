@@ -2,9 +2,9 @@ package database.sql.dml;
 
 import database.mapping.column.PrimaryKeyEntityColumn;
 import database.sql.dml.part.WhereClause;
+import database.sql.dml.part.WhereMap;
 
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 
 public class Delete {
@@ -21,14 +21,13 @@ public class Delete {
         this.where = null;
     }
 
-    public Delete where(Map<String, Object> whereMap) {
+    public Delete where(WhereMap whereMap) {
         this.where = WhereClause.from(whereMap, allFieldNames);
         return this;
     }
 
     public Delete id(Long id) {
-        this.where(Map.of(primaryKey.getColumnName(), id));
-        return this;
+        return this.where(WhereMap.of(primaryKey.getColumnName(), id));
     }
 
     public String buildQuery() {

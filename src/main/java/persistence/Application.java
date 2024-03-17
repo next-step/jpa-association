@@ -27,7 +27,7 @@ public class Application {
             jdbcTemplate.execute(new Create(Order.class, dialect).buildQuery());
             jdbcTemplate.execute(new Create(OrderItem.class, dialect).buildQuery());
 //
-            EntityManager entityManager = EntityManagerImpl.from(jdbcTemplate);
+            EntityManager entityManager = EntityManagerImpl.from(jdbcTemplate, dialect);
 
             Order order = entityManager.persist(new Order("1234"));
             OrderItem orderItem1 = entityManager.persist(new OrderItem("product1", 5, order.getId()));
