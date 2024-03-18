@@ -44,13 +44,19 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
             setValue(entity, field, columnData, resultSet);
         }
 
+        if (columns.hasEagerLoad()) {
+            mapCollection(resultSet, entity, columns);
+        }
+
+        return (T) entity;
+    }
+
+    private void mapCollection(ResultSet resultSet, Object entity, Columns columns) throws SQLException {
         for (OneToManyData association : columns.getEagerAssociations()) {
             Field field = association.getField();
             field.setAccessible(true);
             innerSet(entity, field, getChildren(association, resultSet));
         }
-
-        return (T) entity;
     }
 
     private void setValue(Object entity, Field field, ColumnData columnData, ResultSet resultSet) throws SQLException {
@@ -79,7 +85,8 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     private Object createEntity(Class<?> clazz) throws SQLException {
         try {
             return clazz.getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new SQLException(e);
         }
     }

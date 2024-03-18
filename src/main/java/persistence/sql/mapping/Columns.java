@@ -118,6 +118,9 @@ public class Columns implements Iterable<ColumnData> {
                 .collect(Collectors.toList());
     }
 
+    public boolean hasEagerLoad() {
+        return associations.stream().anyMatch(OneToManyData::isEagerLoad);
+    }
     public boolean hasAssociation() {
         return !associations.isEmpty();
     }
