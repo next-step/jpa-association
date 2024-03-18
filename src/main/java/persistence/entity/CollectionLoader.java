@@ -29,19 +29,19 @@ public class CollectionLoader {
 
     public <T> T load(Class<T> clazz, Object id) {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns);
-        JoinBuilder joinBuilder = new JoinBuilder(table, columns);
+
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
         List<OneToManyData> associations = columns.getEagerAssociations();
 
-        String query = selectQueryBuilder.build(whereBuilder, joinBuilder);
-        logger.info("query: {}", query);
-
         if (associations.stream().noneMatch(OneToManyData::isLazyLoad)) {
+            JoinBuilder joinBuilder = new JoinBuilder(table, columns);
+            String query = selectQueryBuilder.build(whereBuilder, joinBuilder);
             return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
         }
 
         // TODO: LAZY
+        String query = selectQueryBuilder.build(whereBuilder, null);
         return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
     }
 }
