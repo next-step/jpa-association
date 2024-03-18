@@ -25,7 +25,7 @@ public class EntityLoader {
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns);
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
-        String query = selectQueryBuilder.build(whereBuilder, null);
+        String query = selectQueryBuilder.build(whereBuilder);
         return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
     }
 }

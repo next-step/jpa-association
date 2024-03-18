@@ -20,7 +20,7 @@ class SelectQueryBuilderTest {
     void testFindAll() {
         String expected = "select users.id, users.nick_name, users.old, users.email from users";
         WhereBuilder booleanBuilder = new WhereBuilder();
-        String selectQuery = selectQueryBuilder.build(booleanBuilder, null);
+        String selectQuery = selectQueryBuilder.build(booleanBuilder);
 
         assertThat(selectQuery).isEqualTo(expected);
     }
@@ -32,7 +32,7 @@ class SelectQueryBuilderTest {
         String expected = String.format("select users.id, users.nick_name, users.old, users.email from users where id = %s", id);
         WhereBuilder booleanBuilder = new WhereBuilder();
         booleanBuilder.and(eq("id", id));
-        String selectQuery = selectQueryBuilder.build(booleanBuilder, null);
+        String selectQuery = selectQueryBuilder.build(booleanBuilder);
 
         assertThat(selectQuery).isEqualTo(expected);
     }
@@ -52,7 +52,7 @@ class SelectQueryBuilderTest {
         WhereBuilder booleanBuilder = new WhereBuilder();
         booleanBuilder.and(eq("id", id));
 
-        String selectQuery = sut.build(booleanBuilder, joinBuilder);
+        String selectQuery = sut.buildWithJoin(booleanBuilder, joinBuilder);
 
         assertThat(selectQuery).isEqualTo(expected);
     }

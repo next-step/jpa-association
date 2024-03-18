@@ -35,13 +35,12 @@ public class CollectionLoader {
         List<OneToManyData> associations = columns.getEagerAssociations();
 
         if (associations.stream().noneMatch(OneToManyData::isLazyLoad)) {
-            JoinBuilder joinBuilder = new JoinBuilder(table, columns);
-            String query = selectQueryBuilder.build(whereBuilder, joinBuilder);
+            String query = selectQueryBuilder.buildWithJoin(whereBuilder, new JoinBuilder(table, columns));
             return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
         }
 
         // TODO: LAZY
-        String query = selectQueryBuilder.build(whereBuilder, null);
+        String query = selectQueryBuilder.build(whereBuilder);
         return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
     }
 }

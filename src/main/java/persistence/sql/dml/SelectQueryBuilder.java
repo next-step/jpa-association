@@ -1,7 +1,6 @@
 package persistence.sql.dml;
 
 import persistence.sql.mapping.Columns;
-import persistence.sql.mapping.OneToManyData;
 import persistence.sql.mapping.TableData;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ public class SelectQueryBuilder {
         this.columns = columns;
     }
 
-    public String build(WhereBuilder whereBuilder, JoinBuilder joinBuilder) {
+    private String buildTemplate(WhereBuilder whereBuilder, JoinBuilder joinBuilder) {
         StringBuilder query = new StringBuilder();
         query.append("select ");
         query.append(selectClause(columns));
@@ -40,6 +39,14 @@ public class SelectQueryBuilder {
         query.append(whereBuilder.toClause());
 
         return query.toString();
+    }
+
+    public String build(WhereBuilder whereBuilder) {
+        return buildTemplate(whereBuilder, null);
+    }
+
+    public String buildWithJoin(WhereBuilder whereBuilder, JoinBuilder joinBuilder) {
+        return buildTemplate(whereBuilder, joinBuilder);
     }
 
     private String getJoinTableSelect() {

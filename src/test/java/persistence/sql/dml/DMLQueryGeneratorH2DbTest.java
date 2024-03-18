@@ -64,7 +64,7 @@ class DMLQueryGeneratorH2DbTest {
         jdbcTemplate.execute(insertQueryBuilder.build(person2));
 
         List<Person> persons = jdbcTemplate.query(
-                selectQueryBuilder.build(new WhereBuilder(), null),
+                selectQueryBuilder.build(new WhereBuilder()),
                 new PersonRowMapper()
         );
 
