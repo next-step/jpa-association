@@ -1,8 +1,6 @@
 package persistence.sql.mapping;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Table {
@@ -10,7 +8,7 @@ public class Table {
     private final String name;
     private final Map<String, Column> columns;
     private final PrimaryKey primaryKey;
-    private List<TableJoin> tableJoins;
+    private List<TableJoin> tableJoins = new ArrayList<>();
 
     public Table(String name) {
         this.name = name;
@@ -48,5 +46,9 @@ public class Table {
 
     public void addColumns(final List<Column> columns) {
         columns.forEach(this::addColumn);
+    }
+
+    public List<TableJoin> getTableJoins() {
+        return Collections.unmodifiableList(this.tableJoins);
     }
 }
