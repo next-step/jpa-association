@@ -11,8 +11,8 @@ public class Criterion {
     private final Operators operators;
 
     private Criterion(final String key,
-                     final String value,
-                     final Operators operators) {
+                      final String value,
+                      final Operators operators) {
         this.key = key;
         this.value = value;
         this.operators = operators;
