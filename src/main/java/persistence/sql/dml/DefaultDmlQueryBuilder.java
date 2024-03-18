@@ -2,10 +2,7 @@ package persistence.sql.dml;
 
 import persistence.sql.QueryException;
 import persistence.sql.dialect.Dialect;
-import persistence.sql.mapping.Column;
-import persistence.sql.mapping.Table;
-import persistence.sql.mapping.TableJoin;
-import persistence.sql.mapping.Value;
+import persistence.sql.mapping.*;
 import util.StringUtils;
 
 import java.util.List;
@@ -133,7 +130,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
 
     private String buildSelectJoinColumnsClause(final List<TableJoin> tableJoins) {
         return tableJoins.stream()
-                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getTableName(), tableJoin.getJoinColumns()))
+                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getTableName(), tableJoin.getJoinedTableColumns()))
                 .collect(Collectors.joining(", "));
     }
 

@@ -26,7 +26,7 @@ public class TableJoin {
         return this.joinedTable.getName();
     }
 
-    public List<Column> getJoinColumns() {
+    public List<Column> getJoinedTableColumns() {
         return Collections.unmodifiableList(this.joinedTable.getColumns());
     }
 }
