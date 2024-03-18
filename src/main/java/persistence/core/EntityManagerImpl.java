@@ -2,8 +2,12 @@ package persistence.core;
 
 import database.DatabaseServer;
 import jdbc.JdbcTemplate;
+import persistence.entity.OrderItem;
+import persistence.entity.metadata.EntityMetadata;
+import persistence.entity.metadata.RelationEntityTable;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
@@ -29,6 +33,7 @@ public class EntityManagerImpl implements EntityManager {
             persistenceContext.getDatabaseSnapshot(entityKey);
             entityEntry.updateStatus(Status.MANAGED);
         }
+
         return entity;
     }
 

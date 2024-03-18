@@ -1,5 +1,8 @@
 package persistence.entity.metadata;
 
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import persistence.inspector.EntityFieldInspector;
 import persistence.inspector.EntityInfoExtractor;
 import persistence.sql.DataType;
@@ -15,19 +18,40 @@ public class EntityMetadataBuilder {
     public static EntityMetadata build(Class<?> clazz) {
         EntityMetadata metadata = new EntityMetadata();
         metadata.setEntityTable(new EntityTable(clazz.getSimpleName(), EntityInfoExtractor.getTableName(clazz)));
-        metadata.setColumns(new EntityColumns(buildColumns(clazz)));
+        metadata.setColumns(new EntityColumns(buildColumns(metadata.getTableName(), clazz)));
+        metadata.setRelationEntityTables(buildRelationEntities(clazz));
 
         return metadata;
     }
 
-    private static List<EntityColumn> buildColumns(Class<?> clazz) {
-        return EntityInfoExtractor.getColumns(clazz).stream()
-                .map(EntityMetadataBuilder::buildColumn)
+    private static List<RelationEntityTable> buildRelationEntities(Class<?> clazz) {
+        return EntityInfoExtractor.getAllFields(clazz)
+                .stream()
+                .filter(EntityInfoExtractor::isRelationshipField)
+                .map(EntityMetadataBuilder::buildRelationEntityMetadata)
                 .collect(Collectors.toList());
     }
 
-    private static EntityColumn buildColumn(Field field) {
+    private static RelationEntityTable buildRelationEntityMetadata(Field field) {
+        Class<?> fieldClassType = EntityInfoExtractor.getFieldClassType(field);
+        String joinColumnName = field.getAnnotation(JoinColumn.class).name();
+        if (field.isAnnotationPresent(OneToMany.class)) {
+            return new RelationEntityTable(RelationType.ONE_TO_MANY, fieldClassType, field);
+        } else if (field.isAnnotationPresent(ManyToOne.class)) {
+            return new RelationEntityTable(RelationType.MANY_TO_ONE, fieldClassType, field);
+        }
+        return null;
+    }
+
+    private static List<EntityColumn> buildColumns(String tableName, Class<?> clazz) {
+        return EntityInfoExtractor.getColumns(clazz).stream()
+                .map(column -> buildColumn(tableName, column))
+                .collect(Collectors.toList());
+    }
+
+    private static EntityColumn buildColumn(String tableName, Field field) {
         EntityColumn column = new EntityColumn();
+        column.setTableName(tableName);
         column.setField(field);
         column.setFieldName(field.getName());
         column.setColumnName(EntityInfoExtractor.getColumnName(field));

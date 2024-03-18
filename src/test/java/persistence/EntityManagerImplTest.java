@@ -12,12 +12,16 @@ import org.slf4j.LoggerFactory;
 import persistence.core.DDLExcuteor;
 import persistence.core.EntityManager;
 import persistence.core.EntityManagerImpl;
+import persistence.entity.Order;
+import persistence.entity.OrderItem;
 import persistence.entity.Person;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityManagerImplTest {
 
@@ -37,11 +41,15 @@ class EntityManagerImplTest {
         entityManager = new EntityManagerImpl(server);
 
         createTable(Person.class);
+        createTable(Order.class);
+        createTable(OrderItem.class);
     }
 
     @AfterEach
     public void tearDown() throws SQLException {
         dropTable(Person.class);
+        dropTable(Order.class);
+        dropTable(OrderItem.class);
         server.stop();
     }
 
@@ -98,12 +106,37 @@ class EntityManagerImplTest {
 
         entityManager.persist(person);
 
-        System.out.println("------------------------------------------- remove start ");
-
         entityManager.remove(person);
 
         assertThatThrownBy(() -> entityManager.find(Person.class, 1L))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Entity not found");
     }
+
+    @Test
+    @DisplayName("entity relation 조회")
+    public void findRelationEntityTest() {
+        Order order = new Order();
+        order.setOrderNumber("test1");
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setId(1L);
+        orderItem.setProduct("phone");
+        orderItem.setQuantity(2);
+        order.setOrderItems(List.of(orderItem));
+
+        entityManager.persist(order);
+
+        Order persistedOrder = entityManager.find(Order.class, 1L);
+
+        assertAll(
+                () -> assertThat(persistedOrder).isNotNull(),
+                () -> assertThat(persistedOrder.getOrderItems()).isNotEmpty(),
+                () -> assertThat(persistedOrder.getOrderItems().get(0).getProduct()).isEqualTo("phone"),
+                () -> assertThat(persistedOrder.getOrderItems().get(0).getQuantity()).isEqualTo(2)
+        );
+
+    }
+
+
 }

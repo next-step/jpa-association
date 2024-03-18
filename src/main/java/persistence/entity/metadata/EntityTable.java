@@ -4,10 +4,12 @@ public class EntityTable {
 
     private String entityName;
     private String tableName;
+    private EntityColumns columns;
 
     public EntityTable(String entityName, String tableName) {
         this.entityName = entityName;
         this.tableName = tableName;
+
     }
 
     public String getEntityName() {

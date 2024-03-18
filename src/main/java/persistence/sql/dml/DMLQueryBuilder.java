@@ -2,6 +2,7 @@ package persistence.sql.dml;
 
 import persistence.entity.metadata.EntityColumn;
 import persistence.entity.metadata.EntityColumns;
+import persistence.entity.metadata.EntityMetadata;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 public class DMLQueryBuilder {
 
     private static DMLQueryBuilder dmlQueryBuilder = null;
+    private Select select;
 
     public static DMLQueryBuilder getInstance() {
         if (dmlQueryBuilder == null) {
@@ -18,7 +20,11 @@ public class DMLQueryBuilder {
         return dmlQueryBuilder;
     }
 
-    private static final  String COLUMN_SEPARATOR = ", ";
+    public DMLQueryBuilder() {
+        select = new CustomSelect();
+    }
+
+    private static final String COLUMN_SEPARATOR = ", ";
 
     public String insertSql(String tableName, EntityColumns columns, Map<String, Object> columnValues) {
         List<EntityColumn> insertTargetColumns = getInsertTargetColumns(columns);
@@ -53,11 +59,11 @@ public class DMLQueryBuilder {
     }
 
     public String selectByIdQuery(String tableName, EntityColumns columns, Object id) {
-        String sql = selectAllSql(tableName, columns);
-        String condition = createCondition(columns.getIdColumn().getColumnName(), id, "=");
+        return select.selectByIdQuery(tableName, columns, id);
+    }
 
-        return DMLQueryFormatter.createSelectByConditionQuery(sql, condition);
-
+    public String selectJoinQuery(EntityMetadata mainEntity, EntityMetadata joinEntity, String joinColumn, Object oneEntityId) {
+        return select.selectJoinQuery(mainEntity, joinEntity, joinColumn, oneEntityId);
     }
 
     public String updateSql(String tableName, EntityColumns columns, Map<String, Object> columnValues) {
@@ -90,6 +96,7 @@ public class DMLQueryBuilder {
 
         return DMLQueryFormatter.createDeleteQuery(tableName, conditionClause);
     }
+
     private String wherePrimaryKeyClause(EntityColumns columns, Map<String, Object> columnValues) {
         String idColumnName = columns.getIdColumn().getColumnName();
         Object value = columnValues.get(idColumnName);
@@ -109,6 +116,5 @@ public class DMLQueryBuilder {
 
         return value == null ? "" : value.toString();
     }
-
 
 }
