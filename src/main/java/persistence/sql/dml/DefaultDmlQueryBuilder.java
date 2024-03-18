@@ -4,6 +4,7 @@ import persistence.sql.QueryException;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.mapping.Column;
 import persistence.sql.mapping.Table;
+import persistence.sql.mapping.TableJoin;
 import persistence.sql.mapping.Value;
 import util.StringUtils;
 
@@ -106,14 +107,6 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 .orElseThrow(() -> new QueryException("not found InsertQueryValueBinder for " + value.getOriginalType() + " type"));
     }
 
-    private String buildSelectColumnsClause(final List<Column> columns) {
-
-        return columns.stream()
-                .map(Column::getName)
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.joining(", "));
-    }
-
     @Override
     public String buildSelectQuery(final Select select) {
         final Table table = select.getTable();
@@ -121,13 +114,41 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
         return "select" +
                 ENTER +
                 SPACE +
-                buildSelectColumnsClause(table.getColumns()) +
+                buildSelectColumnsClause(table.getName(), table.getColumns()) +
+                buildSelectJoinColumnsClause(table.getTableJoins()) +
                 ENTER +
                 "from" +
                 ENTER +
                 SPACE +
                 table.getName() +
+                buildTablesJoinClause(table.getTableJoins()) +
                 buildWhereClause(buildWheresClause(select.getWheres()));
+    }
+
+    private String buildSelectColumnsClause(final String tableName, final List<Column> columns) {
+        return columns.stream()
+                .map(column -> tableName + "." + column.getName())
+                .collect(Collectors.joining(", "));
+    }
+
+    private String buildSelectJoinColumnsClause(final List<TableJoin> tableJoins) {
+        return tableJoins.stream()
+                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getTableName(), tableJoin.getJoinColumns()))
+                .collect(Collectors.joining(", "));
+    }
+
+    private String buildTablesJoinClause(final List<TableJoin> tableJoins) {
+        return tableJoins.stream()
+                .map(this::buildTableJoinQuery)
+                .collect(Collectors.joining(ENTER + SPACE));
+    }
+
+    private String buildTableJoinQuery(final TableJoin tableJoin) {
+        return tableJoin.getJoinType() +
+                "join" +
+                ENTER +
+                SPACE +
+                tableJoin.getTableName();
     }
 
     @Override
