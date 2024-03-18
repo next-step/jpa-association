@@ -1,8 +1,10 @@
 package persistence.sql.mapping;
 
 import jakarta.persistence.Entity;
+import persistence.model.EntityMetaData;
 import persistence.model.EntityMetaDataMapping;
 import persistence.sql.QueryException;
+import persistence.sql.dml.ComparisonOperator;
 
 import java.util.List;
 
@@ -21,8 +23,16 @@ public class TableBinder {
 
     public Table createTable(final Class<?> clazz) {
         final Table table = new Table(toTableName(clazz));
-        final List<Column> columns = columnBinder.createColumns(EntityMetaDataMapping.getMetaData(clazz.getName()));
+        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
+        final List<Column> columns = columnBinder.createColumns(metaData);
         table.addColumns(columns);
+        metaData.getJoinFields()
+                .forEach(field -> {
+                    final Table joinedTable = createTable(field.getFieldType());
+                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0), joinedTable.getPrimaryKey().getColumns().get(0), new ComparisonOperator(ComparisonOperator.Comparisons.EQ));
+                    final TableJoin tableJoin = new TableJoin(clazz.getName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
+                    table.addTableJoin(tableJoin);
+                });
 
         return table;
     }

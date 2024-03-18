@@ -48,6 +48,10 @@ public class Table {
         columns.forEach(this::addColumn);
     }
 
+    public void addTableJoin(final TableJoin tableJoin) {
+        this.tableJoins.add(tableJoin);
+    }
+
     public List<TableJoin> getTableJoins() {
         return Collections.unmodifiableList(this.tableJoins);
     }
