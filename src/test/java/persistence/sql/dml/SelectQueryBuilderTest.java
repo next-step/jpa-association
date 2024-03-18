@@ -4,16 +4,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.Order;
 import persistence.Person;
+import persistence.sql.mapping.Associations;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static persistence.sql.dml.BooleanExpression.eq;
 
 class SelectQueryBuilderTest {
     private final Columns columns = Columns.createColumns(Person.class);
     private final TableData table = TableData.from(Person.class);
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns);
+    private final Associations associations = Associations.fromEntityClass(Person.class);
+    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns, associations);
 
     @Test
     @DisplayName("요구사항2: findAll 쿼리 생성")
@@ -42,8 +45,8 @@ class SelectQueryBuilderTest {
     void testFindWithJoin() {
         Columns columns = Columns.createColumns(Order.class);
         TableData table = TableData.from(Order.class);
-        SelectQueryBuilder sut = new SelectQueryBuilder(table, columns);
-        JoinBuilder joinBuilder = new JoinBuilder(table, columns);
+        Associations associations = Associations.fromEntityClass(Order.class);
+        SelectQueryBuilder sut = new SelectQueryBuilder(table, columns, associations);
         int id = 1;
         String expected = String.format(
                 "select orders.id, orders.order_number, order_items.id, order_items.product, order_items.quantity from orders join order_items on orders.id = order_items.order_id where id = %s",
@@ -52,7 +55,7 @@ class SelectQueryBuilderTest {
         WhereBuilder booleanBuilder = new WhereBuilder();
         booleanBuilder.and(eq("id", id));
 
-        String selectQuery = sut.buildWithJoin(booleanBuilder, joinBuilder);
+        String selectQuery = sut.build(booleanBuilder);
 
         assertThat(selectQuery).isEqualTo(expected);
     }

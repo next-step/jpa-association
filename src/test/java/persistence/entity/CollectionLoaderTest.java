@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import persistence.H2DBTestSupport;
 import persistence.Order;
 import persistence.sql.ddl.CreateQueryBuilder;
+import persistence.sql.mapping.Associations;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
@@ -17,7 +18,8 @@ class CollectionLoaderTest extends H2DBTestSupport {
     private final CollectionLoader collectionLoader = new CollectionLoader(
             jdbcTemplate,
             TableData.from(Order.class),
-            Columns.createColumns(Order.class)
+            Columns.createColumns(Order.class),
+            Associations.fromEntityClass(Order.class)
     );
 
     @BeforeEach

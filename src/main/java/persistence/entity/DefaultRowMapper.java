@@ -3,10 +3,7 @@ package persistence.entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import jdbc.RowMapper;
-import persistence.sql.mapping.ColumnData;
-import persistence.sql.mapping.Columns;
-import persistence.sql.mapping.OneToManyData;
-import persistence.sql.mapping.TableData;
+import persistence.sql.mapping.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -38,21 +35,22 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
         Object entity = createEntity(clazz);
         TableData table = TableData.from(clazz);
         Columns columns = Columns.createColumns(clazz);
+        Associations associations = Associations.fromEntityClass(clazz);
 
         for (Field field : fields) {
             ColumnData columnData = ColumnData.createColumn(table.getName(), field);
             setValue(entity, field, columnData, resultSet);
         }
 
-        if (columns.hasEagerLoad()) {
-            mapCollection(resultSet, entity, columns);
+        if (associations.hasEagerLoad()) {
+            mapCollection(resultSet, entity, associations);
         }
 
         return (T) entity;
     }
 
-    private void mapCollection(ResultSet resultSet, Object entity, Columns columns) throws SQLException {
-        for (OneToManyData association : columns.getEagerAssociations()) {
+    private void mapCollection(ResultSet resultSet, Object entity, Associations associations) throws SQLException {
+        for (OneToManyData association : associations.getEagerAssociations()) {
             Field field = association.getField();
             field.setAccessible(true);
             innerSet(entity, field, getChildren(association, resultSet));
