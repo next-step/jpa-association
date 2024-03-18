@@ -3,6 +3,7 @@ package persistence.sql.dml;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.EntityMetaDataTestSupport;
+import persistence.sql.Order;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -54,9 +55,32 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final Select select = new Select(table);
 
         final String dml = "select\n" +
-                "    id, nick_name, old, email\n" +
+                "    users.id, users.nick_name, users.old, users.email\n" +
                 "from\n" +
                 "    users";
+
+        // when
+        final String result = queryBuilder.buildSelectQuery(select);
+
+        // then
+        assertThat(result).isEqualTo(dml);
+    }
+
+    @DisplayName("EAGER 연관관계가 있는 엔티티 클래스로 findAll 쿼리를 생성한다")
+    @Test
+    public void buildFindAllQueryWithLeftJoin() throws Exception {
+        // given
+        final Class<Order> clazz = Order.class;
+        final Table table = tableBinder.createTable(clazz);
+        final Select select = new Select(table);
+
+        final String dml = "select\n" +
+                "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
+                "from\n" +
+                "    orders" +
+                "left join\n" +
+                "    order_items\n" +
+                "on orders.id = order_items.order_id";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -77,7 +101,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final Select select = new Select(table, wheres);
 
         final String dml = "select\n" +
-                "    id, nick_name, old, email\n" +
+                "    users.id, users.nick_name, users.old, users.email\n" +
                 "from\n" +
                 "    users\n" +
                 "where\n" +
