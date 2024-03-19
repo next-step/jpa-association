@@ -79,7 +79,7 @@ public class ColumnBinder {
         final jakarta.persistence.Column columnAnnotation = field.getAnnotation(jakarta.persistence.Column.class);
 
         if (columnAnnotation == null || columnAnnotation.name().isBlank()) {
-            return field.getName().toLowerCase();
+            return field.getName();
         }
 
         return columnAnnotation.name();

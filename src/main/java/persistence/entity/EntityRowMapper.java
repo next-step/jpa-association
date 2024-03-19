@@ -57,7 +57,7 @@ public class EntityRowMapper<T> implements RowMapper<T> {
     private void extractFields(final Class<T> clazz) {
         EntityMetaDataMapping.getMetaData(clazz.getName())
                 .getFields()
-                .forEach(field -> fields.put(ColumnBinder.toColumnName(field), field));
+                .forEach(field -> fields.put(ColumnBinder.toColumnName(field).toLowerCase(), field));
     }
 
     private Field getFieldByColumnName(final String columnName) {
