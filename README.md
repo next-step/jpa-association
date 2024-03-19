@@ -9,3 +9,7 @@
 
 - [x] CGLib Proxy 적용
 - [x] 조회 시 프록시 객체를 사용해 적용해보자
+
+### 🚀 3단계 - OneToMany (FetchType.LAZY)
+
+- [x] 리팩터링 (FetchType.LAZY)
