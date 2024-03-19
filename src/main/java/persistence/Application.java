@@ -2,6 +2,7 @@ package persistence;
 
 import database.DatabaseServer;
 import database.H2;
+
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ public class Application {
             server.start();
 
             final JdbcTemplate jdbcTemplate = new JdbcTemplate(server.getConnection());
-
             server.stop();
         } catch (Exception e) {
             logger.error("Error occurred", e);
