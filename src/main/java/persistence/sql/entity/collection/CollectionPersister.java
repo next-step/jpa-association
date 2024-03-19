@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface CollectionPersister {
 
-    <T> T getEntity(Class<T> clazz, List<Object> lazyEntity);
+    List<Object> getEntity(Class<?> clazz, Object id);
 
-    void addEntity(Object entity, List<Object> lazyEntity);
+    void addEntity(Class<?> clazz, Object id, List<Object> lazyEntity);
 }
