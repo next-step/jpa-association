@@ -1,9 +1,6 @@
 package persistence.entity;
 
-import database.DatabaseServer;
 import database.H2;
-import dialect.Dialect;
-import dialect.H2Dialect;
 import entity.Person3;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
@@ -12,8 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.context.PersistenceContext;
-import persistence.context.SimplePersistenceContext;
+import persistence.JpaTest;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dml.UpdateQueryBuilder;
@@ -26,37 +22,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class EntityPersisterImplTest {
+class EntityPersisterImplTest extends JpaTest {
 
-    static Dialect dialect = new H2Dialect();
-    static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
-
-    static DatabaseServer server;
-    static JdbcTemplate jdbcTemplate;
-    static EntityPersister entityPersister;
-    static EntityLoader entityLoader;
-    static SimpleEntityManager simpleEntityManager;
-    static PersistenceContext persistenceContext;
-    static EntityEntry entityEntry;
-
-    Person3 person;
+    static Person3 person = new Person3(1L, "test", 20, "test@test.com");
 
     @BeforeAll
     static void init() throws SQLException {
         server = new H2();
         server.start();
-
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+
+        entityMetaData = new EntityMetaData(Person3.class, person);
         entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
         entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
-        persistenceContext = new SimplePersistenceContext();
         entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
+
         simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
     }
 
     @BeforeEach
     void setUp() {
-        person = new Person3(1L, "test", 20, "test@test.com");
         createTable();
     }
 
@@ -73,8 +58,11 @@ class EntityPersisterImplTest {
     @DisplayName("insert 테스트")
     @Test
     void insertTest() {
+        dropTable();
+        createTable();
         entityPersister.insert(person);
         Person3 person3 = simpleEntityManager.find(person, person.getClass(), person.getId());
+
         assertAll(
                 () -> assertThat(person3.getId()).isEqualTo(person.getId()),
                 () -> assertThat(person3.getName()).isEqualTo(person.getName()),
