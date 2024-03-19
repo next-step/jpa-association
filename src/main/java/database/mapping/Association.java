@@ -52,7 +52,6 @@ public class Association {
         return dialect.convertToSqlTypeDefinition((Class<?>) foreignKeyColumnType, 0);
     }
 
-    // XXX: 얘 노출 안하고 최대한 감춰보기
     public boolean isLazyLoad() {
         OneToMany oneToMany = field.getAnnotation(OneToMany.class);
         return oneToMany.fetch() == FetchType.LAZY;

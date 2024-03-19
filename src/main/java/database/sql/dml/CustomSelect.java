@@ -52,7 +52,9 @@ public class CustomSelect {
     private List<String> selectColumns() {
         List<String> columns = new LinkedList<>(primaryTableColumns());
         for (int tableIndex = 0; tableIndex < associations.size(); tableIndex++) {
-            if (associations.get(tableIndex).isLazyLoad()) continue;
+            if (associations.get(tableIndex).isLazyLoad()) {
+                continue;
+            }
             columns.addAll(associatedTableColumns(tableIndex));
         }
         return columns;
@@ -85,7 +87,9 @@ public class CustomSelect {
     private List<String> joins() {
         List<String> joins = new ArrayList<>();
         for (int index = 0; index < associations.size(); index++) {
-            if (associations.get(index).isLazyLoad()) continue;
+            if (associations.get(index).isLazyLoad()) {
+                continue;
+            }
             joins.add(eachJoin(index));
         }
         return joins;
