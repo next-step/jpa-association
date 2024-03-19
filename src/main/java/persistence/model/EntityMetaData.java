@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EntityMetaData {
 
@@ -28,7 +29,7 @@ public class EntityMetaData {
     }
 
     public List<Field> getFields() {
-        return this.entityFields.getFields().stream().map(EntityField::getField).toList();
+        return this.entityFields.getFields().stream().map(EntityField::getField).collect(Collectors.toList());
     }
 
     public List<EntityJoinEntityField> getJoinFields() {
