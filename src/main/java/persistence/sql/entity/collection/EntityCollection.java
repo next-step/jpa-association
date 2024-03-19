@@ -6,11 +6,11 @@ public class EntityCollection {
 
     private final String className;
     private final Object id;
-    private final List<?> collection;
+    private final List<Object> collection;
 
     public EntityCollection(final String className,
                             final Object id,
-                            final List<?> collection) {
+                            final List<Object> collection) {
         this.className = className;
         this.id = id;
         this.collection = collection;
@@ -18,6 +18,10 @@ public class EntityCollection {
 
     public boolean isEquals(final String className, final Object id) {
         return this.className.equals(className) && this.id.equals(id);
+    }
+
+    public List<Object> getCollection() {
+        return this.collection;
     }
 
 }
