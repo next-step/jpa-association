@@ -25,7 +25,6 @@ class EntityPersisterTest {
     private EntityManager entityManager;
     private EntityPersister entityPersister;
     private DatabaseServer databaseServer;
-    private SimplePersistenceContext persistenceContext;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -38,7 +37,8 @@ class EntityPersisterTest {
         databaseServer.start();
 
         jdbcTemplate = new JdbcTemplate(databaseServer.getConnection());
-        persistenceContext = new SimplePersistenceContext();
+        SimplePersistenceContext persistenceContext = new SimplePersistenceContext();
+
         entityManager = new SimpleEntityManager(jdbcTemplate, DIALECT, persistenceContext);
         entityPersister = new EntityPersister(jdbcTemplate, DIALECT);
 
