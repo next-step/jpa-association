@@ -14,37 +14,39 @@ class SelectTest {
 
     @Test
     void buildSelectQuery() {
-        String actual = newSelect(Person4.class).buildQuery();
+        String actual = newSelect().buildQuery();
         assertThat(actual).isEqualTo("SELECT id, nick_name, old, email FROM users");
     }
 
     @Test
     void buildSelectQueryWithCollection() {
-        String query = newSelect(Person4.class).ids(List.of(1L, 2L)).buildQuery();
+        String query = newSelect().ids(List.of(1L, 2L)).buildQuery();
         assertThat(query).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id IN (1, 2)");
 
     }
 
     @Test
     void buildSelectQueryWithEmptyCollection() {
-        String emptyArrayQuery = newSelect(Person4.class).ids(List.of()).buildQuery();
+        String emptyArrayQuery = newSelect().ids(List.of()).buildQuery();
         assertThat(emptyArrayQuery).isEqualTo("SELECT id, nick_name, old, email FROM users WHERE id IN ()");
     }
 
     @Test
     void buildSelectQueryWithInvalidColumn() {
         RuntimeException exception = assertThrows(RuntimeException.class,
-                                                  () -> newSelect(Person4.class)
+                                                  () -> newSelect()
                                                           .where(WhereMap.of("aaaaa", List.of()))
                                                           .buildQuery());
         assertThat(exception.getMessage()).isEqualTo("Invalid query: aaaaa");
     }
 
-    private Select newSelect(Class<?> entityClass) {
-        EntityMetadata entityMetadata = EntityMetadataFactory.get(entityClass);
+    private Select newSelect() {
+        EntityMetadata entityMetadata = EntityMetadataFactory.get(Person4.class);
         return new Select(
                 entityMetadata.getTableName(),
-                entityMetadata.getAllFieldNames());
+                entityMetadata.getAllColumnNamesWithAssociations(),
+                entityMetadata.getPrimaryKeyName(),
+                entityMetadata.getGeneralColumnNames());
     }
 
 }

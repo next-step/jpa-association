@@ -65,7 +65,7 @@ public class EntityPersister {
     public void delete(Class<?> clazz, Long id) {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
         String query = new Delete(entityMetadata.getTableName(),
-                                  entityMetadata.getAllFieldNames(),
+                                  entityMetadata.getAllColumnNamesWithAssociations(),
                                   entityMetadata.getPrimaryKey()
         )
                 .id(id)

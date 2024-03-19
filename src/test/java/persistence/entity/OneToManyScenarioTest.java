@@ -82,7 +82,7 @@ class OneToManyScenarioTest extends H2DatabaseTest {
 
         assertThat(executedQueries).isEqualTo(List.of(
                 "SELECT t.id, t.orderNumber FROM lazyload_orders t WHERE t.id = 1",
-                "SELECT id, product, quantity, order_id FROM lazyload_order_items WHERE order_id = 1"
+                "SELECT id, product, quantity FROM lazyload_order_items WHERE order_id = 1"
         ));
     }
 }

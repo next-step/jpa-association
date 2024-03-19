@@ -22,7 +22,7 @@ public class CustomSelect {
 
     private final String tableName;
     private final List<EntityColumn> allEntityColumns;
-    private final List<String> allFieldNames;
+    private final List<String> allColumnNamesWithAssociations;
     private final List<Association> associations;
 
     public CustomSelect(Class<?> clazz) {
@@ -32,7 +32,7 @@ public class CustomSelect {
     private CustomSelect(EntityMetadata entityMetadata) {
         this.tableName = entityMetadata.getTableName();
         this.allEntityColumns = entityMetadata.getAllEntityColumns();
-        this.allFieldNames = entityMetadata.getAllFieldNames();
+        this.allColumnNamesWithAssociations = entityMetadata.getAllColumnNamesWithAssociations();
         this.associations = entityMetadata.getAssociations();
     }
 
@@ -120,7 +120,7 @@ public class CustomSelect {
     }
 
     private String whereClause(WhereMap whereMap) {
-        return WhereClause.from(whereMap, allFieldNames, TABLE_ALIAS)
+        return WhereClause.from(whereMap, allColumnNamesWithAssociations, TABLE_ALIAS)
                 .withWhereClause(false)
                 .toQuery();
     }

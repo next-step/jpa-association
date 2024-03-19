@@ -26,10 +26,12 @@ public class EntityLoader {
         RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        String query = new SelectByPrimaryKey(
-                entityMetadata.getTableName(),
-                entityMetadata.getAllFieldNames()
-        ).byId(id).buildQuery();
+        String query = new SelectByPrimaryKey(entityMetadata.getTableName(),
+                                              entityMetadata.getAllColumnNamesWithAssociations(),
+                                              entityMetadata.getPrimaryKeyName(),
+                                              entityMetadata.getGeneralColumnNames())
+                .byId(id)
+                .buildQuery();
         return jdbcTemplate.query(query, rowMapper).stream().findFirst();
     }
 
@@ -37,7 +39,10 @@ public class EntityLoader {
         RowMapper<T> rowMapper = SingleRowMapperFactory.create(clazz, dialect);
 
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        String query = new Select(entityMetadata.getTableName(), entityMetadata.getAllFieldNames())
+        String query = new Select(entityMetadata.getTableName(),
+                                  entityMetadata.getAllColumnNamesWithAssociations(),
+                                  entityMetadata.getPrimaryKeyName(),
+                                  entityMetadata.getGeneralColumnNames())
                 .where(whereMap)
                 .buildQuery();
         return jdbcTemplate.query(query, rowMapper);

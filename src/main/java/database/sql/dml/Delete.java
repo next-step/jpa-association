@@ -10,19 +10,19 @@ import java.util.StringJoiner;
 public class Delete {
     private final String tableName;
     private final PrimaryKeyEntityColumn primaryKey;
-    private final List<String> allFieldNames;
+    private final List<String> allColumnNamesWithAssociations;
     private WhereClause where;
 
-    public Delete(String tableName, List<String> allFieldNames, PrimaryKeyEntityColumn primaryKey) {
+    public Delete(String tableName, List<String> allColumnNamesWithAssociations, PrimaryKeyEntityColumn primaryKey) {
         this.tableName = tableName;
         this.primaryKey = primaryKey;
-        this.allFieldNames = allFieldNames;
+        this.allColumnNamesWithAssociations = allColumnNamesWithAssociations;
 
         this.where = null;
     }
 
     public Delete where(WhereMap whereMap) {
-        this.where = WhereClause.from(whereMap, allFieldNames);
+        this.where = WhereClause.from(whereMap, allColumnNamesWithAssociations);
         return this;
     }
 

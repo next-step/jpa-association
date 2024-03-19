@@ -53,11 +53,8 @@ public class SingleRowMapperFactory {
                                       Class<?> clazz,
                                       Dialect dialect) throws SQLException {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        Object value = dialect.getFieldValueFromResultSet(resultSet, columnIndex, columnType);
-
         Field field = entityMetadata.getFieldByColumnName(columnName);
-
-        if (field == null) return; // XXX: 여기 아예 안들어오게
+        Object value = dialect.getFieldValueFromResultSet(resultSet, columnIndex, columnType);
 
         field.setAccessible(true);
         try {
