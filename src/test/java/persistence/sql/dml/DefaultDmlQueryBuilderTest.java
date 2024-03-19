@@ -77,10 +77,11 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final String dml = "select\n" +
                 "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
                 "from\n" +
-                "    orders" +
+                "    orders\n" +
                 "left join\n" +
                 "    order_items\n" +
-                "on orders.id = order_items.order_id";
+                "on\n" +
+                "    orders.id = order_items.order_id";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -104,6 +105,35 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "    users.id, users.nick_name, users.old, users.email\n" +
                 "from\n" +
                 "    users\n" +
+                "where\n" +
+                "    id = 1";
+
+        // when
+        final String result = queryBuilder.buildSelectQuery(select);
+
+        // then
+        assertThat(result).isEqualTo(dml);
+    }
+
+    @DisplayName("EAGER 연관관계가 있는 엔티티 클래스로 findById 쿼리를 생성한다")
+    @Test
+    public void buildFindByIdQueryWithLeftJoin() throws Exception {
+        // given
+        final Class<Order> clazz = Order.class;
+        final Table table = tableBinder.createTable(clazz);
+        final Column column = table.getColumn("id");
+        final Value value = new Value(Long.class, Types.BIGINT, 1);
+        final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
+        final Select select = new Select(table, wheres);
+
+        final String dml = "select\n" +
+                "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
+                "from\n" +
+                "    orders\n" +
+                "left join\n" +
+                "    order_items\n" +
+                "on\n" +
+                "    orders.id = order_items.order_id\n" +
                 "where\n" +
                 "    id = 1";
 
