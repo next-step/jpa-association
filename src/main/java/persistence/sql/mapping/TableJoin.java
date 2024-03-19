@@ -18,6 +18,10 @@ public class TableJoin {
         this.predicate = predicate;
     }
 
+    public String getParentTableName() {
+        return this.parentTableName;
+    }
+
     public String getJoinType() {
         return this.joinType.toString();
     }
@@ -28,5 +32,17 @@ public class TableJoin {
 
     public List<Column> getJoinedTableColumns() {
         return Collections.unmodifiableList(this.joinedTable.getColumns());
+    }
+
+    public String getOwnerTableColumnName() {
+        return this.predicate.getLeftHandExpression();
+    }
+
+    public String getJoinedTableColumnName() {
+        return this.predicate.getRightHandExpression();
+    }
+
+    public String getOperator() {
+        return this.predicate.getOperator();
     }
 }
