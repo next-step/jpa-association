@@ -15,11 +15,9 @@ import java.util.stream.Collectors;
 public class Columns implements Iterable<ColumnData> {
 
     private final List<ColumnData> columns;
-    private final List<OneToManyData> associations;
 
-    private Columns(List<ColumnData> columns, List<OneToManyData> associations) {
+    private Columns(List<ColumnData> columns) {
         this.columns = columns;
-        this.associations = associations;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class Columns implements Iterable<ColumnData> {
                 .collect(Collectors.toList());
 
         checkHasPrimaryKey(columns);
-        return new Columns(columns, extractAssociations(clazz));
+        return new Columns(columns);
     }
 
     public static Columns createColumnsWithValue(Object entity) {
@@ -52,7 +50,7 @@ public class Columns implements Iterable<ColumnData> {
                 .collect(Collectors.toList());
 
         checkHasPrimaryKey(columns);
-        return new Columns(columns, extractAssociations(clazz));
+        return new Columns(columns);
     }
 
     public List<String> getNames() {
@@ -103,22 +101,5 @@ public class Columns implements Iterable<ColumnData> {
         if (columns.stream().noneMatch(ColumnData::isPrimaryKey)) {
             throw new IdAnnotationMissingException();
         }
-    }
-
-    private static List<OneToManyData> extractAssociations(Class<?> clazz) {
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(OneToMany.class))
-                .map(OneToManyData::from)
-                .collect(Collectors.toList());
-    }
-
-    public List<OneToManyData> getEagerAssociations() {
-        return associations.stream()
-                .filter(OneToManyData::isEagerLoad)
-                .collect(Collectors.toList());
-    }
-
-    public boolean hasAssociation() {
-        return !associations.isEmpty();
     }
 }

@@ -3,10 +3,7 @@ package persistence.entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import jdbc.RowMapper;
-import persistence.sql.mapping.ColumnData;
-import persistence.sql.mapping.Columns;
-import persistence.sql.mapping.OneToManyData;
-import persistence.sql.mapping.TableData;
+import persistence.sql.mapping.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -38,19 +35,26 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
         Object entity = createEntity(clazz);
         TableData table = TableData.from(clazz);
         Columns columns = Columns.createColumns(clazz);
+        Associations associations = Associations.fromEntityClass(clazz);
 
         for (Field field : fields) {
             ColumnData columnData = ColumnData.createColumn(table.getName(), field);
             setValue(entity, field, columnData, resultSet);
         }
 
-        for (OneToManyData association : columns.getEagerAssociations()) {
+        if (associations.hasEagerLoad()) {
+            mapCollection(resultSet, entity, associations);
+        }
+
+        return (T) entity;
+    }
+
+    private void mapCollection(ResultSet resultSet, Object entity, Associations associations) throws SQLException {
+        for (OneToManyData association : associations.getEagerAssociations()) {
             Field field = association.getField();
             field.setAccessible(true);
             innerSet(entity, field, getChildren(association, resultSet));
         }
-
-        return (T) entity;
     }
 
     private void setValue(Object entity, Field field, ColumnData columnData, ResultSet resultSet) throws SQLException {
@@ -65,12 +69,10 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
         final List<Object> children = new ArrayList<>();
 
         do {
-            System.out.println(resultSet.getObject("order_items.product"));
             Object childEntity = createEntity(referenceEntityClazz);
             for (Field field : getFields(referenceEntityClazz)) {
                 field.setAccessible(true);
                 ColumnData column = ColumnData.createColumn(table.getName(), field);
-                Object value = resultSet.getObject(column.getNameWithTable());
                 innerSet(childEntity, field, resultSet.getObject(column.getNameWithTable()));
             }
             children.add(childEntity);
@@ -81,7 +83,8 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     private Object createEntity(Class<?> clazz) throws SQLException {
         try {
             return clazz.getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new SQLException(e);
         }
     }

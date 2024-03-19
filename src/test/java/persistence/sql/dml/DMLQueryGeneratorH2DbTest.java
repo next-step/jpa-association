@@ -9,6 +9,7 @@ import persistence.PersonRowMapper;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import persistence.sql.dialect.H2Dialect;
+import persistence.sql.mapping.Associations;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
@@ -22,9 +23,10 @@ class DMLQueryGeneratorH2DbTest {
 
     private final TableData tableData = TableData.from(Person.class);
     private final Columns columns = Columns.createColumns(Person.class);
+    private final Associations associations = Associations.fromEntityClass(Person.class);
     private final DropQueryBuilder dropQueryBuilder = new DropQueryBuilder(Person.class);
     private final CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(new H2Dialect(), Person.class);;
-    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(tableData, columns);
+    private final SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(tableData, columns, associations);
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder(Person.class);
 
     @BeforeAll
@@ -64,7 +66,7 @@ class DMLQueryGeneratorH2DbTest {
         jdbcTemplate.execute(insertQueryBuilder.build(person2));
 
         List<Person> persons = jdbcTemplate.query(
-                selectQueryBuilder.build(new WhereBuilder(), null),
+                selectQueryBuilder.build(new WhereBuilder()),
                 new PersonRowMapper()
         );
 

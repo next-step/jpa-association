@@ -1,5 +1,6 @@
 package persistence.sql.dml;
 
+import persistence.sql.mapping.Associations;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.OneToManyData;
 import persistence.sql.mapping.TableData;
@@ -10,26 +11,27 @@ import java.util.stream.Collectors;
 public class SelectQueryBuilder {
     private final TableData table;
     private final Columns columns;
+    private final Associations associations;
 
-    public SelectQueryBuilder(TableData table, Columns columns) {
+    public SelectQueryBuilder(TableData table, Columns columns, Associations associations) {
         this.table = table;
         this.columns = columns;
+        this.associations = associations;
     }
 
-    public String build(WhereBuilder whereBuilder, JoinBuilder joinBuilder) {
+    public String build(WhereBuilder whereBuilder) {
         StringBuilder query = new StringBuilder();
         query.append("select ");
         query.append(selectClause(columns));
-        String associationSelects = getJoinTableSelect();
-        if(!associationSelects.isEmpty()){
-            query.append(", ");
-            query.append(associationSelects);
+        if(associations.isNotEmpty()){
+            query.append(getJoinTableSelect(associations));
         }
 
         query.append(" from ");
         query.append(table.getName());
 
-        if(joinBuilder != null) {
+        if(associations.isNotEmpty()) {
+            JoinBuilder joinBuilder = new JoinBuilder(table, columns, associations);
             query.append(joinBuilder.build());
         }
 
@@ -42,10 +44,15 @@ public class SelectQueryBuilder {
         return query.toString();
     }
 
-    private String getJoinTableSelect() {
-        return columns.getEagerAssociations().stream().map(association ->
-            selectClause(Columns.createColumns(association.getReferenceEntityClazz()))
-        ).collect(Collectors.joining(", "));
+    private String getJoinTableSelect(Associations associations) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(OneToManyData association : associations.getEagerAssociations()) {
+            stringBuilder.append(", ");
+            String line = selectClause(Columns.createColumns(association.getReferenceEntityClazz()));
+            stringBuilder.append(line);
+        }
+
+        return stringBuilder.toString();
     }
 
     private String selectClause(Columns columns) {
