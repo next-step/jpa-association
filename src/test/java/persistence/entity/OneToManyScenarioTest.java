@@ -56,18 +56,18 @@ class OneToManyScenarioTest extends H2DatabaseTest {
         EagerLoadTestOrder order = entityManager.find(EagerLoadTestOrder.class, 1L);
 
         assertAll(
-                () -> assertThat(order.getId()).isEqualTo(1L),
-                () -> assertThat(order.getOrderNumber()).isEqualTo("1234"),
-                () -> assertThat(order.getOrderItems()).hasSize(2),
-
-                () -> assertThat(order.getOrderItems().get(0).getId()).isEqualTo(1L),
-                () -> assertThat(order.getOrderItems().get(0).getProduct()).isEqualTo("product1"),
-                () -> assertThat(order.getOrderItems().get(0).getQuantity()).isEqualTo(5),
-
-                () -> assertThat(order.getOrderItems().get(1).getId()).isEqualTo(2L),
-                () -> assertThat(order.getOrderItems().get(1).getProduct()).isEqualTo("product20"),
-                () -> assertThat(order.getOrderItems().get(1).getQuantity()).isEqualTo(50),
-
+                () -> assertThat(order)
+                        .hasFieldOrPropertyWithValue("id", 1L)
+                        .hasFieldOrPropertyWithValue("orderNumber", "1234"),
+                ()->assertThat(order.getOrderItems()).hasSize(2),
+                () -> assertThat(order.getOrderItems().get(0))
+                        .hasFieldOrPropertyWithValue("id", 1L)
+                        .hasFieldOrPropertyWithValue("product", "product1")
+                        .hasFieldOrPropertyWithValue("quantity", 5),
+                () -> assertThat(order.getOrderItems().get(1))
+                        .hasFieldOrPropertyWithValue("id", 2L)
+                        .hasFieldOrPropertyWithValue("product", "product20")
+                        .hasFieldOrPropertyWithValue("quantity", 50),
                 () -> assertThat(executedQueries).isEqualTo(List.of(
                         "SELECT t.id, t.orderNumber, a0.order_id, a0.id, a0.product, a0.quantity FROM eagerload_orders t LEFT JOIN eagerload_order_items a0 ON t.id = a0.order_id WHERE t.id = 1"))
         );
@@ -78,11 +78,21 @@ class OneToManyScenarioTest extends H2DatabaseTest {
     void scenario7() {
         LazyLoadTestOrder res = entityManager.find(LazyLoadTestOrder.class, 1L);
         List<LazyLoadTestOrderItem> orderItems = res.getOrderItems();
-        assertThat(orderItems.size()).isEqualTo(2);
 
-        assertThat(executedQueries).isEqualTo(List.of(
-                "SELECT t.id, t.orderNumber FROM lazyload_orders t WHERE t.id = 1",
-                "SELECT id, product, quantity FROM lazyload_order_items WHERE order_id = 1"
-        ));
+        assertAll(
+                () -> assertThat(orderItems.size()).isEqualTo(2),
+                () -> assertThat(orderItems.get(0))
+                        .hasFieldOrPropertyWithValue("id", 1L)
+                        .hasFieldOrPropertyWithValue("product", "product1")
+                        .hasFieldOrPropertyWithValue("quantity", 5),
+                () -> assertThat(orderItems.get(1))
+                        .hasFieldOrPropertyWithValue("id", 2L)
+                        .hasFieldOrPropertyWithValue("product", "product20")
+                        .hasFieldOrPropertyWithValue("quantity", 50),
+                () -> assertThat(executedQueries).isEqualTo(List.of(
+                        "SELECT t.id, t.orderNumber FROM lazyload_orders t WHERE t.id = 1",
+                        "SELECT id, product, quantity FROM lazyload_order_items WHERE order_id = 1"
+                ))
+        );
     }
 }
