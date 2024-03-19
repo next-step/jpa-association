@@ -223,7 +223,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
 
         final String valueClause = queryValueBinder.bind(value.getValue());
 
-        return (where.getLogicalOperator() + " " + where.getColumnName() + where.getWhereOperator(valueClause)).trim();
+        return (where.getLogicalOperator() + " " + where.getColumnTableName() + "." + where.getColumnName() + where.getWhereOperator(valueClause)).trim();
     }
 
     private String buildWhereClause(final String whereClause) {

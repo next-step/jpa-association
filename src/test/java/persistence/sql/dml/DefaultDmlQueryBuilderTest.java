@@ -106,7 +106,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "from\n" +
                 "    users\n" +
                 "where\n" +
-                "    id = 1";
+                "    users.id = 1";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -135,7 +135,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "on\n" +
                 "    orders.id = order_items.order_id\n" +
                 "where\n" +
-                "    id = 1";
+                "    orders.id = 1";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -161,7 +161,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "set\n" +
                 "    nick_name = 'name', old = 1, email = 'email@domain.com'\n" +
                 "where\n" +
-                "    id = 1";
+                "    users.id = 1";
 
         // when
         final String result = queryBuilder.buildUpdateQuery(update);
@@ -185,7 +185,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "from\n" +
                 "    users\n" +
                 "where\n" +
-                "    id = 1";
+                "    users.id = 1";
 
         // when
         final String result = queryBuilder.buildDeleteQuery(delete);
