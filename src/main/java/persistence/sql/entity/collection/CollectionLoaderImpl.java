@@ -27,7 +27,7 @@ public class CollectionLoaderImpl implements CollectionLoader {
     }
 
     @Override
-    public <T> List<T> findById(final Class<T> clazz, final Object id) {
+    public List<Object> findById(final Class<?> clazz, final Object id) {
         final EntityMappingTable entityMappingTable = EntityMappingTable.from(clazz);
         final PrimaryDomainType primaryDomainType = entityMappingTable.getPkDomainTypes();
         final ColumnClause columnClause = new ColumnClause(entityMappingTable.getColumnName());

@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface CollectionLoader {
 
-    <T> List<T> findById(Class<T> clazz, Object id);
+    List<Object> findById(Class<?> clazz, Object id);
 
 }
