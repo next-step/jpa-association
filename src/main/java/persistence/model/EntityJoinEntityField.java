@@ -1,30 +1,36 @@
 package persistence.model;
 
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+import util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 
 public class EntityJoinEntityField {
 
-    private final Class<?> entityClass;
-    private final Field field;
+    protected final Class<?> entityClass;
+    protected final Field field;
+    protected final FetchType fetchType;
 
-    public EntityJoinEntityField(final Field field) {
-        if (isOne(field)) {
-            this.entityClass = (Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
-        } else {
-            this.entityClass = field.getClass();
-        }
+    public EntityJoinEntityField(final Class<?> entityClass, final Field field, final FetchType fetchType) {
+        this.entityClass = entityClass;
         this.field = field;
-    }
-
-    private boolean isOne(final Field field) {
-        return field.isAnnotationPresent(OneToOne.class) || field.isAnnotationPresent(OneToMany.class);
+        this.fetchType = fetchType;
     }
 
     public Class<?> getFieldType() {
         return this.entityClass;
+    }
+
+    public String getJoinedColumnName() {
+        final JoinColumn annotation = this.field.getAnnotation(JoinColumn.class);
+        if (annotation != null && StringUtils.isNotBlank(annotation.name())) {
+            return annotation.name();
+        }
+
+        return this.field.getName();
+    }
+
+    public boolean isNotLazy() {
+        return this.fetchType == FetchType.EAGER;
     }
 }
