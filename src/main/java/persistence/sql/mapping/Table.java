@@ -48,8 +48,8 @@ public class Table {
         columns.forEach(this::addColumn);
     }
 
-    public void addTableJoin(final TableJoin tableJoin) {
-        this.tableJoins.add(tableJoin);
+    public void addTableJoins(final List<TableJoin> tableJoins) {
+        this.tableJoins.addAll(tableJoins);
     }
 
     public List<TableJoin> getTableJoins() {

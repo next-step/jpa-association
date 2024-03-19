@@ -8,6 +8,7 @@ import persistence.sql.QueryException;
 import persistence.sql.dml.ComparisonOperator;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TableBinder {
 
@@ -16,8 +17,11 @@ public class TableBinder {
     public Table createTable(final Object object) {
         final Class<?> entityClass = object.getClass();
         final Table table = new Table(toTableName(entityClass));
-        final List<Column> columns = columnBinder.createColumns(EntityMetaDataMapping.getMetaData(entityClass.getName()), object);
+        final List<Column> columns = columnBinder.createColumns(table.getName(), EntityMetaDataMapping.getMetaData(entityClass.getName()), object);
         table.addColumns(columns);
+        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(entityClass.getName());
+        final List<TableJoin> tableJoins = extractTableJoins(metaData, table, entityClass);
+        table.addTableJoins(tableJoins);
 
         return table;
     }
@@ -25,18 +29,22 @@ public class TableBinder {
     public Table createTable(final Class<?> clazz) {
         final Table table = new Table(toTableName(clazz));
         final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
-        final List<Column> columns = columnBinder.createColumns(metaData);
+        final List<Column> columns = columnBinder.createColumns(table.getName(), metaData);
         table.addColumns(columns);
-        metaData.getJoinFields()
-                .stream().filter(EntityJoinEntityField::isNotLazy)
-                .forEach(field -> {
-                    final Table joinedTable = createTable(field.getFieldType());
-                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0).getName(), field.getJoinedColumnName(), ComparisonOperator.Comparisons.EQ);
-                    final TableJoin tableJoin = new TableJoin(clazz.getName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
-                    table.addTableJoin(tableJoin);
-                });
+        final List<TableJoin> tableJoins = extractTableJoins(metaData, table, clazz);
+        table.addTableJoins(tableJoins);
 
         return table;
+    }
+
+    private List<TableJoin> extractTableJoins(final EntityMetaData metaData, final Table table, final Class<?> entityClass) {
+        return metaData.getJoinFields()
+                .stream().filter(EntityJoinEntityField::isNotLazy)
+                .map(field -> {
+                    final Table joinedTable = createTable(field.getFieldType());
+                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0).getName(), field.getJoinedColumnName(), ComparisonOperator.Comparisons.EQ);
+                    return new TableJoin(entityClass.getName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
+                }).collect(Collectors.toList());
     }
 
     public Table createTable(final Class<?> clazz, final List<Column> columns) {
