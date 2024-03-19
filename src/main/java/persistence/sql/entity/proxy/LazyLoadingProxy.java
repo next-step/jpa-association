@@ -25,6 +25,7 @@ public class LazyLoadingProxy implements LazyLoader {
 
     @Override
     public Object loadObject() throws Exception {
+        System.out.println("Lazy loading 발생");
         List<Object> entity = collectionPersister.getEntity(clazz, id);
         if(entity != null) {
             return entity;
