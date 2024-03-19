@@ -1,5 +1,7 @@
 package persistence.sql.entity.model;
 
+import jakarta.persistence.FetchType;
+
 import java.lang.reflect.Field;
 
 public interface DomainType {
@@ -19,6 +21,8 @@ public interface DomainType {
     Field getField();
 
     boolean isJoinColumn();
+
+    FetchType getFetchType();
 
     String getAlias(String tableName);
 }

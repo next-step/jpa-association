@@ -1,6 +1,7 @@
 package persistence.sql.entity.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import persistence.sql.dml.exception.InvalidFieldValueException;
@@ -86,6 +87,11 @@ public class PrimaryDomainType implements DomainType {
     @Override
     public boolean isJoinColumn() {
         return false;
+    }
+
+    @Override
+    public FetchType getFetchType() {
+        return null;
     }
 
     @Override
