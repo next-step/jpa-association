@@ -2,8 +2,10 @@ package persistence.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.EntityMetaDataTestSupport;
 import persistence.PersonV3FixtureFactory;
 import persistence.sql.ddl.PersonV0;
+import persistence.sql.ddl.PersonV1;
 import persistence.sql.ddl.PersonV3;
 
 import java.util.Map;
@@ -11,14 +13,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class EntityMetaDataTest {
+class EntityMetaDataTest extends EntityMetaDataTestSupport {
 
     @DisplayName("메타 데이터에 있는 필드들을 이용해 entity 객체에서 필드 값들을 추출한다")
     @Test
     public void extractValues() throws Exception {
         // given
         final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
-        final EntityMetaData metaData = new EntityMetaData(person.getClass());
+        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(person.getClass().getName());
 
         // when
         final Map<String, Object> values = metaData.extractValues(person);
@@ -34,12 +36,12 @@ class EntityMetaDataTest {
     public void extractValuesNotEqualClassType() throws Exception {
         // given
         final PersonV3 person = PersonV3FixtureFactory.generatePersonV3Stub();
-        final EntityMetaData metaData = new EntityMetaData(PersonV0.class);
+        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(PersonV1.class.getName());
 
         // when then
         assertThatThrownBy(() -> metaData.extractValues(person))
                 .isInstanceOf(MetaDataModelMappingException.class)
-                .hasMessage("not equal class type - meta data type: " + PersonV0.class.getName() + ", parameter type: " + person.getClass().getName());
+                .hasMessage("not equal class type - meta data type: " + PersonV1.class.getName() + ", parameter type: " + person.getClass().getName());
     }
 
 }

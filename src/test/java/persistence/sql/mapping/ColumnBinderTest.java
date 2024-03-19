@@ -4,7 +4,9 @@ import jakarta.persistence.Transient;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import persistence.EntityMetaDataTestSupport;
 import persistence.model.EntityMetaData;
+import persistence.model.EntityMetaDataMapping;
 import persistence.sql.ddl.PersonV3;
 
 import java.lang.reflect.Field;
@@ -15,7 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class ColumnBinderTest {
+class ColumnBinderTest extends EntityMetaDataTestSupport {
 
     private final ColumnTypeMapper columnTypeMapper = ColumnTypeMapper.getInstance();
 
@@ -27,7 +29,7 @@ class ColumnBinderTest {
         // given
         final Class<PersonV3> clazz = PersonV3.class;
         final int fieldsNum = (int) Arrays.stream(clazz.getDeclaredFields()).filter(field -> !field.isAnnotationPresent(Transient.class)).count();
-        final EntityMetaData metaData = new EntityMetaData(clazz);
+        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
 
         // when
         final List<Column> columns = columnBinder.createColumns(metaData);
@@ -50,7 +52,7 @@ class ColumnBinderTest {
         final PersonV3 person = new PersonV3(id, name, age, mail, index);
         final Class<? extends PersonV3> clazz = person.getClass();
         final int fieldsNum = (int) Arrays.stream(clazz.getDeclaredFields()).filter(field -> !field.isAnnotationPresent(Transient.class)).count();
-        final EntityMetaData metaData = new EntityMetaData(clazz);
+        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
 
         // when
         final List<Column> columns = columnBinder.createColumns(metaData, person);
