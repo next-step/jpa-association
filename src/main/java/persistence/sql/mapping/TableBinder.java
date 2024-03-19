@@ -1,6 +1,7 @@
 package persistence.sql.mapping;
 
 import jakarta.persistence.Entity;
+import persistence.model.EntityJoinEntityField;
 import persistence.model.EntityMetaData;
 import persistence.model.EntityMetaDataMapping;
 import persistence.sql.QueryException;
@@ -27,9 +28,10 @@ public class TableBinder {
         final List<Column> columns = columnBinder.createColumns(metaData);
         table.addColumns(columns);
         metaData.getJoinFields()
+                .stream().filter(EntityJoinEntityField::isNotLazy)
                 .forEach(field -> {
                     final Table joinedTable = createTable(field.getFieldType());
-                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0), joinedTable.getPrimaryKey().getColumns().get(0), new ComparisonOperator(ComparisonOperator.Comparisons.EQ));
+                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0).getName(), field.getJoinedColumnName(), ComparisonOperator.Comparisons.EQ);
                     final TableJoin tableJoin = new TableJoin(clazz.getName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
                     table.addTableJoin(tableJoin);
                 });
