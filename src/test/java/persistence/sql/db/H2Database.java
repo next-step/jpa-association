@@ -14,6 +14,7 @@ import persistence.sql.dialect.DialectResolutionInfo;
 import persistence.sql.dialect.database.Database;
 import persistence.sql.dml.query.builder.*;
 import persistence.sql.entity.EntityMappingTable;
+import persistence.sql.entity.collection.*;
 import persistence.sql.entity.loader.EntityLoader;
 import persistence.sql.entity.loader.EntityLoaderImpl;
 import persistence.sql.entity.loader.EntityLoaderMapper;
@@ -43,6 +44,9 @@ public abstract class H2Database {
     protected static EntityLoaderMapper entityLoaderMapper;
     protected static EntityLoader entityLoader;
     protected static EntityPersister entityPersister;
+    protected static CollectionPersister collectionPersister;
+    protected static CollectionLoader collectionLoader;
+    protected static LazyLoadingManager lazyLoadingManager;
 
     protected static EntityManager entityManager;
 
@@ -50,6 +54,7 @@ public abstract class H2Database {
     static void setUpAll() throws SQLException {
         server = new H2();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+        collectionPersister = new CollectionPersisterImpl();
 
         selectQueryBuilder = SelectQueryBuilder.getInstance();
         eagerSelectQueryBuilder = EagerSelectQueryBuilder.getInstance();
@@ -63,11 +68,19 @@ public abstract class H2Database {
                 insertQueryBuilder,
                 updateQueryBuilder,
                 deleteQueryBuilder);
+        collectionLoader = new CollectionLoaderImpl(
+                entityLoaderMapper,
+                selectQueryBuilder,
+                jdbcTemplate
+        );
+        lazyLoadingManager = new LazyLoadingManager(collectionPersister, collectionLoader);
         entityLoader = new EntityLoaderImpl(
                 jdbcTemplate,
                 entityLoaderMapper,
                 selectQueryBuilder,
-                eagerSelectQueryBuilder);
+                eagerSelectQueryBuilder,
+                lazyLoadingManager);
+
         entityManager = new EntityManagerImpl(entityLoader, entityPersister);
 
         createTable();
