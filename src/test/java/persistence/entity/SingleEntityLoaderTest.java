@@ -3,9 +3,11 @@ package persistence.entity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.JdbcServerDmlQueryTestSupport;
+import persistence.OrderFixtureFactory;
 import persistence.PersonV3FixtureFactory;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.SingleEntityLoader;
+import persistence.sql.Order;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -40,6 +42,26 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
         assertThat(entity).isNotNull()
                 .extracting("id", "name", "age", "email")
                 .contains(key, person.getName(), person.getAge(), person.getEmail());
+    }
+
+    @DisplayName("EAGER 연관관계 클래스 정보로 엔티티를 조회한다")
+    @Test
+    public void loadEagerJoin() throws Exception {
+        // given
+        final Class<Order> clazz = Order.class;
+        final long key = 1L;
+        final Order order = OrderFixtureFactory.generateOrderStub(key);
+        final String orderInsertQuery = generateOrderTableStubInsertQuery(order);
+        final String orderItemInsertQuery = generateOrderItemTableStubInsertQuery(order);
+
+        jdbcTemplate.execute(orderInsertQuery);
+        jdbcTemplate.execute(orderItemInsertQuery);
+
+        // when
+        final Order entity = entityLoader.load(clazz, key);
+
+        // then
+        assertThat(entity).isNotNull();
     }
 
 }
