@@ -17,7 +17,7 @@ public class DeleteQueryBuilder {
     }
 
     public String deleteQuery(IdField idField) {
-        return String.format(DELETE_QUERY, entityMetaData.getTableInfo().getName(), idField.getFieldNameData(), idField.getFieldValueData());
+        return String.format(DELETE_QUERY, entityMetaData.getEntityName(), idField.getFieldNameData(), idField.getFieldValueData());
     }
 
     public String deleteByIdQuery(Object entity) {
