@@ -32,7 +32,7 @@ class ColumnBinderTest extends EntityMetaDataTestSupport {
         final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
 
         // when
-        final List<Column> columns = columnBinder.createColumns(metaData);
+        final List<Column> columns = columnBinder.createColumns("users", metaData);
 
         // then
         assertThat(columns).hasSize(fieldsNum)
@@ -55,7 +55,7 @@ class ColumnBinderTest extends EntityMetaDataTestSupport {
         final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
 
         // when
-        final List<Column> columns = columnBinder.createColumns(metaData, person);
+        final List<Column> columns = columnBinder.createColumns("users", metaData, person);
 
         // then
         assertThat(columns).hasSize(fieldsNum)
@@ -76,7 +76,7 @@ class ColumnBinderTest extends EntityMetaDataTestSupport {
         final Field nameField = clazz.getDeclaredField("name");
 
         // when
-        final Column column = columnBinder.createColumn(nameField);
+        final Column column = columnBinder.createColumn("users", nameField);
 
         // then
         assertThat(column)

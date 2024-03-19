@@ -5,29 +5,25 @@ import persistence.sql.dialect.Dialect;
 
 public class Column {
 
+    private final String tableName;
     private final String name;
-
     private final int type;
-
     private final Value value;
-
     private int length = 255;
-
     private boolean nullable = true;
-
     private boolean unique = false;
-
     private boolean pk = false;
-
     private GenerationType pkStrategy = null;
 
-    public Column(final String columnName, final int sqlType, final Value value) {
+    public Column(final String tableName, final String columnName, final int sqlType, final Value value) {
+        this.tableName = tableName;
         this.name = columnName;
         this.type = sqlType;
         this.value = value;
     }
 
-    public Column(final String columnName, final int sqlType, final Value value, final int length, final boolean nullable, final boolean unique) {
+    public Column(final String tableName, final String columnName, final int sqlType, final Value value, final int length, final boolean nullable, final boolean unique) {
+        this.tableName = tableName;
         this.name = columnName;
         this.type = sqlType;
         this.value = value;
@@ -37,15 +33,19 @@ public class Column {
     }
 
     public Column clone() {
-        final Column copy = new Column(this.name, this.type, this.getValue(), this.length, this.nullable, this.unique);
+        final Column copy = new Column(this.tableName, this.name, this.type, this.getValue(), this.length, this.nullable, this.unique);
         copy.setPk(this.pk);
         copy.setStrategy(this.pkStrategy);
 
         return copy;
     }
 
+    public String getTableName() {
+        return this.tableName;
+    }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public String getSqlType(Dialect dialect) {
