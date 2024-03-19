@@ -14,7 +14,8 @@ public class OrderItem {
 
     private Integer quantity;
 
-    public OrderItem(final String product, final Integer quantity) {
+    public OrderItem(final Long id, final String product, final Integer quantity) {
+        this.id = id;
         this.product = product;
         this.quantity = quantity;
     }
@@ -22,4 +23,13 @@ public class OrderItem {
     public OrderItem() {
 
     }
+
+    public String getProduct() {
+        return this.product;
+    }
+
+    public Integer getQuantity() {
+        return this.quantity;
+    }
+
 }

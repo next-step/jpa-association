@@ -4,10 +4,13 @@ import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import persistence.sql.JdbcServerTest;
+import persistence.sql.Order;
+import persistence.sql.OrderItem;
 import persistence.sql.TestJdbcServerExtension;
 import persistence.sql.ddl.PersonV3;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @JdbcServerTest
 public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSupport {
@@ -24,7 +27,19 @@ public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSu
                 "    old integer,\n" +
                 "    email varchar(255) not null,\n" +
                 "    primary key (id)\n" +
-                ")";
+                ");\n" +
+                "CREATE TABLE orders (\n" +
+                "    id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
+                "    orderNumber VARCHAR(255)\n" +
+                ");\n" +
+                "\n" +
+                "CREATE TABLE order_items (\n" +
+                "    id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
+                "    product VARCHAR(255),\n" +
+                "    quantity INTEGER,\n" +
+                "    order_id BIGINT,\n" +
+                "    FOREIGN KEY (order_id) REFERENCES orders(id)\n" +
+                ");";
         jdbcTemplate.execute(ddl);
     }
 
@@ -44,7 +59,30 @@ public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSu
                 "    users\n" +
                 "    (nick_name, old, email, id)\n" +
                 "values\n" +
-                "    ('" + person.getName() + "', " + person.getAge() + ", '" + person.getEmail() + "', default)";
+                "    ('" + person.getName() + "', " + person.getAge() + ", '" + person.getEmail() + "', default);";
+    }
+
+    protected String generateOrderTableStubInsertQuery(final Order order) {
+        return "insert\n" +
+                "into\n" +
+                "    orders\n" +
+                "    (orderNumber, id) " +
+                "values\n" +
+                "    ('" + order.getOrderNumber() + "', default);";
+    }
+
+    protected String generateOrderItemTableStubInsertQuery(final Order order) {
+        return this.generateOrderItemTableStubInsertQuery(order.getId(), order.getOrderItems());
+    }
+
+    protected String generateOrderItemTableStubInsertQuery(final Long orderId, final List<OrderItem> orderItems) {
+        final String clause = orderItems.stream().map(orderItem -> "('" + orderItem.getProduct() + "', " + orderItem.getQuantity() + ", " + orderId + ", default)").collect(Collectors.joining(", "));
+        return "insert\n" +
+                "into\n" +
+                "    order_items\n" +
+                "    (product, quantity, order_id, id) " +
+                "values\n" +
+                "    " + clause + ";";
     }
 
 }

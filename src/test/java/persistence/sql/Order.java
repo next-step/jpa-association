@@ -18,12 +18,25 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
 
-    public Order(final String orderNumber, final List<OrderItem> orderItems) {
+    public Order(final Long id, final String orderNumber, final List<OrderItem> orderItems) {
+        this.id = id;
         this.orderNumber = orderNumber;
         this.orderItems = orderItems;
     }
 
     public Order() {
 
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getOrderNumber() {
+        return this.orderNumber;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return this.orderItems;
     }
 }
