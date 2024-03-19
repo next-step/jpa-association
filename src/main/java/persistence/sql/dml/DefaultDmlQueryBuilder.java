@@ -7,6 +7,7 @@ import util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static persistence.sql.QueryBuilderConst.ENTER;
 import static persistence.sql.QueryBuilderConst.SPACE;
@@ -111,8 +112,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
         return "select" +
                 ENTER +
                 SPACE +
-                buildSelectColumnsClause(table.getName(), table.getColumns()) +
-                buildSelectJoinColumnsClause(table.getTableJoins()) +
+                buildSelectColumnsClause(table.getName(), table.getColumns(), table.getTableJoins()) +
                 ENTER +
                 "from" +
                 ENTER +
@@ -120,6 +120,15 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 table.getName() +
                 buildTablesJoinClause(table.getTableJoins()) +
                 buildWhereClause(buildWheresClause(select.getWheres()));
+    }
+
+    private String buildSelectColumnsClause(final String tableName, final List<Column> columns, final List<TableJoin> tableJoins) {
+        final String selectColumnsClause = buildSelectColumnsClause(tableName, columns);
+        final String selectJoinColumnsClause = buildSelectJoinColumnsClause(tableJoins);
+
+        return Stream.of(selectColumnsClause, selectJoinColumnsClause)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(", "));
     }
 
     private String buildSelectColumnsClause(final String tableName, final List<Column> columns) {
@@ -135,17 +144,36 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
     }
 
     private String buildTablesJoinClause(final List<TableJoin> tableJoins) {
-        return tableJoins.stream()
-                .map(this::buildTableJoinQuery)
+
+        final String clause = tableJoins.stream()
+                .map(this::buildTableJoinClause)
                 .collect(Collectors.joining(ENTER + SPACE));
+
+        if (clause.isBlank()) {
+            return "";
+        }
+
+        return ENTER +
+                clause;
     }
 
-    private String buildTableJoinQuery(final TableJoin tableJoin) {
+    private String buildTableJoinClause(final TableJoin tableJoin) {
         return tableJoin.getJoinType() +
                 "join" +
                 ENTER +
                 SPACE +
-                tableJoin.getTableName();
+                tableJoin.getTableName() +
+                ENTER +
+                "on" +
+                ENTER +
+                SPACE +
+                tableJoin.getParentTableName() +
+                "." +
+                tableJoin.getOwnerTableColumnName() +
+                tableJoin.getOperator() +
+                tableJoin.getTableName() +
+                "." +
+                tableJoin.getJoinedTableColumnName();
     }
 
     @Override
@@ -195,7 +223,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
 
         final String valueClause = queryValueBinder.bind(value.getValue());
 
-        return (where.getLogicalOperator() + " " + where.getColumnName() + " " + where.getWhereOperator(valueClause)).trim();
+        return (where.getLogicalOperator() + " " + where.getColumnName() + where.getWhereOperator(valueClause)).trim();
     }
 
     private String buildWhereClause(final String whereClause) {
