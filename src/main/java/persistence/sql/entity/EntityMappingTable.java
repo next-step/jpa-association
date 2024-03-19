@@ -1,5 +1,6 @@
 package persistence.sql.entity;
 
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import persistence.sql.dml.exception.NotFoundIdException;
 import persistence.sql.entity.model.DomainType;
@@ -8,6 +9,7 @@ import persistence.sql.entity.model.PrimaryDomainType;
 import persistence.sql.entity.model.TableName;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EntityMappingTable {
@@ -86,10 +88,17 @@ public class EntityMappingTable {
                 .orElseThrow(NotFoundIdException::new);
     }
 
-    public boolean isEagerType() {
+    public boolean isFetchType(final FetchType fetchType) {
         return domainTypes.getDomainTypes()
                 .stream()
-                .map(DomainType::isJoinColumn).findAny().isPresent();
+                .anyMatch(domainType -> domainType.getFetchType() == fetchType);
+    }
+
+    public List<DomainType> getFetchType() {
+        return domainTypes.getDomainTypes()
+                .stream()
+                .filter(domainType -> domainType.getFetchType() == FetchType.LAZY)
+                .collect(Collectors.toList());
     }
 
 }
