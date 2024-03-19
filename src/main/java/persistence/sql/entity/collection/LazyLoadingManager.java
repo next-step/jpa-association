@@ -22,21 +22,20 @@ public class LazyLoadingManager {
         this.collectionLoader = collectionLoader;
     }
 
-    public <T> T setLazyLoading(final T entity,
-                                final EntityMappingTable entityMappingTable) {
+    public <T> T setLazyLoading(final T entity) {
+        final EntityMappingTable entityMappingTable = EntityMappingTable.of(entity.getClass(), entity);
         List<DomainType> fetchTypeDomainType = entityMappingTable.getFetchType();
 
         fetchTypeDomainType
                 .forEach(domainType -> {
                     Class<?> subEntityType = collectionClass(domainType.getField());
                     Object lazyProxy = Enhancer.create(
-                            subEntityType,
+                            List.class,
                             new LazyLoadingProxy(
                                     collectionPersister,
                                     collectionLoader,
                                     subEntityType,
-                                    domainType.getValue())
-                    );
+                                    domainType.getValue()));
 
                     setField(domainType.getField(), entity, lazyProxy);
                 });
