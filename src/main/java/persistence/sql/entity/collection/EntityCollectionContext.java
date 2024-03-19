@@ -11,14 +11,15 @@ public class EntityCollectionContext {
         this.entityCollections = new ArrayList<>();
     }
 
-    public EntityCollection getCollection(final String className, final Object id) {
+    public List<Object> getCollection(final String className, final Object id) {
         return entityCollections.stream()
                 .filter(entityCollection -> entityCollection.isEquals(className, id))
                 .findFirst()
+                .map(EntityCollection::getCollection)
                 .orElseGet(() -> null);
     }
 
-    public void addCollection(final String className, final Object id, final List<?> collection) {
+    public void addCollection(final String className, final Object id, final List<Object> collection) {
         entityCollections.add(new EntityCollection(className, id, collection));
     }
 }
