@@ -33,7 +33,10 @@ public class EntityColumn {
     public String getStringValue() {
         if(classType == List.class) {
             List<Object> subEntity = (List<Object>) this.value;
-            return String.format(STRING_FORMAT.getFormat(), subEntity);
+            if(subEntity == null) {
+                return null;
+            }
+            return subEntity.get(0).toString();
         }
 
         if (classType == String.class) {
