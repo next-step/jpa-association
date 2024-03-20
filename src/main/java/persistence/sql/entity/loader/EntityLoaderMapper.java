@@ -1,5 +1,6 @@
 package persistence.sql.entity.loader;
 
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import persistence.sql.dml.exception.FieldSetValueException;
 import persistence.sql.dml.exception.InstanceException;
@@ -35,6 +36,10 @@ public class EntityLoaderMapper {
         entityMappingTable.getDomainTypeStream()
                 .forEach(domainType -> {
                     Field field = getField(clazz, domainType.getName());
+                    if(domainType.isJoinColumn() && domainType.getFetchType() == FetchType.LAZY) {
+                        setField(instance, field, List.of(getValue(resultSet, domainType.getColumnName())));
+                        return;
+                    }
                     setField(instance, field, getValue(resultSet, domainType.getColumnName()));
                 });
 

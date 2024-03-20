@@ -1,5 +1,6 @@
 package persistence.sql.entity.loader;
 
+import domain.LazyOrder;
 import domain.Order;
 import domain.OrderItem;
 import domain.Person;
@@ -8,9 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.sql.db.H2Database;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityLoaderImplTest extends H2Database {
 
@@ -19,6 +24,7 @@ class EntityLoaderImplTest extends H2Database {
 
     private Order insertOrder;
     private OrderItem jpaOrderItem;
+    private LazyOrder lazyOrder;
 
 
     @BeforeEach
@@ -28,11 +34,14 @@ class EntityLoaderImplTest extends H2Database {
 
         this.jpaOrderItem = new OrderItem(1L, "만들면서 배우는 JPA", 1);
         this.insertOrder = new Order(1L, "nextstep jpa 강의", List.of(jpaOrderItem));
+        this.lazyOrder = new LazyOrder(1L, "만드면서 배우는 Spring", List.of(jpaOrderItem));
 
         entityPersister.deleteAll(Order.class);
+        entityPersister.deleteAll(LazyOrder.class);
         entityPersister.deleteAll(OrderItem.class);
         entityPersister.insert(jpaOrderItem);
         entityPersister.insert(insertOrder);
+        entityPersister.insert(lazyOrder);
 
         entityPersister.deleteAll(Person.class);
         entityPersister.insert(person1);
@@ -69,6 +78,23 @@ class EntityLoaderImplTest extends H2Database {
         Order order = entityLoader.find(Order.class, 1);
 
         assertThat(order).isEqualTo(insertOrder);
+    }
+
+    @DisplayName("주문테이블에서 필요한 값이 있을떄 조회를 한다.")
+    @Test
+    void lazyLoadingTest() throws Exception{
+        final OutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+
+        LazyOrder order = entityLoader.find(LazyOrder.class, lazyOrder.getId());
+
+        assertAll(
+            () -> assertThat(order.getId()).isEqualTo(lazyOrder.getId()),
+            () -> assertThat(order.getOrderNumber()).isEqualTo(lazyOrder.getOrderNumber())
+        );
+
+        assertThat(order).isEqualTo(lazyOrder);
+        assertThat(out.toString()).isEqualTo("Lazy loading 발생" + System.lineSeparator());
     }
 
 }

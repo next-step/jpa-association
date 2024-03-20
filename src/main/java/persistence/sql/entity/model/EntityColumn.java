@@ -1,5 +1,7 @@
 package persistence.sql.entity.model;
 
+import java.util.List;
+
 import static persistence.sql.constant.SqlFormat.STRING_FORMAT;
 
 public class EntityColumn {
@@ -29,6 +31,14 @@ public class EntityColumn {
     }
 
     public String getStringValue() {
+        if(classType == List.class) {
+            List<Object> subEntity = (List<Object>) this.value;
+            if(subEntity == null) {
+                return null;
+            }
+            return subEntity.get(0).toString();
+        }
+
         if (classType == String.class) {
             return String.format(STRING_FORMAT.getFormat(), value);
         }

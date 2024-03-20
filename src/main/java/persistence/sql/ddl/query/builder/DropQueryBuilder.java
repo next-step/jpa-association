@@ -13,7 +13,7 @@ public class DropQueryBuilder {
     }
 
     public String toSql() {
-        return String.format(DROP.getFormat(), entityMappingTable.getTable().getName());
+        return String.format(DROP.getFormat(), entityMappingTable.getTableName());
     }
 
 }

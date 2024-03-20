@@ -107,9 +107,17 @@ public class NormalDomainType implements DomainType {
         return tableName + DOT.getValue() + this.getColumnName();
     }
 
+    @Override
+    public FetchType getFetchType() {
+        if(!isJoinColumn()) {
+            return null;
+        }
+
+        return field.getDeclaredAnnotation(OneToMany.class).fetch();
+    }
+
     public String getJoinColumn() {
         return field.getDeclaredAnnotation(JoinColumn.class).name();
     }
-
 
 }

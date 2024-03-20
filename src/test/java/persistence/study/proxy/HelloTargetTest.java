@@ -111,10 +111,11 @@ class HelloTargetTest {
                 new HelloTargetLazyLoader(message)
         );
 
-        message.add("일단 넣기");
-        hello.sayHello(NAME);
+        assertThat(message).isEmpty();
 
-        assertThat(message).containsExactly("일단 넣기", "생성되었습니다.");
+        // 메소드가 실행되고 객체가 생성됨
+        hello.sayHello(NAME);
+        assertThat(message).containsExactly("생성되었습니다.");
     }
 
     @DisplayName("ProxyRefDispatcher을 사용하여 메소드를 실행한다.")
