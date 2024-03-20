@@ -34,7 +34,6 @@ public class DefaultRowMapper<T> implements RowMapper<T> {
     public T mapRow(ResultSet resultSet) throws SQLException {
         Object entity = createEntity(clazz);
         TableData table = TableData.from(clazz);
-        Columns columns = Columns.createColumns(clazz);
         Associations associations = Associations.fromEntityClass(clazz);
 
         for (Field field : fields) {
