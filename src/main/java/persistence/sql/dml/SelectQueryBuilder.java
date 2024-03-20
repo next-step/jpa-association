@@ -24,7 +24,7 @@ public class SelectQueryBuilder {
         query.append("select ");
         query.append(selectClause(columns));
         if(associations.isNotEmpty()){
-            query.append(getJoinTableSelect(associations));
+            query.append(getJoinTableSelect());
         }
 
         query.append(" from ");
@@ -44,7 +44,7 @@ public class SelectQueryBuilder {
         return query.toString();
     }
 
-    private String getJoinTableSelect(Associations associations) {
+    private String getJoinTableSelect() {
         StringBuilder stringBuilder = new StringBuilder();
         for(OneToManyData association : associations.getEagerAssociations()) {
             stringBuilder.append(", ");
