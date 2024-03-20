@@ -10,12 +10,9 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * ex) Order
- */
 public class EntityJoinMetaData implements EntityClass {
 
-    private final EntityMetaData owner; //orderItem
+    private final EntityMetaData owner;
     private final Class<?> clazz;
     private final Object entity;
     private final String entityName;

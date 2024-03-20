@@ -6,9 +6,6 @@ import jakarta.persistence.Table;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * ex) OrderItem
- */
 public class EntityMetaData implements EntityClass {
 
     private final Class<?> clazz;
