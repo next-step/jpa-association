@@ -3,17 +3,11 @@ package persistence.sql.mapping;
 import jakarta.persistence.OneToMany;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Associations implements Iterable<OneToManyData> {
+public class Associations {
     private final List<OneToManyData> associations;
-
-    @Override
-    public Iterator<OneToManyData> iterator() {
-        return associations.iterator();
-    }
 
     private Associations(List<OneToManyData> associations) {
         this.associations = associations;
