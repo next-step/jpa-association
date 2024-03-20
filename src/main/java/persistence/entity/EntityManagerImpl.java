@@ -1,8 +1,9 @@
 package persistence.entity;
 
-import database.dialect.MySQLDialect;
+import database.dialect.Dialect;
 import database.mapping.EntityMetadata;
 import database.mapping.EntityMetadataFactory;
+import database.sql.dml.part.ValueMap;
 import jdbc.JdbcTemplate;
 import persistence.entity.context.PersistenceContext;
 import persistence.entity.context.PersistenceContextImpl;
@@ -11,7 +12,6 @@ import persistence.entity.database.CollectionLoader;
 import persistence.entity.database.EntityLoader;
 import persistence.entity.database.EntityPersister;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class EntityManagerImpl implements EntityManager {
@@ -28,12 +28,14 @@ public class EntityManagerImpl implements EntityManager {
         this.collectionLoader = collectionLoader;
     }
 
-    public static EntityManagerImpl from(JdbcTemplate jdbcTemplate) {
+    public static EntityManagerImpl from(JdbcTemplate jdbcTemplate, Dialect dialect) {
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate, dialect);
         return new EntityManagerImpl(
                 new PersistenceContextImpl(),
-                new EntityLoader(jdbcTemplate, MySQLDialect.getInstance()),
+                entityLoader,
                 new EntityPersister(jdbcTemplate),
-                new CollectionLoader(jdbcTemplate));
+                new CollectionLoader(entityLoader, jdbcTemplate, dialect)
+        );
     }
 
     @Override
@@ -81,7 +83,7 @@ public class EntityManagerImpl implements EntityManager {
 
     private Object updateEntity(Object entity, Class<?> clazz, Long id) {
         Object oldEntity = find(clazz, id);
-        Map<String, Object> diff = EntitySnapshot.of(oldEntity).diff(EntitySnapshot.of(entity));
+        ValueMap diff = EntitySnapshot.of(oldEntity).diff(EntitySnapshot.of(entity));
         if (!diff.isEmpty()) {
             entityPersister.update(clazz, id, diff);
             persistenceContext.addEntity(entity);

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public interface Dialect {
     String convertToSqlTypeDefinition(Class<?> type, Integer columnLength);
 
-    Object getFieldValueFromResultSet(ResultSet resultSet, String columnName, int columnType) throws SQLException;
+    Object getFieldValueFromResultSet(ResultSet resultSet, int columnIndex, int sqlType) throws SQLException;
 
     String autoIncrementDefinition();
 

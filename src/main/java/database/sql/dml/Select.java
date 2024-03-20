@@ -1,31 +1,43 @@
 package database.sql.dml;
 
-import database.mapping.column.EntityColumn;
 import database.sql.dml.part.WhereClause;
+import database.sql.dml.part.WhereMap;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class Select {
+    private static final String COLUMNS_DELIMITER = ", ";
+
     private final String tableName;
-    private final List<EntityColumn> allEntityColumns;
+    private final List<String> allColumnNamesWithAssociations;
+    private final String primaryKeyColumnName;
+    private final List<String> generalEntityColumnNames;
     private WhereClause where;
 
-    public Select(String tableName, List<EntityColumn> allEntityColumns) {
+    public Select(String tableName, List<String> allColumnNamesWithAssociations,
+                  String primaryKeyColumnName,
+                  List<String> generalEntityColumnNames
+    ) {
         this.tableName = tableName;
-        this.allEntityColumns = allEntityColumns;
+        this.allColumnNamesWithAssociations = allColumnNamesWithAssociations;
+        this.primaryKeyColumnName = primaryKeyColumnName;
+        this.generalEntityColumnNames = generalEntityColumnNames;
         this.where = null;
     }
 
-    public Select where(Map<String, Object> whereMap) {
-        this.where = WhereClause.from(whereMap, allEntityColumns);
+    public Select where(WhereMap whereMap) {
+        this.where = WhereClause.from(whereMap, allColumnNamesWithAssociations);
         return this;
     }
 
     public Select id(Long id) {
-        return this.where(Map.of("id", id));
+        return where(WhereMap.of("id", id));
+    }
+
+    public Select ids(List<Long> ids) {
+        return where(WhereMap.of("id", ids));
     }
 
     public String buildQuery() {
@@ -43,6 +55,10 @@ public class Select {
     }
 
     private String joinAllColumnNames() {
-        return allEntityColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.joining(", "));
+        List<String> columns = new ArrayList<>();
+        columns.add(primaryKeyColumnName);
+        columns.addAll(generalEntityColumnNames);
+
+        return String.join(COLUMNS_DELIMITER, columns);
     }
 }

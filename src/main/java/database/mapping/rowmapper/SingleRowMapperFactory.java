@@ -27,7 +27,7 @@ public class SingleRowMapperFactory {
                 for (int i = 1; i < rsMetaData.getColumnCount() + 1; i++) {
                     String columnName = rsMetaData.getColumnName(i);
                     int columnType = rsMetaData.getColumnType(i);
-                    setFieldValue(resultSet, columnName, columnType, object, clazz, dialect);
+                    setFieldValue(resultSet, columnName, i, columnType, object, clazz, dialect);
                 }
                 return object;
             } catch (InstantiationException | IllegalAccessException |
@@ -47,14 +47,15 @@ public class SingleRowMapperFactory {
 
     private static void setFieldValue(ResultSet resultSet,
                                       String columnName,
+                                      int columnIndex,
                                       int columnType,
                                       Object entity,
                                       Class<?> clazz,
                                       Dialect dialect) throws SQLException {
         EntityMetadata entityMetadata = EntityMetadataFactory.get(clazz);
-        Object value = dialect.getFieldValueFromResultSet(resultSet, columnName, columnType);
-
         Field field = entityMetadata.getFieldByColumnName(columnName);
+        Object value = dialect.getFieldValueFromResultSet(resultSet, columnIndex, columnType);
+
         field.setAccessible(true);
         try {
             field.set(entity, value);

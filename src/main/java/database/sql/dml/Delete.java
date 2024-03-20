@@ -1,35 +1,33 @@
 package database.sql.dml;
 
-import database.mapping.column.EntityColumn;
 import database.mapping.column.PrimaryKeyEntityColumn;
 import database.sql.dml.part.WhereClause;
+import database.sql.dml.part.WhereMap;
 
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 
 public class Delete {
     private final String tableName;
     private final PrimaryKeyEntityColumn primaryKey;
-    private final List<EntityColumn> allColumns;
+    private final List<String> allColumnNamesWithAssociations;
     private WhereClause where;
 
-    public Delete(String tableName, List<EntityColumn> allColumns, PrimaryKeyEntityColumn primaryKey) {
+    public Delete(String tableName, List<String> allColumnNamesWithAssociations, PrimaryKeyEntityColumn primaryKey) {
         this.tableName = tableName;
         this.primaryKey = primaryKey;
-        this.allColumns = allColumns;
+        this.allColumnNamesWithAssociations = allColumnNamesWithAssociations;
 
         this.where = null;
     }
 
-    public Delete where(Map<String, Object> whereMap) {
-        this.where = WhereClause.from(whereMap, allColumns);
+    public Delete where(WhereMap whereMap) {
+        this.where = WhereClause.from(whereMap, allColumnNamesWithAssociations);
         return this;
     }
 
     public Delete id(Long id) {
-        this.where(Map.of(primaryKey.getColumnName(), id));
-        return this;
+        return this.where(WhereMap.of(primaryKey.getColumnName(), id));
     }
 
     public String buildQuery() {

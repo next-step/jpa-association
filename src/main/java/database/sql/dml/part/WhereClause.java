@@ -1,39 +1,36 @@
 package database.sql.dml.part;
 
-import database.mapping.column.EntityColumn;
 import database.sql.dml.part.where.FilterExpression;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WhereClause {
-    private final Map<String, Object> conditionMap;
-    private final List<String> allColumnNames;
+    private final WhereMap whereMap;
+    private final List<String> allFieldNames;
     private final String alias;
     private boolean withWhereClause;
 
-    private WhereClause(Map<String, Object> conditionMap, List<String> allColumnNames, String alias) {
-        this.conditionMap = conditionMap;
-        this.allColumnNames = allColumnNames;
+    private WhereClause(WhereMap whereMap, List<String> allFieldNames, String alias) {
+        this.whereMap = whereMap;
+        this.allFieldNames = allFieldNames;
         this.alias = alias;
         this.withWhereClause = true;
     }
 
-    public static WhereClause from(Map<String, Object> conditionMap, List<EntityColumn> allColumns) {
-        return from(conditionMap, allColumns, null);
+    public static WhereClause from(WhereMap whereMap, List<String> allFieldNames) {
+        return from(whereMap, allFieldNames, null);
     }
 
-    public static WhereClause from(Map<String, Object> conditionMap, List<EntityColumn> allColumns, String alias) {
-        List<String> allColumnNames = allColumns.stream().map(EntityColumn::getColumnName).collect(Collectors.toList());
-        checkColumnNameInCondition(conditionMap, allColumnNames);
+    public static WhereClause from(WhereMap whereMap, List<String> allFieldNames, String alias) {
+        checkColumnNameInCondition(whereMap, allFieldNames);
 
-        return new WhereClause(conditionMap, allColumnNames, alias);
+        return new WhereClause(whereMap, allFieldNames, alias);
     }
 
-    private static void checkColumnNameInCondition(Map<String, Object> conditionMap, List<String> allColumnNames) {
-        for (String inputColumnName : conditionMap.keySet()) {
-            if (!allColumnNames.contains(inputColumnName)) {
+    private static void checkColumnNameInCondition(WhereMap whereMap, List<String> allFieldNames) {
+        for (String inputColumnName : whereMap.keySet()) {
+            if (!allFieldNames.contains(inputColumnName)) {
                 throw new RuntimeException("Invalid query: " + inputColumnName);
             }
         }
@@ -45,14 +42,14 @@ public class WhereClause {
     }
 
     public String toQuery() {
-        if (conditionMap.isEmpty()) {
+        if (whereMap.isEmpty()) {
             return FilterExpression.EMPTY;
         }
 
         String prefix = withWhereClause ? "WHERE " : "";
-        return allColumnNames.stream()
-                .filter(conditionMap::containsKey)
-                .map(columnName -> columnAndValue(columnName, conditionMap.get(columnName)))
+        return allFieldNames.stream()
+                .filter(whereMap::containsKey)
+                .map(columnName -> columnAndValue(columnName, whereMap.get(columnName)))
                 .collect(Collectors.joining(" AND ", prefix, ""));
     }
 

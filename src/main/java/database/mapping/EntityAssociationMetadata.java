@@ -23,8 +23,8 @@ public class EntityAssociationMetadata {
                 .collect(Collectors.toList());
     }
 
-    public List<Association> getAssociationRelatedToOtherEntities(List<Class<?>> entities) {
-        return entities.stream()
+    public List<Association> getAssociationRelatedToOtherEntities() {
+        return AllEntities.getEntities().stream()
                 .filter(this::exceptMe)
                 .flatMap(this::getAssociationsBetweenMeAndOther)
                 .collect(Collectors.toList());
@@ -46,20 +46,13 @@ public class EntityAssociationMetadata {
     }
 
     private boolean isConnectedToMe(Association association) {
-        return association.getEntityType() == clazz;
+        return association.getFieldGenericType() == clazz;
     }
 
     public List<Association> getAssociations() {
         return associationFields.stream()
                 .filter(EntityAssociationMetadata::checkAssociationAnnotation)
-                .map(field -> {
-                    JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-                    String foreignKeyColumnName = joinColumn.name();
-                    Type[] actualTypeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-                    Class<?> clazz = (Class<?>) actualTypeArguments[0];
-                    String fieldName = field.getName();
-                    return new Association(foreignKeyColumnName, clazz, fieldName);
-                })
+                .map(Association::fromField)
                 .collect(Collectors.toList());
     }
 
