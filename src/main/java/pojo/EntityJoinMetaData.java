@@ -10,61 +10,58 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EntityJoinMetaData implements EntityClass {
+import static utils.StringUtils.isBlankOrEmpty;
 
-    private final EntityMetaData owner;
+public class EntityJoinMetaData {
+
     private final Class<?> clazz;
     private final Object entity;
     private final String entityName;
-    private final List<EntityColumn> entityColumns;
+    private final String joinColumnName;
+    private final List<FieldName> fieldNames;
     private final boolean lazy;
 
-    public EntityJoinMetaData(EntityMetaData owner, Class<?> clazz, Object entity) {
+    public EntityJoinMetaData(Class<?> clazz, Object entity, Field field) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalStateException("Entity 클래스가 아닙니다.");
         }
-        this.owner = owner;
         this.clazz = clazz;
         this.entity = entity;
         this.entityName = getEntityNameInfo();
-        this.entityColumns = getEntityColumnsInfo();
-        this.lazy = isLazy();
+        this.joinColumnName = getJoinColumnNameInfo(field);
+        this.fieldNames = getFieldNamesInfo();
+        this.lazy = isLazy(field);
     }
 
-    public EntityMetaData getOwner() {
-        return owner;
-    }
-
-    @Override
     public String getEntityName() {
         return entityName;
     }
 
-    @Override
-    public List<EntityColumn> getEntityColumns() {
-        return entityColumns;
+    public String getJoinColumnName() {
+        return joinColumnName;
     }
 
-    public String joinColumnName() {
-        return new FieldInfos(clazz.getDeclaredFields()).getJoinColumnField().getAnnotation(JoinColumn.class).name();
+    public List<FieldName> getFieldNames() {
+        return fieldNames;
     }
 
     private String getEntityNameInfo() {
-        return clazz.isAnnotationPresent(Table.class) ? clazz.getAnnotation(Table.class).name()
-                : clazz.getSimpleName().toLowerCase();
+        return clazz.isAnnotationPresent(Table.class) && !isBlankOrEmpty(clazz.getAnnotation(Table.class).name())
+                ? clazz.getAnnotation(Table.class).name() : clazz.getSimpleName().toLowerCase();
     }
 
-    private List<EntityColumn> getEntityColumnsInfo() {
+    public String getJoinColumnNameInfo(Field field) {
+        return field.getAnnotation(JoinColumn.class).name();
+    }
+
+    private List<FieldName> getFieldNamesInfo() {
         return new FieldInfos(clazz.getDeclaredFields()).getIdAndColumnFields().stream()
-                .map(field -> new EntityColumn(field, entity))
+                .map(FieldName::new)
                 .collect(Collectors.toList());
     }
 
-    private boolean isLazy() {
-        Field joinColumnField = new FieldInfos(clazz.getDeclaredFields()).getJoinColumnField();
-
+    private boolean isLazy(Field field) {
         //일단 OneToMany 만 고려
-        FetchType fetchType = joinColumnField.getAnnotation(OneToMany.class).fetch();
-        return !fetchType.equals(FetchType.EAGER);
+        return !field.getAnnotation(OneToMany.class).fetch().equals(FetchType.EAGER);
     }
 }
