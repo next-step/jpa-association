@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FieldInfos {
@@ -19,7 +20,7 @@ public class FieldInfos {
         if (Objects.isNull(fields)) {
             throw new IllegalArgumentException("fields 가 null 이어서는 안됩니다.");
         }
-        this.fieldList = Arrays.stream(fields).collect(Collectors.toList());
+        this.fieldList = Arrays.stream(fields).filter(field -> !isTransientField(field)).collect(Collectors.toList());
     }
 
     public List<Field> getFieldDataList() {
@@ -35,20 +36,20 @@ public class FieldInfos {
 
     public List<Field> getColumnFields() {
         return fieldList.stream()
-                .filter(field -> !isIdField(field) && !isTransientField(field) && !isJoinColumnField(field))
+                .filter(field -> !isIdField(field) && !isJoinColumnField(field))
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
     public List<Field> getIdAndColumnFields() {
         return fieldList.stream()
-                .filter(field -> !isTransientField(field) && !isJoinColumnField(field))
+                .filter(field -> !isJoinColumnField(field))
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
-    public Field getJoinColumnField() {
+    public Optional<Field> getJoinColumnField() {
         return fieldList.stream()
                 .filter(this::isJoinColumnField)
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     private boolean isIdField(Field field) {
