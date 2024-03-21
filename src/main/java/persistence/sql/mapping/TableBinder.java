@@ -54,7 +54,7 @@ public class TableBinder {
         return table;
     }
 
-    private String toTableName(final Class<?> clazz) {
+    public static String toTableName(final Class<?> clazz) {
         validationEntityClazz(clazz);
 
         final jakarta.persistence.Table tableAnnotation = clazz.getAnnotation(jakarta.persistence.Table.class);
@@ -66,7 +66,7 @@ public class TableBinder {
         return tableAnnotation.name();
     }
 
-    private void validationEntityClazz(final Class<?> clazz) {
+    private static void validationEntityClazz(final Class<?> clazz) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new QueryException(clazz.getSimpleName() + " is not entity");
         }
