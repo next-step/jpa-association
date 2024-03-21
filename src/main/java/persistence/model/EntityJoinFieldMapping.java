@@ -12,11 +12,11 @@ public abstract class EntityJoinFieldMapping {
         return field.isAnnotationPresent(annotationClass);
     }
 
-    public EntityJoinEntityField create(final Field field) {
-        return new EntityJoinEntityField(getEntityType(field), field, getFetchType(field));
+    public EntityJoinEntityField create(final EntityMetaData metaData, final Field field) {
+        return new EntityJoinEntityField(metaData, field, getFetchType(field));
     }
 
-    protected Class<?> getEntityType(final Field field) {
+    public Class<?> getEntityType(final Field field) {
         return field.getClass();
     }
 

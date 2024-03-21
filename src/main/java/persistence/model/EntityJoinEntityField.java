@@ -7,18 +7,18 @@ import java.lang.reflect.Field;
 
 public class EntityJoinEntityField {
 
-    protected final Class<?> entityClass;
-    protected final Field field;
-    protected final FetchType fetchType;
+    private final EntityMetaData metaData;
+    private final Field field;
+    private final FetchType fetchType;
 
-    public EntityJoinEntityField(final Class<?> entityClass, final Field field, final FetchType fetchType) {
-        this.entityClass = entityClass;
+    public EntityJoinEntityField(final EntityMetaData metaData, final Field field, final FetchType fetchType) {
+        this.metaData = metaData;
         this.field = field;
         this.fetchType = fetchType;
     }
 
     public Class<?> getFieldType() {
-        return this.entityClass;
+        return this.metaData.getEntityClass();
     }
 
     public String getJoinedColumnName() {
@@ -32,5 +32,13 @@ public class EntityJoinEntityField {
 
     public boolean isNotLazy() {
         return this.fetchType == FetchType.EAGER;
+    }
+
+    public EntityMetaData getMetaData() {
+        return this.metaData;
+    }
+
+    public Field getField() {
+        return this.field;
     }
 }
