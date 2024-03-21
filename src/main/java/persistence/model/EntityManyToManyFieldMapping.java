@@ -12,11 +12,6 @@ public class EntityManyToManyFieldMapping extends EntityJoinFieldMapping {
     }
 
     @Override
-    protected Class<?> getEntityType(final Field field) {
-        return null;
-    }
-
-    @Override
     protected FetchType getFetchType(final Field field) {
         return field.getDeclaredAnnotation(ManyToMany.class).fetch();
     }
