@@ -55,6 +55,10 @@ public class ReflectionUtils {
                 field.set(object, list);
             }
 
+            if (Objects.isNull(value)) {
+                return;
+            }
+
             ((List) list).add(value);
         } catch (IllegalAccessException e) {
             throw new QueryException("can't set field " + field.getName() + " at " + object.getClass().getName());
