@@ -24,6 +24,10 @@ public class OrderItem {
 
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getProduct() {
         return this.product;
     }
