@@ -34,7 +34,9 @@ public class SingleEntityLoader implements EntityLoader {
         final EntityRowMapper<T> entityRowMapper = new EntityRowMapper<>(clazz);
 
         return jdbcTemplate.query(selectQuery, entityRowMapper)
-                .stream().distinct()
+                .stream()
+                .filter(Objects::nonNull)
+                .distinct()
                 .collect(Collectors.toUnmodifiableList());
     }
 
