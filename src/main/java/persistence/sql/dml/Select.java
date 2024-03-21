@@ -2,7 +2,7 @@ package persistence.sql.dml;
 
 import persistence.sql.mapping.Table;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Select {
@@ -12,12 +12,16 @@ public class Select {
     private final Wheres wheres;
 
     public Select(final Table table) {
-        this(table, Collections.emptyList());
+        this(table, new ArrayList<>());
     }
 
     public Select(final Table table, final List<Where> wheres) {
         this.table = table;
         this.wheres = new Wheres(wheres);
+    }
+
+    public void addWhere(final Where where) {
+        this.wheres.addWhere(where);
     }
 
     public Table getTable() {
