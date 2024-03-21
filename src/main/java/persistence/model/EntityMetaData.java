@@ -1,6 +1,7 @@
 package persistence.model;
 
 import persistence.sql.QueryException;
+import persistence.sql.mapping.TableBinder;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -11,13 +12,27 @@ import java.util.stream.Collectors;
 public class EntityMetaData {
 
     private final String entityName;
+    private final String tableName;
     private final Class<?> entityClass;
     private final EntityFields entityFields;
 
     public EntityMetaData(final Class<?> entityClass, final EntityFields entityFields) {
         this.entityName = entityClass.getName();
+        this.tableName = TableBinder.toTableName(entityClass);
         this.entityClass = entityClass;
         this.entityFields = entityFields;
+    }
+
+    public Class<?> getEntityClass() {
+        return this.entityClass;
+    }
+
+    public Field getIdField() {
+        return this.entityFields.getIdField().getField();
+    }
+
+    public boolean isSameTableName(final String tableName) {
+        return tableName.equalsIgnoreCase(this.tableName);
     }
 
     public String getEntityName() {
