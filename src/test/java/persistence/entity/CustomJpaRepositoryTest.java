@@ -13,7 +13,6 @@ import persistence.JpaTest;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import pojo.EntityMetaData;
-import pojo.EntityStatus;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -23,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CustomJpaRepositoryTest extends JpaTest {
 
     static Person3 person = new Person3(1L, "test", 20, "test@test.com");
+    static EntityMetaData entityMetaData;
 
     @BeforeAll
     static void init() throws SQLException {
@@ -31,12 +31,7 @@ class CustomJpaRepositoryTest extends JpaTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         entityMetaData = new EntityMetaData(Person3.class, person);
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
-        entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
-        entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
-
-        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
-        jpaRepository = new CustomJpaRepository(simpleEntityManager);
+        initForTest(entityMetaData);
     }
 
     @BeforeEach

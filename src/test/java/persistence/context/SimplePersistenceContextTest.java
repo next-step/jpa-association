@@ -10,11 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.JpaTest;
-import persistence.entity.EntityLoaderImpl;
-import persistence.entity.EntityPersisterImpl;
 import persistence.entity.EntitySnapshot;
-import persistence.entity.SimpleEntityEntry;
-import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import pojo.EntityMetaData;
@@ -32,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SimplePersistenceContextTest extends JpaTest {
 
     static Person3 person = new Person3(1L, "test", 20, "test@test.com");
+    static EntityMetaData entityMetaData;
 
     @BeforeAll
     static void init() throws SQLException {
@@ -40,11 +37,7 @@ class SimplePersistenceContextTest extends JpaTest {
         jdbcTemplate = new JdbcTemplate(server.getConnection());
 
         entityMetaData = new EntityMetaData(Person3.class, person);
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
-        entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
-        entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
-
-        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
+        initForTest(entityMetaData);
     }
 
     @BeforeEach
