@@ -32,7 +32,7 @@ public class SimpleEntityManager implements EntityManager {
         final EntityEntry entityEntry = persistenceContext.getEntityEntry(key, clazz);
 
         if (entityEntry == null) {
-            final T found = entityLoader.load(clazz, key);
+            final T found = entityLoader.load(clazz, key).get(0);
             persistenceContext.addEntity(key, found);
 
             return found;
@@ -46,7 +46,7 @@ public class SimpleEntityManager implements EntityManager {
 
         entityEntry.setStatus(Status.LOADING);
 
-        final T found = entityLoader.load(clazz, key);
+        final T found = entityLoader.load(clazz, key).get(0);
         persistenceContext.addEntity(key, found);
 
         return found;
