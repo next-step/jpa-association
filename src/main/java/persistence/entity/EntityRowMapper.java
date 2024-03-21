@@ -2,66 +2,39 @@ package persistence.entity;
 
 import jakarta.persistence.Entity;
 import jdbc.RowMapper;
-import persistence.ReflectionUtils;
-import persistence.model.EntityMetaDataMapping;
 import persistence.sql.QueryException;
-import persistence.sql.mapping.ColumnBinder;
 
-import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 
 public class EntityRowMapper<T> implements RowMapper<T> {
-    private final Class<T> clazz;
-
-    private ResultSetMetaData metaData;
-
-    private int columnCount = -1;
-
-    final LinkedHashMap<String, Field> fields = new LinkedHashMap<>();
+    private final PersistentClass<T> persistentClass;
 
     public EntityRowMapper(Class<T> clazz) {
         final boolean isEntity = clazz.isAnnotationPresent(Entity.class);
         if (!isEntity) {
             throw new QueryException(clazz.getName() + " is not entity");
         }
-        this.clazz = clazz;
+        this.persistentClass = new PersistentClass<>(clazz);
     }
 
     @Override
     public T mapRow(final ResultSet resultSet) throws SQLException {
-        T entity;
+        final ResultSetMetaData metaData = resultSet.getMetaData();
+        final int columnCount = metaData.getColumnCount();
 
-        if (metaData == null) {
-            metaData = resultSet.getMetaData();
-            columnCount = metaData.getColumnCount();
-        }
-
-        entity = ReflectionUtils.createInstance(clazz);
-        extractFields(clazz);
+        this.persistentClass.initPersistentClass();
 
         for (int i = 1; i <= columnCount; i++) {
+            final String tableName = metaData.getTableName(i);
             final String columnLabel = metaData.getColumnLabel(i);
+            final Object value = resultSet.getObject(i);
 
-            final Field field = getFieldByColumnName(columnLabel);
-            final Object value = resultSet.getObject(columnLabel);
-
-            ReflectionUtils.setFieldValue(field, entity, value);
+            persistentClass.setFieldValue(tableName, columnLabel, value);
         }
 
-        return entity;
-    }
-
-    private void extractFields(final Class<T> clazz) {
-        EntityMetaDataMapping.getMetaData(clazz.getName())
-                .getFields()
-                .forEach(field -> fields.put(ColumnBinder.toColumnName(field).toLowerCase(), field));
-    }
-
-    private Field getFieldByColumnName(final String columnName) {
-        return this.fields.get(columnName.toLowerCase());
+        return persistentClass.getEntity();
     }
 
 }
