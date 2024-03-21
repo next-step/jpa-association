@@ -23,9 +23,13 @@ public class EntityMetaDataMapping {
     }
 
     public static void putMetaData(final Class<?> entityClass) {
+        final EntityMetaData metaData = createMetaData(entityClass);
+        entityMetaDataMap.putIfAbsent(metaData.getEntityName(), metaData);
+    }
+
+    private static EntityMetaData createMetaData(final Class<?> entityClass) {
         final EntityFields entityFields = extractEntityFields(entityClass);
-        final EntityMetaData metaData = new EntityMetaData(entityClass, entityFields);
-        entityMetaDataMap.put(metaData.getEntityName(), metaData);
+        return new EntityMetaData(entityClass, entityFields);
     }
 
     private static EntityFields extractEntityFields(final Class<?> entityClass) {
@@ -36,7 +40,10 @@ public class EntityMetaDataMapping {
                         .filter(mapping -> mapping.support(field))
                         .findFirst()
                         .ifPresentOrElse(
-                                mapping -> entityFields.addJoinField(mapping.create(field)),
+                                mapping -> {
+                                    final Class<?> joinedEntityType = mapping.getEntityType(field);
+                                    entityFields.addJoinField(mapping.create(getMetaData(joinedEntityType, joinedEntityType.getName()), field));
+                                },
                                 () -> entityFields.addField(new EntityField(field.getName(), field.getClass(), field))
                         ));
 
@@ -45,6 +52,10 @@ public class EntityMetaDataMapping {
 
     private static boolean isColumnField(final Field field) {
         return !field.isAnnotationPresent(Transient.class);
+    }
+
+    private static EntityMetaData getMetaData(final Class<?> clazz, final String entityName) {
+        return entityMetaDataMap.computeIfAbsent(entityName, key -> createMetaData(clazz));
     }
 
     public static EntityMetaData getMetaData(final String entityName) {
