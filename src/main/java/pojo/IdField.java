@@ -15,7 +15,7 @@ public class IdField implements FieldData {
         this.generationType = getGenerationType();
     }
 
-    public EntityColumn getFieldInfoTemp() {
+    public EntityColumn getEntityColumn() {
         return entityColumn;
     }
 
@@ -29,7 +29,7 @@ public class IdField implements FieldData {
     }
 
     private H2GenerationType getGenerationType() {
-        if (entityColumn.getField().isAnnotationPresent(GeneratedValue.class)) {
+        if (entityColumn.hasGenerationType()) {
             return H2GenerationType.from(entityColumn.getField().getAnnotation(GeneratedValue.class).strategy());
         }
         return null;
