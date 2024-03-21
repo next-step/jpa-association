@@ -10,6 +10,8 @@ import persistence.sql.mapping.Table;
 import persistence.sql.mapping.TableBinder;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SingleEntityLoader implements EntityLoader {
 
@@ -24,21 +26,28 @@ public class SingleEntityLoader implements EntityLoader {
     }
 
     @Override
-    public <T> T load(final Class<T> clazz, final Object key) {
+    public <T> List<T> load(final Class<T> clazz, final Object key) {
         final Select select = generateSelect(clazz, key);
 
         final String selectQuery = dmlQueryBuilder.buildSelectQuery(select);
+        log.debug("\n" + selectQuery);
         final EntityRowMapper<T> entityRowMapper = new EntityRowMapper<>(clazz);
 
-        return jdbcTemplate.queryForObject(selectQuery, entityRowMapper);
+        return jdbcTemplate.query(selectQuery, entityRowMapper)
+                .stream().distinct()
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private <T> Select generateSelect(final Class<T> clazz, final Object key) {
         final Table table = tableBinder.createTable(clazz);
 
-        final Where where = generateIdColumnWhere(table, key);
+        final Select select = new Select(table);
 
-        return new Select(table, List.of(where));
+        if (Objects.nonNull(key)) {
+            select.addWhere(generateIdColumnWhere(table, key));
+        }
+
+        return select;
     }
 
     private Where generateIdColumnWhere(final Table table, final Object key) {
