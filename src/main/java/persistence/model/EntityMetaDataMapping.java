@@ -28,12 +28,12 @@ public class EntityMetaDataMapping {
     }
 
     private static EntityMetaData createMetaData(final Class<?> entityClass) {
-        final EntityFields entityFields = extractEntityFields(entityClass);
-        return new EntityMetaData(entityClass, entityFields);
+        final EntityMetaData metaData = new EntityMetaData(entityClass);
+        extractEntityFields(entityClass, metaData);
+        return metaData;
     }
 
-    private static EntityFields extractEntityFields(final Class<?> entityClass) {
-        final EntityFields entityFields = new EntityFields();
+    private static void extractEntityFields(final Class<?> entityClass, final EntityMetaData metaData) {
         Arrays.stream(entityClass.getDeclaredFields())
                 .filter(EntityMetaDataMapping::isColumnField)
                 .forEach(field -> Arrays.stream(joinFieldMappings)
@@ -42,20 +42,14 @@ public class EntityMetaDataMapping {
                         .ifPresentOrElse(
                                 mapping -> {
                                     final Class<?> joinedEntityType = mapping.getEntityType(field);
-                                    entityFields.addJoinField(mapping.create(getMetaData(joinedEntityType, joinedEntityType.getName()), field));
+                                    metaData.addEntityJoinEntityField(mapping.create(joinedEntityType, field));
                                 },
-                                () -> entityFields.addField(new EntityField(field.getName(), field.getClass(), field))
+                                () -> metaData.addEntityField(new EntityField(field.getName(), field.getClass(), field))
                         ));
-
-        return entityFields;
     }
 
     private static boolean isColumnField(final Field field) {
         return !field.isAnnotationPresent(Transient.class);
-    }
-
-    private static EntityMetaData getMetaData(final Class<?> clazz, final String entityName) {
-        return entityMetaDataMap.computeIfAbsent(entityName, key -> createMetaData(clazz));
     }
 
     public static EntityMetaData getMetaData(final String entityName) {
