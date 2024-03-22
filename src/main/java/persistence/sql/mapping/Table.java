@@ -9,6 +9,7 @@ public class Table {
     private final Map<String, Column> columns;
     private final PrimaryKey primaryKey;
     private List<TableJoin> tableJoins = new ArrayList<>();
+    private List<Table> joinTables = new ArrayList<>();
 
     public Table(String name) {
         this.name = name;
@@ -54,5 +55,13 @@ public class Table {
 
     public List<TableJoin> getTableJoins() {
         return Collections.unmodifiableList(this.tableJoins);
+    }
+
+    public List<Table> getJoinTables() {
+        return Collections.unmodifiableList(this.joinTables);
+    }
+
+    public void addJoinTable(final Table joinedTable) {
+        this.joinTables.add(joinedTable);
     }
 }

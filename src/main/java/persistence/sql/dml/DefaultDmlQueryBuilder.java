@@ -112,17 +112,28 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
         return "select" +
                 ENTER +
                 SPACE +
-                buildSelectColumnsClause(table.getName(), table.getColumns(), table.getTableJoins()) +
+//                buildSelectColumnsClause(table.getName(), table.getColumns(), table.getTableJoins()) +
+                buildSelectColumnsClause(table.getName(), table.getColumns(), table.getJoinTables()) +
                 ENTER +
                 "from" +
                 ENTER +
                 SPACE +
                 table.getName() +
-                buildTablesJoinClause(table.getTableJoins()) +
+//                buildTablesJoinClause(table.getTableJoins()) +
+                buildTablesJoinClause(table) +
                 buildWhereClause(buildWheresClause(select.getWheres()));
     }
 
-    private String buildSelectColumnsClause(final String tableName, final List<Column> columns, final List<TableJoin> tableJoins) {
+//    private String buildSelectColumnsClause(final String tableName, final List<Column> columns, final List<TableJoin> tableJoins) {
+//        final String selectColumnsClause = buildSelectColumnsClause(tableName, columns);
+//        final String selectJoinColumnsClause = buildSelectJoinColumnsClause(tableJoins);
+//
+//        return Stream.of(selectColumnsClause, selectJoinColumnsClause)
+//                .filter(StringUtils::isNotBlank)
+//                .collect(Collectors.joining(", "));
+//    }
+
+    private String buildSelectColumnsClause(final String tableName, final List<Column> columns, final List<Table> tableJoins) {
         final String selectColumnsClause = buildSelectColumnsClause(tableName, columns);
         final String selectJoinColumnsClause = buildSelectJoinColumnsClause(tableJoins);
 
@@ -137,16 +148,37 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 .collect(Collectors.joining(", "));
     }
 
-    private String buildSelectJoinColumnsClause(final List<TableJoin> tableJoins) {
+//    private String buildSelectJoinColumnsClause(final List<TableJoin> tableJoins) {
+//        return tableJoins.stream()
+//                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getTableName(), tableJoin.getJoinedTableColumns()))
+//                .collect(Collectors.joining(", "));
+//    }
+
+    private String buildSelectJoinColumnsClause(final List<Table> tableJoins) {
         return tableJoins.stream()
-                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getTableName(), tableJoin.getJoinedTableColumns()))
+                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getName(), tableJoin.getColumns()))
                 .collect(Collectors.joining(", "));
     }
 
-    private String buildTablesJoinClause(final List<TableJoin> tableJoins) {
+//    private String buildTablesJoinClause(final List<TableJoin> tableJoins) {
+//
+//        final String clause = tableJoins.stream()
+//                .map(this::buildTableJoinClause)
+//                .collect(Collectors.joining(ENTER + SPACE));
+//
+//        if (clause.isBlank()) {
+//            return "";
+//        }
+//
+//        return ENTER +
+//                clause;
+//    }
+
+    private String buildTablesJoinClause(final Table table) {
+        final List<Table> tableJoins = table.getJoinTables();
 
         final String clause = tableJoins.stream()
-                .map(this::buildTableJoinClause)
+                .map(joinedTable -> buildTableJoinClause(table, joinedTable))
                 .collect(Collectors.joining(ENTER + SPACE));
 
         if (clause.isBlank()) {
@@ -174,6 +206,24 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 tableJoin.getTableName() +
                 "." +
                 tableJoin.getJoinedTableColumnName();
+    }
+
+    private String buildTableJoinClause(final Table parentTable, final Table tableJoin) {
+        return "left join" +
+                ENTER +
+                SPACE +
+                tableJoin.getName() +
+                ENTER +
+                "on" +
+                ENTER +
+                SPACE +
+                parentTable.getName() +
+                "." +
+                parentTable.getPrimaryKey().getColumns().get(0).getName() +
+                " = " +
+                tableJoin.getName() +
+                "." +
+                tableJoin.getPrimaryKey().getColumns().get(0).getName();
     }
 
     @Override
