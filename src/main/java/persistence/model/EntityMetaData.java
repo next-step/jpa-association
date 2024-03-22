@@ -15,16 +15,26 @@ public class EntityMetaData {
     private final String tableName;
     private final Class<?> entityClass;
     private final EntityFields entityFields;
+    private final EntityJoinEntityFields entityJoinEntityFields;
 
-    public EntityMetaData(final Class<?> entityClass, final EntityFields entityFields) {
+    public EntityMetaData(final Class<?> entityClass) {
         this.entityName = entityClass.getName();
         this.tableName = TableBinder.toTableName(entityClass);
         this.entityClass = entityClass;
-        this.entityFields = entityFields;
+        this.entityFields = new EntityFields();
+        this.entityJoinEntityFields = new EntityJoinEntityFields();
     }
 
     public Class<?> getEntityClass() {
         return this.entityClass;
+    }
+
+    public void addEntityField(final EntityField field) {
+        this.entityFields.addField(field);
+    }
+
+    public void addEntityJoinEntityField(final EntityJoinEntityField entityJoinEntityField) {
+        this.entityJoinEntityFields.addJoinField(entityJoinEntityField);
     }
 
     public Field getIdField() {
@@ -48,7 +58,7 @@ public class EntityMetaData {
     }
 
     public List<EntityJoinEntityField> getJoinFields() {
-        return this.entityFields.getJoinFields();
+        return this.entityJoinEntityFields.getJoinFields();
     }
 
     public Map<String, Object> extractValues(final Object entity) {
