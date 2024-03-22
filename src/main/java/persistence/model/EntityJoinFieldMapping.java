@@ -12,8 +12,8 @@ public abstract class EntityJoinFieldMapping {
         return field.isAnnotationPresent(annotationClass);
     }
 
-    public EntityJoinEntityField create(final EntityMetaData metaData, final Field field) {
-        return new EntityJoinEntityField(metaData, field, getFetchType(field));
+    public EntityJoinEntityField create(final Class<?> clazz, final Field field) {
+        return new EntityJoinEntityField(clazz, field, getFetchType(field));
     }
 
     public Class<?> getEntityType(final Field field) {
