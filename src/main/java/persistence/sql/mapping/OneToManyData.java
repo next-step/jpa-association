@@ -3,6 +3,7 @@ package persistence.sql.mapping;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import persistence.entity.PersistentCollection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -55,6 +56,15 @@ public class OneToManyData {
 
     public Field getField() {
         return field;
+    }
+
+    public <T> void setCollectionToField(Object entity, PersistentCollection<T> collection) {
+        field.setAccessible(true);
+        try {
+            field.set(entity, collection);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isEagerLoad() {

@@ -4,12 +4,10 @@ import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.sql.dml.BooleanExpression;
-import persistence.sql.dml.JoinBuilder;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.WhereBuilder;
 import persistence.sql.mapping.Associations;
 import persistence.sql.mapping.Columns;
-import persistence.sql.mapping.OneToManyData;
 import persistence.sql.mapping.TableData;
 
 import java.util.List;
@@ -40,14 +38,25 @@ public class CollectionLoader {
 
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
+        String query = selectQueryBuilder.build(whereBuilder);
 
-        if (associations.hasNotLazyLoad()) {
-            String query = selectQueryBuilder.build(whereBuilder);
-            return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
+        T entity = jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
+
+        if (associations.hasLazyLoad()) {
+            setPersistentCollection(entity);
         }
 
-        // TODO: LAZY
-        String query = selectQueryBuilder.build(whereBuilder);
-        return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
+        return entity;
+    }
+
+    private <T> void setPersistentCollection(T entity) {
+        associations.getLazyAssociations().forEach(association -> {
+            Class<?> collectionType = association.getField().getType();
+            if (collectionType == List.class) {
+                association.setCollectionToField(entity, new PersistentList<>(this));
+            } else {
+                throw new UnsupportedOperationException("Unsupported collection type: " + collectionType.getSimpleName());
+            }
+        });
     }
 }

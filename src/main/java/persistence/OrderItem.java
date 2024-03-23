@@ -13,4 +13,16 @@ public class OrderItem {
     private String product;
 
     private Integer quantity;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
 }

@@ -30,7 +30,7 @@ public class SelectQueryBuilder {
         query.append(" from ");
         query.append(table.getName());
 
-        if(associations.isNotEmpty()) {
+        if(associations.hasEagerLoad()) {
             JoinBuilder joinBuilder = new JoinBuilder(table, columns, associations);
             query.append(joinBuilder.build());
         }

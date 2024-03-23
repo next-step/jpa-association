@@ -27,10 +27,6 @@ public class Associations {
         return associations.stream().anyMatch(OneToManyData::isEagerLoad);
     }
 
-    public boolean hasNotLazyLoad() {
-        return associations.stream().noneMatch(OneToManyData::isLazyLoad);
-    }
-
     public boolean isNotEmpty() {
         return !associations.isEmpty();
     }
@@ -40,5 +36,13 @@ public class Associations {
                 .filter(field -> field.isAnnotationPresent(OneToMany.class))
                 .map(OneToManyData::from)
                 .collect(Collectors.toList());
+    }
+
+    public boolean hasLazyLoad() {
+        return associations.stream().anyMatch(OneToManyData::isLazyLoad);
+    }
+
+    public List<OneToManyData> getLazyAssociations() {
+        return associations.stream().filter(OneToManyData::isLazyLoad).collect(Collectors.toList());
     }
 }
