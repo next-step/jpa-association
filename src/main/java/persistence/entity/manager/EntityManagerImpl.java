@@ -54,11 +54,11 @@ public class EntityManagerImpl implements EntityManager {
         EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
         entityEntry.save();
         entityEntry.finishStatusUpdate();
-        return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).value());
+        return persistenceContext.updateEntity(insertedEntity, new PrimaryKey(insertedEntity).getPrimaryKeyValue(entity));
     }
 
     private void validate(Object entity) {
-        Long primaryKey = new PrimaryKey(entity).value();
+        Long primaryKey = new PrimaryKey(entity).getPrimaryKeyValue(entity);
 
         Optional<?> searchedEntityEntry = persistenceContext.getEntityEntry(entity.getClass(), primaryKey);
         if (searchedEntityEntry.isPresent()) {
@@ -74,7 +74,7 @@ public class EntityManagerImpl implements EntityManager {
             throw new ReadOnlyException();
         }
 
-        Long primaryKey = new PrimaryKey(entity).value();
+        Long primaryKey = new PrimaryKey(entity).getPrimaryKeyValue(entity);
 
         if (persistenceContext.isDirty(entity)) {
             entityEntry.save();

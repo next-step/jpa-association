@@ -44,7 +44,7 @@ public class PersistenceContextImpl implements PersistenceContext {
 
     @Override
     public void removeEntity(Object entity) {
-        Class<?> clazz = entity.getClass();Long id = new PrimaryKey(entity).value();
+        Class<?> clazz = entity.getClass();Long id = new PrimaryKey(entity).getPrimaryKeyValue(entity);
         EntityKey entityKey = new EntityKey(clazz, id);
         entityCache.remove(entityKey);
         snapshot.remove(entityKey);

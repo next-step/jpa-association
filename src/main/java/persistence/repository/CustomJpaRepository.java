@@ -15,7 +15,7 @@ public class CustomJpaRepository {
 
 
     <T> T save (T entity) {
-        boolean isInEntityManger = entityManager.find(entity.getClass(), new PrimaryKey(entity).value()).isPresent();
+        boolean isInEntityManger = entityManager.find(entity.getClass(), new PrimaryKey(entity).getPrimaryKeyValue(entity)).isPresent();
 
         if (isInEntityManger) {
            return entityManager.merge(entity);
