@@ -1,8 +1,5 @@
 package persistence.entity;
 
-import persistence.sql.mapping.OneToManyData;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -13,16 +10,13 @@ import java.util.stream.Stream;
 public abstract class PersistentCollection<T> implements Collection<T> {
     protected Collection<T> collection = null;
     private final CollectionLoader collectionLoader;
-    private final OneToManyData association;
     private final Object joinColumnValue;
 
     public PersistentCollection(
             CollectionLoader collectionLoader,
-            OneToManyData association,
             Object joinColumnValue
     ) {
         this.collectionLoader = collectionLoader;
-        this.association = association;
         this.joinColumnValue = joinColumnValue;
     }
 
@@ -30,7 +24,7 @@ public abstract class PersistentCollection<T> implements Collection<T> {
         if (collection != null) {
             return;
         }
-        collection = collectionLoader.loadCollection(association, joinColumnValue);
+        collection = collectionLoader.loadCollection(joinColumnValue);
     }
 
     @Override

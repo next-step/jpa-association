@@ -8,6 +8,8 @@ import persistence.sql.mapping.Associations;
 import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
+import java.util.List;
+
 public class EntityLoader {
     private final JdbcTemplate jdbcTemplate;
     public EntityLoader(JdbcTemplate jdbcTemplate) {
@@ -19,15 +21,33 @@ public class EntityLoader {
         Columns columns = Columns.createColumns(clazz);
         Associations associations = Associations.fromEntityClass(clazz);
 
-        if(associations.isNotEmpty()) {
-            CollectionLoader collectionLoader = new CollectionLoader(jdbcTemplate, table, columns, associations);
-            return collectionLoader.load(clazz, id);
-        }
-
         SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns, associations);
         WhereBuilder whereBuilder = new WhereBuilder();
         whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
         String query = selectQueryBuilder.build(whereBuilder);
-        return jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
+        T entity = jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
+
+        if(associations.hasLazyLoad()) {
+            setPersistentCollection(entity, id, associations);
+        }
+
+        return entity;
+    }
+
+    private <T> void setPersistentCollection(
+            T entity,
+            Object id,
+            Associations associations
+    ) {
+        associations.getLazyAssociations().forEach(association -> {
+            Class<?> collectionType = association.getField().getType();
+            CollectionLoader collectionLoader = new CollectionLoader(jdbcTemplate, association);
+
+            if (collectionType == List.class) {
+                association.setCollectionToField(entity, new PersistentList<>(collectionLoader, id));
+            } else {
+                throw new UnsupportedOperationException("Unsupported collection type: " + collectionType.getSimpleName());
+            }
+        });
     }
 }

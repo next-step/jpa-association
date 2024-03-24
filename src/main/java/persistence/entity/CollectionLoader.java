@@ -12,57 +12,23 @@ import persistence.sql.mapping.OneToManyData;
 import persistence.sql.mapping.TableData;
 
 import java.util.Collection;
-import java.util.List;
 
 
 public class CollectionLoader {
     private final JdbcTemplate jdbcTemplate;
-    private final TableData table;
-    private final Columns columns;
-    private final Associations associations;
+    private final OneToManyData association;
     private static final Logger logger = LoggerFactory.getLogger(CollectionLoader.class);
 
 
     public CollectionLoader(
             JdbcTemplate jdbcTemplate,
-            TableData table,
-            Columns columns,
-            Associations associations
+            OneToManyData association
     ) {
-        this.columns = columns;
-        this.table = table;
         this.jdbcTemplate = jdbcTemplate;
-        this.associations = associations;
+        this.association = association;
     }
 
-    public <T> T load(Class<T> clazz, Object id) {
-        SelectQueryBuilder selectQueryBuilder = new SelectQueryBuilder(table, columns, associations);
-
-        WhereBuilder whereBuilder = new WhereBuilder();
-        whereBuilder.and(BooleanExpression.eq(columns.getPkColumnName(), id));
-        String query = selectQueryBuilder.build(whereBuilder);
-
-        T entity = jdbcTemplate.queryForObject(query, new DefaultRowMapper<T>(clazz));
-
-        if (associations.hasLazyLoad()) {
-            setPersistentCollection(entity, id);
-        }
-
-        return entity;
-    }
-
-    private <T> void setPersistentCollection(T entity, Object id) {
-        associations.getLazyAssociations().forEach(association -> {
-            Class<?> collectionType = association.getField().getType();
-            if (collectionType == List.class) {
-                association.setCollectionToField(entity, new PersistentList<>(this, association, id));
-            } else {
-                throw new UnsupportedOperationException("Unsupported collection type: " + collectionType.getSimpleName());
-            }
-        });
-    }
-
-    public <T> Collection<T> loadCollection(OneToManyData association, Object parentId) {
+    public <T> Collection<T> loadCollection(Object parentId) {
         Class<T> clazz = (Class<T>) association.getReferenceEntityClazz();
         TableData table = TableData.from(clazz);
         Columns columns = Columns.createColumns(clazz);

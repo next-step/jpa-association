@@ -6,8 +6,8 @@ import java.util.*;
 
 public class PersistentList<T> extends PersistentCollection<T> implements List<T> {
 
-    public PersistentList(CollectionLoader collectionLoader, OneToManyData association, Object joinColumnValue) {
-        super(collectionLoader, association, joinColumnValue);
+    public PersistentList(CollectionLoader collectionLoader, Object joinColumnValue) {
+        super(collectionLoader, joinColumnValue);
     }
 
     @Override

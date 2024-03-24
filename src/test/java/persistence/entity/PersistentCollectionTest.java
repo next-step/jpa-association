@@ -5,23 +5,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.H2DBTestSupport;
-import persistence.Order;
 import persistence.OrderItem;
 import persistence.OrderLazy;
 import persistence.sql.mapping.Associations;
-import persistence.sql.mapping.Columns;
-import persistence.sql.mapping.TableData;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PersistentCollectionTest extends H2DBTestSupport {
     private final CollectionLoader lazyCollectionLoader = new CollectionLoader(
             jdbcTemplate,
-            TableData.from(OrderLazy.class),
-            Columns.createColumns(OrderLazy.class),
-            Associations.fromEntityClass(OrderLazy.class)
+            Associations.fromEntityClass(OrderLazy.class).getLazyAssociations().get(0)
     );
     @BeforeEach
     void setUp() {
@@ -42,11 +35,7 @@ class PersistentCollectionTest extends H2DBTestSupport {
         jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product1', 1)");
         Associations associations = Associations.fromEntityClass(OrderLazy.class);
 
-        PersistentList<OrderItem> list = new PersistentList<>(
-                lazyCollectionLoader,
-                associations.getLazyAssociations().get(0),
-                1L
-        );
+        PersistentList<OrderItem> list = new PersistentList<>(lazyCollectionLoader, 1L);
 
         assertThat(list.get(0).getId()).isEqualTo(1L);
     }

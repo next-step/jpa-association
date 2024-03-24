@@ -2,28 +2,17 @@ package persistence.entity;
 
 import org.junit.jupiter.api.*;
 import persistence.H2DBTestSupport;
-import persistence.Order;
 import persistence.OrderLazy;
 import persistence.sql.mapping.Associations;
-import persistence.sql.mapping.Columns;
-import persistence.sql.mapping.TableData;
+
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 class CollectionLoaderTest extends H2DBTestSupport {
-    private final CollectionLoader eagerCollectionLoader = new CollectionLoader(
+    private final CollectionLoader collectionLoader = new CollectionLoader(
             jdbcTemplate,
-            TableData.from(Order.class),
-            Columns.createColumns(Order.class),
-            Associations.fromEntityClass(Order.class)
-    );
-
-    private final CollectionLoader lazyCollectionLoader = new CollectionLoader(
-            jdbcTemplate,
-            TableData.from(OrderLazy.class),
-            Columns.createColumns(OrderLazy.class),
-            Associations.fromEntityClass(OrderLazy.class)
+            Associations.fromEntityClass(OrderLazy.class).getLazyAssociations().get(0)
     );
 
     @BeforeEach
@@ -39,32 +28,14 @@ class CollectionLoaderTest extends H2DBTestSupport {
     }
 
     @Test
-    @DisplayName("oneToMany eager 로딩 테스트")
-    void eagerLoadTest() {
-        jdbcTemplate.execute("insert into orders (id, order_number) values (1, '1')");
-
-        jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product1', 1)");
-        jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product2', 2)");
-        jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product3', 3)");
-
-        Order order = eagerCollectionLoader.load(Order.class, 1L);
-
-        assertSoftly(softly -> {
-            softly.assertThat(order.getId()).isEqualTo(1L);
-            softly.assertThat(order.getOrderItems()).hasSize(3);
-        });
-    }
-
-    @Test
-    @DisplayName("lazy 로딩이 있을땐 persistentCollection 을 반환한다")
-    void instanceIsProxyWhenHasLazyLoading() {
+    void testLoadCollection(){
         jdbcTemplate.execute("insert into orders (id, order_number) values (1, '1')");
         jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product1', 1)");
         jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product2', 2)");
         jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product3', 3)");
 
-        OrderLazy order = lazyCollectionLoader.load(OrderLazy.class, 1L);
+        Collection<Object> collection = collectionLoader.loadCollection(1L);
 
-        assertThat(order.getOrderItems()).isInstanceOf(PersistentList.class);
+        assertThat(collection.size()).isEqualTo(3);
     }
 }
