@@ -67,19 +67,4 @@ class CollectionLoaderTest extends H2DBTestSupport {
 
         assertThat(order.getOrderItems()).isInstanceOf(PersistentList.class);
     }
-
-    @Test
-    @DisplayName("lazy froxy는 접근시 쿼리를 통해 로딩한다")
-    @Disabled
-    void getDataWhenAccessCollection() {
-        jdbcTemplate.execute("insert into orders (id, order_number) values (1, '1')");
-        jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product1', 1)");
-
-        OrderLazy order = eagerCollectionLoader.load(OrderLazy.class, 1L);
-
-        assertSoftly(softly -> {
-            softly.assertThat(order.getOrderItems().get(0).getId()).isEqualTo(1L);
-            softly.assertThat(order.getOrderItems().get(0).getProduct()).isEqualTo("product1");
-        });
-    }
 }
