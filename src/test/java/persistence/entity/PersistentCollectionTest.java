@@ -35,7 +35,6 @@ class PersistentCollectionTest extends H2DBTestSupport {
     void loadWhenAccessCollection() {
         jdbcTemplate.execute("insert into orders (id, order_number) values (1, '1')");
         jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product1', 1)");
-        Associations associations = Associations.fromEntityClass(OrderLazy.class);
 
         PersistentList<OrderItem> list = new PersistentList<>(lazyCollectionLoader, 1L);
 
