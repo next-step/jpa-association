@@ -15,7 +15,6 @@ public class PersistentList<T> extends PersistentCollection<T> implements List<T
             if(index-- == 0){
                 return element;
             }
-            index--;
         }
         throw new IndexOutOfBoundsException();
     }
