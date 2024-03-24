@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import persistence.H2DBTestSupport;
 import persistence.OrderItem;
 import persistence.OrderLazy;
+import persistence.entity.collection.CollectionLoader;
+import persistence.entity.collection.PersistentList;
 import persistence.sql.mapping.Associations;
 
 import static org.assertj.core.api.Assertions.assertThat;

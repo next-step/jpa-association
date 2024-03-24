@@ -3,6 +3,7 @@ package persistence.entity;
 import org.junit.jupiter.api.*;
 import persistence.H2DBTestSupport;
 import persistence.OrderLazy;
+import persistence.entity.collection.CollectionLoader;
 import persistence.sql.mapping.Associations;
 
 import java.util.Collection;

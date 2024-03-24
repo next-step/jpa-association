@@ -1,5 +1,10 @@
 package persistence.entity;
 
+import persistence.entity.context.*;
+import persistence.entity.exception.EntityAlreadyExistsException;
+import persistence.entity.exception.EntityNotExistsException;
+import persistence.entity.exception.EntityReadOnlyException;
+
 public class EntityMangerImpl implements EntityManger {
     private final EntityPersister entityPersister;
     private final EntityLoader entityLoader;

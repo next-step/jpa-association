@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.collection;
 
 import java.util.Collection;
 import java.util.Iterator;

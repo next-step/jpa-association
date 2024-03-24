@@ -1,6 +1,8 @@
 package persistence.entity;
 
 import jdbc.JdbcTemplate;
+import persistence.entity.collection.CollectionLoader;
+import persistence.entity.collection.PersistentList;
 import persistence.sql.dml.BooleanExpression;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.WhereBuilder;

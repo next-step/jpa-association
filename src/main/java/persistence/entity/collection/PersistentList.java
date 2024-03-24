@@ -1,6 +1,4 @@
-package persistence.entity;
-
-import persistence.sql.mapping.OneToManyData;
+package persistence.entity.collection;
 
 import java.util.*;
 

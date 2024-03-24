@@ -7,11 +7,7 @@ import org.junit.jupiter.api.Test;
 import persistence.H2DBTestSupport;
 import persistence.Order;
 import persistence.OrderLazy;
-import persistence.Person;
-import persistence.sql.ddl.CreateQueryBuilder;
-import persistence.sql.ddl.DropQueryBuilder;
-import persistence.sql.dialect.H2Dialect;
-import persistence.sql.dml.InsertQueryBuilder;
+import persistence.entity.collection.PersistentList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;

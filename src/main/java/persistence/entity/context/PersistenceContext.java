@@ -1,4 +1,6 @@
-package persistence.entity;
+package persistence.entity.context;
+
+import persistence.entity.context.EntityKey;
 
 public interface PersistenceContext {
 

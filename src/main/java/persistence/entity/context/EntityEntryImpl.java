@@ -1,4 +1,7 @@
-package persistence.entity;
+package persistence.entity.context;
+
+import persistence.entity.Status;
+import persistence.entity.context.EntityEntry;
 
 public class EntityEntryImpl implements EntityEntry {
     private Status status;

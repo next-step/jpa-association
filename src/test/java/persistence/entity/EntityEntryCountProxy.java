@@ -1,5 +1,7 @@
 package persistence.entity;
 
+import persistence.entity.context.EntityEntry;
+
 import java.util.HashMap;
 import java.util.Map;
 

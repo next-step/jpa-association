@@ -3,7 +3,7 @@ package persistence.sql.mapping;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import persistence.entity.PersistentCollection;
+import persistence.entity.collection.PersistentCollection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

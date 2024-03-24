@@ -5,9 +5,11 @@ import jakarta.persistence.Id;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.Person;
+import persistence.entity.context.EntityKey;
+import persistence.entity.context.PersistenceContext;
+import persistence.entity.context.PersistenceContextImpl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @Entity
 class TestEntity {

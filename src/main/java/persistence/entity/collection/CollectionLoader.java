@@ -1,8 +1,9 @@
-package persistence.entity;
+package persistence.entity.collection;
 
 import jdbc.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.DefaultRowMapper;
 import persistence.sql.dml.BooleanExpression;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.WhereBuilder;
