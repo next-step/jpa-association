@@ -2,20 +2,9 @@ package persistence.model;
 
 import java.lang.reflect.Field;
 
-public class EntityField {
+public class EntityField extends AbstractEntityField {
 
-    private final String fieldName;
-    private final Class<?> entityClass;
-    private final Field field;
-
-    public EntityField(String fieldName, Class<?> entityClass, Field field) {
-        this.fieldName = fieldName;
-        this.entityClass = entityClass;
-        this.field = field;
+    public EntityField(final String fieldName, final String columnName, final Class<?> entityClass, final Field field) {
+        super(fieldName, columnName, entityClass, field);
     }
-
-    public Field getField() {
-        return this.field;
-    }
-
 }
