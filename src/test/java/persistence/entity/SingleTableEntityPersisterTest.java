@@ -6,6 +6,7 @@ import persistence.JdbcServerDmlQueryTestSupport;
 import persistence.PersonV3FixtureFactory;
 import persistence.entity.persister.EntityPersister;
 import persistence.entity.persister.SingleTableEntityPersister;
+import persistence.model.PersistentClassMapping;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -25,7 +26,7 @@ class SingleTableEntityPersisterTest extends JdbcServerDmlQueryTestSupport {
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
     private final Class<PersonV3> personV3Class = PersonV3.class;
     private final EntityPersister entityPersister = new SingleTableEntityPersister(personV3Class.getName(), tableBinder, dmlQueryBuilder, jdbcTemplate, personV3Class);
-    private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersonV3.class);
+    private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersistentClassMapping.getPersistentClass((personV3Class)));
 
     @AfterEach
     void tearDown() {

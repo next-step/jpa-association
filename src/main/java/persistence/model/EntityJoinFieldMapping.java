@@ -12,13 +12,17 @@ public abstract class EntityJoinFieldMapping {
         return field.isAnnotationPresent(annotationClass);
     }
 
-    public EntityJoinEntityField create(final Class<?> clazz, final Field field) {
-        return new EntityJoinEntityField(clazz, field, getFetchType(field));
-    }
-
     public Class<?> getEntityType(final Field field) {
         return field.getClass();
     }
 
     protected abstract FetchType getFetchType(final Field field);
+
+    private boolean isLazy(final Field field) {
+        return this.getFetchType(field) == FetchType.LAZY;
+    }
+
+    public <T> CollectionPersistentClass createCollectionPersistentClass(final PersistentClass<T> owner, final PersistentClass<?> persistentClass, final Field field) {
+        return new CollectionPersistentClass(owner, persistentClass, isLazy(field));
+    }
 }
