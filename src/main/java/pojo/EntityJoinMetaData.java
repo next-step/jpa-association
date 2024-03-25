@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static constants.CommonConstants.UNDER_SCORE;
 import static utils.StringUtils.isBlankOrEmpty;
 
 public class EntityJoinMetaData {
@@ -21,14 +22,14 @@ public class EntityJoinMetaData {
     private final List<FieldName> fieldNames;
     private final boolean lazy;
 
-    public EntityJoinMetaData(Class<?> clazz, Object entity, Field field) {
+    public EntityJoinMetaData(Class<?> clazz, Object entity, Field field, IdField entityMetaDataIdField) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
             throw new IllegalStateException("Entity 클래스가 아닙니다.");
         }
         this.clazz = clazz;
         this.entity = entity;
         this.entityName = getEntityNameInfo();
-        this.joinColumnName = getJoinColumnNameInfo(field);
+        this.joinColumnName = getJoinColumnNameInfo(field, entityMetaDataIdField);
         this.fieldNames = getFieldNamesInfo();
         this.lazy = isLazy(field);
     }
@@ -45,13 +46,18 @@ public class EntityJoinMetaData {
         return fieldNames;
     }
 
+    public boolean isLazy() {
+        return lazy;
+    }
+
     private String getEntityNameInfo() {
         return clazz.isAnnotationPresent(Table.class) && !isBlankOrEmpty(clazz.getAnnotation(Table.class).name())
                 ? clazz.getAnnotation(Table.class).name() : clazz.getSimpleName().toLowerCase();
     }
 
-    public String getJoinColumnNameInfo(Field field) {
-        return field.getAnnotation(JoinColumn.class).name();
+    public String getJoinColumnNameInfo(Field field, IdField entityMetaDataIdField) {
+        return field.isAnnotationPresent(JoinColumn.class) && !isBlankOrEmpty(field.getAnnotation(JoinColumn.class).name())
+                ? field.getAnnotation(JoinColumn.class).name() : getEntityNameInfo() + UNDER_SCORE + entityMetaDataIdField.getFieldNameData();
     }
 
     private List<FieldName> getFieldNamesInfo() {
