@@ -1,6 +1,7 @@
 package pojo;
 
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -32,7 +33,10 @@ public class EntityColumn {
         return fieldValue;
     }
 
-    public boolean hasGenerationType() {
-        return field.isAnnotationPresent(GeneratedValue.class);
+    public H2GenerationType getGenerationType() {
+        if (field.isAnnotationPresent(GeneratedValue.class)) {
+            return H2GenerationType.from(field.getAnnotation(GeneratedValue.class).strategy());
+        }
+        return null;
     }
 }

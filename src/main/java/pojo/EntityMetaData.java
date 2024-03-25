@@ -55,12 +55,17 @@ public class EntityMetaData {
     }
 
     private EntityJoinMetaData getEntityJoinMetaDataInfo() {
-        Optional<Field> joinColumnField = new FieldInfos(clazz.getDeclaredFields()).getJoinColumnField();
+        FieldInfos fieldInfos = new FieldInfos(clazz.getDeclaredFields());
+
+        Optional<Field> joinColumnField = fieldInfos.getJoinColumnField();
         if (joinColumnField.isEmpty()) {
             return null;
         }
 
+        Field field = fieldInfos.getIdField();
+        IdField idField = new IdField(field, entity);
+
         Class<?> joinClass = (Class<?>) ((ParameterizedType) joinColumnField.get().getGenericType()).getActualTypeArguments()[0];
-        return new EntityJoinMetaData(joinClass, null, joinColumnField.get());
+        return new EntityJoinMetaData(joinClass, null, joinColumnField.get(), idField);
     }
 }

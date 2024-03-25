@@ -1,7 +1,5 @@
 package pojo;
 
-import jakarta.persistence.GeneratedValue;
-
 import java.lang.reflect.Field;
 import java.util.Objects;
 
@@ -29,10 +27,7 @@ public class IdField implements FieldData {
     }
 
     private H2GenerationType getGenerationType() {
-        if (entityColumn.hasGenerationType()) {
-            return H2GenerationType.from(entityColumn.getField().getAnnotation(GeneratedValue.class).strategy());
-        }
-        return null;
+        return entityColumn.getGenerationType();
     }
 
     @Override
