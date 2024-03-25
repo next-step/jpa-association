@@ -3,7 +3,9 @@ package persistence.sql.ddl.clause.table;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import persistence.sql.ddl.clause.column.ColumnClauses;
+import persistence.sql.ddl.clause.column.JoinClause;
 import persistence.sql.ddl.clause.primkarykey.PrimaryKeyClause;
 import persistence.sql.exception.InvalidEntityException;
 
@@ -11,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TableClause {
@@ -18,6 +21,7 @@ public class TableClause {
     private final PrimaryKeyClause primaryKeyClause;
     private final ColumnClauses columnClauses;
     private final Object instanceOfTable;
+    private final JoinClause joinClause;
 
     public TableClause(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(Entity.class)) {
@@ -27,6 +31,7 @@ public class TableClause {
         this.primaryKeyClause = new PrimaryKeyClause(clazz);
         this.columnClauses = extractColumnsFrom(clazz);
         this.instanceOfTable = getInstanceOfTable(clazz);
+        this.joinClause = JoinClause.newOne(clazz);
     }
 
     private Object getInstanceOfTable(Class<?> clazz) {
@@ -71,7 +76,7 @@ public class TableClause {
     }
 
     public List<String> columnQueries() {
-        return columnClauses.getQueries();
+        return columnClauses.getQueries().stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public List<String> columnNames() {
@@ -80,5 +85,13 @@ public class TableClause {
 
     public Object newInstance() {
         return this.instanceOfTable;
+    }
+
+    public String createJoinQuery() {
+        return joinClause.getJoinQuery(name, primaryKeyName());
+    }
+
+    public boolean hasJoinedEntity() {
+        return this.joinClause != null;
     }
 }

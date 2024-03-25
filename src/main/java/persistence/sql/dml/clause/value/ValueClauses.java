@@ -1,8 +1,10 @@
 package persistence.sql.dml.clause.value;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +20,9 @@ public class ValueClauses {
     }
 
     private static boolean isColumn(Field field) {
-        return !field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(Id.class);
+        List<Class<? extends Annotation>> invalidAnnotations = List.of(Transient.class, Id.class, OneToMany.class);
+
+        return invalidAnnotations.stream().noneMatch(field::isAnnotationPresent);
     }
 
     public List<String> getQueries() {

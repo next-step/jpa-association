@@ -13,33 +13,26 @@ public class PrimaryKey {
     private final String name;
     private final String dataTypeName;
 
-    private final Long value;
-
     public PrimaryKey(Class<?> clazz) {
         this.field = getIdField(clazz);
         this.name = field.getName();
         this.dataTypeName = field.getType().getSimpleName();
-        this.value = null;
     }
 
     public <T> PrimaryKey(T entity) {
         this.field = getIdField(entity.getClass());
         this.name = field.getName();
         this.dataTypeName = field.getType().getSimpleName();
-        this.value = getPrimaryKeyValue(entity, field);
     }
 
-    private <T> Long getPrimaryKeyValue(T entity, Field primaryKeyField) {
-        primaryKeyField.setAccessible(true);
+    public <T> Long getPrimaryKeyValue(T entity) {
+        Field idField = getIdField(entity.getClass());
+        idField.setAccessible(true);
         try {
-            return (Long) primaryKeyField.get(entity);
+            return (Long) idField.get(entity);
         } catch (IllegalAccessException e) {
             throw new InvalidPrimaryKeyException();
         }
-    }
-
-    public Long value() {
-        return value;
     }
 
     public Field field() {

@@ -4,13 +4,11 @@ import database.DatabaseServer;
 import database.H2;
 import jdbc.JdbcTemplate;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.entity.testfixture.notcolumn.Person;
+import persistence.entity.testfixture.order.Order;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
 import persistence.sql.dml.querybuilder.InsertQueryBuilder;
@@ -71,25 +69,12 @@ class SelectQueryBuilderTest {
         Assertions.assertThat(persons).hasSize(3);
     }
 
-    @DisplayName("[요구사항3] 3건의 person insert 후, findById를 실행시, 1건이 조회된다.")
+    @DisplayName("selectAll 쿼리 생성시, entity내 eager Load 가 있으면 Join 구문을 생성한다.")
     @Test
-    void 요구사항3_test() {
-        // given
-        List<String> insertQueries = Stream.of(
-                new Person("김철수", 21, "chulsoo.kim@gmail.com", 11),
-                        new Person("김영희", 15, "younghee.kim@gmail.com", 11),
-                        new Person("신짱구", 15, "jjangoo.sin@gmail.com", 11))
-                .map(person -> new InsertQueryBuilder(Person.class).getInsertQuery(person)).collect(Collectors.toList());
-
-        for (String query : insertQueries) {
-            jdbcTemplate.execute(query);
-        }
-
-        // when
-        String query = new SelectQueryBuilder(Person.class).getFindById(1L);
-        Person selectedPerson = jdbcTemplate.queryForObject(query, new DtoMapper<>(Person.class));
+    void join_구문_test() {
+        String query = new SelectQueryBuilder(Order.class).getFindAllQuery();
 
         // then
-        Assertions.assertThat(selectedPerson.getId()).isEqualTo(1L);
+        Assertions.assertThat(query).isEqualTo("SELECT * FROM orders inner join order_items on orders.id = order_items.order_id");
     }
 }

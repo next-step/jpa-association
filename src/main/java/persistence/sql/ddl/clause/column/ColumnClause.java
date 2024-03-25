@@ -20,6 +20,9 @@ public class ColumnClause {
     }
 
     public String getQuery() {
+        if (typeToSqlConverter.get(this.spec.type()) == null) {
+            return null;
+        }
         return typeToSqlConverter.get(this.spec.type()).apply(this.spec.name()) + " " + nullClause.getQuery();
     }
 

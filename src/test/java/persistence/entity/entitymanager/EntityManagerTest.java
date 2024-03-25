@@ -15,6 +15,8 @@ import persistence.entity.persistencecontext.EntityEntry;
 import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.testfixture.notcolumn.Person;
+import persistence.entity.testfixture.order.Order;
+import persistence.entity.testfixture.order.OrderItem;
 import persistence.sql.common.DtoMapper;
 import persistence.sql.ddl.querybuilder.CreateQueryBuilder;
 import persistence.sql.dml.querybuilder.SelectQueryBuilder;

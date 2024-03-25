@@ -27,7 +27,7 @@ public class Snapshot {
     public <T> boolean isDirty(T entity) {
 
         Class<?> clazz = entity.getClass();
-        Long primaryKeyValue = new PrimaryKey(entity).value();
+        Long primaryKeyValue = new PrimaryKey(entity).getPrimaryKeyValue(entity);
         EntityKey key = new EntityKey(clazz, primaryKeyValue);
         T searchedEntity = (T) snapshot.get(key);
         return !entity.equals(searchedEntity);

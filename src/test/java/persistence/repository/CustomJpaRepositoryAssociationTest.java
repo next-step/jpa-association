@@ -17,9 +17,9 @@ import java.util.List;
 
 import static persistence.sql.ddl.common.TestSqlConstant.DROP_TABLE_USERS;
 
-class CustomJpaRepositoryTest {
+class CustomJpaRepositoryAssociationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(CustomJpaRepositoryTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomJpaRepositoryAssociationTest.class);
     private static DatabaseServer server;
     private static JdbcTemplate jdbcTemplate;
     private CustomJpaRepository repository;
@@ -38,9 +38,11 @@ class CustomJpaRepositoryTest {
     }
     @BeforeEach
     void setUp() {
-        String query = new CreateQueryBuilder(Person.class).getQuery();
-        jdbcTemplate.execute(query);
-
+        List<String> queries = List.of(
+                new CreateQueryBuilder(Order.class).getQuery(),
+                new CreateQueryBuilder(OrderItem.class).getQuery()
+        );
+        queries.forEach(x-> jdbcTemplate.execute(x));
         repository = new CustomJpaRepository(jdbcTemplate);
     }
 
@@ -55,32 +57,17 @@ class CustomJpaRepositoryTest {
     }
 
     @Test
-    @DisplayName("JPA repository는 id가 이미 있는 entity를 저장시 update 한다.")
-    void saveWithDirty() {
+    @DisplayName("JPA repository는 find 실행시 eagerFetch 관계의 엔티티 값도  가져온다.")
+    void findEagerFetchedItemsTest() {
         // given
-        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        Person savedPerson = repository.save(person);
-        Long personId = savedPerson.getId();
-
-        // when
-        Person updatedPerson = savedPerson.changeEmail("soo@gmail.com");
-        Person changedPerson = repository.save(updatedPerson);
+        OrderItem orderItem1 = new OrderItem("불닭볶음면", 13);
+        OrderItem orderItem2 = new OrderItem("짜파게티", 9);
+        Order order = new Order("김철수", List.of(orderItem1, orderItem2));
+        Order expectedOrder = repository.save(order);
+        List<OrderItem> expectedOrderItems = expectedOrder.getOrderItems();
 
         // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(changedPerson).isEqualTo(new Person(personId, "김철수", 21, "soo@gmail.com", null));
-        });
-    }
-
-
-    @Test
-    @DisplayName("JPA repository는 find 실행시 기존에 저장된 값을 가져온다.")
-    void find() {
-        // given
-        Person person = new Person("김철수", 21, "chulsoo.kim@gmail.com", 11);
-        Person expected = repository.save(person);
-
-        // then
-        Assertions.assertThat(repository.find(Person.class, person.getId()).get()).isEqualTo(expected);
+        Assertions.assertThat(repository.find(Order.class, expectedOrder.getId()).get()).isEqualTo(expectedOrder);
+        Assertions.assertThat(repository.find(OrderItem.class, expectedOrder.getId()).get()).isEqualTo(expectedOrderItems.get(0));
     }
 }
