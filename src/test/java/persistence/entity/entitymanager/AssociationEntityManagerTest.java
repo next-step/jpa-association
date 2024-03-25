@@ -48,14 +48,14 @@ public class AssociationEntityManagerTest {
         jdbcTemplate.execute("CREATE TABLE orders (id BIGINT AUTO_INCREMENT PRIMARY KEY, order_number VARCHAR(30) NULL)");
         jdbcTemplate.execute("CREATE TABLE order_items (id BIGINT AUTO_INCREMENT PRIMARY KEY, product VARCHAR(30) NULL, quantity INT NULL, order_id BIGINT, FOREIGN KEY (order_id) REFERENCES orders(id))");
 
-        jdbcTemplate.execute("INSERT INTO orders (order_number) VALUES ('ON1000')");
-        jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('불닭볶음면', 10, 1)");
-        jdbcTemplate.execute("INSERT INTO order_items (product, quantity, order_id) VALUES ('마라볶음면', 7, 1)");
+        jdbcTemplate.execute("INSERT INTO orders (id, order_number) VALUES (1, 'ON1000')");
+        jdbcTemplate.execute("INSERT INTO order_items (id, product, quantity, order_id) VALUES (1, '불닭볶음면', 10, 1)");
+        jdbcTemplate.execute("INSERT INTO order_items (id, product, quantity, order_id) VALUES (2, '마라볶음면', 7, 1)");
 
 
         Order order = entityManager.find(Order.class, 1L).get();
 
         List<OrderItem> orderItemsResult = List.of(new OrderItem("불닭볶음면", 10), new OrderItem("마라볶음면", 7));
-        Assertions.assertThat(order).isEqualTo(new Order(1L, "ON1000", orderItemsResult));
+        Assertions.assertThat(order).isEqualTo(new Order("ON1000", orderItemsResult));
     }
 }

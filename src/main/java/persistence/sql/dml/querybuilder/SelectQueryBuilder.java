@@ -15,7 +15,6 @@ public class SelectQueryBuilder {
     }
 
     public String getFindAllQuery() {
-        // oneToMany 있는지 확인
         if (this.tableClause.hasJoinedEntity()) {
             return String.format(SELECT_ALL_QUERY, tableClause.name()) + this.tableClause.createJoinQuery();
         }

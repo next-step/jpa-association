@@ -23,6 +23,11 @@ public class EntityLoader {
         return getFoundResult(selected, id);
     }
 
+    public <T> List<T> findAll(Class<T> clazz) {
+        String query = new SelectQueryBuilder(clazz).getFindAllQuery();
+        return jdbcTemplate.query(query, new DtoMapper<>(clazz));
+    }
+
     private <T> Optional<T> getFoundResult(List<T> selected, Long id) {
         if (selected.isEmpty()) {
             return Optional.empty();

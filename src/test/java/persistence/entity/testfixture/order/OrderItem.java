@@ -2,6 +2,8 @@ package persistence.entity.testfixture.order;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "order_items")
 public class OrderItem {
@@ -24,5 +26,18 @@ public class OrderItem {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderItem orderItem = (OrderItem) o;
+        return Objects.equals(id, orderItem.id) && Objects.equals(product, orderItem.product) && Objects.equals(quantity, orderItem.quantity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, product, quantity);
     }
 }

@@ -12,11 +12,33 @@ import java.util.Optional;
 
 public class JoinClause {
     public static final String JOIN_QUERY = " inner join %s on %s.%s = %s.%s";
+
     private final TableClause childClause;
     private final String referenceKeyName;
     public JoinClause(Class<?> clazz, String referenceKeyName) {
         this.childClause = new TableClause(clazz);
         this.referenceKeyName = referenceKeyName;
+    }
+
+    public static boolean hasOneToMany(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .anyMatch(x -> x.isAnnotationPresent(OneToMany.class));
+    }
+
+    public static Field findChildEntityField(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(x -> x.isAnnotationPresent(OneToMany.class))
+                .findFirst().get();
+    }
+    public static Class<?> childEntityClass(Class<?> clazz) {
+        Optional<Field> childEntity = Arrays.stream(clazz.getDeclaredFields())
+                .filter(x -> x.isAnnotationPresent(OneToMany.class))
+                .findFirst();
+
+        if (childEntity.isEmpty() || isFetchTypeLAZY(childEntity.get())) {
+            return null;
+        }
+        return (Class<?>) ((ParameterizedType) childEntity.get().getGenericType()).getActualTypeArguments()[0];
     }
 
     public static JoinClause newOne(Class<?> clazz) {
@@ -39,5 +61,9 @@ public class JoinClause {
     public String getJoinQuery(String parentEntity, String referenceKey) {
         return String.format(JOIN_QUERY,
                 childClause.name(), parentEntity, referenceKey, childClause.name(), referenceKeyName);
+    }
+
+    public TableClause getChildClause() {
+        return childClause;
     }
 }
