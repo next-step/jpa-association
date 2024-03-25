@@ -2,7 +2,6 @@ package persistence.sql;
 
 import database.H2;
 import entity.Order;
-import entity.OrderItem;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -21,16 +20,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CustomSelectQueryBuilderTest extends JpaTest {
 
-    static OrderItem orderItem1 = new OrderItem(1L, "A", 1);
-    static OrderItem orderItem2 = new OrderItem(2L, "B", 10);
-    static OrderItem orderItem3 = new OrderItem(3L, "C", 5);
-    static Order order = new Order(1L, "test1", List.of(orderItem1, orderItem2, orderItem3));
+    static EntityMetaData entityMetaData;
 
     @BeforeAll
     static void init() throws SQLException {
         server = new H2();
         server.start();
         jdbcTemplate = new JdbcTemplate(server.getConnection());
+
+        entityMetaData = new EntityMetaData(Order.class, order);
+        initForTest(entityMetaData);
     }
 
     @BeforeEach
@@ -55,10 +54,17 @@ class CustomSelectQueryBuilderTest extends JpaTest {
         EntityMetaData entityMetaData = new EntityMetaData(Order.class, order);
 
         CustomSelectQueryBuilder customSelectQueryBuilder = new CustomSelectQueryBuilder(entityMetaData);
-        String selectJoinQuery = customSelectQueryBuilder.findByIdJoinQuery(order, Order.class, 1);
+        String selectJoinQuery = customSelectQueryBuilder.findByIdJoinQuery(order, Order.class);
 
         String resultQuery = "SELECT orders.id, orders.order_number, order_items.id, order_items.product, order_items.quantity FROM orders LEFT JOIN order_items ON orders.id = order_items.order_id WHERE orders.id = 1;";
         assertThat(selectJoinQuery).isEqualTo(resultQuery);
+    }
+
+    @DisplayName("findById 테스트 - 연관관계가 있는 경우")
+    @Test
+    void findByIdWithAssociationTest() {
+        List<? extends Order> savedOrderList = entityLoader.findByIdWithAssociation(order.getClass(), order, order.getId());
+        assertThat(savedOrderList).hasSize(3);
     }
 
     private void createTable() {

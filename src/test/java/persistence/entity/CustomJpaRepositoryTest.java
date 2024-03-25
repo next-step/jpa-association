@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CustomJpaRepositoryTest extends JpaTest {
 
-    static Person3 person = new Person3(1L, "test", 20, "test@test.com");
     static EntityMetaData entityMetaData;
 
     @BeforeAll

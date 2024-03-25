@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EntityLoaderImplTest extends JpaTest {
 
-    static Person3 person = new Person3(1L, "test", 20, "test@test.com");
     static EntityMetaData entityMetaData;
 
     @BeforeAll
@@ -49,7 +48,7 @@ class EntityLoaderImplTest extends JpaTest {
         server.stop();
     }
 
-    @DisplayName("findById 테스트")
+    @DisplayName("findById 테스트 - 연관관계가 없는 경우")
     @Test
     void findByIdTest() {
         entityPersister.insert(person);
