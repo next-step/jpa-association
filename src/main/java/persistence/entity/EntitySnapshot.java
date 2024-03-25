@@ -1,6 +1,6 @@
 package persistence.entity;
 
-import pojo.FieldInfo;
+import pojo.EntityColumn;
 import pojo.FieldInfos;
 
 import java.lang.reflect.Field;
@@ -17,7 +17,7 @@ public class EntitySnapshot {
     public EntitySnapshot(Object entity) {
         List<Field> fields = new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFields();
         this.map = fields.stream()
-                .map(field -> new FieldInfo(field, entity))
+                .map(field -> new EntityColumn(field, entity))
                 .collect(Collectors.toMap(
                         fieldInfo -> fieldInfo.getFieldName().getName(),
                         fieldInfo -> fieldInfo.getFieldValue().getValue()

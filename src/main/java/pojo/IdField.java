@@ -1,22 +1,20 @@
 package pojo;
 
-import jakarta.persistence.GeneratedValue;
-
 import java.lang.reflect.Field;
 import java.util.Objects;
 
 public class IdField implements FieldData {
 
-    private final FieldInfo fieldInfo;
+    private final EntityColumn entityColumn;
     private final H2GenerationType generationType;
 
     public IdField(Field field, Object entity) {
-        this.fieldInfo = new FieldInfo(field, entity);
+        this.entityColumn = new EntityColumn(field, entity);
         this.generationType = getGenerationType();
     }
 
-    public FieldInfo getFieldInfoTemp() {
-        return fieldInfo;
+    public EntityColumn getEntityColumn() {
+        return entityColumn;
     }
 
     public String getGenerationTypeStrategy() {
@@ -29,10 +27,7 @@ public class IdField implements FieldData {
     }
 
     private H2GenerationType getGenerationType() {
-        if (fieldInfo.getField().isAnnotationPresent(GeneratedValue.class)) {
-            return H2GenerationType.from(fieldInfo.getField().getAnnotation(GeneratedValue.class).strategy());
-        }
-        return null;
+        return entityColumn.getGenerationType();
     }
 
     @Override
@@ -57,11 +52,11 @@ public class IdField implements FieldData {
 
     @Override
     public String getFieldNameData() {
-        return fieldInfo.getFieldName().getName();
+        return entityColumn.getFieldName().getName();
     }
 
     @Override
     public Object getFieldValueData() {
-        return fieldInfo.getFieldValue().getValue();
+        return entityColumn.getFieldValue().getValue();
     }
 }

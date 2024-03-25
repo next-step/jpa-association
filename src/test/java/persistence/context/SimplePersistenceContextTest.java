@@ -1,9 +1,6 @@
 package persistence.context;
 
-import database.DatabaseServer;
 import database.H2;
-import dialect.Dialect;
-import dialect.H2Dialect;
 import entity.Person3;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
@@ -12,13 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.entity.EntityLoader;
-import persistence.entity.EntityLoaderImpl;
-import persistence.entity.EntityPersister;
-import persistence.entity.EntityPersisterImpl;
+import persistence.JpaTest;
 import persistence.entity.EntitySnapshot;
-import persistence.entity.SimpleEntityEntry;
-import persistence.entity.SimpleEntityManager;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import pojo.EntityMetaData;
@@ -33,37 +25,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SimplePersistenceContextTest {
+class SimplePersistenceContextTest extends JpaTest {
 
-    static Dialect dialect = new H2Dialect();
-    static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
-
-    static DatabaseServer server;
-    static JdbcTemplate jdbcTemplate;
-    static EntityPersister entityPersister;
-    static EntityLoader entityLoader;
-    static SimpleEntityManager simpleEntityManager;
-    static PersistenceContext persistenceContext;
-    static SimpleEntityEntry entityEntry;
-
-    Person3 person;
+    static EntityMetaData entityMetaData;
 
     @BeforeAll
     static void init() throws SQLException {
         server = new H2();
         server.start();
-
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
-        entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
-        persistenceContext = new SimplePersistenceContext();
-        entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
-        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
+
+        entityMetaData = new EntityMetaData(Person3.class, person);
+        initForTest(entityMetaData);
     }
 
     @BeforeEach
     void setUp() {
-        person = new Person3(1L, "test", 20, "test@test.com");
         createTable();
     }
 

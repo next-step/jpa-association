@@ -34,9 +34,10 @@ public class CreateQueryBuilder {
 
     public String createTable(Object entity) {
         FieldInfos fieldInfos = new FieldInfos(entity.getClass().getDeclaredFields());
-        return String.format(CREATE_TABLE_QUERY, entityMetaData.getTableInfo().getName(), createClause(fieldInfos.getFieldDataList(), entity));
+        return String.format(CREATE_TABLE_QUERY, entityMetaData.getEntityName(), createClause(fieldInfos.getFieldDataList(), entity));
     }
 
+    //create 시에 JoinColumn 어노테이션이 있는 필드는 -> JoinColumn 의 name 을 그 필드 객체 생성 시 만들어줘야 한다.
     private String createClause(List<Field> fields, Object entity) {
         return fields.stream()
                 .filter(field -> !field.isAnnotationPresent(Transient.class))

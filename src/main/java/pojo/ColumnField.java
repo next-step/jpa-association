@@ -7,10 +7,10 @@ import java.util.Objects;
 
 public class ColumnField implements FieldData {
 
-    private final FieldInfo fieldInfo;
+    private final EntityColumn entityColumn;
 
     public ColumnField(Field field, Object entity) {
-        this.fieldInfo = new FieldInfo(field, entity);
+        this.entityColumn = new EntityColumn(field, entity);
     }
 
     public String getFieldLength(boolean isVarcharType) {
@@ -18,7 +18,7 @@ public class ColumnField implements FieldData {
     }
 
     public String getColumnNullConstraint() {
-        if (!isColumnField() || fieldInfo.getField().getAnnotation(Column.class).nullable()) {
+        if (!isColumnField() || entityColumn.getField().getAnnotation(Column.class).nullable()) {
             return Constraints.NULL.getName();
         }
         return Constraints.NOT_NULL.getName();
@@ -26,7 +26,7 @@ public class ColumnField implements FieldData {
 
     private String getColumnLength(boolean isVarcharType) {
         if (isColumnField() && isVarcharType) {
-            return String.valueOf(fieldInfo.getField().getAnnotation(Column.class).length());
+            return String.valueOf(entityColumn.getField().getAnnotation(Column.class).length());
         }
 
         if (isColumnField() && !isVarcharType) {
@@ -37,8 +37,8 @@ public class ColumnField implements FieldData {
     }
 
     private String getLengthOrDefaultValue(int defaultLengthValue) {
-        return fieldInfo.getField().getAnnotation(Column.class).length() == defaultLengthValue ? null
-                : String.valueOf(fieldInfo.getField().getAnnotation(Column.class).length());
+        return entityColumn.getField().getAnnotation(Column.class).length() == defaultLengthValue ? null
+                : String.valueOf(entityColumn.getField().getAnnotation(Column.class).length());
     }
 
     @Override
@@ -58,16 +58,16 @@ public class ColumnField implements FieldData {
 
     @Override
     public boolean isNullableField() {
-        return fieldInfo.getField().getAnnotation(Column.class).nullable();
+        return entityColumn.getField().getAnnotation(Column.class).nullable();
     }
 
     @Override
     public String getFieldNameData() {
-        return fieldInfo.getFieldName().getName();
+        return entityColumn.getFieldName().getName();
     }
 
     @Override
     public Object getFieldValueData() {
-        return fieldInfo.getFieldValue().getValue();
+        return entityColumn.getFieldValue().getValue();
     }
 }
