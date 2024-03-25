@@ -1,15 +1,19 @@
 package persistence.sql.common;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import jdbc.RowMapper;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DtoMapper<T> implements RowMapper<T> {
@@ -34,14 +38,21 @@ public class DtoMapper<T> implements RowMapper<T> {
             InvocationTargetException, NoSuchMethodException, SQLException {
         T dto;
         dto = clazz.getDeclaredConstructor().newInstance();
-        List<Field> fields = Arrays.stream(clazz.getDeclaredFields()).filter(x -> !x.isAnnotationPresent(Transient.class)).collect(Collectors.toList());
+        List<Class<? extends Annotation>> invalidAnnotations = List.of(Transient.class, Id.class, OneToMany.class);
+        List<Field> fields = Arrays.stream(clazz.getDeclaredFields()).filter(x -> invalidAnnotations.stream().noneMatch(x::isAnnotationPresent)).collect(Collectors.toList());
         for (Field field : fields) {
             field.setAccessible(true);
             Column annotation = field.getAnnotation(Column.class);
-            String columnName = annotation == null || annotation.name().isEmpty()? field.getName() : annotation.name();
+            String columnName = annotation == null || annotation.name().isEmpty()? camelToSnake(field.getName()) : annotation.name();
             Object value = resultSet.getObject(columnName);
             field.set(dto, value);
         }
         return dto;
+    }
+
+    private static String camelToSnake(String camelCase) {
+        return Pattern.compile("([a-z])([A-Z])")
+                .matcher(camelCase)
+                .replaceAll(match -> String.format("%s_%s", match.group(1), match.group(2)));
     }
 }

@@ -1,8 +1,10 @@
 package persistence.entity.manager;
 
+import jakarta.persistence.OneToMany;
 import jdbc.JdbcTemplate;
 import persistence.PrimaryKey;
 import persistence.entity.exception.EntityExistsException;
+import persistence.entity.exception.NoOneToManyAssociationException;
 import persistence.entity.exception.ReadOnlyException;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.persistencecontext.EntityEntry;
@@ -10,7 +12,12 @@ import persistence.entity.persistencecontext.PersistenceContext;
 import persistence.entity.persistencecontext.PersistenceContextImpl;
 import persistence.entity.persister.EntityPersister;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
@@ -68,6 +75,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T merge(T entity) {
+        // TODO oneToMany 관계
 
         EntityEntry entityEntry = persistenceContext.getEntityEntry(entity);
         if (entityEntry.isReadOnly()) {

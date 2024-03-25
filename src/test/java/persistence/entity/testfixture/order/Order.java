@@ -27,6 +27,12 @@ public class Order {
         this.orderItems = orderItems;
     }
 
+    public Order(Long id, String orderNumber, List<OrderItem> orderItems) {
+        this.id = id;
+        this.orderNumber = orderNumber;
+        this.orderItems = orderItems;
+    }
+
     public Long getId() {
         return id;
     }
