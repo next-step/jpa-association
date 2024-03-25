@@ -2,7 +2,7 @@ package persistence.sql.mapping;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import persistence.model.EntityMetaData;
+import persistence.model.PersistentClass;
 import persistence.sql.QueryException;
 
 import java.lang.reflect.Field;
@@ -17,17 +17,17 @@ public class ColumnBinder {
         this.columnTypeMapper = columnTypeMapper;
     }
 
-    public List<Column> createColumns(final String tableName, final EntityMetaData metaData) {
-        return metaData.getFields()
+    public List<Column> createColumns(final String tableName, final PersistentClass<?> persistentClass) {
+        return persistentClass.getFields()
                 .stream()
-                .map(field -> this.createColumn(tableName, field))
+                .map(entityField -> this.createColumn(tableName, entityField.getField()))
                 .collect(Collectors.toList());
     }
 
-    public List<Column> createColumns(final String tableName, final EntityMetaData metaData, final Object object) {
-        return metaData.getFields()
+    public List<Column> createColumns(final String tableName, final PersistentClass<?> persistentClass, final Object object) {
+        return persistentClass.getFields()
                 .stream()
-                .map(field -> createColumn(tableName, field, object))
+                .map(entityField -> createColumn(tableName, entityField.getField(), object))
                 .collect(Collectors.toList());
     }
 

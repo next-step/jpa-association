@@ -1,7 +1,7 @@
 package persistence.entity.context.cache;
 
-import persistence.model.EntityMetaData;
-import persistence.model.EntityMetaDataMapping;
+import persistence.model.PersistentClassMapping;
+import persistence.model.PersistentClass;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,20 +9,20 @@ import java.util.Objects;
 
 public class EntitySnapshot {
 
-    private final EntityMetaData entityMetaData;
+    private final PersistentClass<?> persistentClass;
     private final Map<String, Object> values = new HashMap<>();
 
     public EntitySnapshot(final Object entity) {
-        this.entityMetaData = EntityMetaDataMapping.getMetaData(entity.getClass().getName());
-        values.putAll(entityMetaData.extractValues(entity));
+        this.persistentClass = PersistentClassMapping.getPersistentClass(entity.getClass().getName());
+        values.putAll(persistentClass.extractValues(entity));
     }
 
     public boolean checkDirty(final Object entity) {
-        if (entity.getClass() != entityMetaData.getEntityType()) {
+        if (entity.getClass() != persistentClass.getEntityClass()) {
             return false;
         }
 
-        final Map<String, Object> thatValues = entityMetaData.extractValues(entity);
+        final Map<String, Object> thatValues = persistentClass.extractValues(entity);
 
         return thatValues.keySet().stream()
                 .anyMatch(fieldName -> !Objects.deepEquals(thatValues.get(fieldName), values.get(fieldName)));

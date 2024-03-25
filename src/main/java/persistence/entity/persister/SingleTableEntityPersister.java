@@ -1,10 +1,8 @@
 package persistence.entity.persister;
 
-import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
 import persistence.model.EntityIdentifierMapping;
-import persistence.model.EntityMetaDataMapping;
-import persistence.model.MetaDataModelMappingException;
+import persistence.model.PersistentClassMapping;
 import persistence.sql.dml.Delete;
 import persistence.sql.dml.DmlQueryBuilder;
 import persistence.sql.dml.Insert;
@@ -32,12 +30,10 @@ public class SingleTableEntityPersister implements EntityPersister {
     }
 
     private Field getIdField() {
-        return EntityMetaDataMapping.getMetaData(this.name)
-                .getFields()
-                .stream()
-                .filter(field -> field.isAnnotationPresent(Id.class))
-                .findFirst()
-                .orElseThrow(() -> new MetaDataModelMappingException("id field not found"));
+        return PersistentClassMapping.getPersistentClass(this.name)
+                .getEntityFields()
+                .getIdField()
+                .getField();
     }
 
     public String getTargetEntityName() {
