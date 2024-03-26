@@ -1,9 +1,8 @@
 package persistence.sql.mapping;
 
 import jakarta.persistence.Entity;
-import persistence.model.EntityJoinEntityField;
-import persistence.model.EntityMetaData;
-import persistence.model.EntityMetaDataMapping;
+import persistence.ReflectionUtils;
+import persistence.model.*;
 import persistence.sql.QueryException;
 import persistence.sql.dml.ComparisonOperator;
 
@@ -17,41 +16,39 @@ public class TableBinder {
     public Table createTable(final Object object) {
         final Class<?> entityClass = object.getClass();
         final Table table = new Table(toTableName(entityClass));
-        final List<Column> columns = columnBinder.createColumns(table.getName(), EntityMetaDataMapping.getMetaData(entityClass.getName()), object);
+        final List<Column> columns = columnBinder.createColumns(table.getName(), PersistentClassMapping.getPersistentClass(entityClass.getName()), object);
         table.addColumns(columns);
-        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(entityClass.getName());
-        final List<TableJoin> tableJoins = extractTableJoins(metaData, table, entityClass);
-        table.addTableJoins(tableJoins);
 
         return table;
     }
 
     public Table createTable(final Class<?> clazz) {
         final Table table = new Table(toTableName(clazz));
-        final EntityMetaData metaData = EntityMetaDataMapping.getMetaData(clazz.getName());
-        final List<Column> columns = columnBinder.createColumns(table.getName(), metaData);
+        final PersistentClass<?> persistentClass = PersistentClassMapping.getPersistentClass(clazz.getName());
+        final List<Column> columns = columnBinder.createColumns(table.getName(), persistentClass);
         table.addColumns(columns);
-        final List<TableJoin> tableJoins = extractTableJoins(metaData, table, clazz);
+
+        return table;
+    }
+
+    public Table createTable(final Class<?> clazz, final CollectionPersistentClassBinder collectionPersistentClassBinder) {
+        final Table table = this.createTable(clazz);
+        final PersistentClass<?> persistentClass = PersistentClassMapping.getPersistentClass(clazz.getName());
+        final List<TableJoin> tableJoins = extractTableJoins(table, persistentClass, collectionPersistentClassBinder);
         table.addTableJoins(tableJoins);
 
         return table;
     }
 
-    private List<TableJoin> extractTableJoins(final EntityMetaData metaData, final Table table, final Class<?> entityClass) {
-        return metaData.getJoinFields()
-                .stream().filter(EntityJoinEntityField::isNotLazy)
+    private List<TableJoin> extractTableJoins(final Table table, final PersistentClass<?> persistentClass, final CollectionPersistentClassBinder collectionPersistentClassBinder) {
+        return persistentClass.getJoinFields()
+                .stream()
+                .filter(EntityJoinField::isEager)
                 .map(field -> {
-                    final Table joinedTable = createTable(field.getFieldType());
+                    final Table joinedTable = createTable(collectionPersistentClassBinder.getCollectionPersistentClass(ReflectionUtils.mapToGenericClassName(field.getField())).getEntityClass());
                     final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0).getName(), field.getJoinedColumnName(), ComparisonOperator.Comparisons.EQ);
-                    return new TableJoin(entityClass.getName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
+                    return new TableJoin(persistentClass.getEntityName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
                 }).collect(Collectors.toList());
-    }
-
-    public Table createTable(final Class<?> clazz, final List<Column> columns) {
-        final Table table = this.createTable(clazz);
-        table.addColumns(columns);
-
-        return table;
     }
 
     public static String toTableName(final Class<?> clazz) {
