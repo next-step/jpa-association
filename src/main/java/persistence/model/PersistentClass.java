@@ -46,8 +46,16 @@ public class PersistentClass<T> {
         return this.fields;
     }
 
+    public List<EntityJoinField> getJoinFields() {
+        return this.fields.getJoinFields();
+    }
+
     public List<AbstractEntityField> getFields() {
         return this.fields.getFields();
+    }
+
+    public List<AbstractEntityField> getColumns() {
+        return this.fields.getColumns();
     }
 
     public T createInstance() {
