@@ -1,6 +1,7 @@
 package persistence.model;
 
 import jakarta.persistence.FetchType;
+import persistence.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -13,16 +14,16 @@ public abstract class EntityJoinFieldMapping {
     }
 
     public Class<?> getEntityType(final Field field) {
-        return field.getClass();
+        return ReflectionUtils.mapToGenericClass(field);
     }
 
     protected abstract FetchType getFetchType(final Field field);
 
-    private boolean isLazy(final Field field) {
+    public boolean isLazy(final Field field) {
         return this.getFetchType(field) == FetchType.LAZY;
     }
 
-    public <T> CollectionPersistentClass createCollectionPersistentClass(final PersistentClass<T> owner, final PersistentClass<?> persistentClass, final Field field) {
-        return new CollectionPersistentClass(owner, persistentClass, isLazy(field));
+    public <T> CollectionPersistentClass createCollectionPersistentClass(final PersistentClass<?> persistentClass) {
+        return new CollectionPersistentClass(persistentClass);
     }
 }

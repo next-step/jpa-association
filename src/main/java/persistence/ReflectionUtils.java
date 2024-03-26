@@ -2,16 +2,15 @@ package persistence;
 
 import persistence.sql.QueryException;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ReflectionUtils {
 
-    private ReflectionUtils() {}
+    private ReflectionUtils() {
+    }
 
     public static <T> T createInstance(final Class<T> clazz) {
         try {
@@ -95,7 +94,26 @@ public class ReflectionUtils {
         }
     }
 
-    public static boolean isDifferentFieldValue(final Field field, final Object object, final Object value) {
-        return !Objects.deepEquals(getFieldValue(field, object), value);
+    private static String getClassNameByType(final Type type) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+
+            return typeArguments[0].getTypeName();
+        }
+
+        return type.getTypeName();
+    }
+
+    public static String mapToGenericClassName(final Field field) {
+        return getClassNameByType(field.getGenericType());
+    }
+
+    public static Class<?> mapToGenericClass(final Field field) {
+        try {
+            return Class.forName(getClassNameByType(field.getGenericType()));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

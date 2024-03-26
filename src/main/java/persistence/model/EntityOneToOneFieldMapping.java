@@ -5,7 +5,7 @@ import jakarta.persistence.OneToOne;
 
 import java.lang.reflect.Field;
 
-public class EntityOneToOneFieldMapping extends EntityOneToXFieldMapping {
+public class EntityOneToOneFieldMapping extends EntityJoinFieldMapping {
 
     public EntityOneToOneFieldMapping() {
         this.annotationClass = OneToOne.class;
