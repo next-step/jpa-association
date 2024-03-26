@@ -8,6 +8,7 @@ import persistence.OrderFixtureFactory;
 import persistence.PersonV3FixtureFactory;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.SingleEntityLoader;
+import persistence.model.PersistentClassMapping;
 import persistence.sql.Order;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
@@ -26,7 +27,7 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
     private final Dialect dialect = new H2Dialect();
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
 
-    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, dmlQueryBuilder, jdbcTemplate);
+    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, PersistentClassMapping.getCollectionPersistentClassBinder(), dmlQueryBuilder, jdbcTemplate);
 
     @DisplayName("클래스 정보로 엔티티를 조회한다.")
     @Test

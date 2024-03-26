@@ -3,6 +3,8 @@ package persistence.sql.dml;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.EntityMetaDataTestSupport;
+import persistence.model.CollectionPersistentClassBinder;
+import persistence.model.PersistentClassMapping;
 import persistence.sql.Order;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
@@ -17,8 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
 
     private final TableBinder tableBinder = new TableBinder();
-    private final ColumnBinder columnBinder = new ColumnBinder(ColumnTypeMapper.getInstance());
-
+    private final CollectionPersistentClassBinder collectionPersistentClassBinder = PersistentClassMapping.getCollectionPersistentClassBinder();
     private final Dialect dialect = new H2Dialect();
 
     private final DmlQueryBuilder queryBuilder = new DefaultDmlQueryBuilder(dialect);
@@ -71,7 +72,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
     public void buildFindAllQueryWithLeftJoin() throws Exception {
         // given
         final Class<Order> clazz = Order.class;
-        final Table table = tableBinder.createTable(clazz);
+        final Table table = tableBinder.createTable(clazz, collectionPersistentClassBinder);
         final Select select = new Select(table);
 
         final String dml = "select\n" +
@@ -120,7 +121,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
     public void buildFindByIdQueryWithLeftJoin() throws Exception {
         // given
         final Class<Order> clazz = Order.class;
-        final Table table = tableBinder.createTable(clazz);
+        final Table table = tableBinder.createTable(clazz, collectionPersistentClassBinder);
         final Column column = table.getColumn("id");
         final Value value = new Value(Long.class, Types.BIGINT, 1);
         final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
