@@ -9,15 +9,22 @@ import java.lang.reflect.Field;
 public abstract class AbstractEntityField {
 
     public static AbstractEntityField createEntityField(final Field field) {
+        final String fieldName = field.getName();
+
         if (field.isAnnotationPresent(Transient.class)) {
-            throw new MetaDataModelMappingException(field.getName() + " is Transient field.");
+            throw new MetaDataModelMappingException(fieldName + " is Transient field.");
         }
+
+        final String columnName = ColumnBinder.toColumnName(field);
+        final Class<? extends Field> fieldClass = field.getClass();
 
         if (field.isAnnotationPresent(Id.class)) {
-            return new EntityId(field.getName(), ColumnBinder.toColumnName(field), field.getClass(), field);
+            return new EntityId(fieldName, columnName, fieldClass, field);
+        } else if (isJoinField(field)) {
+            return new EntityJoinField(fieldName, columnName, fieldClass, field);
         }
 
-        return new EntityField(field.getName(), ColumnBinder.toColumnName(field), field.getClass(), field);
+        return new EntityField(fieldName, columnName, fieldClass, field);
     }
 
     private final String fieldName;
@@ -32,12 +39,16 @@ public abstract class AbstractEntityField {
         this.field = field;
     }
 
-    public boolean isJoinField() {
-        final boolean oneToOneField = this.field.isAnnotationPresent(OneToOne.class);
-        final boolean oneToManyField = this.field.isAnnotationPresent(OneToMany.class);
-        final boolean manyToOneField = this.field.isAnnotationPresent(ManyToOne.class);
-        final boolean manyToManyField = this.field.isAnnotationPresent(ManyToMany.class);
+    private static boolean isJoinField(final Field field) {
+        final boolean oneToOneField = field.isAnnotationPresent(OneToOne.class);
+        final boolean oneToManyField = field.isAnnotationPresent(OneToMany.class);
+        final boolean manyToOneField = field.isAnnotationPresent(ManyToOne.class);
+        final boolean manyToManyField = field.isAnnotationPresent(ManyToMany.class);
         return oneToOneField|| oneToManyField || manyToOneField || manyToManyField;
+    }
+
+    public boolean isJoinField() {
+        return isJoinField(this.field);
     }
 
     public Field getField() {
