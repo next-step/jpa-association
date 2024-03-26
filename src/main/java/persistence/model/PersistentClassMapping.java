@@ -3,66 +3,57 @@ package persistence.model;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PersistentClassMapping {
 
     private static final Map<String, PersistentClass<?>> persistentClassMap = new HashMap<>();
     private static final CollectionPersistentClassBinder collectionPersistentClassBinder = new CollectionPersistentClassBinder();
-    private static final EntityJoinFieldMapping[] joinFieldMappings = initJoinFieldMappings();
-
-    private static EntityJoinFieldMapping[] initJoinFieldMappings() {
-        return new EntityJoinFieldMapping[]{
-                new EntityManyToManyFieldMapping(),
-                new EntityManyToOneFieldMapping(),
-                new EntityOneToManyFieldMapping(),
-                new EntityOneToOneFieldMapping()
-        };
-    }
+    private static final EntityJoinFieldMapper entityJoinFieldMapper = new EntityJoinFieldMapper();
 
     public static <T> void putPersistentClass(final Class<T> entityClass) {
         final PersistentClass<T> persistentClass = createPersistentClass(entityClass);
         persistentClassMap.putIfAbsent(persistentClass.getEntityName(), persistentClass);
-        extractEntityFields(entityClass, persistentClass);
     }
 
     private static <T> PersistentClass<T> createPersistentClass(final Class<T> entityClass) {
-        return new PersistentClass<T>(entityClass);
+        final PersistentClass<T> persistentClass = new PersistentClass<>(entityClass);
+        final List<AbstractEntityField> entityFields = extractEntityFields(entityClass);
+        persistentClass.addEntityFields(entityFields);
+
+        return persistentClass;
     }
 
-    private static <T> void extractEntityFields(final Class<?> entityClass, final PersistentClass<T> persistentClass) {
-        Arrays.stream(entityClass.getDeclaredFields())
-                .filter(PersistentClassMapping::isColumnField)
-                .forEach(field -> {
-                    final AbstractEntityField entityField = AbstractEntityField.createEntityField(field);
-                    persistentClass.addEntityField(entityField);
-
-                    if (entityField.isJoinField()) {
-                        // TODO 일급 컬렉션으로 리팩토링
-                        Arrays.stream(joinFieldMappings).filter(mapping -> mapping.support(field))
-                                .findFirst()
-                                .ifPresent(mapping -> {
-                                    final Class<?> entityType = mapping.getEntityType(field);
-                                    final boolean lazy = mapping.isLazy(field);
-                                    final EntityJoinField entityJoinField = (EntityJoinField) entityField;
-                                    entityJoinField.setLazy(lazy);
-                                    final PersistentClass<?> joinedPersistentClass = getPersistentClass(entityType.getName(), entityType);
-                                    final CollectionPersistentClass collectionPersistentClass = collectionPersistentClassBinder.getCollectionPersistentClassOrDefault(entityType.getName(), mapping.createCollectionPersistentClass(joinedPersistentClass));
-                                    collectionPersistentClass.addAssociation(persistentClass, lazy);
-                                });
-                    }
-                });
+    private static <T> List<AbstractEntityField> extractEntityFields(final Class<?> entityClass) {
+        return Arrays.stream(entityClass.getDeclaredFields()).filter(PersistentClassMapping::isColumnField).map(AbstractEntityField::createEntityField).collect(Collectors.toList());
     }
 
     private static boolean isColumnField(final Field field) {
         return !field.isAnnotationPresent(Transient.class);
     }
 
-    private static PersistentClass<?> getPersistentClass(final String entityName, final Class<?> entityClass) {
-        return persistentClassMap.getOrDefault(entityName, createPersistentClass(entityClass));
+    private static <T> void createCollectionPersistentClass(final PersistentClass<T> persistentClass, final AbstractEntityField entityField) {
+        final Field field = entityField.getField();
+        final EntityJoinField entityJoinField = (EntityJoinField) entityField;
+
+        final EntityJoinFieldMapping joinFieldMapping = entityJoinFieldMapper.findJoinFieldMapping(field);
+
+        final boolean lazy = joinFieldMapping.isLazy(field);
+        entityJoinField.setLazy(lazy);
+
+        final Class<?> entityType = joinFieldMapping.getEntityType(field);
+        final PersistentClass<?> joinedPersistentClass = getPersistentClass(entityType.getName());
+        final CollectionPersistentClass collectionPersistentClass =
+                collectionPersistentClassBinder.getCollectionPersistentClassOrDefault(entityType.getName(), joinFieldMapping.createCollectionPersistentClass(joinedPersistentClass));
+        collectionPersistentClass.addAssociation(persistentClass, lazy);
+    }
+
+    public static void setCollectionPersistentClassBinder() {
+        persistentClassMap.values().forEach(persistentClass -> {
+            final List<EntityJoinField> joinFields = persistentClass.getJoinFields();
+            joinFields.forEach(field -> createCollectionPersistentClass(persistentClass, field));
+        });
     }
 
     public static <T> PersistentClass<T> getPersistentClass(final Class<T> clazz) {

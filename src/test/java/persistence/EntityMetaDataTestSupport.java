@@ -20,5 +20,6 @@ public abstract class EntityMetaDataTestSupport {
         PersistentClassMapping.putPersistentClass(PersonV3.class);
         PersistentClassMapping.putPersistentClass(Order.class);
         PersistentClassMapping.putPersistentClass(OrderItem.class);
+        PersistentClassMapping.setCollectionPersistentClassBinder();
     }
 }
