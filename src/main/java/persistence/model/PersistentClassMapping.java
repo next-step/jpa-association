@@ -46,9 +46,12 @@ public class PersistentClassMapping {
                                 .findFirst()
                                 .ifPresent(mapping -> {
                                     final Class<?> entityType = mapping.getEntityType(field);
+                                    final boolean lazy = mapping.isLazy(field);
+                                    final EntityJoinField entityJoinField = (EntityJoinField) entityField;
+                                    entityJoinField.setLazy(lazy);
                                     final PersistentClass<?> joinedPersistentClass = getPersistentClass(entityType.getName(), entityType);
-                                    final CollectionPersistentClass collectionPersistentClass =  mapping.createCollectionPersistentClass(persistentClass, joinedPersistentClass, field);
-                                    collectionPersistentClassBinder.addClass(collectionPersistentClass);
+                                    final CollectionPersistentClass collectionPersistentClass = collectionPersistentClassBinder.getCollectionPersistentClassOrDefault(entityType.getName(), mapping.createCollectionPersistentClass(joinedPersistentClass));
+                                    collectionPersistentClass.addAssociation(persistentClass, lazy);
                                 });
                     }
                 });
@@ -74,6 +77,10 @@ public class PersistentClassMapping {
         }
 
         return persistentClass;
+    }
+
+    public static CollectionPersistentClassBinder getCollectionPersistentClassBinder() {
+        return collectionPersistentClassBinder;
     }
 
 }
