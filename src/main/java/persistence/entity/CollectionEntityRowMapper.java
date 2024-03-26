@@ -1,17 +1,14 @@
 package persistence.entity;
 
-import jdbc.RowMapper;
-import persistence.model.AbstractEntityField;
 import persistence.model.CollectionPersistentClass;
 import persistence.model.EntityId;
 import persistence.model.PersistentClass;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CollectionEntityRowMapper<T> implements RowMapper<T> {
+public class CollectionEntityRowMapper<T> extends AbstractEntityRowMapper<T> {
     private final PersistentClass<T> persistentClass;
     private final CollectionPersistentClass collectionPersistentClass;
     private final Map<Object, T> entityMap;
@@ -27,16 +24,16 @@ public class CollectionEntityRowMapper<T> implements RowMapper<T> {
     }
 
     @Override
-    public T mapRow(final ResultSet resultSet) throws SQLException {
+    public T mapRow(final ResultSet resultSet) {
         final T entity = mapToEntity(this.persistentClass, resultSet);
-        final Object joinedEntity = mapToJoinedEntity(this.collectionPersistentClass, resultSet, entity);
+        final Object joinedEntity = mapToJoinedEntity(this.collectionPersistentClass, resultSet);
 
         setEntityAssociationFieldsValue(this.persistentClass, entity, joinedEntity);
 
         return entity;
     }
 
-    private Object mapToJoinedEntity(final CollectionPersistentClass collectionPersistentClass, final ResultSet resultSet, final T entity) {
+    private Object mapToJoinedEntity(final CollectionPersistentClass collectionPersistentClass, final ResultSet resultSet) {
         final Object joinedEntity = collectionPersistentClass.createInstance();
         setJoinedEntityFieldsValue(joinedEntity, collectionPersistentClass, resultSet);
 
@@ -45,9 +42,7 @@ public class CollectionEntityRowMapper<T> implements RowMapper<T> {
 
     private void setEntityAssociationFieldsValue(final PersistentClass<T> persistentClass, final T entity, final Object joinedEntity) {
         persistentClass.getJoinFields()
-                .forEach(joinField -> {
-                    joinField.setValue(entity, joinedEntity);
-                });
+                .forEach(joinField -> joinField.setValue(entity, joinedEntity));
     }
 
     private T mapToEntity(final PersistentClass<T> persistentClass, final ResultSet resultSet) {
@@ -64,34 +59,8 @@ public class CollectionEntityRowMapper<T> implements RowMapper<T> {
         });
     }
 
-    private void setEntityFieldsValue(final PersistentClass<T> persistentClass, final Object entity, final String tableName, final ResultSet resultSet) {
-        persistentClass.getColumns().forEach(field -> {
-            setEntityFieldValue(entity, resultSet, field, tableName);
-        });
-    }
-
     private void setJoinedEntityFieldsValue(final Object joinedEntity, final CollectionPersistentClass collectionPersistentClass, final ResultSet resultSet) {
         final String tableName = collectionPersistentClass.getTableName();
-        collectionPersistentClass.getColumns().forEach(field -> {
-            setEntityFieldValue(joinedEntity, resultSet, field, tableName);
-        });
-    }
-
-    private void setEntityFieldValue(final Object joinedEntity, final ResultSet resultSet, final AbstractEntityField field, final String tableName) {
-        final String columnLabel = toColumnLabel(tableName, field.getColumnName());
-        final Object value = extractColumnResult(resultSet, columnLabel);
-        field.setValue(joinedEntity, value);
-    }
-
-    private String toColumnLabel(final String tableName, final String columnName) {
-        return tableName + "." + columnName;
-    }
-
-    private Object extractColumnResult(final ResultSet resultSet, final String columnLabel) {
-        try {
-            return resultSet.getObject(columnLabel);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        collectionPersistentClass.getColumns().forEach(field -> setEntityFieldValue(joinedEntity, resultSet, field, tableName));
     }
 }
