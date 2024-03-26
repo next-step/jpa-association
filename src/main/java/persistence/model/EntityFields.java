@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class EntityFields {
     private final List<AbstractEntityField> fields = new ArrayList<>();
 
-    public void addField(final AbstractEntityField field) {
-        this.fields.add(field);
+    public void addFields(final List<AbstractEntityField> entityFields) {
+        this.fields.addAll(entityFields);
     }
 
     public EntityId getIdField() {

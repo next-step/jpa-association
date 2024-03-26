@@ -38,8 +38,8 @@ public class PersistentClass<T> {
         return this.tableName;
     }
 
-    public void addEntityField(final AbstractEntityField entityField) {
-        this.fields.addField(entityField);
+    public void addEntityFields(final List<AbstractEntityField> entityFields) {
+        this.fields.addFields(entityFields);
     }
 
     public EntityFields getEntityFields() {
