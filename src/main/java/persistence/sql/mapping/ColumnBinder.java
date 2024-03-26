@@ -18,14 +18,14 @@ public class ColumnBinder {
     }
 
     public List<Column> createColumns(final String tableName, final PersistentClass<?> persistentClass) {
-        return persistentClass.getFields()
+        return persistentClass.getColumns()
                 .stream()
                 .map(entityField -> this.createColumn(tableName, entityField.getField()))
                 .collect(Collectors.toList());
     }
 
     public List<Column> createColumns(final String tableName, final PersistentClass<?> persistentClass, final Object object) {
-        return persistentClass.getFields()
+        return persistentClass.getColumns()
                 .stream()
                 .map(entityField -> createColumn(tableName, entityField.getField(), object))
                 .collect(Collectors.toList());
@@ -77,6 +77,16 @@ public class ColumnBinder {
 
     public static String toColumnName(final Field field) {
         final jakarta.persistence.Column columnAnnotation = field.getAnnotation(jakarta.persistence.Column.class);
+
+        if (columnAnnotation == null || columnAnnotation.name().isBlank()) {
+            return field.getName();
+        }
+
+        return columnAnnotation.name();
+    }
+
+    public static String toJoinColumnName(final Field field) {
+        final jakarta.persistence.JoinColumn columnAnnotation = field.getAnnotation(jakarta.persistence.JoinColumn.class);
 
         if (columnAnnotation == null || columnAnnotation.name().isBlank()) {
             return field.getName();
