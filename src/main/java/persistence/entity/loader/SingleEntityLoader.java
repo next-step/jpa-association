@@ -61,9 +61,9 @@ public class SingleEntityLoader implements EntityLoader {
     }
 
     private <T> List<T> queryWithEagerColumn(final Class<T> clazz, final String selectQuery, final CollectionPersistentClass collectionPersistentClass) {
-        final RowMapper<T> rowMApper = new CollectionEntityRowMapper<>(clazz, collectionPersistentClass);
+        final RowMapper<T> rowMapper = new CollectionEntityRowMapper<>(clazz, collectionPersistentClass);
 
-        return jdbcTemplate.query(selectQuery, rowMApper)
+        return jdbcTemplate.query(selectQuery, rowMapper)
                 .stream()
                 .filter(Objects::nonNull)
                 .distinct()
