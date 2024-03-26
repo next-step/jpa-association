@@ -47,10 +47,6 @@ public abstract class AbstractEntityField {
         return oneToOneField|| oneToManyField || manyToOneField || manyToManyField;
     }
 
-    public boolean isJoinField() {
-        return isJoinField(this.field);
-    }
-
     public Field getField() {
         return this.field;
     }
