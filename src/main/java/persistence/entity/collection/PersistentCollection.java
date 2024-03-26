@@ -66,7 +66,7 @@ public abstract class PersistentCollection<T> implements Collection<T> {
     @Override
     public boolean add(T t) {
         load();
-        return false;
+        return true;
     }
 
     @Override

@@ -3,6 +3,7 @@ package persistence.entity;
 import jdbc.JdbcTemplate;
 import persistence.entity.collection.CollectionLoader;
 import persistence.entity.collection.PersistentList;
+import persistence.entity.collection.PersistentSet;
 import persistence.sql.dml.BooleanExpression;
 import persistence.sql.dml.SelectQueryBuilder;
 import persistence.sql.dml.WhereBuilder;
@@ -11,6 +12,7 @@ import persistence.sql.mapping.Columns;
 import persistence.sql.mapping.TableData;
 
 import java.util.List;
+import java.util.Set;
 
 public class EntityLoader {
     private final JdbcTemplate jdbcTemplate;
@@ -45,8 +47,10 @@ public class EntityLoader {
             Class<?> collectionType = association.getField().getType();
             CollectionLoader collectionLoader = new CollectionLoader(jdbcTemplate, association);
 
-            if (collectionType == List.class) {
+            if (collectionType.equals(List.class)) {
                 association.setCollectionToField(entity, new PersistentList<>(collectionLoader, id));
+            } else if (collectionType.equals(Set.class)) {
+                association.setCollectionToField(entity, new PersistentSet<>(collectionLoader, id));
             } else {
                 throw new UnsupportedOperationException("Unsupported collection type: " + collectionType.getSimpleName());
             }
