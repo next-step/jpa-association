@@ -4,6 +4,7 @@ import persistence.sql.QueryException;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +55,7 @@ public class ReflectionUtils {
                 field.set(object, list);
             }
 
-            if (Objects.isNull(value)) {
+            if (Objects.isNull(value) || !isDefinedObject(value)) {
                 return;
             }
 
@@ -70,23 +71,17 @@ public class ReflectionUtils {
         return List.class.isAssignableFrom(field.getType());
     }
 
+    public static boolean isDefinedObject(final Object object) {
+        return Arrays.stream(object.getClass().getDeclaredFields())
+                .anyMatch(field -> isDefinedField(field, object));
+    }
+
     private static boolean isDefinedField(final Field field, final Object object) {
         try {
             field.setAccessible(true);
             final Object value = field.get(object);
 
             return Objects.nonNull(value);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } finally {
-            field.setAccessible(false);
-        }
-    }
-
-    private static Object getFieldValue(final Field field, final Object object) {
-        try {
-            field.setAccessible(true);
-            return field.get(object);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } finally {
