@@ -20,7 +20,7 @@ public abstract class PersistentCollection<T> implements Collection<T> {
         this.joinColumnValue = joinColumnValue;
     }
 
-    protected void load() {
+    final protected void load() {
         if (collection != null) {
             return;
         }
