@@ -3,6 +3,9 @@ package persistence.sql.dml;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.EntityMetaDataTestSupport;
+import persistence.model.CollectionPersistentClassBinder;
+import persistence.model.PersistentClassMapping;
+import persistence.sql.Order;
 import persistence.sql.ddl.PersonV3;
 import persistence.sql.dialect.Dialect;
 import persistence.sql.dialect.H2Dialect;
@@ -16,8 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
 
     private final TableBinder tableBinder = new TableBinder();
-    private final ColumnBinder columnBinder = new ColumnBinder(ColumnTypeMapper.getInstance());
-
+    private final CollectionPersistentClassBinder collectionPersistentClassBinder = PersistentClassMapping.getCollectionPersistentClassBinder();
     private final Dialect dialect = new H2Dialect();
 
     private final DmlQueryBuilder queryBuilder = new DefaultDmlQueryBuilder(dialect);
@@ -54,9 +56,33 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final Select select = new Select(table);
 
         final String dml = "select\n" +
-                "    id, nick_name, old, email\n" +
+                "    users.id, users.nick_name, users.old, users.email\n" +
                 "from\n" +
                 "    users";
+
+        // when
+        final String result = queryBuilder.buildSelectQuery(select);
+
+        // then
+        assertThat(result).isEqualTo(dml);
+    }
+
+    @DisplayName("EAGER 연관관계가 있는 엔티티 클래스로 findAll 쿼리를 생성한다")
+    @Test
+    public void buildFindAllQueryWithLeftJoin() throws Exception {
+        // given
+        final Class<Order> clazz = Order.class;
+        final Table table = tableBinder.createTable(clazz, collectionPersistentClassBinder);
+        final Select select = new Select(table);
+
+        final String dml = "select\n" +
+                "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
+                "from\n" +
+                "    orders\n" +
+                "left join\n" +
+                "    order_items\n" +
+                "on\n" +
+                "    orders.id = order_items.order_id";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -77,11 +103,40 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final Select select = new Select(table, wheres);
 
         final String dml = "select\n" +
-                "    id, nick_name, old, email\n" +
+                "    users.id, users.nick_name, users.old, users.email\n" +
                 "from\n" +
                 "    users\n" +
                 "where\n" +
-                "    id = 1";
+                "    users.id = 1";
+
+        // when
+        final String result = queryBuilder.buildSelectQuery(select);
+
+        // then
+        assertThat(result).isEqualTo(dml);
+    }
+
+    @DisplayName("EAGER 연관관계가 있는 엔티티 클래스로 findById 쿼리를 생성한다")
+    @Test
+    public void buildFindByIdQueryWithLeftJoin() throws Exception {
+        // given
+        final Class<Order> clazz = Order.class;
+        final Table table = tableBinder.createTable(clazz, collectionPersistentClassBinder);
+        final Column column = table.getColumn("id");
+        final Value value = new Value(Long.class, Types.BIGINT, 1);
+        final List<Where> wheres = List.of(new Where(column, value, LogicalOperator.NONE, new ComparisonOperator(ComparisonOperator.Comparisons.EQ)));
+        final Select select = new Select(table, wheres);
+
+        final String dml = "select\n" +
+                "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
+                "from\n" +
+                "    orders\n" +
+                "left join\n" +
+                "    order_items\n" +
+                "on\n" +
+                "    orders.id = order_items.order_id\n" +
+                "where\n" +
+                "    orders.id = 1";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -107,7 +162,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "set\n" +
                 "    nick_name = 'name', old = 1, email = 'email@domain.com'\n" +
                 "where\n" +
-                "    id = 1";
+                "    users.id = 1";
 
         // when
         final String result = queryBuilder.buildUpdateQuery(update);
@@ -131,7 +186,7 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
                 "from\n" +
                 "    users\n" +
                 "where\n" +
-                "    id = 1";
+                "    users.id = 1";
 
         // when
         final String result = queryBuilder.buildDeleteQuery(delete);

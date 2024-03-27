@@ -14,6 +14,10 @@ public class Wheres {
                 .ifPresent(where -> where.changeLogicalOperator(LogicalOperator.NONE));
     }
 
+    public void addWhere(final Where where) {
+        this.wheres.add(where);
+    }
+
     public List<Where> getWheres() {
         return Collections.unmodifiableList(this.wheres);
     }

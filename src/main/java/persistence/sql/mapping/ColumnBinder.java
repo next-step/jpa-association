@@ -2,7 +2,7 @@ package persistence.sql.mapping;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import persistence.model.EntityMetaData;
+import persistence.model.PersistentClass;
 import persistence.sql.QueryException;
 
 import java.lang.reflect.Field;
@@ -17,25 +17,25 @@ public class ColumnBinder {
         this.columnTypeMapper = columnTypeMapper;
     }
 
-    public List<Column> createColumns(final EntityMetaData metaData) {
-        return metaData.getFields()
+    public List<Column> createColumns(final String tableName, final PersistentClass<?> persistentClass) {
+        return persistentClass.getColumns()
                 .stream()
-                .map(this::createColumn)
+                .map(entityField -> this.createColumn(tableName, entityField.getField()))
                 .collect(Collectors.toList());
     }
 
-    public List<Column> createColumns(final EntityMetaData metaData, final Object object) {
-        return metaData.getFields()
+    public List<Column> createColumns(final String tableName, final PersistentClass<?> persistentClass, final Object object) {
+        return persistentClass.getColumns()
                 .stream()
-                .map(field -> createColumn(field, object))
+                .map(entityField -> createColumn(tableName, entityField.getField(), object))
                 .collect(Collectors.toList());
     }
 
-    public Column createColumn(final Field field) {
+    public Column createColumn(final String tableName, final Field field) {
         final String columnName = toColumnName(field);
         final int sqlType = columnTypeMapper.toSqlType(field.getType());
 
-        final Column column = getColumn(field, columnName, sqlType);
+        final Column column = getColumn(tableName, field, columnName, sqlType);
 
         final Id idAnnotation = field.getAnnotation(Id.class);
 
@@ -51,7 +51,7 @@ public class ColumnBinder {
         return column;
     }
 
-    private Column getColumn(final Field field, final String columnName, final int sqlType) {
+    private Column getColumn(final String tableName, final Field field, final String columnName, final int sqlType) {
         final Value value = new Value(field.getType(), sqlType);
 
         final jakarta.persistence.Column columnAnnotation = field.getAnnotation(jakarta.persistence.Column.class);
@@ -61,14 +61,14 @@ public class ColumnBinder {
             boolean nullable = columnAnnotation.nullable();
             boolean unique = columnAnnotation.unique();
 
-            return new Column(columnName, sqlType, value, length, nullable, unique);
+            return new Column(tableName, columnName, sqlType, value, length, nullable, unique);
         }
 
-        return new Column(columnName, sqlType, value);
+        return new Column(tableName, columnName, sqlType, value);
     }
 
-    private Column createColumn(final Field field, final Object object) {
-        final Column column = createColumn(field);
+    private Column createColumn(final String tableName, final Field field, final Object object) {
+        final Column column = createColumn(tableName, field);
 
         setColumnValue(column, field, object);
 
@@ -79,7 +79,17 @@ public class ColumnBinder {
         final jakarta.persistence.Column columnAnnotation = field.getAnnotation(jakarta.persistence.Column.class);
 
         if (columnAnnotation == null || columnAnnotation.name().isBlank()) {
-            return field.getName().toLowerCase();
+            return field.getName();
+        }
+
+        return columnAnnotation.name();
+    }
+
+    public static String toJoinColumnName(final Field field) {
+        final jakarta.persistence.JoinColumn columnAnnotation = field.getAnnotation(jakarta.persistence.JoinColumn.class);
+
+        if (columnAnnotation == null || columnAnnotation.name().isBlank()) {
+            return field.getName();
         }
 
         return columnAnnotation.name();

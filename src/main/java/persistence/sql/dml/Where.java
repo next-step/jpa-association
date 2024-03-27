@@ -20,6 +20,10 @@ public class Where {
         this.whereOperator = whereOperator;
     }
 
+    public String getColumnTableName() {
+        return this.column.getTableName();
+    }
+
     public String getColumnName() {
         return this.column.getName();
     }

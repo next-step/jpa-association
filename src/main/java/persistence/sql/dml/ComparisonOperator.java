@@ -3,8 +3,8 @@ package persistence.sql.dml;
 public class ComparisonOperator extends WhereOperator {
 
     public enum Comparisons {
-        EQ("="), NE("<>"), GT(">"),
-        GE(">="), LT("<"), LE("<="),
+        EQ(" = "), NE(" <> "), GT(" > "),
+        GE(" >= "), LT(" < "), LE(" <= "),
         ;
 
         private final String operator;
@@ -26,6 +26,6 @@ public class ComparisonOperator extends WhereOperator {
 
     @Override
     String operatorClause(final String value) {
-        return this.comparison.operator + " " + value;
+        return this.comparison.operator + value;
     }
 }

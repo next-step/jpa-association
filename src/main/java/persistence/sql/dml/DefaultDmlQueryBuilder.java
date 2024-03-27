@@ -2,13 +2,12 @@ package persistence.sql.dml;
 
 import persistence.sql.QueryException;
 import persistence.sql.dialect.Dialect;
-import persistence.sql.mapping.Column;
-import persistence.sql.mapping.Table;
-import persistence.sql.mapping.Value;
+import persistence.sql.mapping.*;
 import util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static persistence.sql.QueryBuilderConst.ENTER;
 import static persistence.sql.QueryBuilderConst.SPACE;
@@ -106,14 +105,6 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
                 .orElseThrow(() -> new QueryException("not found InsertQueryValueBinder for " + value.getOriginalType() + " type"));
     }
 
-    private String buildSelectColumnsClause(final List<Column> columns) {
-
-        return columns.stream()
-                .map(Column::getName)
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.joining(", "));
-    }
-
     @Override
     public String buildSelectQuery(final Select select) {
         final Table table = select.getTable();
@@ -121,13 +112,68 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
         return "select" +
                 ENTER +
                 SPACE +
-                buildSelectColumnsClause(table.getColumns()) +
+                buildSelectColumnsClause(table.getName(), table.getColumns(), table.getTableJoins()) +
                 ENTER +
                 "from" +
                 ENTER +
                 SPACE +
                 table.getName() +
+                buildTablesJoinClause(table.getTableJoins()) +
                 buildWhereClause(buildWheresClause(select.getWheres()));
+    }
+
+    private String buildSelectColumnsClause(final String tableName, final List<Column> columns, final List<TableJoin> tableJoins) {
+        final String selectColumnsClause = buildSelectColumnsClause(tableName, columns);
+        final String selectJoinColumnsClause = buildSelectJoinColumnsClause(tableJoins);
+
+        return Stream.of(selectColumnsClause, selectJoinColumnsClause)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(", "));
+    }
+
+    private String buildSelectColumnsClause(final String tableName, final List<Column> columns) {
+        return columns.stream()
+                .map(column -> tableName + "." + column.getName())
+                .collect(Collectors.joining(", "));
+    }
+
+    private String buildSelectJoinColumnsClause(final List<TableJoin> tableJoins) {
+        return tableJoins.stream()
+                .map(tableJoin -> buildSelectColumnsClause(tableJoin.getTableName(), tableJoin.getJoinedTableColumns()))
+                .collect(Collectors.joining(", "));
+    }
+
+    private String buildTablesJoinClause(final List<TableJoin> tableJoins) {
+
+        final String clause = tableJoins.stream()
+                .map(this::buildTableJoinClause)
+                .collect(Collectors.joining(ENTER + SPACE));
+
+        if (clause.isBlank()) {
+            return "";
+        }
+
+        return ENTER +
+                clause;
+    }
+
+    private String buildTableJoinClause(final TableJoin tableJoin) {
+        return tableJoin.getJoinType() +
+                "join" +
+                ENTER +
+                SPACE +
+                tableJoin.getTableName() +
+                ENTER +
+                "on" +
+                ENTER +
+                SPACE +
+                tableJoin.getParentTableName() +
+                "." +
+                tableJoin.getOwnerTableColumnName() +
+                tableJoin.getOperator() +
+                tableJoin.getTableName() +
+                "." +
+                tableJoin.getJoinedTableColumnName();
     }
 
     @Override
@@ -177,7 +223,7 @@ public class DefaultDmlQueryBuilder implements DmlQueryBuilder {
 
         final String valueClause = queryValueBinder.bind(value.getValue());
 
-        return (where.getLogicalOperator() + " " + where.getColumnName() + " " + where.getWhereOperator(valueClause)).trim();
+        return (where.getLogicalOperator() + " " + where.getColumnTableName() + "." + where.getColumnName() + where.getWhereOperator(valueClause)).trim();
     }
 
     private String buildWhereClause(final String whereClause) {
