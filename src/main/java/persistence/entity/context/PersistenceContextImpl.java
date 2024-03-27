@@ -1,4 +1,4 @@
-package persistence.entity;
+package persistence.entity.context;
 
 import java.util.HashMap;
 import java.util.Map;

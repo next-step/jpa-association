@@ -1,21 +1,23 @@
 package persistence.entity;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import persistence.H2DBTestSupport;
+import persistence.OrderItem;
 import persistence.OrderLazy;
 import persistence.entity.collection.CollectionLoader;
+import persistence.entity.collection.PersistentList;
 import persistence.sql.mapping.Associations;
-
-import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CollectionLoaderTest extends H2DBTestSupport {
-    private final CollectionLoader collectionLoader = new CollectionLoader(
+class PersistentCollectionTest extends H2DBTestSupport {
+    private final CollectionLoader lazyCollectionLoader = new CollectionLoader(
             jdbcTemplate,
             Associations.fromEntityClass(OrderLazy.class).getLazyAssociations().get(0)
     );
-
     @BeforeEach
     void setUp() {
         jdbcTemplate.execute("create table orders (id bigint auto_increment, order_number varchar(255))");
@@ -29,14 +31,13 @@ class CollectionLoaderTest extends H2DBTestSupport {
     }
 
     @Test
-    void testLoadCollection(){
+    @DisplayName("컬렉션에 접근시 쿼리를 통해 로딩한다")
+    void loadWhenAccessCollection() {
         jdbcTemplate.execute("insert into orders (id, order_number) values (1, '1')");
         jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product1', 1)");
-        jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product2', 2)");
-        jdbcTemplate.execute("insert into order_items (order_id, product, quantity) values (1, 'product3', 3)");
 
-        Collection<Object> collection = collectionLoader.loadCollection(1L);
+        PersistentList<OrderItem> list = new PersistentList<>(lazyCollectionLoader, 1L);
 
-        assertThat(collection.size()).isEqualTo(3);
+        assertThat(list.get(0).getId()).isEqualTo(1L);
     }
 }

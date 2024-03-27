@@ -3,17 +3,11 @@ package persistence.sql.mapping;
 import jakarta.persistence.OneToMany;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Associations implements Iterable<OneToManyData> {
+public class Associations {
     private final List<OneToManyData> associations;
-
-    @Override
-    public Iterator<OneToManyData> iterator() {
-        return associations.iterator();
-    }
 
     private Associations(List<OneToManyData> associations) {
         this.associations = associations;
@@ -33,10 +27,6 @@ public class Associations implements Iterable<OneToManyData> {
         return associations.stream().anyMatch(OneToManyData::isEagerLoad);
     }
 
-    public boolean hasNotLazyLoad() {
-        return associations.stream().noneMatch(OneToManyData::isLazyLoad);
-    }
-
     public boolean isNotEmpty() {
         return !associations.isEmpty();
     }
@@ -46,5 +36,13 @@ public class Associations implements Iterable<OneToManyData> {
                 .filter(field -> field.isAnnotationPresent(OneToMany.class))
                 .map(OneToManyData::from)
                 .collect(Collectors.toList());
+    }
+
+    public boolean hasLazyLoad() {
+        return associations.stream().anyMatch(OneToManyData::isLazyLoad);
+    }
+
+    public List<OneToManyData> getLazyAssociations() {
+        return associations.stream().filter(OneToManyData::isLazyLoad).collect(Collectors.toList());
     }
 }
