@@ -2,9 +2,7 @@ package persistence.entity.loader;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
-import persistence.ReflectionUtils;
-import persistence.entity.CollectionEntityRowMapper;
-import persistence.entity.EntityRowMapper;
+import persistence.entity.SingleEntityRowMapper;
 import persistence.model.*;
 import persistence.sql.QueryException;
 import persistence.sql.dml.*;
@@ -40,30 +38,21 @@ public class SingleEntityLoader implements EntityLoader {
         final String selectQuery = dmlQueryBuilder.buildSelectQuery(select);
         log.debug("\n" + selectQuery);
 
-        final Optional<EntityJoinField> eagerJoinField = persistentClass.getJoinFields()
-                .stream().filter(EntityJoinField::isEager)
+        final Optional<EntityJoinField> eagerJoinField = persistentClass.getFields()
+                .stream()
+                .filter(AbstractEntityField::isJoinField)
+                .map(joinField -> (EntityJoinField) joinField)
+                .filter(EntityJoinField::isEager)
                 .findFirst();
 
         if (eagerJoinField.isPresent()) {
-            final EntityJoinField entityJoinField = eagerJoinField.get();
-            final CollectionPersistentClass collectionPersistentClass = this.collectionPersistentClassBinder.getCollectionPersistentClass(ReflectionUtils.mapToGenericClassName(entityJoinField.getField()));
-
-            return queryWithEagerColumn(clazz, selectQuery, collectionPersistentClass);
+            final CollectionEntityLoader collectionEntityLoader = new CollectionEntityLoader(jdbcTemplate);
+            return collectionEntityLoader.queryWithEagerColumn(clazz, eagerJoinField.get(), this.collectionPersistentClassBinder, selectQuery);
         }
 
-        final RowMapper<T> rowMApper = new EntityRowMapper<>(persistentClass);
+        final RowMapper<T> rowMApper = new SingleEntityRowMapper<>(persistentClass);
 
         return jdbcTemplate.query(selectQuery, rowMApper)
-                .stream()
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    private <T> List<T> queryWithEagerColumn(final Class<T> clazz, final String selectQuery, final CollectionPersistentClass collectionPersistentClass) {
-        final RowMapper<T> rowMapper = new CollectionEntityRowMapper<>(clazz, collectionPersistentClass);
-
-        return jdbcTemplate.query(selectQuery, rowMapper)
                 .stream()
                 .filter(Objects::nonNull)
                 .distinct()
