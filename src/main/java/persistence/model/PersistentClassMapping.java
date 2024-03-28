@@ -51,7 +51,10 @@ public class PersistentClassMapping {
 
     public static void setCollectionPersistentClassBinder() {
         persistentClassMap.values().forEach(persistentClass -> {
-            final List<EntityJoinField> joinFields = persistentClass.getJoinFields();
+            final List<EntityJoinField> joinFields = persistentClass.getFields().stream()
+                    .filter(AbstractEntityField::isJoinField)
+                    .map(joinField -> (EntityJoinField) joinField)
+                    .collect(Collectors.toList());
             joinFields.forEach(field -> createCollectionPersistentClass(persistentClass, field));
         });
     }
