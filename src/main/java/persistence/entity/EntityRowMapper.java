@@ -1,25 +1,33 @@
 package persistence.entity;
 
+import jdbc.RowMapper;
+import persistence.model.AbstractEntityField;
 import persistence.model.PersistentClass;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class EntityRowMapper<T> extends AbstractEntityRowMapper<T> {
-    private final PersistentClass<T> persistentClass;
+public interface EntityRowMapper<T> extends RowMapper<T> {
 
-    public EntityRowMapper(final PersistentClass<T> persistentClass) {
-        this.persistentClass = persistentClass;
+    default void setEntityFieldsValue(final PersistentClass<T> persistentClass, final Object entity, final String tableName, final ResultSet resultSet) {
+        persistentClass.getColumns().forEach(field -> setEntityFieldValue(entity, resultSet, field, tableName));
     }
 
-    @Override
-    public T mapRow(final ResultSet resultSet) {
-        return mapToEntity(persistentClass, resultSet);
+    default void setEntityFieldValue(final Object joinedEntity, final ResultSet resultSet, final AbstractEntityField field, final String tableName) {
+        final String columnLabel = toColumnLabel(tableName, field.getColumnName());
+        final Object value = extractColumnResult(resultSet, columnLabel);
+        field.setValue(joinedEntity, value);
     }
 
-    private T mapToEntity(final PersistentClass<T> persistentClass, final ResultSet resultSet) {
-        final T instance = this.persistentClass.createInstance();
-        setEntityFieldsValue(this.persistentClass, instance, persistentClass.getTableName(), resultSet);
+    default String toColumnLabel(final String tableName, final String columnName) {
+        return tableName + "." + columnName;
+    }
 
-        return instance;
+    default Object extractColumnResult(final ResultSet resultSet, final String columnLabel) {
+        try {
+            return resultSet.getObject(columnLabel);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package persistence.entity;
 
+import persistence.model.AbstractEntityField;
 import persistence.model.CollectionPersistentClass;
 import persistence.model.EntityId;
 import persistence.model.PersistentClass;
@@ -8,7 +9,7 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CollectionEntityRowMapper<T> extends AbstractEntityRowMapper<T> {
+public class CollectionEntityRowMapper<T> implements EntityRowMapper<T> {
     private final PersistentClass<T> persistentClass;
     private final CollectionPersistentClass collectionPersistentClass;
     private final Map<Object, T> entityMap;
@@ -41,7 +42,8 @@ public class CollectionEntityRowMapper<T> extends AbstractEntityRowMapper<T> {
     }
 
     private void setEntityAssociationFieldsValue(final PersistentClass<T> persistentClass, final T entity, final Object joinedEntity) {
-        persistentClass.getJoinFields()
+        persistentClass.getFields()
+                .stream().filter(AbstractEntityField::isJoinField)
                 .forEach(joinField -> joinField.setValue(entity, joinedEntity));
     }
 
