@@ -41,12 +41,13 @@ public class TableBinder {
     }
 
     private List<TableJoin> extractTableJoins(final Table table, final PersistentClass<?> persistentClass, final CollectionPersistentClassBinder collectionPersistentClassBinder) {
-        return persistentClass.getJoinFields()
+        return persistentClass.getFields()
                 .stream()
-                .filter(EntityJoinField::isEager)
+                .filter(AbstractEntityField::isJoinField)
                 .map(field -> {
-                    final Table joinedTable = createTable(collectionPersistentClassBinder.getCollectionPersistentClass(ReflectionUtils.mapToGenericClassName(field.getField())).getEntityClass());
-                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0).getName(), field.getJoinedColumnName(), ComparisonOperator.Comparisons.EQ);
+                    final EntityJoinField joinField = (EntityJoinField) field;
+                    final Table joinedTable = createTable(collectionPersistentClassBinder.getCollectionPersistentClass(ReflectionUtils.mapToGenericClassName(joinField.getField())).getEntityClass());
+                    final JoinColumn predicate = new JoinColumn(table.getPrimaryKey().getColumns().get(0).getName(), joinField.getJoinedColumnName(), ComparisonOperator.Comparisons.EQ);
                     return new TableJoin(persistentClass.getEntityName(), table.getName(), joinedTable, SqlAstJoinType.LEFT, predicate);
                 }).collect(Collectors.toList());
     }

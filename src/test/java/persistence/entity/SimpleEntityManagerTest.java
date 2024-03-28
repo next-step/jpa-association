@@ -34,7 +34,7 @@ class SimpleEntityManagerTest extends JdbcServerDmlQueryTestSupport {
     private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, PersistentClassMapping.getCollectionPersistentClassBinder(), dmlQueryBuilder, jdbcTemplate);
     private final MappingMetaModel mappingMetaModel = new MappingMetaModel(personEntityPersister);
     private final EntityManager entityManager = new SimpleEntityManager(mappingMetaModel, entityLoader);
-    private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersistentClassMapping.getPersistentClass(personV3Class));
+    private final RowMapper<PersonV3> rowMapper = new SingleEntityRowMapper<>(PersistentClassMapping.getPersistentClass(personV3Class));
 
     @AfterEach
     void tearDown() {

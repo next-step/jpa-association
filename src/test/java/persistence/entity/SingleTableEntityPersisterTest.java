@@ -26,7 +26,7 @@ class SingleTableEntityPersisterTest extends JdbcServerDmlQueryTestSupport {
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
     private final Class<PersonV3> personV3Class = PersonV3.class;
     private final EntityPersister entityPersister = new SingleTableEntityPersister(personV3Class.getName(), tableBinder, dmlQueryBuilder, jdbcTemplate, personV3Class);
-    private final RowMapper<PersonV3> rowMapper = new EntityRowMapper<>(PersistentClassMapping.getPersistentClass((personV3Class)));
+    private final RowMapper<PersonV3> rowMapper = new SingleEntityRowMapper<>(PersistentClassMapping.getPersistentClass((personV3Class)));
 
     @AfterEach
     void tearDown() {
