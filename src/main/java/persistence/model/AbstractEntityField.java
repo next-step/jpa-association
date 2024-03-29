@@ -8,6 +8,18 @@ import java.lang.reflect.Field;
 
 public abstract class AbstractEntityField {
 
+    private final String fieldName;
+    private final String columnName;
+    private final Class<?> entityClass;
+    private final Field field;
+
+    protected AbstractEntityField(final String fieldName, final String columnName, final Class<?> entityClass, final Field field) {
+        this.fieldName = fieldName;
+        this.columnName = columnName;
+        this.entityClass = entityClass;
+        this.field = field;
+    }
+
     public static AbstractEntityField createEntityField(final Field field) {
         final String fieldName = field.getName();
 
@@ -25,18 +37,6 @@ public abstract class AbstractEntityField {
         }
 
         return new EntityField(fieldName, columnName, fieldClass, field);
-    }
-
-    private final String fieldName;
-    private final String columnName;
-    private final Class<?> entityClass;
-    private final Field field;
-
-    protected AbstractEntityField(final String fieldName, final String columnName, final Class<?> entityClass, final Field field) {
-        this.fieldName = fieldName;
-        this.columnName = columnName;
-        this.entityClass = entityClass;
-        this.field = field;
     }
 
     private static boolean isJoinField(final Field field) {
