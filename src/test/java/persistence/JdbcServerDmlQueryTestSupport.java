@@ -33,7 +33,14 @@ public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSu
                 "    orderNumber VARCHAR(255)\n" +
                 ");\n" +
                 "\n" +
-                "CREATE TABLE order_items (\n" +
+                "CREATE TABLE eager_order_items (\n" +
+                "    id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
+                "    product VARCHAR(255),\n" +
+                "    quantity INTEGER,\n" +
+                "    order_id BIGINT,\n" +
+                "    FOREIGN KEY (order_id) REFERENCES orders(id)\n" +
+                ");\n" +
+                "CREATE TABLE lazy_order_items (\n" +
                 "    id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "    product VARCHAR(255),\n" +
                 "    quantity INTEGER,\n" +
@@ -79,7 +86,7 @@ public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSu
         final String clause = eagerOrderItems.stream().map(eagerOrderItem -> "('" + eagerOrderItem.getProduct() + "', " + eagerOrderItem.getQuantity() + ", " + orderId + ", default)").collect(Collectors.joining(", "));
         return "insert\n" +
                 "into\n" +
-                "    order_items\n" +
+                "    eager_order_items\n" +
                 "    (product, quantity, order_id, id) " +
                 "values\n" +
                 "    " + clause + ";";

@@ -3,7 +3,7 @@ package persistence.sql;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "eager_order_items")
 public class EagerOrderItem {
 
     @Id

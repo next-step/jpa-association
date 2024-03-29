@@ -76,13 +76,13 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final Select select = new Select(table);
 
         final String dml = "select\n" +
-                "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
+                "    orders.id, orders.orderNumber, eager_order_items.id, eager_order_items.product, eager_order_items.quantity\n" +
                 "from\n" +
                 "    orders\n" +
                 "left join\n" +
-                "    order_items\n" +
+                "    eager_order_items\n" +
                 "on\n" +
-                "    orders.id = order_items.order_id";
+                "    orders.id = eager_order_items.order_id";
 
         // when
         final String result = queryBuilder.buildSelectQuery(select);
@@ -128,13 +128,13 @@ class DefaultDmlQueryBuilderTest extends EntityMetaDataTestSupport {
         final Select select = new Select(table, wheres);
 
         final String dml = "select\n" +
-                "    orders.id, orders.orderNumber, order_items.id, order_items.product, order_items.quantity\n" +
+                "    orders.id, orders.orderNumber, eager_order_items.id, eager_order_items.product, eager_order_items.quantity\n" +
                 "from\n" +
                 "    orders\n" +
                 "left join\n" +
-                "    order_items\n" +
+                "    eager_order_items\n" +
                 "on\n" +
-                "    orders.id = order_items.order_id\n" +
+                "    orders.id = eager_order_items.order_id\n" +
                 "where\n" +
                 "    orders.id = 1";
 
