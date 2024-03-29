@@ -28,7 +28,7 @@ public abstract class AbstractEntityField {
         }
 
         final String columnName = ColumnBinder.toColumnName(field);
-        final Class<? extends Field> fieldClass = field.getClass();
+        final Class<?> fieldClass = ReflectionUtils.mapToGenericClass(field);
 
         if (field.isAnnotationPresent(Id.class)) {
             return new EntityId(fieldName, columnName, fieldClass, field);
@@ -49,6 +49,10 @@ public abstract class AbstractEntityField {
 
     public boolean isJoinField() {
         return isJoinField(this.field);
+    }
+
+    public Class<?> getEntityClass() {
+        return this.entityClass;
     }
 
     public Field getField() {
