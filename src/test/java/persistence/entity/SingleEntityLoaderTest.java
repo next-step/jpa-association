@@ -56,12 +56,12 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
         final Class<Order> clazz = Order.class;
         final long key = 1L;
         final Order order1 = OrderFixtureFactory.generateOrderStub(key);
-        final Order order2 = OrderFixtureFactory.generateOrderStub(2L, List.of());
-        final Order order3 = OrderFixtureFactory.generateOrderStub(3L, List.of());
+        final Order order2 = OrderFixtureFactory.generateOrderStub(2L, List.of(), List.of());
+        final Order order3 = OrderFixtureFactory.generateOrderStub(3L, List.of(), List.of());
         final String order1InsertQuery = generateOrderTableStubInsertQuery(order1);
         final String order2InsertQuery = generateOrderTableStubInsertQuery(order2);
         final String order3InsertQuery = generateOrderTableStubInsertQuery(order3);
-        final String orderItemInsertQuery = generateOrderItemTableStubInsertQuery(order1);
+        final String orderItemInsertQuery = generateEagerOrderItemTableStubInsertQuery(order1);
 
         jdbcTemplate.execute(order1InsertQuery);
         jdbcTemplate.execute(order2InsertQuery);
@@ -78,13 +78,13 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
                         tuple(order2.getId(), order2.getOrderNumber()),
                         tuple(order3.getId(), order3.getOrderNumber())
                 );
-        assertThat(results.get(0).getOrderItems()).hasSize(order1.getOrderItems().size())
+        assertThat(results.get(0).getEagerOrderItems()).hasSize(order1.getEagerOrderItems().size())
                 .extracting("id", "product", "quantity")
                 .containsExactlyInAnyOrder(
-                        order1.getOrderItems().stream().map(orderItem -> tuple(orderItem.getId(), orderItem.getProduct(), orderItem.getQuantity())).toArray(Tuple[]::new)
+                        order1.getEagerOrderItems().stream().map(orderItem -> tuple(orderItem.getId(), orderItem.getProduct(), orderItem.getQuantity())).toArray(Tuple[]::new)
                 );
-        assertThat(results.get(1).getOrderItems()).hasSize(0);
-        assertThat(results.get(2).getOrderItems()).hasSize(0);
+        assertThat(results.get(1).getEagerOrderItems()).hasSize(0);
+        assertThat(results.get(2).getEagerOrderItems()).hasSize(0);
     }
 
 }
