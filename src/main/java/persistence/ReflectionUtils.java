@@ -27,6 +27,17 @@ public class ReflectionUtils {
         }
     }
 
+    public static <T> Object getFieldValue(final Field field, final T object) {
+        try {
+            field.setAccessible(true);
+            return field.get(object);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } finally {
+            field.setAccessible(false);
+        }
+    }
+
     public static <T> void setFieldValue(final Field field, final T object, final Object value) {
         try {
             if (isListType(field)) {
@@ -62,6 +73,22 @@ public class ReflectionUtils {
             ((List) list).add(value);
         } catch (IllegalAccessException e) {
             throw new QueryException("can't set field " + field.getName() + " at " + object.getClass().getName());
+        } finally {
+            field.setAccessible(false);
+        }
+    }
+
+    public static <T> void setListFieldValue(final Field field, final T object, final List<?> listValue) {
+        try {
+            field.setAccessible(true);
+
+            if (!isListType(field)) {
+                throw new RuntimeException(field.getName() + " is not list type");
+            }
+
+            field.set(object, listValue);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         } finally {
             field.setAccessible(false);
         }
