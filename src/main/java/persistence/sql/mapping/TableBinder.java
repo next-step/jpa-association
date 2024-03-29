@@ -43,7 +43,7 @@ public class TableBinder {
     private List<TableJoin> extractTableJoins(final Table table, final PersistentClass<?> persistentClass, final CollectionPersistentClassBinder collectionPersistentClassBinder) {
         return persistentClass.getFields()
                 .stream()
-                .filter(AbstractEntityField::isJoinField)
+                .filter(field -> field.isJoinField() && ((EntityJoinField) field).isEager())
                 .map(field -> {
                     final EntityJoinField joinField = (EntityJoinField) field;
                     final Table joinedTable = createTable(collectionPersistentClassBinder.getCollectionPersistentClass(ReflectionUtils.mapToGenericClassName(joinField.getField())).getEntityClass());
