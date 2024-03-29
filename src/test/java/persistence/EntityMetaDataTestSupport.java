@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.model.PersistentClassMapping;
 import persistence.sql.Order;
-import persistence.sql.OrderItem;
+import persistence.sql.EagerOrderItem;
 import persistence.sql.ddl.PersonV1;
 import persistence.sql.ddl.PersonV2;
 import persistence.sql.ddl.PersonV3;
@@ -19,7 +19,7 @@ public abstract class EntityMetaDataTestSupport {
         PersistentClassMapping.putPersistentClass(PersonV2.class);
         PersistentClassMapping.putPersistentClass(PersonV3.class);
         PersistentClassMapping.putPersistentClass(Order.class);
-        PersistentClassMapping.putPersistentClass(OrderItem.class);
+        PersistentClassMapping.putPersistentClass(EagerOrderItem.class);
         PersistentClassMapping.setCollectionPersistentClassBinder();
     }
 }

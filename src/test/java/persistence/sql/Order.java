@@ -16,12 +16,12 @@ public class Order {
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id")
-    private List<OrderItem> orderItems;
+    private List<EagerOrderItem> eagerOrderItems;
 
-    public Order(final Long id, final String orderNumber, final List<OrderItem> orderItems) {
+    public Order(final Long id, final String orderNumber, final List<EagerOrderItem> eagerOrderItems) {
         this.id = id;
         this.orderNumber = orderNumber;
-        this.orderItems = orderItems;
+        this.eagerOrderItems = eagerOrderItems;
     }
 
     public Order() {
@@ -36,7 +36,7 @@ public class Order {
         return this.orderNumber;
     }
 
-    public List<OrderItem> getOrderItems() {
-        return this.orderItems;
+    public List<EagerOrderItem> getOrderItems() {
+        return this.eagerOrderItems;
     }
 }

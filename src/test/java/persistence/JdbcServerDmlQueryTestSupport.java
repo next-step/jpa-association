@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import persistence.sql.JdbcServerTest;
 import persistence.sql.Order;
-import persistence.sql.OrderItem;
+import persistence.sql.EagerOrderItem;
 import persistence.sql.TestJdbcServerExtension;
 import persistence.sql.ddl.PersonV3;
 
@@ -75,8 +75,8 @@ public abstract class JdbcServerDmlQueryTestSupport extends EntityMetaDataTestSu
         return this.generateOrderItemTableStubInsertQuery(order.getId(), order.getOrderItems());
     }
 
-    protected String generateOrderItemTableStubInsertQuery(final Long orderId, final List<OrderItem> orderItems) {
-        final String clause = orderItems.stream().map(orderItem -> "('" + orderItem.getProduct() + "', " + orderItem.getQuantity() + ", " + orderId + ", default)").collect(Collectors.joining(", "));
+    protected String generateOrderItemTableStubInsertQuery(final Long orderId, final List<EagerOrderItem> eagerOrderItems) {
+        final String clause = eagerOrderItems.stream().map(eagerOrderItem -> "('" + eagerOrderItem.getProduct() + "', " + eagerOrderItem.getQuantity() + ", " + orderId + ", default)").collect(Collectors.joining(", "));
         return "insert\n" +
                 "into\n" +
                 "    order_items\n" +
