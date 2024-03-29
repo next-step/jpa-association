@@ -46,6 +46,10 @@ public class PersistentClass<T> {
         return this.fields;
     }
 
+    public EntityId getEntityId() {
+        return this.fields.getIdField();
+    }
+
     public List<AbstractEntityField> getFields() {
         return this.fields.getFields();
     }
