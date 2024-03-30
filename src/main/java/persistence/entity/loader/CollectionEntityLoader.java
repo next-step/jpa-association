@@ -4,9 +4,11 @@ import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
 import persistence.ReflectionUtils;
 import persistence.entity.CollectionEntityRowMapper;
+import persistence.entity.SingleEntityRowMapper;
 import persistence.model.CollectionPersistentClass;
 import persistence.model.CollectionPersistentClassBinder;
 import persistence.model.EntityJoinField;
+import persistence.model.PersistentClass;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,5 +31,15 @@ public class CollectionEntityLoader {
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public <T> List<T> queryWithLazyColumn(final PersistentClass<T> persistentClass, final String selectQuery) {
+        final RowMapper<T> rowMapper = new SingleEntityRowMapper<>(persistentClass);
+
+        return jdbcTemplate.query(selectQuery, rowMapper)
+                .stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
