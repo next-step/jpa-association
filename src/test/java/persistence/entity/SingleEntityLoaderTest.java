@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
 
@@ -72,19 +73,78 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
         final List<Order> results = entityLoader.load(clazz, null);
 
         // then
-        assertThat(results).hasSize(3).extracting("id", "orderNumber")
-                .containsExactlyInAnyOrder(
-                        tuple(order1.getId(), order1.getOrderNumber()),
-                        tuple(order2.getId(), order2.getOrderNumber()),
-                        tuple(order3.getId(), order3.getOrderNumber())
-                );
-        assertThat(results.get(0).getEagerOrderItems()).hasSize(order1.getEagerOrderItems().size())
-                .extracting("id", "product", "quantity")
-                .containsExactlyInAnyOrder(
-                        order1.getEagerOrderItems().stream().map(orderItem -> tuple(orderItem.getId(), orderItem.getProduct(), orderItem.getQuantity())).toArray(Tuple[]::new)
-                );
-        assertThat(results.get(1).getEagerOrderItems()).hasSize(0);
-        assertThat(results.get(2).getEagerOrderItems()).hasSize(0);
+        assertAll(
+                () -> assertThat(results).hasSize(3).extracting("id", "orderNumber")
+                        .containsExactlyInAnyOrder(
+                                tuple(order1.getId(), order1.getOrderNumber()),
+                                tuple(order2.getId(), order2.getOrderNumber()),
+                                tuple(order3.getId(), order3.getOrderNumber())
+                        ),
+                () ->assertThat(results.get(0).getEagerOrderItems()).hasSize(order1.getEagerOrderItems().size())
+                        .extracting("id", "product", "quantity")
+                        .containsExactlyInAnyOrder(
+                                results.get(0).getEagerOrderItems().stream().map(orderItem -> tuple(orderItem.getId(), orderItem.getProduct(), orderItem.getQuantity())).toArray(Tuple[]::new)
+                        ),
+                () -> assertThat(results.get(1).getEagerOrderItems()).hasSize(0),
+                () -> assertThat(results.get(2).getEagerOrderItems()).hasSize(0)
+        );
+    }
+
+    @DisplayName("EAGER 와 LAZY 연관관계가 모두 있는 클래스 정보로 엔티티를 조회한다")
+    @Test
+    public void loadEagerAndLazyJoin() throws Exception {
+        // given
+        final Class<Order> clazz = Order.class;
+        final long key = 1L;
+        final Order order1 = OrderFixtureFactory.generateOrderStub(key);
+        final Order order2 = OrderFixtureFactory.generateOrderStub(2L, OrderFixtureFactory.generateEagerOrderItemsStub(4L, 5L), List.of());
+        final Order order3 = OrderFixtureFactory.generateOrderStub(3L, List.of(), OrderFixtureFactory.generateLazyItemsStub(4L));
+        final Order[] orders = new Order[]{order1, order2, order3};
+        final String order1InsertQuery = generateOrderTableStubInsertQuery(order1);
+        final String order2InsertQuery = generateOrderTableStubInsertQuery(order2);
+        final String order3InsertQuery = generateOrderTableStubInsertQuery(order3);
+        final String eagerOrderItemInsertQuery1 = generateEagerOrderItemTableStubInsertQuery(order1);
+        final String eagerOrderItemInsertQuery2 = generateEagerOrderItemTableStubInsertQuery(order2);
+        final String lazyOrderItemInsertQuery1 = generateLazyOrderItemTableStubInsertQuery(order1);
+        final String lazyOrderItemInsertQuery2 = generateLazyOrderItemTableStubInsertQuery(order3);
+
+        jdbcTemplate.execute(order1InsertQuery);
+        jdbcTemplate.execute(order2InsertQuery);
+        jdbcTemplate.execute(order3InsertQuery);
+        jdbcTemplate.execute(eagerOrderItemInsertQuery1);
+        jdbcTemplate.execute(eagerOrderItemInsertQuery2);
+        jdbcTemplate.execute(lazyOrderItemInsertQuery1);
+        jdbcTemplate.execute(lazyOrderItemInsertQuery2);
+
+        // when
+        final List<Order> results = entityLoader.load(clazz, null);
+
+        // then
+        assertAll(
+                () -> assertThat(results).hasSize(3).extracting("id", "orderNumber")
+                        .containsExactlyInAnyOrder(
+                                tuple(order1.getId(), order1.getOrderNumber()),
+                                tuple(order2.getId(), order2.getOrderNumber()),
+                                tuple(order3.getId(), order3.getOrderNumber())
+                        ),
+                () -> {
+                    for (int i = 0; i < results.size(); i++) {
+                        final Order result = results.get(i);
+                        final Order order = orders[i];
+
+                        assertThat(result.getEagerOrderItems()).hasSize(order.getEagerOrderItems().size())
+                                .extracting("id", "product", "quantity")
+                                .containsExactlyInAnyOrder(
+                                        result.getEagerOrderItems().stream().map(orderItem -> tuple(orderItem.getId(), orderItem.getProduct(), orderItem.getQuantity())).toArray(Tuple[]::new)
+                                );
+                        assertThat(result.getLazyOrderItems()).hasSize(order.getLazyOrderItems().size())
+                                .extracting("id", "product", "quantity")
+                                .containsExactlyInAnyOrder(
+                                        result.getLazyOrderItems().stream().map(orderItem -> tuple(orderItem.getId(), orderItem.getProduct(), orderItem.getQuantity())).toArray(Tuple[]::new)
+                                );
+                    }
+                }
+        );
     }
 
 }
