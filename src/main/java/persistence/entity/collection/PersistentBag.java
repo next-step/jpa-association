@@ -1,121 +1,68 @@
 package persistence.entity.collection;
 
+import persistence.entity.loader.CollectionEntityLoader;
+import persistence.model.PersistentClass;
+
 import java.util.*;
 
-public class PersistentBag<T> implements List<T> {
+public class PersistentBag<T> extends AbstractPersistentCollection<T> implements List<T> {
 
-    @Override
-    public int size() {
-        return 0;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public boolean contains(final Object o) {
-        return false;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return null;
-    }
-
-    @Override
-    public Object[] toArray() {
-        return new Object[0];
-    }
-
-    @Override
-    public <T1> T1[] toArray(final T1[] a) {
-        return null;
-    }
-
-    @Override
-    public boolean add(final T t) {
-        return false;
-    }
-
-    @Override
-    public boolean remove(final Object o) {
-        return false;
-    }
-
-    @Override
-    public boolean containsAll(final Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean addAll(final Collection<? extends T> c) {
-        return false;
+    public PersistentBag(final CollectionEntityLoader collectionEntityLoader, final PersistentClass<T> persistentClass, final String query) {
+        super(collectionEntityLoader, persistentClass, query);
     }
 
     @Override
     public boolean addAll(final int index, final Collection<? extends T> c) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(final Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(final Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-
+        return getValuesInternal().addAll(index, c);
     }
 
     @Override
     public T get(final int index) {
-        return null;
+        return getValuesInternal().get(index);
     }
 
     @Override
     public T set(final int index, final T element) {
-        return null;
+        return getValuesInternal().set(index, element);
     }
 
     @Override
     public void add(final int index, final T element) {
-
+        getValuesInternal().add(index, element);
     }
 
     @Override
     public T remove(final int index) {
-        return null;
+        return getValuesInternal().remove(index);
     }
 
     @Override
     public int indexOf(final Object o) {
-        return 0;
+        return getValuesInternal().indexOf(o);
     }
 
     @Override
     public int lastIndexOf(final Object o) {
-        return 0;
+        return getValuesInternal().lastIndexOf(o);
     }
 
     @Override
     public ListIterator<T> listIterator() {
-        return null;
+        return getValuesInternal().listIterator();
     }
 
     @Override
     public ListIterator<T> listIterator(final int index) {
-        return null;
+        return getValuesInternal().listIterator(index);
     }
 
     @Override
     public List<T> subList(final int fromIndex, final int toIndex) {
-        return null;
+        return getValuesInternal().subList(fromIndex, toIndex);
+    }
+
+    private List<T> getValuesInternal() {
+        initialize();
+        return (List<T>) this.values;
     }
 }
