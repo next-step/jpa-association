@@ -6,18 +6,18 @@ import persistence.sql.mapping.Value;
 public class Where {
 
     private final String tableName;
-    private final Column column;
+    private final String columnName;
     private final Value value;
     private LogicalOperator logicalOperator;
     private final WhereOperator whereOperator;
 
     public Where(final Column column, final Value value, final LogicalOperator logicalOperator, final WhereOperator whereOperator) {
-        this(column.getTableName(), column, value, logicalOperator, whereOperator);
+        this(column.getTableName(), column.getName(), value, logicalOperator, whereOperator);
     }
 
-    public Where(final String tableName, final Column column, final Value value, final LogicalOperator logicalOperator, final WhereOperator whereOperator) {
+    public Where(final String tableName, final String columnName, final Value value, final LogicalOperator logicalOperator, final WhereOperator whereOperator) {
         this.tableName = tableName;
-        this.column = column;
+        this.columnName = columnName;
         this.value = value;
         this.logicalOperator = logicalOperator;
         this.whereOperator = whereOperator;
@@ -28,7 +28,7 @@ public class Where {
     }
 
     public String getColumnName() {
-        return this.column.getName();
+        return this.columnName;
     }
 
     public Value getColumnValue() {
