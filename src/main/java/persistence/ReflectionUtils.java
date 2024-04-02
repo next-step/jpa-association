@@ -3,10 +3,7 @@ package persistence;
 import persistence.sql.QueryException;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ReflectionUtils {
 
@@ -40,8 +37,8 @@ public class ReflectionUtils {
 
     public static <T> void setFieldValue(final Field field, final T object, final Object value) {
         try {
-            if (isListType(field)) {
-                setListFieldValue(field, object, value);
+            if (isCollectionType(field)) {
+                setCollectionFieldValue(field, object, value);
                 return;
             }
 
@@ -56,7 +53,7 @@ public class ReflectionUtils {
         }
     }
 
-    private static <T> void setListFieldValue(final Field field, final T object, final Object value) {
+    private static <T> void setCollectionFieldValue(final Field field, final T object, final Object value) {
         try {
             field.setAccessible(true);
             Object list = field.get(object);
@@ -78,15 +75,15 @@ public class ReflectionUtils {
         }
     }
 
-    public static <T> void setListFieldValue(final Field field, final T object, final List<?> listValue) {
+    public static <T> void setCollectionFieldValue(final Field field, final T object, final Collection<?> collection) {
         try {
             field.setAccessible(true);
 
-            if (!isListType(field)) {
+            if (!isCollectionType(field)) {
                 throw new RuntimeException(field.getName() + " is not list type");
             }
 
-            field.set(object, listValue);
+            field.set(object, collection);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } finally {
@@ -94,8 +91,8 @@ public class ReflectionUtils {
         }
     }
 
-    private static boolean isListType(final Field field) {
-        return List.class.isAssignableFrom(field.getType());
+    private static boolean isCollectionType(final Field field) {
+        return Collection.class.isAssignableFrom(field.getType());
     }
 
     public static boolean isDefinedObject(final Object object) {
