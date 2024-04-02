@@ -1,14 +1,14 @@
 package persistence.entity.collection;
 
-import persistence.entity.loader.CollectionEntityLoader;
-import persistence.model.PersistentClass;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
 
 public class PersistentBag<T> extends AbstractPersistentCollection<T> implements List<T> {
 
-    public PersistentBag(final CollectionEntityLoader collectionEntityLoader, final PersistentClass<T> persistentClass, final String query) {
-        super(collectionEntityLoader, persistentClass, query);
+    public PersistentBag() {
+        super(new ArrayList<>());
     }
 
     @Override
@@ -62,7 +62,6 @@ public class PersistentBag<T> extends AbstractPersistentCollection<T> implements
     }
 
     private List<T> getValuesInternal() {
-        initialize();
         return (List<T>) this.values;
     }
 }
