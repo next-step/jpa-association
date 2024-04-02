@@ -6,6 +6,7 @@ import jdbc.RowMapper;
 import org.junit.jupiter.api.*;
 import persistence.JdbcServerDmlQueryTestSupport;
 import persistence.PersonV3FixtureFactory;
+import persistence.entity.Proxy.CglibProxyFactory;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.SingleEntityLoader;
 import persistence.entity.persister.SingleTableEntityPersister;
@@ -31,7 +32,7 @@ class SimpleEntityManagerTest extends JdbcServerDmlQueryTestSupport {
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
     private final Class<PersonV3> personV3Class = PersonV3.class;
     private final SingleTableEntityPersister personEntityPersister = new SingleTableEntityPersister(personV3Class.getName(), tableBinder, dmlQueryBuilder, jdbcTemplate, personV3Class);
-    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, PersistentClassMapping.getCollectionPersistentClassBinder(), dmlQueryBuilder, jdbcTemplate);
+    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, PersistentClassMapping.getCollectionPersistentClassBinder(), new CglibProxyFactory(), dmlQueryBuilder, jdbcTemplate);
     private final MappingMetaModel mappingMetaModel = new MappingMetaModel(personEntityPersister);
     private final EntityManager entityManager = new SimpleEntityManager(mappingMetaModel, entityLoader);
     private final RowMapper<PersonV3> rowMapper = new SingleEntityRowMapper<>(PersistentClassMapping.getPersistentClass(personV3Class));

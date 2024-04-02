@@ -2,11 +2,9 @@ package persistence.entity.loader;
 
 import jdbc.JdbcTemplate;
 import jdbc.RowMapper;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.LazyLoader;
 import persistence.ReflectionUtils;
+import persistence.entity.Proxy.ProxyFactory;
 import persistence.entity.SingleEntityRowMapper;
-import persistence.entity.collection.PersistentBag;
 import persistence.model.*;
 import persistence.sql.QueryException;
 import persistence.sql.dml.*;
@@ -19,12 +17,14 @@ public class SingleEntityLoader implements EntityLoader {
 
     private final TableBinder tableBinder;
     private final CollectionPersistentClassBinder collectionPersistentClassBinder;
+    private final ProxyFactory proxyFactory;
     private final DmlQueryBuilder dmlQueryBuilder;
     private final JdbcTemplate jdbcTemplate;
 
-    public SingleEntityLoader(final TableBinder tableBinder, final CollectionPersistentClassBinder collectionPersistentClassBinder, final DmlQueryBuilder dmlQueryBuilder, final JdbcTemplate jdbcTemplate) {
+    public SingleEntityLoader(final TableBinder tableBinder, final CollectionPersistentClassBinder collectionPersistentClassBinder, final ProxyFactory proxyFactory, final DmlQueryBuilder dmlQueryBuilder, final JdbcTemplate jdbcTemplate) {
         this.tableBinder = tableBinder;
         this.collectionPersistentClassBinder = collectionPersistentClassBinder;
+        this.proxyFactory = proxyFactory;
         this.dmlQueryBuilder = dmlQueryBuilder;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -67,9 +67,9 @@ public class SingleEntityLoader implements EntityLoader {
             lazyJoinFields.forEach(joinField -> {
                 final Select joinedEntitySelect = generateSelect(joinField.getEntityClass(), joinField.getJoinedColumnName(), idValue);
                 final String joinedTableSelectQuery = dmlQueryBuilder.buildSelectQuery(joinedEntitySelect);
-                final Enhancer enhancer = generateEnhancer(collectionEntityLoader, joinField.getEntityClass(), joinedTableSelectQuery);
+                final Collection<?> values = proxyFactory.generateCollectionProxy(joinField.getFieldClass(), collectionEntityLoader, joinField.getEntityClass(), joinedTableSelectQuery);
 
-                ReflectionUtils.setListFieldValue(joinField.getField(), entity, (List<?>) enhancer.create());
+                ReflectionUtils.setCollectionFieldValue(joinField.getField(), entity, values);
             });
         });
     }
@@ -87,14 +87,6 @@ public class SingleEntityLoader implements EntityLoader {
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toUnmodifiableList());
-    }
-
-    private Enhancer generateEnhancer(final CollectionEntityLoader collectionEntityLoader, final Class<?> joinedEntityClass, final String joinedTableSelectQuery) {
-        final Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(List.class);
-        final PersistentClass<?> persistentClass = PersistentClassMapping.getPersistentClass(joinedEntityClass);
-        enhancer.setCallback((LazyLoader) () -> new PersistentBag<>(collectionEntityLoader, persistentClass, joinedTableSelectQuery));
-        return enhancer;
     }
 
     private <T> Select generateSelect(final Class<T> clazz, final Object key) {

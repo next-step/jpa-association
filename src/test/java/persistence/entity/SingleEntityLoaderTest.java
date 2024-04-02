@@ -1,11 +1,13 @@
 package persistence.entity;
 
 import org.assertj.core.groups.Tuple;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.JdbcServerDmlQueryTestSupport;
 import persistence.OrderFixtureFactory;
 import persistence.PersonV3FixtureFactory;
+import persistence.entity.Proxy.CglibProxyFactory;
 import persistence.entity.loader.EntityLoader;
 import persistence.entity.loader.SingleEntityLoader;
 import persistence.model.PersistentClassMapping;
@@ -28,7 +30,15 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
     private final Dialect dialect = new H2Dialect();
     private final DefaultDmlQueryBuilder dmlQueryBuilder = new DefaultDmlQueryBuilder(dialect);
 
-    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, PersistentClassMapping.getCollectionPersistentClassBinder(), dmlQueryBuilder, jdbcTemplate);
+    private final EntityLoader entityLoader = new SingleEntityLoader(tableBinder, PersistentClassMapping.getCollectionPersistentClassBinder(), new CglibProxyFactory(), dmlQueryBuilder, jdbcTemplate);
+
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.execute("delete from users");
+        jdbcTemplate.execute("delete from eager_order_items");
+        jdbcTemplate.execute("delete from lazy_order_items");
+        jdbcTemplate.execute("delete from orders");
+    }
 
     @DisplayName("클래스 정보로 엔티티를 조회한다.")
     @Test
@@ -55,10 +65,10 @@ class SingleEntityLoaderTest extends JdbcServerDmlQueryTestSupport {
     public void loadEagerJoin() throws Exception {
         // given
         final Class<Order> clazz = Order.class;
-        final long key = 1L;
+        final long key = 4L;
         final Order order1 = OrderFixtureFactory.generateOrderStub(key);
-        final Order order2 = OrderFixtureFactory.generateOrderStub(2L, List.of(), List.of());
-        final Order order3 = OrderFixtureFactory.generateOrderStub(3L, List.of(), List.of());
+        final Order order2 = OrderFixtureFactory.generateOrderStub(5L, List.of(), List.of());
+        final Order order3 = OrderFixtureFactory.generateOrderStub(6L, List.of(), List.of());
         final String order1InsertQuery = generateOrderTableStubInsertQuery(order1);
         final String order2InsertQuery = generateOrderTableStubInsertQuery(order2);
         final String order3InsertQuery = generateOrderTableStubInsertQuery(order3);
