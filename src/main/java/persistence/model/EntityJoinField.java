@@ -25,4 +25,8 @@ public class EntityJoinField extends AbstractEntityField {
     public String getJoinedColumnName() {
         return this.joinedColumnName;
     }
+
+    public Class<?> getFieldClass() {
+        return this.getField().getType();
+    }
 }
