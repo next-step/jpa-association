@@ -1,9 +1,7 @@
 package persistence.entity;
 
-import database.DatabaseServer;
 import database.H2;
-import dialect.Dialect;
-import dialect.H2Dialect;
+import entity.Order;
 import entity.Person3;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterAll;
@@ -12,49 +10,32 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import persistence.context.PersistenceContext;
-import persistence.context.SimplePersistenceContext;
+import persistence.JpaTest;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.DropQueryBuilder;
 import pojo.EntityMetaData;
-import pojo.EntityStatus;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class EntityLoaderImplTest {
+class EntityLoaderImplTest extends JpaTest {
 
-    static Dialect dialect = new H2Dialect();
-    static EntityMetaData entityMetaData = new EntityMetaData(Person3.class);
-
-    static DatabaseServer server;
-    static JdbcTemplate jdbcTemplate;
-    static EntityPersister entityPersister;
-    static EntityLoader entityLoader;
-    static SimpleEntityManager simpleEntityManager;
-    static PersistenceContext persistenceContext;
-    static EntityEntry entityEntry;
-
-    Person3 person;
+    static EntityMetaData entityMetaData;
 
     @BeforeAll
     static void init() throws SQLException {
         server = new H2();
         server.start();
-
         jdbcTemplate = new JdbcTemplate(server.getConnection());
-        entityPersister = new EntityPersisterImpl(jdbcTemplate, entityMetaData);
-        entityLoader = new EntityLoaderImpl(jdbcTemplate, entityMetaData);
-        persistenceContext = new SimplePersistenceContext();
-        entityEntry = new SimpleEntityEntry(EntityStatus.LOADING);
-        simpleEntityManager = new SimpleEntityManager(entityPersister, entityLoader, persistenceContext, entityEntry);
     }
 
     @BeforeEach
     void setUp() {
-        person = new Person3(1L, "test", 20, "test@test.com");
+        entityMetaData = new EntityMetaData(Person3.class);
+        initForTest(entityMetaData);
         createTable();
     }
 
@@ -68,7 +49,7 @@ class EntityLoaderImplTest {
         server.stop();
     }
 
-    @DisplayName("findById 테스트")
+    @DisplayName("findById 테스트 - 연관관계가 없는 경우")
     @Test
     void findByIdTest() {
         entityPersister.insert(person);
@@ -79,6 +60,21 @@ class EntityLoaderImplTest {
                 () -> assertThat(person3.getAge()).isEqualTo(person.getAge()),
                 () -> assertThat(person3.getEmail()).isEqualTo(person.getEmail())
         );
+    }
+
+    @DisplayName("findById 테스트 - 연관관계가 있는 경우")
+    @Test
+    void findByIdWithAssociationTest() {
+        entityMetaData = new EntityMetaData(Order.class);
+        initForTest(entityMetaData);
+
+        createOrderAndOrderItemTable();
+        insertOrderAndOrderItemData();
+
+        List<? extends Order> savedOrderList = entityLoader.findByIdWithAssociation(order.getClass(), order, order.getId());
+        assertThat(savedOrderList).hasSize(3);
+
+        dropOrderAndOrderItemTable();
     }
 
     @DisplayName("findAll 테스트")
@@ -96,6 +92,7 @@ class EntityLoaderImplTest {
     }
 
     private void createTable() {
+        dropTable();
         CreateQueryBuilder createQueryBuilder = new CreateQueryBuilder(dialect, entityMetaData);
         jdbcTemplate.execute(createQueryBuilder.createTable(person));
     }

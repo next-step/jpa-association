@@ -7,4 +7,6 @@ public interface EntityLoader {
     <T> T findById(Class<T> clazz, Object entity, Object condition);
 
     <T> List<T> findAll(Class<T> clazz);
+
+    <T> List<T> findByIdWithAssociation(Class<T> clazz, Object entity, Object condition);
 }

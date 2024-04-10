@@ -28,8 +28,8 @@ public class CustomJpaRepository<T, ID> implements JpaRepository<T, ID> {
         try {
             Field field = new FieldInfos(entity.getClass().getDeclaredFields()).getIdField();
             IdField idField = new IdField(field, entity);
-            return idField.getFieldInfoTemp().getFieldValue() == null
-                    || isBlankOrEmpty(idField.getFieldInfoTemp().getFieldValue().getValue());
+            return idField.getEntityColumn().getFieldValue() == null
+                    || isBlankOrEmpty(idField.getEntityColumn().getFieldValue().getValue());
         } catch (IllegalArgumentException e) {
             return false;
         }

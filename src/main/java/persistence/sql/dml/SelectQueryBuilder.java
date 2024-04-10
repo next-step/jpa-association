@@ -18,13 +18,13 @@ public class SelectQueryBuilder {
     }
 
     public String findAllQuery() {
-        return String.format(FIND_ALL_QUERY, entityMetaData.getTableInfo().getName());
+        return String.format(FIND_ALL_QUERY, entityMetaData.getEntityName());
     }
 
     public String findByIdQuery(Object entity, Class<?> clazz, Object condition) {
         Field field = new FieldInfos(clazz.getDeclaredFields()).getIdField();
         IdField idField = new IdField(field, entity);
-        return String.format(FIND_BY_ID_QUERY, entityMetaData.getTableInfo().getName(),
+        return String.format(FIND_BY_ID_QUERY, entityMetaData.getEntityName(),
                 idField.getFieldNameData(), condition);
     }
 }

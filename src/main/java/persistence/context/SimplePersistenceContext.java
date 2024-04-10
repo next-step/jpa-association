@@ -1,7 +1,5 @@
 package persistence.context;
 
-import dialect.Dialect;
-import dialect.H2Dialect;
 import persistence.entity.EntityCacheKey;
 import persistence.entity.EntitySnapshot;
 import pojo.FieldInfos;
@@ -13,7 +11,6 @@ import java.util.Map;
 
 public class SimplePersistenceContext implements PersistenceContext {
 
-    private final Dialect dialect = new H2Dialect();
     private final Map<EntityCacheKey, Object> entitiesByKey = new HashMap<>();
     private final Map<EntityCacheKey, EntitySnapshot> entitySnapshotsByKey = new HashMap<>();
 

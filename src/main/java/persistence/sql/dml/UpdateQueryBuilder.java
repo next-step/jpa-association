@@ -1,15 +1,17 @@
 package persistence.sql.dml;
 
+import pojo.EntityColumn;
 import pojo.EntityMetaData;
-import pojo.FieldInfo;
 import pojo.FieldInfos;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 
 import static constants.CommonConstants.AND;
 import static constants.CommonConstants.COMMA;
 import static constants.CommonConstants.EQUAL;
+import static utils.StringUtils.joinNameAndValue;
 
 public class UpdateQueryBuilder {
 
@@ -23,16 +25,16 @@ public class UpdateQueryBuilder {
     }
 
     public String insertQuery(Object entity) {
-        return String.format(INSERT_DATA_QUERY, entityMetaData.getTableInfo().getName(), columnsClause(entity), valuesClause(entity));
+        return String.format(INSERT_DATA_QUERY, entityMetaData.getEntityName(), columnsClause(entity), valuesClause(entity));
     }
 
     public String updateQuery(Object entity) {
-        return String.format(UPDATE_DATA_QUERY, entityMetaData.getTableInfo().getName(), setClause(entity), whereClause(entity));
+        return String.format(UPDATE_DATA_QUERY, entityMetaData.getEntityName(), setClause(entity), whereClause(entity));
     }
 
     private String columnsClause(Object entity) {
         return new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFields().stream()
-                .map(field -> new FieldInfo(field, entity))
+                .map(field -> new EntityColumn(field, entity))
                 .map(fieldInfo -> fieldInfo.getFieldName().getName())
                 .reduce((o1, o2) -> String.join(COMMA, o1, String.valueOf(o2)))
                 .orElseThrow(() -> new IllegalStateException("Id 혹은 Column 타입이 없습니다."));
@@ -40,7 +42,7 @@ public class UpdateQueryBuilder {
 
     private String valuesClause(Object entity) {
         return new FieldInfos(entity.getClass().getDeclaredFields()).getIdAndColumnFields().stream()
-                .map(field -> new FieldInfo(field, entity))
+                .map(field -> new EntityColumn(field, entity))
                 .map(fieldInfo -> fieldInfo.getFieldValue().getValue())
                 .reduce((o1, o2) -> String.join(COMMA, o1, String.valueOf(o2)))
                 .orElseThrow(() -> new IllegalStateException("Id 혹은 Column 타입이 없습니다."));
@@ -58,10 +60,11 @@ public class UpdateQueryBuilder {
 
     private String fieldNameAndValueClause(Object entity, List<Field> fields, String delimiter) {
         return fields.stream()
-                .map(field -> new FieldInfo(field, entity))
-                .filter(FieldInfo::isNotBlankOrEmpty)
-                .map(fieldInfo -> fieldInfo.joinNameAndValueWithDelimiter(EQUAL))
-                .reduce((o1, o2) -> String.join(delimiter, o1, String.valueOf(o2)))
+                .map(field -> new EntityColumn(field, entity))
+                .filter(fieldInfo -> Objects.nonNull(fieldInfo.getFieldName()) && Objects.nonNull(fieldInfo.getFieldValue()))
+                .map(fieldInfo ->
+                        joinNameAndValue(EQUAL, fieldInfo.getFieldName().getName(), String.valueOf(fieldInfo.getFieldValue().getValue())))
+                .reduce((o1, o2) -> String.join(delimiter, o1, o2))
                 .orElseThrow(() -> new IllegalStateException("update 데이터가 없습니다."));
     }
 }

@@ -19,5 +19,6 @@ public interface EntityEntry {
     void postRemove();
 
     void preReadOnly();
+
     void postReadOnly();
 }
