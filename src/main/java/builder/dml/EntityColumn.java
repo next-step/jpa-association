@@ -1,11 +1,12 @@
 package builder.dml;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import util.StringUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,24 +40,6 @@ public class EntityColumn {
         return this.columns.stream()
                 .filter(column -> !column.isPrimaryKey())
                 .map(column -> column.getColumnName() + EQUALS + column.getColumnValueByType())
-                .collect(Collectors.joining(COMMA));
-    }
-
-    public String getColumnNames() {
-//        if (this.joinStatus.isTrue()) {
-//            String baseColumnNames = this.columns.stream()
-//                    .map(columnData -> this.alias + "." + columnData.getColumnName())
-//                    .collect(Collectors.joining(COMMA));
-//
-//            String joinColumn = this.joinEntity.stream()
-//                    .map(joinEntityData -> joinEntityData.getEntityData().getColumnNames())
-//                    .collect(Collectors.joining());
-//
-//            return joinColumn.isEmpty() ? baseColumnNames : baseColumnNames + COMMA + joinColumn;
-//        }
-
-        return this.columns.stream()
-                .map(DMLColumnData::getColumnName)
                 .collect(Collectors.joining(COMMA));
     }
 
@@ -141,7 +124,7 @@ public class EntityColumn {
     }
 
     private void createDMLEntityColumnData(List<DMLColumnData> DMLColumnDataList, Field field) {
-        if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(Id.class))
+        if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(OneToMany.class))
             return; // @Transient인 경우 검증하지 않
         // @Transient인 경우 검증하지 않음
         String columnName = field.getName();
@@ -151,23 +134,11 @@ public class EntityColumn {
             columnName = column.name().isEmpty() ? columnName : column.name();
         }
 
-        if (field.isAnnotationPresent(OneToMany.class)) {
-            OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-            FetchType fetchType = oneToMany.fetch();
-
-            Type type = field.getGenericType();
-
-            Type[] types = ((ParameterizedType) type).getActualTypeArguments();
-
-//            this.joinEntity.add(new JoinEntityData(fetchType, new EntityData((Class<?>) types[0], this.otherAlias)));
-//            joinStatusTrue();
-        }
-
         DMLColumnDataList.add(DMLColumnData.createEntityColumn(columnName));
     }
 
     private <T> void createDMLInstanceColumnData(List<DMLColumnData> DMLColumnDataList, Field field, T entityInstance) {
-        if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(Id.class))
+        if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(OneToMany.class))
             return; // @Transient인 경우 검증하지 않음
 
         String columnName = field.getName();

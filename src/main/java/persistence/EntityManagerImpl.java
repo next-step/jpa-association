@@ -77,7 +77,7 @@ public class EntityManagerImpl implements EntityManager {
         this.persistenceContext.insertEntityEntryMap(entityKey, EntityStatus.SAVING);
 
         EntityData diffBuilderData = checkDirtyCheck(entityData);
-        if (diffBuilderData.getColumns().isEmpty()) {
+        if (diffBuilderData.getEntityColumn().getColumns().isEmpty()) {
             return;
         }
 

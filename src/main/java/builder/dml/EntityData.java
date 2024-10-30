@@ -1,12 +1,10 @@
 package builder.dml;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import util.StringUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,49 +12,46 @@ import java.util.stream.Collectors;
 
 public class EntityData {
 
-    private final static String NOT_EXIST_ENTITY_ANNOTATION = "@Entity 어노테이션이 존재하지 않습니다.";
+    private static final String NOT_EXIST_ENTITY_ANNOTATION = "@Entity 어노테이션이 존재하지 않습니다.";
+    private static final String COMMA = ", ";
 
     private final Class<?> clazz;
     private final String tableName;
-    private final String alias;
     private final String pkName;
     private Object id;
     private final EntityColumn entityColumn;
-    private JoinStatus joinStatus;
     private Object entityInstance;
+    private JoinEntity joinEntity;
 
     // Constructor
     private EntityData(Object entityInstance) {
         this.clazz = entityInstance.getClass();
         confirmEntityAnnotation(this.clazz);
-        this.joinStatus = JoinStatus.FALSE;
         this.tableName = getTableName(this.clazz);
-        this.alias = getAlias();
         this.entityColumn = new EntityColumn(entityInstance, this.clazz);
         this.id = this.entityColumn.getPkValue();
         this.pkName = this.entityColumn.getPkName();
         this.entityInstance = deepCopy(entityInstance);
+        this.joinEntity = new JoinEntity();
     }
 
     private <T> EntityData(Class<T> clazz, Object id) {
         confirmEntityAnnotation(clazz);
-        this.joinStatus = JoinStatus.FALSE;
         this.clazz = clazz;
         this.tableName = getTableName(clazz);
-        this.alias = getAlias();
         this.entityColumn = new EntityColumn(clazz);
         this.id = id;
         this.pkName = this.entityColumn.getPkName();
+        this.joinEntity = new JoinEntity(clazz);
     }
 
     private <T> EntityData(Class<T> clazz) {
         confirmEntityAnnotation(clazz);
-        this.joinStatus = JoinStatus.FALSE;
         this.clazz = clazz;
         this.tableName = getTableName(clazz);
-        this.alias = getAlias();
         this.entityColumn = new EntityColumn(clazz);
         this.pkName = this.entityColumn.getPkName();
+        this.joinEntity = new JoinEntity(clazz);
     }
 
     // Static Factory Methods
@@ -73,8 +68,8 @@ public class EntityData {
     }
 
     public String getTableName() {
-        if (this.joinStatus.isTrue()) {
-            return this.tableName + " " + this.alias;
+        if (checkJoin()) {
+            return AliasColumn.aliasTable(this.tableName);
         }
         return this.tableName;
     }
@@ -84,8 +79,8 @@ public class EntityData {
     }
 
     public String getPkNm() {
-        if (this.joinStatus.isTrue()) {
-            return this.alias + "." + this.pkName;
+        if (checkJoin()) {
+            return AliasColumn.aliasColumn(this.tableName, this.pkName);
         }
         return this.pkName;
     }
@@ -102,8 +97,8 @@ public class EntityData {
         return entityColumn;
     }
 
-    public boolean checkJoin() {
-        return this.joinStatus.isTrue();
+    public JoinEntity getJoinEntity() {
+        return joinEntity;
     }
 
     public String wrapString() {
@@ -113,10 +108,6 @@ public class EntityData {
     public EntityData changeColumns(List<DMLColumnData> columns) {
         this.entityColumn.changeColumns(columns);
         return this;
-    }
-
-    public String getColumnNames() {
-        return this.entityColumn.getColumnNames();
     }
 
     public String getColumnValues() {
@@ -134,6 +125,29 @@ public class EntityData {
     public Map<String, DMLColumnData> convertDMLColumnDataMap() {
         return this.entityColumn.getColumns().stream()
                 .collect(Collectors.toMap(DMLColumnData::getColumnName, Function.identity()));
+    }
+
+    public String getColumnNames() {
+        if (checkJoin()) {
+            String baseColumnNames = this.entityColumn.getColumns().stream()
+                    .map(columnData -> AliasColumn.aliasColumn(this.tableName, columnData.getColumnName())) // aliasColumn 메서드 사용
+                    .collect(Collectors.joining(COMMA));
+
+            String joinColumn = this.joinEntity.getJoinEntityData().stream()
+                    .flatMap(joinEntityData -> joinEntityData.getJoinColumnData().stream()
+                            .map(dmlColumnData -> AliasColumn.aliasColumn(joinEntityData.getTableName(), dmlColumnData.getColumnName())))
+                    .collect(Collectors.joining(COMMA)); // 원하는 구분자로 결합
+
+            return baseColumnNames + COMMA + joinColumn;
+        }
+
+        return this.entityColumn.getColumns().stream()
+                .map(DMLColumnData::getColumnName)
+                .collect(Collectors.joining(COMMA));
+    }
+
+    public boolean checkJoin() {
+        return this.joinEntity.checkJoin();
     }
 
     private void confirmEntityAnnotation(Class<?> entityClass) {
@@ -169,20 +183,4 @@ public class EntityData {
         }
     }
 
-    private String getAlias() {
-        String alias = this.tableName.substring(0, 1).toLowerCase();
-
-//        int suffix = 2;
-//        while (SqlKeyword.isKeyword(alias) || this.otherAlias.contains(alias)) {
-//            alias = this.tableName.substring(0, suffix);
-//            suffix++;
-//        }
-//
-//        this.otherAlias.add(alias);
-        return alias;
-    }
-
-    private void joinStatusTrue() {
-        this.joinStatus = JoinStatus.TRUE;
-    }
 }
