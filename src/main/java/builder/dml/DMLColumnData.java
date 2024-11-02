@@ -26,11 +26,11 @@ public class DMLColumnData {
         this.columnName = columnName;
     }
 
-    public static DMLColumnData creatInstancePkColumn(String columnName, Class<?> columnType) {
+    public static DMLColumnData createEntityPkColumn(String columnName, Class<?> columnType) {
         return new DMLColumnData(columnName, columnType, true);
     }
 
-    public static DMLColumnData creatEntityPkColumn(String columnName, Class<?> columnType, Object columnValue) {
+    public static DMLColumnData createInstancePkColumn(String columnName, Class<?> columnType, Object columnValue) {
         return new DMLColumnData(columnName, columnType, columnValue, true);
     }
 
