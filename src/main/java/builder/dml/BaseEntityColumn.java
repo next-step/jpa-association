@@ -1,9 +1,6 @@
 package builder.dml;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -17,16 +14,24 @@ public abstract class BaseEntityColumn {
 
     protected <T> List<DMLColumnData> getInstanceColumnData(T entityInstance, Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
+                .filter(this::checkSkipAnnotation)
                 .map(field -> getDmlColumnData(field, entityInstance))
                 .collect(Collectors.toList());
     }
 
     protected List<DMLColumnData> getEntityColumnData(Class<?> entityClass) {
         return Arrays.stream(entityClass.getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
+                .filter(this::checkSkipAnnotation)
                 .map(this::getDmlColumnData)
                 .collect(Collectors.toList());
+    }
+
+    protected String getTableName(Class<?> entityClass) {
+        if (entityClass.isAnnotationPresent(Table.class)) {
+            Table table = entityClass.getAnnotation(Table.class);
+            return table.name();
+        }
+        return entityClass.getSimpleName();
     }
 
     @NotNull
@@ -43,7 +48,7 @@ public abstract class BaseEntityColumn {
     }
 
     @NotNull
-    protected DMLColumnData getDmlColumnData(Field field) {
+    private DMLColumnData getDmlColumnData(Field field) {
         if (field.isAnnotationPresent(Id.class)) {
             return DMLColumnData.createEntityPkColumn(field.getName(), field.getType());
         }
@@ -66,7 +71,7 @@ public abstract class BaseEntityColumn {
     }
 
     @NotNull
-    protected DMLColumnData getColumnData(Field field) {
+    private DMLColumnData getColumnData(Field field) {
         String columnName = field.getName();
         if (field.isAnnotationPresent(Column.class)) {
             Column column = field.getAnnotation(Column.class);
@@ -75,12 +80,8 @@ public abstract class BaseEntityColumn {
         return DMLColumnData.createEntityColumn(columnName);
     }
 
-    protected String getTableName(Class<?> entityClass) {
-        if (entityClass.isAnnotationPresent(Table.class)) {
-            Table table = entityClass.getAnnotation(Table.class);
-            return table.name();
-        }
-        return entityClass.getSimpleName();
+    private boolean checkSkipAnnotation(Field field) {
+        return !field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(OneToMany.class);
     }
 
 }
