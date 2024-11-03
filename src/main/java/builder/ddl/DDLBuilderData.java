@@ -84,7 +84,7 @@ public class DDLBuilderData {
 
     //Column 어노테이션 여부를 확인하여 변수의 컬럼타입을 가져온다.
     private DDLColumnData getColumnAnnotationData(Field field) {
-        if (field.isAnnotationPresent(Transient.class)) {
+        if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(OneToMany.class)) {
             return null;
         }
         String columnName = field.getName();
