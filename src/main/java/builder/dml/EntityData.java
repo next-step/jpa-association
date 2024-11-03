@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 public class EntityData {
 
     private static final String NOT_EXIST_ENTITY_ANNOTATION = "@Entity 어노테이션이 존재하지 않습니다.";
-    private static final String COMMA = ", ";
 
     private final Class<?> clazz;
     private final String tableName;
@@ -22,6 +21,7 @@ public class EntityData {
     private final EntityColumn entityColumn;
     private Object entityInstance;
     private final JoinEntity joinEntity;
+    private final String alias;
 
     // Constructor
     private EntityData(Object entityInstance) {
@@ -33,6 +33,7 @@ public class EntityData {
         this.pkName = this.entityColumn.getPkName();
         this.entityInstance = deepCopy(entityInstance);
         this.joinEntity = new JoinEntity(entityInstance);
+        this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
     private <T> EntityData(Class<T> clazz, Object id) {
@@ -43,6 +44,7 @@ public class EntityData {
         this.id = id;
         this.pkName = this.entityColumn.getPkName();
         this.joinEntity = new JoinEntity(clazz);
+        this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
     private <T> EntityData(Class<T> clazz) {
@@ -52,6 +54,7 @@ public class EntityData {
         this.entityColumn = new EntityColumn(clazz);
         this.pkName = this.entityColumn.getPkName();
         this.joinEntity = new JoinEntity(clazz);
+        this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
     // Static Factory Methods
@@ -76,9 +79,6 @@ public class EntityData {
     }
 
     public String getPkNm() {
-        if (checkJoin()) {
-            return AliasColumn.aliasColumn(this.tableName, this.pkName);
-        }
         return this.pkName;
     }
 
@@ -107,12 +107,12 @@ public class EntityData {
         return this;
     }
 
-    public String getColumnValues() {
-        return this.entityColumn.getColumnValues();
-    }
-
     public String getColumnDefinitions() {
         return this.entityColumn.getColumnDefinitions();
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
     public List<DMLColumnData> getDifferentColumns(EntityData snapshotEntityData) {
@@ -122,24 +122,6 @@ public class EntityData {
     public Map<String, DMLColumnData> convertDMLColumnDataMap() {
         return this.entityColumn.getColumns().stream()
                 .collect(Collectors.toMap(DMLColumnData::getColumnName, Function.identity()));
-    }
-
-    public String getColumnNames() {
-        if (checkJoin()) {
-            String baseColumnNames = this.entityColumn.getColumns().stream()
-                    .map(columnData -> AliasColumn.aliasColumn(this.tableName, columnData.getColumnName())) // aliasColumn 메서드 사용
-                    .collect(Collectors.joining(COMMA));
-
-            JoinEntityData joinEntityData = this.joinEntity.getJoinEntityData().getFirst();
-
-            String joinColumn = joinEntityData.getJoinColumnData().getColumns().stream()
-                    .map(dmlColumnData -> AliasColumn.aliasColumn(joinEntityData.getTableName(), dmlColumnData.getColumnName()))
-                    .collect(Collectors.joining(COMMA));
-
-            return baseColumnNames + COMMA + joinColumn;
-        }
-
-        return this.entityColumn.getColumnNames();
     }
 
     public boolean checkJoin() {
