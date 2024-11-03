@@ -1,24 +1,30 @@
 package builder.dml;
 
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Table;
 
-import java.util.List;
-
-public class JoinEntityData extends BaseEntityColumn{
+public class JoinEntityData {
 
     private final FetchType fetchType;
     private final String tableName;
     private final String joinColumnName;
-    private final List<DMLColumnData> joinColumnData;
+    private final EntityColumn joinColumnData;
 
     public JoinEntityData(FetchType fetchType, Class<?> clazz, String joinColumnName) {
         this.fetchType = fetchType;
         this.tableName = getTableName(clazz);
         this.joinColumnName = joinColumnName;
-        this.joinColumnData = getEntityColumnData(clazz);
+        this.joinColumnData = new EntityColumn(clazz);
     }
 
-    public List<DMLColumnData> getJoinColumnData() {
+    public <T> JoinEntityData(FetchType fetchType, T entityInstance, String joinColumnName) {
+        this.fetchType = fetchType;
+        this.tableName = getTableName(entityInstance.getClass());
+        this.joinColumnName = joinColumnName;
+        this.joinColumnData = new EntityColumn(entityInstance, entityInstance.getClass());
+    }
+
+    public EntityColumn getJoinColumnData() {
         return joinColumnData;
     }
 
@@ -32,6 +38,14 @@ public class JoinEntityData extends BaseEntityColumn{
 
     public String getJoinColumnName() {
         return joinColumnName;
+    }
+
+    private String getTableName(Class<?> entityClass) {
+        if (entityClass.isAnnotationPresent(Table.class)) {
+            Table table = entityClass.getAnnotation(Table.class);
+            return table.name();
+        }
+        return entityClass.getSimpleName();
     }
 
 }

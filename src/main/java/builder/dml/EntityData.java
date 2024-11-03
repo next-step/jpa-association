@@ -21,7 +21,7 @@ public class EntityData {
     private Object id;
     private final EntityColumn entityColumn;
     private Object entityInstance;
-    private JoinEntity joinEntity;
+    private final JoinEntity joinEntity;
 
     // Constructor
     private EntityData(Object entityInstance) {
@@ -32,7 +32,7 @@ public class EntityData {
         this.id = this.entityColumn.getPkValue();
         this.pkName = this.entityColumn.getPkName();
         this.entityInstance = deepCopy(entityInstance);
-        this.joinEntity = new JoinEntity();
+        this.joinEntity = new JoinEntity(entityInstance);
     }
 
     private <T> EntityData(Class<T> clazz, Object id) {
@@ -68,9 +68,6 @@ public class EntityData {
     }
 
     public String getTableName() {
-        if (checkJoin()) {
-            return AliasColumn.aliasTable(this.tableName);
-        }
         return this.tableName;
     }
 
@@ -133,17 +130,16 @@ public class EntityData {
                     .map(columnData -> AliasColumn.aliasColumn(this.tableName, columnData.getColumnName())) // aliasColumn 메서드 사용
                     .collect(Collectors.joining(COMMA));
 
-            String joinColumn = this.joinEntity.getJoinEntityData().stream()
-                    .flatMap(joinEntityData -> joinEntityData.getJoinColumnData().stream()
-                            .map(dmlColumnData -> AliasColumn.aliasColumn(joinEntityData.getTableName(), dmlColumnData.getColumnName())))
-                    .collect(Collectors.joining(COMMA)); // 원하는 구분자로 결합
+            JoinEntityData joinEntityData = this.joinEntity.getJoinEntityData().getFirst();
+
+            String joinColumn = joinEntityData.getJoinColumnData().getColumns().stream()
+                    .map(dmlColumnData -> AliasColumn.aliasColumn(joinEntityData.getTableName(), dmlColumnData.getColumnName()))
+                    .collect(Collectors.joining(COMMA));
 
             return baseColumnNames + COMMA + joinColumn;
         }
 
-        return this.entityColumn.getColumns().stream()
-                .map(DMLColumnData::getColumnName)
-                .collect(Collectors.joining(COMMA));
+        return this.entityColumn.getColumnNames();
     }
 
     public boolean checkJoin() {
