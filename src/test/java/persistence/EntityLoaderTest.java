@@ -6,16 +6,25 @@ import builder.ddl.builder.DropQueryBuilder;
 import builder.ddl.dataType.DB;
 import builder.dml.EntityData;
 import database.H2DBConnection;
+import entity.Order;
+import entity.OrderItem;
 import entity.Person;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jdbc.JdbcTemplate;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 
 
 /*
@@ -38,9 +47,13 @@ class EntityLoaderTest {
 
         //테이블 생성
         CreateQueryBuilder queryBuilder = new CreateQueryBuilder();
-        String createQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
+        String personCreateQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
+        String OrderCreateQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Order.class, DB.H2));
+        String OrderItemCreateQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(OrderItem.class, DB.H2));
 
-        jdbcTemplate.execute(createQuery);
+        jdbcTemplate.execute(personCreateQuery);
+        jdbcTemplate.execute(OrderCreateQuery);
+        jdbcTemplate.execute(OrderItemCreateQuery);
 
         this.persistenceContext = new PersistenceContextImpl();
 
@@ -52,8 +65,12 @@ class EntityLoaderTest {
     @AfterEach
     void tearDown() {
         DropQueryBuilder queryBuilder = new DropQueryBuilder();
-        String dropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
-        jdbcTemplate.execute(dropQuery);
+        String personDropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
+        String orderDropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Order.class, DB.H2));
+        String orderItemDropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(OrderItem.class, DB.H2));
+        jdbcTemplate.execute(personDropQuery);
+        jdbcTemplate.execute(orderDropQuery);
+        jdbcTemplate.execute(orderItemDropQuery);
         this.h2DBConnection.stop();
     }
 
@@ -68,18 +85,27 @@ class EntityLoaderTest {
                 .contains(1L, "test1", 29, "test@test.com");
     }
 
-//    @DisplayName("Persist로 Order 저장 후 영속성 컨텍스트에 존재하는지 확인한다.")
-//    @Test
-//    void findTest() {
-//        Person person = createPerson(1);
-//        this.entityPersister.persist(EntityData.createEntityData(person));
-//
-//        assertThat(this.entityLoader.find(Person.class, 1L))
-//                .extracting("id", "name", "age", "email")
-//                .contains(1L, "test1", 29, "test@test.com");
-//    }
+    @DisplayName("Persist로 Order와 OrderItem을 저장 후 조회한다.")
+    @Test
+    void findOrderTest() {
+        Order order = new Order(1L, "1234", List.of(createOrderItem(1, 1L)));
+        this.entityPersister.persist(EntityData.createEntityData(order));
+
+        Order findOrder = this.entityLoader.find(Order.class, 1L);
+
+        assertThat(findOrder)
+                .extracting("id", "orderNumber")
+                .contains(1L, "1234");
+        assertThat(findOrder.getOrderItems())
+                .extracting("id", "orderId", "product", "quantity")
+                .containsExactly(tuple(1L, 1L, "테스트상품1", 1));
+    }
 
     private Person createPerson(int i) {
         return new Person((long) i, "test" + i, 29, "test@test.com");
+    }
+
+    private OrderItem createOrderItem(int i, Long orderId) {
+        return new OrderItem((long) i, orderId, "테스트상품"+i, 1);
     }
 }

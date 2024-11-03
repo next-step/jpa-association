@@ -6,6 +6,8 @@ import builder.ddl.builder.DropQueryBuilder;
 import builder.ddl.dataType.DB;
 import builder.dml.EntityData;
 import database.H2DBConnection;
+import entity.Order;
+import entity.OrderItem;
 import entity.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,9 +35,13 @@ public class EntityPersisterTest {
 
         //테이블 생성
         CreateQueryBuilder queryBuilder = new CreateQueryBuilder();
-        String createQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
+        String personCreateQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
+        String OrderCreateQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Order.class, DB.H2));
+        String OrderItemCreateQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(OrderItem.class, DB.H2));
 
-        jdbcTemplate.execute(createQuery);
+        jdbcTemplate.execute(personCreateQuery);
+        jdbcTemplate.execute(OrderCreateQuery);
+        jdbcTemplate.execute(OrderItemCreateQuery);
 
         this.entityLoader = new EntityLoader(jdbcTemplate);
         this.entityPersister = new EntityPersister(jdbcTemplate);
@@ -44,8 +51,12 @@ public class EntityPersisterTest {
     @AfterEach
     void tearDown() {
         DropQueryBuilder queryBuilder = new DropQueryBuilder();
-        String dropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
-        jdbcTemplate.execute(dropQuery);
+        String personDropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Person.class, DB.H2));
+        String orderDropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(Order.class, DB.H2));
+        String orderItemDropQuery = queryBuilder.buildQuery(DDLBuilderData.createDDLBuilderData(OrderItem.class, DB.H2));
+        jdbcTemplate.execute(personDropQuery);
+        jdbcTemplate.execute(orderDropQuery);
+        jdbcTemplate.execute(orderItemDropQuery);
         this.h2DBConnection.stop();
     }
 
@@ -90,7 +101,20 @@ public class EntityPersisterTest {
                 .contains(1L, "test1", 29, "changed@test.com");
     }
 
+    @DisplayName("Join되어있는 Entity도 insert를 실행한다.")
+    @Test
+    void joinInsertTest() {
+        Order order = new Order(1L, "1234", List.of(createOrderItem(1, 1L)));
+        this.entityPersister.persist(EntityData.createEntityData(order));
+
+    }
+
     private Person createPerson(int i) {
         return new Person((long) i, "test" + i, 29, "test@test.com");
     }
+
+    private OrderItem createOrderItem(int i, Long orderId) {
+        return new OrderItem((long) i, orderId, "테스트상품"+i, 1);
+    }
+
 }
