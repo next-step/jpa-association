@@ -9,7 +9,6 @@ import jdbc.JdbcTemplate;
 
 public class EntityPersister {
 
-    private final static String DATA_NOT_EXIST_MESSAGE = "데이터가 존재하지 않습니다. : ";
     private final JdbcTemplate jdbcTemplate;
 
     private final InsertQueryBuilder insertQueryBuilder = new InsertQueryBuilder();

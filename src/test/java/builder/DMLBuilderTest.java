@@ -6,7 +6,6 @@ import database.H2DBConnection;
 import entity.Order;
 import entity.Person;
 import jdbc.JdbcTemplate;
-import org.h2.command.query.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,17 +29,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 */
 class DMLBuilderTest {
 
-    private EntityManager entityManager;
-    private PersistenceContext persistenceContext;
-
     @BeforeEach
     void setUp() throws SQLException {
         H2DBConnection h2DBConnection = new H2DBConnection();
         JdbcTemplate jdbcTemplate = h2DBConnection.start();
 
-        this.persistenceContext = new PersistenceContextImpl();
+        PersistenceContext persistenceContext = new PersistenceContextImpl();
 
-        this.entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
+        EntityManager entityManager = new EntityManagerImpl(persistenceContext, jdbcTemplate);
     }
 
     @DisplayName("Insert 쿼리 문자열 생성하기")
@@ -51,8 +47,10 @@ class DMLBuilderTest {
 
         InsertQueryBuilder queryBuilder = new InsertQueryBuilder();
 
+        EntityData entityData = EntityData.createEntityData(person);
+
         //when, then
-        assertThat(queryBuilder.buildQuery(EntityData.createEntityData(person)))
+        assertThat(queryBuilder.buildQuery(entityData.getTableName(), entityData.getEntityColumn()))
                 .isEqualTo("INSERT INTO users (id, nick_name, old, email) VALUES (1, 'sangki', 29, 'test@test.com');");
     }
 
@@ -140,8 +138,6 @@ class DMLBuilderTest {
     @Test
     void buildDMLBuilderJoinFindAllTest() {
         //given
-        Order order = new Order(1L);
-
         EntityData entityData = EntityData.createEntityData(Order.class);
 
         SelectAllQueryBuilder queryBuilder = new SelectAllQueryBuilder();
@@ -149,7 +145,8 @@ class DMLBuilderTest {
         //when, then
         assertThat(queryBuilder.buildQuery(entityData))
                 .isEqualTo(
-                        "SELECT orders_.id, orders_.orderNumber, order_items_.id, order_items_.product, order_items_.quantity " +
+                        "SELECT orders_.id, orders_.orderNumber, " +
+                                "order_items_.id, order_items_.order_id, order_items_.product, order_items_.quantity " +
                                 "FROM orders orders_ " +
                                 "JOIN order_items order_items_ " +
                                 "ON orders_.id = order_items_.order_id;"
@@ -167,11 +164,12 @@ class DMLBuilderTest {
         //when, then
         assertThat(queryBuilder.buildQuery(entityData))
                 .isEqualTo(
-                        "SELECT orders_.id, orders_.orderNumber, order_items_.id, order_items_.product, order_items_.quantity " +
-                        "FROM orders orders_ " +
-                        "JOIN order_items order_items_ " +
-                        "ON orders_.id = order_items_.order_id " +
-                        "WHERE orders_.id = 1;"
+                        "SELECT orders_.id, orders_.orderNumber, " +
+                                "order_items_.id, order_items_.order_id, order_items_.product, order_items_.quantity " +
+                                "FROM orders orders_ " +
+                                "JOIN order_items order_items_ " +
+                                "ON orders_.id = order_items_.order_id " +
+                                "WHERE orders_.id = 1;"
                 );
     }
 
