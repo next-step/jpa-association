@@ -1,12 +1,17 @@
 package jdbc;
 
-import jakarta.persistence.Column;
+import builder.dml.EntityData;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class EntityMapper {
 
@@ -14,16 +19,79 @@ public class EntityMapper {
     private final static String FAILED_ACCESS_FIELD = "필드에 접근을 실패했습니다.";
     private final static String FAILED_CREATE_INSTANCE = "인스턴스를 생성하는데 실패하였습니다.";
 
-    //입력 받은 Entity 에 맞게 자동으로 매핑한다.
-    public static <T> T mapRow(ResultSet rs, Class<T> entityClass) {
-        try {
-            // 해당 클래스의 인스턴스 생성
-            T entityInstance = entityClass.getDeclaredConstructor().newInstance();
-            Field[] fields = entityClass.getDeclaredFields();
+    private static int index = 1;
+    private static int joinIndex = 0;
 
-            for (Field field : fields) {
-                confirmAnnotationSetColumnFieldName(field, rs, entityInstance);
+    public static <T> T mapRow(ResultSet rs, Class<T> entityClass) {
+        EntityData entityData = EntityData.createEntityData(entityClass);
+        if (entityData.getJoinEntity().checkJoin()) {
+            return confirmAnnotationSetColumnContainJoinEntity(rs, entityClass);
+        }
+        return confirmAnnotationSetColumnMainEntity(rs, entityClass);
+    }
+
+    private static <T> T confirmAnnotationSetColumnContainJoinEntity(ResultSet rs, Class<T> entityClass) {
+        T entityInstance = confirmAnnotationSetColumnMainEntity(rs, entityClass);
+
+        Arrays.stream(entityClass.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(OneToMany.class))
+                .forEach(field -> setJoinEntity(field, rs, entityInstance));
+
+        return entityInstance;
+    }
+
+    private static <T> void setJoinEntity(Field field, ResultSet rs, T entityInstance) {
+        List<?> relatedEntities = fetchRelatedEntities(field, rs);
+        field.setAccessible(true);
+        try {
+            field.set(entityInstance, relatedEntities);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(FAILED_ACCESS_FIELD);
+        }
+    }
+
+    private static <T> List<T> fetchRelatedEntities(Field field, ResultSet rs) {
+        List<T> relatedEntities = new ArrayList<>();
+
+        ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+        Class<?> joinEntityClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+
+        try {
+            do {
+                T relatedEntity = (T) createAndPopulateEntity(rs, joinEntityClass);
+                relatedEntities.add(relatedEntity);
             }
+            while (rs.next());
+        } catch (SQLException | InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            throw new RuntimeException(FAILED_CREATE_INSTANCE);
+        }
+
+        return relatedEntities;
+    }
+
+    private static <T> T createAndPopulateEntity(ResultSet rs, Class<T> entityClass) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, SQLException {
+        T entityInstance = entityClass.getDeclaredConstructor().newInstance();
+        int index = joinIndex;
+
+        for (Field field : entityClass.getDeclaredFields()) {
+            setValueInField(rs, field, entityInstance, index);
+            index++;
+        }
+
+        return entityInstance;
+    }
+
+    private static <T> T confirmAnnotationSetColumnMainEntity(ResultSet rs, Class<T> entityClass) {
+        try {
+            Field[] fields = entityClass.getDeclaredFields();
+            T entityInstance = entityClass.getDeclaredConstructor().newInstance();
+            for (Field field : fields) {
+                if (noCheckAnnotation(field)) continue;
+                setValueInField(rs, field, entityInstance, index);
+                index++;
+            }
+            joinIndex = index;
             return entityInstance;
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
                  InvocationTargetException e) {
@@ -31,17 +99,10 @@ public class EntityMapper {
         }
     }
 
-    // 인스턴스의 어노테이션을 검증하여 컬럼 데이터를 세팅해준다.
-    private static <T> void confirmAnnotationSetColumnFieldName(Field field, ResultSet rs, T entityInstance) {
-        if (field.isAnnotationPresent(Transient.class)) return;
-        field.setAccessible(true);
+    private static <T> void setValueInField(ResultSet rs, Field field, T entityInstance, int index) {
         try {
-            String columnName = field.getName();
-            if (field.isAnnotationPresent(Column.class)) {
-                Column column = field.getAnnotation(Column.class);
-                columnName = column.name().isEmpty() ? columnName : column.name();
-            }
-            Object value = rs.getObject(columnName);
+            field.setAccessible(true);
+            Object value = rs.getObject(index);
             field.set(entityInstance, value);
         } catch (SQLException e) {
             throw new RuntimeException(FAILED_GET_COLUMN);
@@ -50,4 +111,7 @@ public class EntityMapper {
         }
     }
 
+    private static boolean noCheckAnnotation(Field field) {
+        return field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(OneToMany.class);
+    }
 }
