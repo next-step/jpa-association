@@ -19,7 +19,6 @@ public class EntityMapper {
     private final static String FAILED_ACCESS_FIELD = "필드에 접근을 실패했습니다.";
     private final static String FAILED_CREATE_INSTANCE = "인스턴스를 생성하는데 실패하였습니다.";
 
-    private static int index = 1;
     private static int joinIndex = 0;
 
     public static <T> T mapRow(ResultSet rs, Class<T> entityClass) {
@@ -86,6 +85,7 @@ public class EntityMapper {
         try {
             Field[] fields = entityClass.getDeclaredFields();
             T entityInstance = entityClass.getDeclaredConstructor().newInstance();
+            int index = 1;
             for (Field field : fields) {
                 if (noCheckAnnotation(field)) continue;
                 setValueInField(rs, field, entityInstance, index);
