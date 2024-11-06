@@ -22,14 +22,18 @@ public class QueryBuildUtil {
     }
 
     public static String getTableName(EntityData entityData) {
-        if (entityData.checkJoin()) {
+        if (entityData.checkJoinAndEager()) {
             return entityData.getTableName() + BLANK + entityData.getAlias();
         }
         return entityData.getTableName();
     }
 
+    public static String getTableName(JoinEntityData joinEntityData) {
+        return joinEntityData.getTableName();
+    }
+
     public static String getColumnNames(EntityData entityData) {
-        if (entityData.checkJoin()) {
+        if (entityData.checkJoinAndEager()) {
             String baseColumnNames = entityData.getEntityColumn().getColumns().stream()
                     .map(columnData -> getContainAliasColumnName(columnData.getColumnName(), entityData.getAlias())) // aliasColumn 메서드 사용
                     .collect(Collectors.joining(COMMA));
@@ -44,6 +48,10 @@ public class QueryBuildUtil {
         }
 
         return entityData.getEntityColumn().getColumnNames();
+    }
+
+    public static String getColumnNames(JoinEntityData joinEntityData) {
+        return joinEntityData.getJoinColumnData().getColumnNames();
     }
 
 }
