@@ -13,7 +13,7 @@ public class SelectAllQueryBuilder {
     //findAll 쿼리문을 생성한다.
     private String findAllQuery(EntityData entityData) {
 
-        if (entityData.checkJoin()) {
+        if (entityData.checkJoinAndEager()) {
             JoinEntityData joinEntityData = entityData.getJoinEntity().getJoinEntityData().getFirst();
             return new SelectQueryBuilder()
                     .select(QueryBuildUtil.getColumnNames(entityData))

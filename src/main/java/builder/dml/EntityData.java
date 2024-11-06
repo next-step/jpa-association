@@ -32,7 +32,7 @@ public class EntityData {
         this.id = this.entityColumn.getPkValue();
         this.pkName = this.entityColumn.getPkName();
         this.entityInstance = deepCopy(entityInstance);
-        this.joinEntity = new JoinEntity(entityInstance);
+        this.joinEntity = new JoinEntity(entityInstance, this.id);
         this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
@@ -43,7 +43,7 @@ public class EntityData {
         this.entityColumn = new EntityColumn(clazz);
         this.id = id;
         this.pkName = this.entityColumn.getPkName();
-        this.joinEntity = new JoinEntity(clazz);
+        this.joinEntity = new JoinEntity(clazz, id);
         this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
@@ -53,7 +53,7 @@ public class EntityData {
         this.tableName = getTableName(clazz);
         this.entityColumn = new EntityColumn(clazz);
         this.pkName = this.entityColumn.getPkName();
-        this.joinEntity = new JoinEntity(clazz);
+        this.joinEntity = new JoinEntity(clazz, this.id);
         this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
@@ -126,6 +126,10 @@ public class EntityData {
 
     public boolean checkJoin() {
         return this.joinEntity.checkJoin();
+    }
+
+    public boolean checkJoinAndEager() {
+        return this.joinEntity.checkJoin() && this.joinEntity.checkFetchEager();
     }
 
     private void confirmEntityAnnotation(Class<?> entityClass) {

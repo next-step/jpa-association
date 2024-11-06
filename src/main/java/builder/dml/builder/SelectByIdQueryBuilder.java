@@ -9,10 +9,14 @@ public class SelectByIdQueryBuilder {
     public String buildQuery(EntityData entityData) {
         return findByIdQuery(entityData);
     }
+
+    public String buildLazyQuery(JoinEntityData joinEntityData) {
+        return findByIdQueryJoin(joinEntityData);
+    }
     //findAll 쿼리문을 생성한다.
     private String findByIdQuery(EntityData entityData) {
 
-        if (entityData.checkJoin()) {
+        if (entityData.checkJoinAndEager()) {
             JoinEntityData joinEntityData = entityData.getJoinEntity().getJoinEntityData().getFirst();
             return new SelectQueryBuilder()
                     .select(QueryBuildUtil.getColumnNames(entityData))
@@ -27,6 +31,14 @@ public class SelectByIdQueryBuilder {
                 .select(QueryBuildUtil.getColumnNames(entityData))
                 .from(QueryBuildUtil.getTableName(entityData))
                 .where(entityData.getPkNm(), String.valueOf(entityData.wrapString()))
+                .build();
+    }
+
+    private String findByIdQueryJoin(JoinEntityData joinEntityData) {
+        return new SelectQueryBuilder()
+                .select(QueryBuildUtil.getColumnNames(joinEntityData))
+                .from(QueryBuildUtil.getTableName(joinEntityData))
+                .where(joinEntityData.getJoinColumnName(), String.valueOf(joinEntityData.wrapString()))
                 .build();
     }
 
