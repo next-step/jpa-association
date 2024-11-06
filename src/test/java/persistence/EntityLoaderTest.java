@@ -8,6 +8,7 @@ import builder.dml.EntityData;
 import database.H2DBConnection;
 import entity.Order;
 import entity.OrderItem;
+import entity.OrderLazy;
 import entity.Person;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -92,6 +93,37 @@ class EntityLoaderTest {
         this.entityPersister.persist(EntityData.createEntityData(order));
 
         Order findOrder = this.entityLoader.find(Order.class, 1L);
+
+        assertThat(findOrder)
+                .extracting("id", "orderNumber")
+                .contains(1L, "1234");
+        assertThat(findOrder.getOrderItems())
+                .extracting("id", "orderId", "product", "quantity")
+                .containsExactly(tuple(1L, 1L, "테스트상품1", 1));
+    }
+
+    @DisplayName("Persist로 Order와 OrderItem을 저장 후 Lazy상태의 OrderItems를 조회한다.")
+    @Test
+    void findOrderItemTest() {
+        Order order = new Order(1L, "1234", List.of(createOrderItem(1, 1L)));
+
+        EntityData entityData = EntityData.createEntityData(order);
+        this.entityPersister.persist(entityData);
+
+        List<?> findOrderItems = this.entityLoader.findByIdLazy(entityData.getJoinEntity().getJoinEntityData().getFirst());
+
+        assertThat(findOrderItems)
+                .extracting("id", "orderId", "product", "quantity")
+                .containsExactly(tuple(1L, 1L, "테스트상품1", 1));
+    }
+
+    @DisplayName("Persist로 Order와 OrderItem을 저장 후 프록시를 생성하여 Lazy 조회한다.")
+    @Test
+    void findOrderLazyTest() {
+        OrderLazy order = new OrderLazy(1L, "1234", List.of(createOrderItem(1, 1L)));
+        this.entityPersister.persist(EntityData.createEntityData(order));
+
+        OrderLazy findOrder = this.entityLoader.find(OrderLazy.class, 1L);
 
         assertThat(findOrder)
                 .extracting("id", "orderNumber")

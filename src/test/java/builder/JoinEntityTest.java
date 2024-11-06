@@ -1,10 +1,8 @@
 package builder;
 
-import builder.dml.EntityData;
 import builder.dml.JoinEntity;
 import entity.Order;
 import entity.OrderItem;
-import jakarta.persistence.FetchType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,10 +16,10 @@ class JoinEntityTest {
     @DisplayName("@OneToMany 관계가 포함되어있는 Class를 입력받아 JoinEntity를 생성한다.")
     @Test
     void createJoinEntityInputClassTest() {
-        JoinEntity joinEntity = new JoinEntity(Order.class);
+        JoinEntity joinEntity = new JoinEntity(Order.class, 1L);
         assertThat(joinEntity.getJoinEntityData())
-                .extracting("fetchType", "tableName", "joinColumnName", "alias")
-                .containsExactly(tuple(FetchType.EAGER, "order_items", "order_id", "order_items_"));
+                .extracting("tableName", "joinColumnName", "alias")
+                .containsExactly(tuple("order_items", "order_id", "order_items_"));
     }
 
     @DisplayName("@OneToMany 관계가 포함되어있는 Class를 입력받아 JoinEntity를 생성한다.")
@@ -29,10 +27,10 @@ class JoinEntityTest {
     void createJoinEntityInputInstanceTest() {
         Order order = new Order(1L, "1234", List.of(createOrderItem(1, 1L)));
 
-        JoinEntity joinEntity = new JoinEntity(order);
+        JoinEntity joinEntity = new JoinEntity(order, 1L);
         assertThat(joinEntity.getJoinEntityData())
-                .extracting("fetchType", "tableName", "joinColumnName", "alias")
-                .containsExactly(tuple(FetchType.EAGER, "order_items", "order_id", "order_items_"));
+                .extracting("tableName", "joinColumnName", "alias")
+                .containsExactly(tuple("order_items", "order_id", "order_items_"));
     }
 
     private OrderItem createOrderItem(int i, Long orderId) {
