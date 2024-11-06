@@ -1,28 +1,31 @@
 package builder.dml;
 
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
+import util.StringUtil;
 
 public class JoinEntityData {
 
-    private final FetchType fetchType;
     private final String tableName;
     private final String joinColumnName;
+    private final Object joinColumnValue;
     private final EntityColumn joinColumnData;
     private final String alias;
+    private Class<?> clazz;
 
-    public JoinEntityData(FetchType fetchType, Class<?> clazz, String joinColumnName) {
-        this.fetchType = fetchType;
+    public JoinEntityData(Class<?> clazz, String joinColumnName, Object joinColumnValue) {
+        this.clazz = clazz;
         this.tableName = getTableName(clazz);
         this.joinColumnName = joinColumnName;
+        this.joinColumnValue = joinColumnValue;
         this.joinColumnData = new EntityColumn(clazz);
         this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
 
-    public <T> JoinEntityData(FetchType fetchType, T entityInstance, String joinColumnName) {
-        this.fetchType = fetchType;
+    public <T> JoinEntityData(T entityInstance, String joinColumnName, Object joinColumnValue) {
+        this.clazz = entityInstance.getClass();
         this.tableName = getTableName(entityInstance.getClass());
         this.joinColumnName = joinColumnName;
+        this.joinColumnValue = joinColumnValue;
         this.joinColumnData = new EntityColumn(entityInstance, entityInstance.getClass());
         this.alias = QueryBuildUtil.getAlias(this.tableName);
     }
@@ -41,6 +44,14 @@ public class JoinEntityData {
 
     public String getAlias() {
         return alias;
+    }
+
+    public Class<?> getClazz() {
+        return clazz;
+    }
+
+    public String wrapString() {
+        return (this.joinColumnValue instanceof String) ? StringUtil.wrapSingleQuote(this.joinColumnValue) : String.valueOf(this.joinColumnValue);
     }
 
     private String getTableName(Class<?> entityClass) {

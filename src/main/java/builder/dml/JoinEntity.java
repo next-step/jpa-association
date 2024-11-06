@@ -15,15 +15,16 @@ public class JoinEntity {
     private static final String GET_FIELD_VALUE_ERROR_MESSAGE = "필드 값을 가져오는 중 에러가 발생했습니다.";
     private final List<JoinEntityData> joinEntityData = new ArrayList<>();
     private JoinStatus joinStatus;
+    private FetchType fetchType;
 
-    public <T> JoinEntity(T entityInstance) {
+    public <T> JoinEntity(T entityInstance, Object joinColumnValue) {
         this.joinStatus = JoinStatus.FALSE;
-        getInstanceColumnData(entityInstance);
+        getInstanceColumnData(entityInstance, joinColumnValue);
     }
 
-    public JoinEntity(Class<?> clazz) {
+    public JoinEntity(Class<?> clazz, Object joinColumnValue) {
         this.joinStatus = JoinStatus.FALSE;
-        getEntityColumnData(clazz);
+        getEntityColumnData(clazz, joinColumnValue);
     }
 
     public List<JoinEntityData> getJoinEntityData() {
@@ -34,22 +35,38 @@ public class JoinEntity {
         return this.joinStatus.isTrue();
     }
 
-    private <T> void getInstanceColumnData(T entityInstance) {
+    public boolean checkFetchEager() {
+        return this.fetchType == FetchType.EAGER;
+    }
+
+    public JoinEntityData findJoinEntityData(Class<?> clazz) {
+        return this.joinEntityData.stream()
+                .filter(entityData -> entityData.getClazz() == clazz)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void changeFetchType(FetchType fetchType) {
+        this.fetchType = fetchType;
+    }
+
+    private <T> void getInstanceColumnData(T entityInstance, Object joinColumnValue) {
         for (Field field : entityInstance.getClass().getDeclaredFields()) {
-            createDMLInstanceColumnData(field, entityInstance);
+            createDMLInstanceColumnData(field, entityInstance, joinColumnValue);
         }
     }
 
-    private void getEntityColumnData(Class<?> entityClass) {
+    private void getEntityColumnData(Class<?> entityClass, Object joinColumnName) {
         for (Field field : entityClass.getDeclaredFields()) {
-            createDMLEntityColumnData(field);
+            createDMLEntityColumnData(field, joinColumnName);
         }
     }
 
-    private <T> void createDMLInstanceColumnData(Field field, T entityInstance) {
+    private <T> void createDMLInstanceColumnData(Field field, T entityInstance, Object joinColumnValue) {
         if (field.isAnnotationPresent(OneToMany.class)) {
             OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-            FetchType fetchType = oneToMany.fetch();
+            changeFetchType(oneToMany.fetch());
+
 
             JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
             field.setAccessible(true);
@@ -61,22 +78,22 @@ public class JoinEntity {
             }
 
             relatedEntities.forEach(object -> {
-                        this.joinEntityData.add(new JoinEntityData(fetchType, object, joinColumn.name()));
-                        joinStatus = JoinStatus.TRUE;
-                    });
+                this.joinEntityData.add(new JoinEntityData(object, joinColumn.name(), joinColumnValue));
+                joinStatus = JoinStatus.TRUE;
+            });
         }
     }
 
-    private void createDMLEntityColumnData(Field field) {
+    private void createDMLEntityColumnData(Field field, Object joinColumnValue) {
         if (field.isAnnotationPresent(OneToMany.class)) {
             OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-            FetchType fetchType = oneToMany.fetch();
+            changeFetchType(oneToMany.fetch());
 
             JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
 
             Type type = field.getGenericType();
             Type[] types = ((ParameterizedType) type).getActualTypeArguments();
-            this.joinEntityData.add(new JoinEntityData(fetchType, (Class<?>) types[0], joinColumn.name()));
+            this.joinEntityData.add(new JoinEntityData((Class<?>) types[0], joinColumn.name(), joinColumnValue));
             joinStatus = JoinStatus.TRUE;
         }
     }
