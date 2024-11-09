@@ -1,6 +1,7 @@
 package persistence.sql.dml;
 
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import persistence.sql.exception.ExceptionMessage;
 import persistence.sql.exception.RequiredObjectException;
@@ -42,6 +43,7 @@ public class InsertQuery {
         return Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(GeneratedValue.class))
+                .filter(field -> !field.isAnnotationPresent(OneToMany.class))
                 .map(field -> new EntityColumnName(field).getValue())
                 .collect(Collectors.joining(", "));
     }
@@ -50,6 +52,7 @@ public class InsertQuery {
         return Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
                 .filter(field -> !field.isAnnotationPresent(GeneratedValue.class))
+                .filter(field -> !field.isAnnotationPresent(OneToMany.class))
                 .map(field -> getValueInClause(object, field))
                 .collect(Collectors.joining(", "));
     }

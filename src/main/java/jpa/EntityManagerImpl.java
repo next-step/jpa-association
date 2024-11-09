@@ -1,5 +1,9 @@
 package jpa;
 
+import persistence.sql.entity.EntityJoin;
+
+import java.util.Collection;
+
 public class EntityManagerImpl implements EntityManager {
     private final EntityPersister entityPersister;
     private final PersistenceContext persistenceContext;
@@ -31,7 +35,18 @@ public class EntityManagerImpl implements EntityManager {
         T insertedEntity = entityPersister.insert(entity);
         persistenceContext.add(entity);
         persistenceContext.createDatabaseSnapshot(entity);
+
+        persistJoinEntity(entity);
+
         return insertedEntity;
+    }
+
+    private <T> void persistJoinEntity(T entity) {
+        EntityJoin entityJoin = new EntityJoin(entity.getClass());
+        entityJoin.getEntityJoinInfos().forEach(entityJoinInfo -> {
+            Collection<?> entityJoinCollections = entityJoinInfo.getEntityJoinCollections(entity);
+            entityJoinCollections.forEach(this::persist);
+        });
     }
 
     @Override

@@ -1,9 +1,6 @@
 package persistence.sql.ddl;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import persistence.sql.Dialect;
 import persistence.sql.exception.ExceptionMessage;
 import persistence.sql.exception.RequiredFieldException;
@@ -42,6 +39,7 @@ public class DDLColumn {
         this.fields = new ArrayList<>(Arrays.asList(fields))
                 .stream()
                 .filter(field -> !field.isAnnotationPresent(Transient.class))
+                .filter(field -> !field.isAnnotationPresent(OneToMany.class))
                 .collect(Collectors.toList());
     }
 

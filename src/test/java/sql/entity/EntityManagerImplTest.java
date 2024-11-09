@@ -9,6 +9,8 @@ import persistence.sql.H2Dialect;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.Person;
 import persistence.sql.ddl.QueryBuilder;
+import persistence.sql.entity.Order;
+import persistence.sql.entity.OrderItem;
 import persistence.sql.model.EntityColumnValue;
 import sql.ddl.JdbcServerExtension;
 import sql.ddl.JdbcServerTest;
@@ -30,6 +32,12 @@ class EntityManagerImplTest {
     static void init() {
         QueryBuilder createQueryBuilder = new CreateQueryBuilder(Person.class, dialect);
         jdbcTemplate.execute(createQueryBuilder.build());
+
+        QueryBuilder orderCreateQueryBuilder = new CreateQueryBuilder(Order.class, dialect);
+        jdbcTemplate.execute(orderCreateQueryBuilder.build());
+
+        QueryBuilder orderItemCreateQueryBuilder = new CreateQueryBuilder(OrderItem.class, dialect);
+        jdbcTemplate.execute(orderItemCreateQueryBuilder.build());
     }
 
     @Test
@@ -90,5 +98,25 @@ class EntityManagerImplTest {
         Person dirtyCheckedPerson = newEntityManager.find(Person.class, savedPerson.getId());
 
         assertThat(dirtyCheckedPerson.getEmail()).isEqualTo(updatedEmail);
+    }
+
+    @Test
+    void test() {
+        Order order = new Order("orderNumber");
+
+        OrderItem orderItem1 = new OrderItem("product", 1);
+        OrderItem orderItem2 = new OrderItem("product2", 1);
+
+        order.getOrderItems().add(orderItem1);
+        order.getOrderItems().add(orderItem2);
+
+        entityManager.persist(order);
+
+        EntityPersister entityPersister = new EntityPersisterImpl(jdbcTemplate);
+        EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
+        EntityManager entityManagers = new EntityManagerImpl(entityPersister, entityLoader);
+
+        Order order1 = entityManagers.find(Order.class, 1L);
+        System.out.println("das");
     }
 }

@@ -7,6 +7,7 @@ import persistence.sql.H2Dialect;
 import persistence.sql.ddl.CreateQueryBuilder;
 import persistence.sql.ddl.Person;
 import persistence.sql.ddl.QueryBuilder;
+import persistence.sql.entity.Order;
 import persistence.sql.exception.ExceptionMessage;
 import persistence.sql.exception.RequiredClassException;
 
@@ -30,5 +31,12 @@ class H2CreateQueryBuilderTest {
         assertThatThrownBy(() -> new CreateQueryBuilder(null, dialect))
                 .isInstanceOf(RequiredClassException.class)
                 .hasMessage(ExceptionMessage.REQUIRED_CLASS.getMessage());
+    }
+    
+    @Test
+    void test() {
+        QueryBuilder orderCreateQueryBuilder = new CreateQueryBuilder(Order.class, dialect);
+        String sql = orderCreateQueryBuilder.build();
+        System.out.println("sql = " + sql);
     }
 }

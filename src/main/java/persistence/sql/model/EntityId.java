@@ -42,4 +42,9 @@ public class EntityId {
         Field idField = getIdField();
         return idField.getType();
     }
+
+    public String getIdColumnName() {
+        Field idField = getIdField();
+        return new EntityColumnName(idField).getValue();
+    }
 }

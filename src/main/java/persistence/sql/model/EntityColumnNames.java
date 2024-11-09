@@ -1,6 +1,8 @@
 package persistence.sql.model;
 
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import persistence.sql.exception.ExceptionMessage;
 import persistence.sql.exception.RequiredClassException;
@@ -15,6 +17,7 @@ public class EntityColumnNames {
 
     private final List<EntityColumnName> entityColumnNames;
     private final Class<?> clazz;
+    private final String alias;
 
     public EntityColumnNames(Class<?> clazz) {
         if (clazz == null) {
@@ -23,14 +26,17 @@ public class EntityColumnNames {
 
         this.clazz = clazz;
         this.entityColumnNames = Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> !field.isAnnotationPresent(Transient.class))
+                .filter(
+                        field -> !field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(OneToMany.class)
+                )
                 .map(EntityColumnName::new)
                 .collect(Collectors.toList());
+        this.alias = new TableName(clazz).getAlias();
     }
 
     public String getColumnNames() {
         return this.entityColumnNames.stream()
-                .map(EntityColumnName::getValue)
+                .map(entityColumnName -> String.format("%s.%s", this.alias, entityColumnName.getValue()))
                 .collect(Collectors.joining(", "));
     }
 

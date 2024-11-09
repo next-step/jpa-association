@@ -6,6 +6,7 @@ import persistence.sql.exception.RequiredClassException;
 
 public class TableName {
     private final String value;
+    private final String alias;
 
     public TableName(Class<?> clazz) {
         if (clazz == null) {
@@ -13,6 +14,7 @@ public class TableName {
         }
 
         this.value = getTableName(clazz);
+        this.alias = getTableName(clazz).toLowerCase();
     }
 
     private String getTableName(Class<?> clazz) {
@@ -31,4 +33,9 @@ public class TableName {
     public String getValue() {
         return this.value;
     }
+
+    public String getAlias() {
+        return alias;
+    }
+
 }

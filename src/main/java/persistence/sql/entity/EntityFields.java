@@ -33,5 +33,10 @@ public class EntityFields {
                 .collect(Collectors.toList());
     }
 
+    public String getIdFieldName() {
+        return getIdFields().get(0).getName();
+    }
+
+
 
 }
