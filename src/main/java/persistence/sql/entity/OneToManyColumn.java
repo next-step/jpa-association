@@ -7,13 +7,15 @@ import java.lang.reflect.ParameterizedType;
 
 public class OneToManyColumn {
     private final Field field;
+    private Class<?> joinEntityClass;
 
     public OneToManyColumn(Field field) {
         this.field = field;
+        this.joinEntityClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
     }
 
     public Class<?> getJoinEntityClass() {
-        return (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+        return joinEntityClass;
     }
 
     public String getForeignKeyColumnName() {

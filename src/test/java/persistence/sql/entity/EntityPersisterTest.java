@@ -86,10 +86,10 @@ class EntityPersisterTest {
         List<OrderItem> selectResult = jdbcTemplate.query(selectQuery, new EntityRowMapper<>(OrderItem.class));
 
         assertThat(selectResult).hasSize(2);
-        assertThat(selectResult.get(0).getProduct()).isEqualTo(orderItem1.getProduct());
-        assertThat(selectResult.get(0).getQuantity()).isEqualTo(orderItem1.getQuantity());
-        assertThat(selectResult.get(1).getProduct()).isEqualTo(orderItem2.getProduct());
-        assertThat(selectResult.get(1).getQuantity()).isEqualTo(orderItem2.getQuantity());
+        assertThat(selectResult.get(0).getProduct()).isEqualTo("감자");
+        assertThat(selectResult.get(0).getQuantity()).isEqualTo(3);
+        assertThat(selectResult.get(1).getProduct()).isEqualTo("고구마");
+        assertThat(selectResult.get(1).getQuantity()).isEqualTo(1);
 
         jdbcTemplate.execute("drop table order_items");
         jdbcTemplate.execute("drop table orders");
