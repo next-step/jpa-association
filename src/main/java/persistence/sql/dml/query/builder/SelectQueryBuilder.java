@@ -4,7 +4,9 @@ import static persistence.sql.dml.query.WhereClauseGenerator.whereClause;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import persistence.meta.SchemaMeta;
 import persistence.sql.dml.query.WhereCondition;
+import persistence.sql.dml.query.WhereOperator;
 
 public class SelectQueryBuilder {
 
@@ -20,6 +22,14 @@ public class SelectQueryBuilder {
 
     public static SelectQueryBuilder builder() {
         return new SelectQueryBuilder();
+    }
+
+    public static SelectQueryBuilder builder(SchemaMeta schemaMeta, Object id) {
+        SelectQueryBuilder builder = new SelectQueryBuilder();
+        builder.select(schemaMeta.columnNamesWithoutRelation(), schemaMeta.tableName())
+                .from(schemaMeta.tableName())
+                .where(List.of(new WhereCondition(schemaMeta.primaryKeyColumnName(), WhereOperator.EQUAL, id)));
+        return builder;
     }
 
     public String build() {

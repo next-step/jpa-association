@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import persistence.meta.ColumnMeta;
+import persistence.meta.RelationMeta;
+import persistence.meta.SchemaMeta;
 import persistence.meta.TableMeta;
+import persistence.meta.store.ObjectValueMetas;
 import persistence.sql.ddl.type.ColumnType;
 
 public class InsertQueryBuilder {
@@ -21,6 +24,27 @@ public class InsertQueryBuilder {
 
     public static InsertQueryBuilder builder() {
         return new InsertQueryBuilder();
+    }
+
+    public static InsertQueryBuilder builder(Object entity) {
+        SchemaMeta schemaMeta = new SchemaMeta(entity);
+        List<ColumnMeta> columnMetas = schemaMeta.columnMetasHasNotRelation();
+        List<Object> objectValues = ObjectValueMetas.values(columnMetas, entity);
+
+        InsertQueryBuilder builder = new InsertQueryBuilder();
+        return builder.insert(schemaMeta.tableMeta(), columnMetas)
+                .values(objectValues);
+    }
+
+    public static InsertQueryBuilder builder(Object entity, RelationMeta relationMeta, List<Object> relationValues) {
+        SchemaMeta relatedSchemaMeta = new SchemaMeta(entity);
+
+        List<ColumnMeta> columnMetas = relatedSchemaMeta.columnMetasHasNotRelation();
+        List<Object> objectValues = ObjectValueMetas.valuesWithoutPrimaryKey(columnMetas, entity);
+
+        InsertQueryBuilder builder = new InsertQueryBuilder();
+        return builder.insert(relationMeta.joinTableName(), relatedSchemaMeta.columnNamesWithoutPrimaryKey(), List.of(relationMeta.joinColumnName()))
+                .values(objectValues, relationValues);
     }
 
     public String build() {

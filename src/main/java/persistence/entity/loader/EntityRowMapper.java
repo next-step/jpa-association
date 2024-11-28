@@ -2,6 +2,7 @@ package persistence.entity.loader;
 
 import static persistence.validator.AnnotationValidator.notPredicate;
 
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -44,6 +45,7 @@ public class EntityRowMapper<T> implements RowMapper<T> {
     private void mapFields(Object object, ResultSet resultSet) {
         Arrays.stream(object.getClass().getDeclaredFields())
                 .filter(notPredicate(Transient.class))
+                .filter(notPredicate(OneToMany.class))
                 .forEach(field -> mapField(object, field, resultSet));
     }
 

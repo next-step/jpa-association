@@ -18,7 +18,7 @@ public record SchemaMeta(Class<?> clazz,
                 clazz,
                 Arrays.stream(clazz.getDeclaredFields())
                         .filter(field -> isNotPresent(field, Transient.class))
-                        .map(field -> new ColumnMeta(field))
+                        .map(ColumnMeta::new)
                         .toList(),
                 Collections.emptyList(),
                 new TableMeta(clazz),
@@ -31,7 +31,7 @@ public record SchemaMeta(Class<?> clazz,
                 instance.getClass(),
                 Arrays.stream(instance.getClass().getDeclaredFields())
                         .filter(field -> isNotPresent(field, Transient.class))
-                        .map(field -> new ColumnMeta(field))
+                        .map(ColumnMeta::new)
                         .toList(),
                 Arrays.stream(instance.getClass().getDeclaredFields())
                         .filter(field -> isNotPresent(field, Transient.class))
@@ -67,12 +67,6 @@ public record SchemaMeta(Class<?> clazz,
                 .toList();
     }
 
-    public List<Object> columnValues() {
-        return columnValueMetas.stream()
-                .map(ColumnValueMeta::value)
-                .toList();
-    }
-
     public List<String> columnNamesWithoutPrimaryKey() {
         return columnMetas.stream()
                 .filter(ColumnMeta::isNotPrimaryKey)
@@ -87,8 +81,16 @@ public record SchemaMeta(Class<?> clazz,
                 .toList();
     }
 
+    public List<Object> columnValuesMatchWith(List<ColumnMeta> columnMetas, Object instance) {
+        return columnMetas.stream()
+                .map(columnMeta -> ColumnValueMeta.of(columnMeta.field(), instance))
+                .map(ColumnValueMeta::value)
+                .toList();
+    }
+
     public List<ColumnMeta> columnMetasHasRelation() {
         return columnMetas.stream()
+                .filter(ColumnMeta::isNotPrimaryKey)
                 .filter(columnMeta -> columnMeta.relationMeta().hasRelation())
                 .toList();
     }
@@ -97,6 +99,13 @@ public record SchemaMeta(Class<?> clazz,
         return columnMetas.stream()
                 .filter(ColumnMeta::isNotPrimaryKey)
                 .filter(columnMeta -> columnMeta.relationMeta().hasNotRelation())
+                .toList();
+    }
+
+    public List<String> columnNamesWithoutRelation() {
+        return columnMetas.stream()
+                .filter(columnMeta -> columnMeta.relationMeta().hasNotRelation())
+                .map(ColumnMeta::name)
                 .toList();
     }
 

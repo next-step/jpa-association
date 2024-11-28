@@ -29,3 +29,14 @@
 ### 구현 기능 목록
 - [ ] 소문자를 대문자로 캐스팅하는 Proxy 구현
 - [ ] Proxy 를 활용하여 LazyLoadingHandler 구현
+
+# 3단계 - OneToMany (FetchType.LAZY)
+- 미션의 목표
+  - 프록시를 사용하여 지연 로딩 구현하기
+  - FetchType 에 따라 어떻게 분기 처리를 해야 할지 고민하기 -> Proxy 를 활용하는 경우와 아닌 경우
+- 요구 사항 1 - 로딩 전략에 따른 분기 (FetchType.LAZY)
+- 요구 사항 2 - Proxy 를 활용한 지연 로딩 구현
+
+### 구현 기능 목록
+- [ ] FetchType.EAGER & FetchType.LAZY 모두 처리 가능하도록 구현
+- [ ] Proxy 를 활용해서 FetchType.LAZY 처리 구현

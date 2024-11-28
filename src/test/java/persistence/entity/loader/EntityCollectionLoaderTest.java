@@ -23,6 +23,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import persistence.entity.persister.DefaultEntityPersister;
 import persistence.entity.persister.EntityPersister;
+import persistence.meta.ColumnMeta;
+import persistence.meta.SchemaMeta;
 
 class EntityCollectionLoaderTest {
 
@@ -57,16 +59,18 @@ class EntityCollectionLoaderTest {
         EntityPersister persister = new DefaultEntityPersister(jdbcTemplate);
         persister.insert(parent);
 
+        SchemaMeta schemaMeta = new SchemaMeta(parent);
+        List<ColumnMeta> columnMetas = schemaMeta.columnMetasHasRelation();
+
         EntityCollectionLoader collectionLoader = new EntityCollectionLoader(jdbcTemplate);
-        Parent loadParent = collectionLoader.loadCollection(Parent.class, parent);
+        ColumnMeta columnMeta = columnMetas.get(0);
+        List<Child> loadChildren = collectionLoader.load(Child.class, columnMeta.field(), 1L);
 
         assertAll("연관관계 엔티티 조회 검증",
-                () -> assertThat(loadParent.name).isEqualTo("parent"),
-                () -> assertThat(loadParent.id).isEqualTo(1L),
-                () -> assertThat(loadParent.children.get(0).name).isEqualTo("childA"),
-                () -> assertThat(loadParent.children.get(0).id).isEqualTo(1L),
-                () -> assertThat(loadParent.children.get(1).name).isEqualTo("childB"),
-                () -> assertThat(loadParent.children.get(1).id).isEqualTo(2L)
+                () -> assertThat(loadChildren.get(0).name).isEqualTo("childA"),
+                () -> assertThat(loadChildren.get(0).id).isEqualTo(1L),
+                () -> assertThat(loadChildren.get(1).name).isEqualTo("childB"),
+                () -> assertThat(loadChildren.get(1).id).isEqualTo(2L)
         );
 
     }
