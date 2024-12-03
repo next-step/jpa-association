@@ -2,6 +2,8 @@ package persistence.entity;
 
 import database.DatabaseServer;
 import database.H2;
+import example.entity.Order;
+import example.entity.OrderItem;
 import example.entity.Person;
 import jdbc.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import persistence.EntityScanner;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class EntityManagerImplTest {
     private static final Logger logger = LoggerFactory.getLogger(EntityManagerImplTest.class);
@@ -167,5 +170,33 @@ public class EntityManagerImplTest {
         logger.debug("(5) find after transaction commit...");
         EntityLoader entityLoader = new EntityLoader(jdbcTemplate);
         Assertions.assertThrows(RuntimeException.class, () -> entityLoader.find(Person.class, 1L));
+    }
+
+    @Test
+    @DisplayName("test")
+    void test() {
+        EntityManagerImpl entityManagerImpl = new EntityManagerImpl(jdbcTemplate);
+        entityManagerImpl.beginTransaction();
+
+        Order insertingOrder = new Order();
+        insertingOrder.setOrderNumber(UUID.randomUUID().toString());
+
+        OrderItem insertingOrderItem1 = new OrderItem();
+        insertingOrderItem1.setProduct("P-001");
+        insertingOrderItem1.setQuantity(10);
+        insertingOrderItem1.setOrderId(1L);
+
+        OrderItem insertingOrderItem2 = new OrderItem();
+        insertingOrderItem2.setProduct("P-002");
+        insertingOrderItem2.setQuantity(15);
+        insertingOrderItem2.setOrderId(1L);
+
+        entityManagerImpl.persist(insertingOrder);
+        entityManagerImpl.persist(insertingOrderItem1);
+        entityManagerImpl.persist(insertingOrderItem2);
+
+        Object o = entityManagerImpl.find(Order.class, 1L);
+
+        logger.debug("{}", o);
     }
 }

@@ -28,7 +28,7 @@ public class InsertQueryBuilder {
     private static String columnClause(Class<?> clazz) {
         StringBuilder stringBuilder = new StringBuilder(" (");
 
-        Field[] managedFields = EntityUtils.getManagedFields(clazz);
+        Field[] managedFields = EntityUtils.getManagedFieldsExceptId(clazz);
         for (Field field : managedFields) {
             stringBuilder
                     .append(NameUtils.getColumnName(field))
@@ -45,10 +45,14 @@ public class InsertQueryBuilder {
         StringBuilder stringBuilder = new StringBuilder("(");
 
         Class<?> clazz = entity.getClass();
-        Field[] fields = EntityUtils.getManagedFields(clazz);
+        Field[] fields = EntityUtils.getManagedFieldsExceptId(clazz);
         for (Field field : fields) {
             field.setAccessible(true);
             Object fieldValue = EntityUtils.getFieldValue(field, entity);
+            if (fieldValue == null) {
+                stringBuilder.append("null, ");
+                continue;
+            }
             stringBuilder
                     .append("'")
                     .append(fieldValue)

@@ -1,5 +1,6 @@
 package jdbc;
 
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,8 @@ public class EntityRowMapper<T> implements RowMapper<T> {
             T entity = this.entityClass.getDeclaredConstructor().newInstance();
 
             for (Field field : this.entityClass.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Transient.class)) {
+                if (field.isAnnotationPresent(Transient.class)
+                        || field.isAnnotationPresent(JoinColumn.class)) {
                     continue;
                 }
                 field.setAccessible(true);

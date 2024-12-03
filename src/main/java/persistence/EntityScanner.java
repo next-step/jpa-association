@@ -1,9 +1,9 @@
 package persistence;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.entity.EntityUtils;
 import persistence.sql.NameUtils;
 import persistence.sql.ddl.create.CreateQueryBuilder;
 import persistence.sql.ddl.create.component.column.ColumnComponentBuilder;
@@ -77,12 +77,9 @@ public class EntityScanner {
     }
 
     private String generateDdlCreateQuery(Class<?> entityClass) {
-        Field[] fields = entityClass.getDeclaredFields();
         CreateQueryBuilder queryBuilder = CreateQueryBuilder.newInstance();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Transient.class)) {
-                continue;
-            }
+
+        for (Field field : EntityUtils.getManagedFields(entityClass)) {
             queryBuilder.add(ColumnComponentBuilder.from(field));
             queryBuilder.add(ConstraintComponentBuilder.from(field));
         }

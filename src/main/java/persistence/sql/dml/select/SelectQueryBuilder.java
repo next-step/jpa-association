@@ -1,47 +1,46 @@
 package persistence.sql.dml.select;
 
-import jakarta.persistence.Id;
-import persistence.sql.NameUtils;
+import persistence.sql.component.ColumnInfo;
+import persistence.sql.component.Condition;
+import persistence.sql.component.JoinCondition;
+import persistence.sql.component.TableInfo;
 
-import java.lang.reflect.Field;
+import java.util.List;
 
 public class SelectQueryBuilder {
-    private SelectQueryBuilder() {
+    private List<ColumnInfo> selectColumnInfos;
+    private TableInfo fromTableInfo;
+    private Condition whereCondition;
+    private List<JoinCondition> joinConditions;
+
+    public SelectQueryBuilder selectColumnInfos(List<ColumnInfo> selectColumnInfos) {
+        this.selectColumnInfos = selectColumnInfos;
+        return this;
     }
 
-    public static String generateQuery(Class<?> entityClass) {
-        String tableName = NameUtils.getTableName(entityClass);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder
-                .append("select * from ")
-                .append(tableName)
-                .append(";");
-        return stringBuilder.toString();
+    public SelectQueryBuilder fromTableInfo(TableInfo fromTableInfo) {
+        this.fromTableInfo = fromTableInfo;
+        return this;
     }
 
-    public static String generateQuery(Class<?> entityClass, Long id) {
-        String tableName = NameUtils.getTableName(entityClass);
-        String idColumnName = NameUtils.getColumnName(getIdColumn(entityClass));
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder
-                .append("select * from ")
-                .append(tableName)
-                .append(" where ")
-                .append(idColumnName)
-                .append(" = ")
-                .append(id.toString())
-                .append(";");
-        return stringBuilder.toString();
+    public SelectQueryBuilder whereCondition(Condition whereCondition) {
+        this.whereCondition = whereCondition;
+        return this;
     }
 
-    private static Field getIdColumn(Class<?> entityClass) {
-        for (Field field : entityClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class)) {
-                return field;
-            }
+    public SelectQueryBuilder joinConditions(List<JoinCondition> joinConditions) {
+        this.joinConditions = joinConditions;
+        return this;
+    }
+
+    public SelectQuery build() {
+        SelectQuery selectQuery = new SelectQuery(fromTableInfo, whereCondition);
+        if (joinConditions != null) {
+            selectQuery.setJoinConditions(joinConditions);
         }
-        throw new IllegalArgumentException("Inappropriate entity class!");
+        if (selectColumnInfos != null) {
+            selectQuery.setSelectColumnInfos(selectColumnInfos);
+        }
+        return selectQuery;
     }
 }

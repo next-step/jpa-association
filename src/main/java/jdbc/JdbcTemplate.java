@@ -1,5 +1,8 @@
 package jdbc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -7,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTemplate {
+    private static final Logger logger = LoggerFactory.getLogger(JdbcTemplate.class);
     private final Connection connection;
 
     public JdbcTemplate(final Connection connection) {
@@ -19,6 +23,7 @@ public class JdbcTemplate {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        logger.debug("executed query : {}", sql);
     }
 
     public Long executeAndReturnGeneratedKey(final String sql) {
@@ -32,6 +37,7 @@ public class JdbcTemplate {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        logger.debug("executed query : {}", sql);
         return null;
     }
 
@@ -40,10 +46,11 @@ public class JdbcTemplate {
         if (results.size() != 1) {
             throw new RuntimeException("Expected 1 result, got " + results.size());
         }
+        logger.debug("executed query : {}", sql);
         return results.get(0);
     }
 
-    public <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
+    private <T> List<T> query(final String sql, final RowMapper<T> rowMapper) {
         try (final ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             final List<T> result = new ArrayList<>();
             while (resultSet.next()) {

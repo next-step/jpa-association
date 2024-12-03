@@ -3,6 +3,7 @@ package persistence.entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Transient;
 
 import java.lang.reflect.Field;
@@ -25,15 +26,25 @@ public class EntityUtils {
                 .toArray(Field[]::new);
     }
 
+    public static Field[] getManagedFieldsExceptId(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(EntityUtils::isManagedField)
+                .filter(field -> !field.isAnnotationPresent(Id.class))
+                .toArray(Field[]::new);
+    }
+
     private static boolean isManagedField(Field field) {
         if (field.isAnnotationPresent(Transient.class)) {
             return false;
         }
-        if (field.isAnnotationPresent(Id.class)
-                && field.isAnnotationPresent(GeneratedValue.class)
-                && GenerationType.IDENTITY.equals(field.getAnnotation(GeneratedValue.class).strategy())) {
+        if (field.isAnnotationPresent(JoinColumn.class)) {
             return false;
         }
+//        if (field.isAnnotationPresent(Id.class)
+//                && field.isAnnotationPresent(GeneratedValue.class)
+//                && GenerationType.IDENTITY.equals(field.getAnnotation(GeneratedValue.class).strategy())) {
+//            return false;
+//        }
         return true;
     }
 
